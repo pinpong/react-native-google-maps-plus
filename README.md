@@ -5,19 +5,14 @@ React-native wrapper for android & IOS google maps sdk
 ## Installation
 
 ```sh
-npm install react-native-google-maps-plus react-native-nitro-modules
+yarn add react-native-google-maps-plus react-native-nitro-modules
 
 > `react-native-nitro-modules` is required as this library relies on [Nitro Modules](https://nitro.margelo.com/).
 ```
 
 ## Usage
 
-```js
-import { GoogleMapsNitroView } from 'react-native-google-maps-plus';
-
-// ...
-<GoogleMapsNitroView color="tomato" />;
-```
+Checkout the example app in the [example](./example) folder.
 
 ## Contributing
 
