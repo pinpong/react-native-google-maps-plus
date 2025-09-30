@@ -1,0 +1,4 @@
+LocationNotAvailableTitle = "Location not available";
+LocationNotAvailableMessage = "Please check your location settings.";
+OpenLocationAlertButton = "Open settings";
+CancelButton = "Cancel";

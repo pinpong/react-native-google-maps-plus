@@ -1,0 +1,4 @@
+LocationNotAvailableTitle = "Standort nicht verfügbar";
+LocationNotAvailableMessage = "Bitte prüfe die Standort-Einstellungen.";
+OpenLocationAlertButton = "Einstellungen öffnen";
+CancelButton = "Abbrechen";

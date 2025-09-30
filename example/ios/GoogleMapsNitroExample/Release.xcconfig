@@ -1,0 +1,2 @@
+#include "Pods/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample.release.xcconfig"
+#include "Secrets.xcconfig"

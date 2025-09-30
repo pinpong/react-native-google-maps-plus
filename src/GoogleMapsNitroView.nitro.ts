@@ -1,0 +1,78 @@
+import type {
+  HybridView,
+  HybridViewMethods,
+  HybridViewProps,
+} from 'react-native-nitro-modules';
+import type {
+  RNCamera,
+  RNLatLng,
+  RNMapPadding,
+  RNPolygon,
+  RNPolyline,
+  RNUserInterfaceStyle,
+  RNLocationErrorCode,
+  RNMarker,
+  RNLocationPermissionResult,
+  RNRegion,
+  RNLocation,
+  RNMapErrorCode,
+} from './types';
+
+export interface GoogleMapsNitroViewProps extends HybridViewProps {
+  buildingEnabled: boolean;
+  trafficEnabled: boolean;
+  customMapStyle: string;
+  initialCamera: RNCamera;
+  userInterfaceStyle: RNUserInterfaceStyle;
+  minZoomLevel: number;
+  maxZoomLevel: number;
+  mapPadding: RNMapPadding;
+  markers: RNMarker[];
+  polygons: RNPolygon[];
+  polylines: RNPolyline[];
+  onMapError?: (error: RNMapErrorCode) => void;
+  onMapReady?: (ready: boolean) => void;
+  onLocationUpdate?: (location: RNLocation) => void;
+  onLocationError?: (error: RNLocationErrorCode) => void;
+  onMapPress?: (coordinate: RNLatLng) => void;
+  onMarkerPress?: (id: string) => void;
+  onCameraChangeStart?: (
+    region: RNRegion,
+    camera: RNCamera,
+    isGesture: boolean
+  ) => void;
+  onCameraChange?: (
+    region: RNRegion,
+    camera: RNCamera,
+    isGesture: boolean
+  ) => void;
+  onCameraChangeComplete?: (
+    region: RNRegion,
+    camera: RNCamera,
+    isGesture: boolean
+  ) => void;
+}
+
+export interface GoogleMapsNitroViewMethods extends HybridViewMethods {
+  setCamera(camera: RNCamera, animated?: boolean, durationMS?: number): void;
+
+  setCameraToCoordinates(
+    coordinates: RNLatLng[],
+    padding?: RNMapPadding,
+    animated?: boolean,
+    durationMS?: number
+  ): void;
+
+  showLocationDialog(): void;
+
+  openLocationSettings(): void;
+
+  requestLocationPermission(): Promise<RNLocationPermissionResult>;
+
+  isGooglePlayServicesAvailable(): boolean;
+}
+
+export type GoogleMapsNitroView = HybridView<
+  GoogleMapsNitroViewProps,
+  GoogleMapsNitroViewMethods
+>;

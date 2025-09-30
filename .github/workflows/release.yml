@@ -1,0 +1,45 @@
+name: release.yml
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-library:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build package
+        run: yarn build
+
+  release:
+    runs-on: macos-latest
+    needs: [build-library]
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build tarball
+        run: |
+          mkdir -p release
+          npm pack --pack-destination release
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn release

@@ -1,0 +1,174 @@
+import type { GoogleMapsNitroViewMethods } from './GoogleMapsNitroView.nitro';
+import type { HybridView } from 'react-native-nitro-modules';
+
+export type GoogleMapsViewRef = HybridView<GoogleMapsNitroViewMethods>;
+
+export type RNLatLng = { latitude: number; longitude: number };
+
+export type RNBoundingBox = { northEast: RNLatLng; southWest: RNLatLng };
+
+export type RNMapPadding = {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+};
+
+export type RNUserInterfaceStyle = 'light' | 'dark' | 'default';
+
+export type RNFeatureType = string;
+
+/*
+  | 'administrative'
+  | 'administrative.country'
+  | 'administrative.land_parcel'
+  | 'administrative.locality'
+  | 'administrative.neighborhood'
+  | 'administrative.province'
+  | 'landscape'
+  | 'landscape.man_made'
+  | 'landscape.natural'
+  | 'poi'
+  | 'poi.attraction'
+  | 'poi.business'
+  | 'poi.government'
+  | 'poi.medical'
+  | 'poi.park'
+  | 'poi.place_of_worship'
+  | 'poi.school'
+  | 'poi.sports_complex'
+  | 'road'
+  | 'road.arterial'
+  | 'road.highway'
+  | 'road.local'
+  | 'transit'
+  | 'transit.line'
+  | 'transit.station'
+  | 'water';
+ */
+
+export type RNElementType = string;
+
+/*
+  | 'all'
+  | 'geometry'
+  | 'geometry.fill'
+  | 'geometry.stroke'
+  | 'labels'
+  | 'labels.icon'
+  | 'labels.text'
+  | 'labels.text.fill'
+  | 'labels.text.stroke'
+ */
+
+export type RNVisibility = string;
+
+/*
+'on' | 'off' | 'simplified';
+ */
+
+export interface RNMapStyler {
+  color?: string;
+  visibility?: RNVisibility;
+  weight?: number;
+  gamma?: number;
+  lightness?: number;
+  saturation?: number;
+  invert_lightness?: boolean;
+}
+
+export interface RNMapStyleElement {
+  featureType?: RNFeatureType;
+  elementType?: RNElementType;
+  stylers: RNMapStyler[];
+}
+
+export type RNCamera = {
+  center?: RNLatLng;
+  zoom?: number;
+  bearing?: number;
+  tilt?: number;
+};
+
+export type RNRegion = {
+  center: RNLatLng;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
+export type RNPosition = {
+  x: number;
+  y: number;
+};
+
+export type RNLineCapType = 'butt' | 'round' | 'square';
+export type RNLineJoinType = 'miter' | 'round' | 'bevel';
+
+export type RNMarker = {
+  id: string;
+  zIndex: number;
+  coordinate: RNLatLng;
+  anchor?: RNPosition;
+  width: number;
+  height: number;
+  iconSvg: string;
+};
+
+export type RNPolygon = {
+  id: string;
+  zIndex: number;
+  coordinates: RNLatLng[];
+  fillColor?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+};
+
+export type RNPolyline = {
+  id: string;
+  zIndex: number;
+  coordinates: RNLatLng[];
+  lineCap?: RNLineCapType;
+  lineJoin?: RNLineJoinType;
+  color?: string;
+  width?: number;
+};
+
+export type RNLocationPermissionResult = {
+  android?: RNAndroidLocationPermissionResult;
+  ios?: RNIOSPermissionResult;
+};
+
+export enum RNAndroidLocationPermissionResult {
+  GRANTED = 1,
+  DENIED = -1,
+  NEVER_ASK_AGAIN = -2,
+}
+
+export enum RNIOSPermissionResult {
+  DENIED = -1,
+  AUTHORIZED = 1,
+}
+
+export type RNLocation = {
+  center: RNLatLng;
+  bearing: number;
+};
+
+export enum RNLocationErrorCode {
+  PERMISSION_DENIED = 1,
+  POSITION_UNAVAILABLE = 2,
+  TIMEOUT = 3,
+  PLAY_SERVICE_NOT_AVAILABLE = 4,
+  SETTINGS_NOT_SATISFIED = 5,
+  INTERNAL_ERROR = -1,
+}
+
+export enum RNMapErrorCode {
+  PLAY_SERVICES_MISSING = 0,
+  PLAY_SERVICES_INVALID = 1,
+  PLAY_SERVICES_DISABLED = 2,
+  PLAY_SERVICES_OUTDATED = 3,
+  PLAY_SERVICE_UPDATE_AVAILABLE = 4,
+  PLAY_SERVICE_UPDATING = 5,
+  UNKNOWN = 6,
+}

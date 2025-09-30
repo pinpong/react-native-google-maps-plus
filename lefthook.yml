@@ -1,0 +1,21 @@
+pre-commit:
+  parallel: false
+  commands:
+    lint-js:
+      glob: '**/*.{js,ts,jsx,tsx}'
+      run: yarn lint:js
+    lint-android:
+      glob: 'android/**/*.{kt,java,xml,gradle}'
+      run: yarn lint:android
+    lint-ios:
+      glob: 'ios/**/*.{h,m,mm,cpp,swift}'
+      run: yarn lint:ios
+    types:
+      glob: '**/*.{ts,tsx}'
+      run: npx tsc --noEmit
+
+commit-msg:
+  parallel: true
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}

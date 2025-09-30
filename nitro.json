@@ -1,0 +1,28 @@
+{
+  "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "cxxNamespace": ["googlemapsnitro"],
+  "ios": {
+    "iosModuleName": "GoogleMapsNitro"
+  },
+  "android": {
+    "androidNamespace": ["googlemapsnitro"],
+    "androidCxxLibName": "GoogleMapsNitro"
+  },
+  "hybridViews": [
+    {
+      "name": "GoogleMapsNitroView",
+      "platforms": ["ios", "android"]
+    }
+  ],
+  "autolinking": {
+    "GoogleMapsNitroView": {
+      "swift": "HybridGoogleMapsNitroView",
+      "kotlin": "HybridGoogleMapsNitroView"
+    },
+    "GoogleMapsNitroModule": {
+      "swift": "HybridGoogleMapsNitroModule",
+      "kotlin": "HybridGoogleMapsNitroModule"
+    }
+  },
+  "ignorePaths": ["**/node_modules"]
+}

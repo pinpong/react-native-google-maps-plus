@@ -1,0 +1,154 @@
+{
+  "name": "react-native-google-maps-plus",
+  "version": "0.1.0",
+  "description": "React-native wrapper for android & IOS google maps sdk",
+  "main": "./lib/module/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "source": "src/index",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "yarn lint:js && yarn lint:android && yarn lint:ios",
+    "lint:js": "eslint . --max-warnings 0 && yarn prettier --check .",
+    "lint:android": "cd android && ktlint -F ./**/*.kt*",
+    "lint:ios": "cd ios && swiftlint --quiet",
+    "format": "yarn format:js && yarn format:ios && yarn format:android",
+    "format:js": "prettier --write .",
+    "format:android": "cd android && ktlint ./**/*.kt*",
+    "format:ios": "cd ios && swiftlint --quiet --fix",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "test": "jest",
+    "git:clean": "git clean -dfX",
+    "release": "semantic-release",
+    "build": "yarn typecheck && yarn nitrogen && bob build",
+    "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/post-script.js",
+    "prepare": "bob build"
+  },
+  "keywords": [
+    "react-native",
+    "react-native-google-maps-plus"
+  ],
+  "files": [
+    "src",
+    "lib",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "react-native.config.js",
+    "nitrogen",
+    "cpp",
+    "nitro.json",
+    "android/build.gradle",
+    "android/fix-prefab.gradle",
+    "android/gradle.properties",
+    "android/CMakeLists.txt",
+    "android/src",
+    "ios/**/*.h",
+    "ios/**/*.m",
+    "ios/**/*.mm",
+    "ios/**/*.cpp",
+    "ios/**/*.swift",
+    "app.plugin.js",
+    "*.podspec",
+    "README.md"
+  ],
+  "workspaces": [
+    "example"
+  ],
+  "repository": "https://github.com/pinpong/react-native-google-maps-plus.git",
+  "author": "pinpong",
+  "license": "MIT",
+  "bugs": "https://github.com/pinpong/react-native-google-maps-plus/issues",
+  "homepage": "https://github.com/pinpong/react-native-google-maps-plus#readme",
+  "devDependencies": {
+    "@commitlint/cli": "20.0.0",
+    "@commitlint/config-conventional": "20.0.0",
+    "@eslint/compat": "1.4.0",
+    "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.36.0",
+    "@jamesacarr/eslint-formatter-github-actions": "0.2.0",
+    "@react-native/babel-preset": "0.82.0-rc.4",
+    "@react-native/eslint-config": "0.82.0-rc.4",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/git": "10.0.1",
+    "@types/jest": "30.0.0",
+    "@types/react": "19.1.15",
+    "clang-format-node": "2.0.1",
+    "conventional-changelog-conventionalcommits": "9.1.0",
+    "del-cli": "7.0.0",
+    "eslint": "9.36.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-ft-flow": "3.0.11",
+    "eslint-plugin-prettier": "5.5.4",
+    "jest": "30.2.0",
+    "lefthook": "1.13.5",
+    "nitrogen": "0.29.6",
+    "prettier": "3.6.2",
+    "react": "19.1.1",
+    "react-native": "0.82.0-rc.4",
+    "react-native-builder-bob": "0.40.13",
+    "react-native-nitro-modules": "0.29.6",
+    "semantic-release": "24.2.9",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-nitro-modules": "*"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@react-native",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "warn",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "es5",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      "typescript"
+    ]
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "packageManager": "yarn@3.6.1"
+}
