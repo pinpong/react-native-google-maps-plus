@@ -43,10 +43,6 @@ jobs:
           mkdir -p release
           npm pack --pack-destination release
 
-
-      - name: Test publish with OIDC
-        run: npm publish --dry-run --access public --provenance --tag=ci-test
-
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
