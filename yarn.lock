@@ -11513,7 +11513,7 @@ __metadata:
     react-native: 0.82.0-rc.4
     react-native-builder-bob: 0.40.13
     react-native-nitro-modules: 0.29.6
-    semantic-release: ^25.0.0-alpha.6
+    semantic-release: 25.0.0-beta.6
     typescript: 5.9.2
   peerDependencies:
     react: "*"
@@ -11989,7 +11989,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semantic-release@npm:^25.0.0-alpha.6":
+"semantic-release@npm:25.0.0-beta.6":
   version: 25.0.0-beta.6
   resolution: "semantic-release@npm:25.0.0-beta.6"
   dependencies:
