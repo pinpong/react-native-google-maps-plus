@@ -21,6 +21,7 @@ jobs:
     runs-on: macos-latest
     needs: [build-library]
     permissions:
+      id-token: write
       contents: write
       issues: write
       pull-requests: write
