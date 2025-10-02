@@ -43,6 +43,12 @@ jobs:
           mkdir -p release
           npm pack --pack-destination release
 
+      - name: Debug OIDC Token
+        run: |
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm" | jq -r '.value')
+          echo "OIDC token (first 100 chars): ${TOKEN:0:100}"
+
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
