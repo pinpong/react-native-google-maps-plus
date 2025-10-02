@@ -40,11 +40,6 @@ jobs:
           mkdir -p release
           npm pack --pack-destination release
 
-      - name: Check Node & npm version
-        run: |
-          node -v
-          npm -v
-
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

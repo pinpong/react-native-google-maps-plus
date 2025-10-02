@@ -13,12 +13,6 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-
-      - name: Check Node & npm version
-        run: |
-          node -v
-          npm -v
-
       - name: Install ktlint & swiftlint
         run: |
           brew install ktlint
