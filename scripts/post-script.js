@@ -55,9 +55,9 @@ async function start(dir) {
 (async () => {
   try {
     await start(ROOT_DIR);
-    console.log('✅ All occurrences patched successfully.');
+    console.log('All occurrences patched successfully.');
   } catch (err) {
-    console.error('❌ Error while processing files:', err);
+    console.error('Error while processing files:', err);
     process.exit(1);
   }
 })();
