@@ -1,21 +1,28 @@
 pre-commit:
   parallel: false
-  commands:
-    lint-js:
-      glob: '**/*.{js,ts,jsx,tsx}'
+  jobs:
+    - name: format
+      run: yarn format
+      stage_fixed: true
+
+    - name: lint-js
       run: yarn lint:js
-    lint-android:
-      glob: 'android/**/*.{kt,java,xml,gradle}'
+
+    - name: lint-android
       run: yarn lint:android
-    lint-ios:
-      glob: 'ios/**/*.{h,m,mm,cpp,swift}'
+
+    - name: lint-ios
       run: yarn lint:ios
-    types:
-      glob: '**/*.{ts,tsx}'
-      run: npx tsc --noEmit
+
+    - name: final-check
+      run: |
+        if git diff --cached --quiet HEAD; then
+          echo "No changes to commit"
+          exit 1
+        fi
 
 commit-msg:
-  parallel: true
-  commands:
-    commitlint:
+  parallel: false
+  jobs:
+    - name: commitlint
       run: npx commitlint --edit {1}
