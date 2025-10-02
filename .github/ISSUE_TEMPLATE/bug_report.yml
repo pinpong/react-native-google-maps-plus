@@ -9,18 +9,23 @@ body:
 
         👋 Hi!
 
-        **Please fill the following carefully before opening a new issue ❗**
-        *(Your issue may be closed if it doesn't provide the required pieces of information)*
+        **Please read this carefully before opening an issue**
+
+        This project is maintained in free time.
+        👉 If you only open tickets but don’t provide a fix, a PR, or help with debugging, your issue may be **closed without further notice**.
+        Please respect that and consider contributing instead of just reporting.
   - type: checkboxes
     attributes:
       label: Before submitting a new issue
-      description: Please perform simple checks first.
+      description: Perform these checks first
       options:
-        - label: I tested using the latest version of the library, as the bug might be already fixed.
+        - label: I tested using the latest version of the library (the bug might already be fixed).
           required: true
-        - label: I tested using a [supported version](https://github.com/reactwg/react-native-releases/blob/main/docs/support.md) of react native.
+        - label: I tested using a [supported version](https://github.com/reactwg/react-native-releases/blob/main/docs/support.md) of React Native.
           required: true
         - label: I checked for possible duplicate issues, with possible answers.
+          required: true
+        - label: I am willing to help with debugging or contribute a fix (otherwise my issue might be closed).
           required: true
   - type: textarea
     id: summary
@@ -28,7 +33,7 @@ body:
       label: Bug summary
       description: |
         Provide a clear and concise description of what the bug is.
-        If needed, you can also provide other samples: error messages / stack traces, screenshots, gifs, etc.
+        If needed, include error messages / stack traces, screenshots, gifs, etc.
     validations:
       required: true
   - type: input
@@ -62,6 +67,6 @@ body:
     id: reproducible-example
     attributes:
       label: Reproducible example repository
-      description: Please provide a link to a repository on GitHub with a reproducible example.
+      description: Please provide a link to a repository on GitHub with a reproducible example (required for triage).
     validations:
       required: true
