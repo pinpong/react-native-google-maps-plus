@@ -43,11 +43,18 @@ jobs:
           mkdir -p release
           npm pack --pack-destination release
 
-      - name: Debug OIDC Token
+      - name: Debug OIDC Token length
         run: |
           TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm" | jq -r '.value')
-          echo "OIDC token (first 100 chars): ${TOKEN:0:100}"
+          echo "OIDC token length: ${#TOKEN}"
+
+
+      - name: Check semantic-release/npm version
+        run: yarn why @semantic-release/npm
+
+      - name: Check semantic-release version
+        run: yarn why semantic-release
 
       - name: Run semantic-release
         env:
