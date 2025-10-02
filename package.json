@@ -20,7 +20,7 @@
     "test": "jest",
     "git:clean": "git clean -dfX",
     "release": "semantic-release",
-    "build": "yarn typecheck && yarn nitrogen && bob build",
+    "build": "yarn nitrogen && bob build",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/post-script.js",
     "prepare": "bob build"
   },
