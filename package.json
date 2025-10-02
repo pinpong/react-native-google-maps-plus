@@ -60,6 +60,10 @@
   "license": "MIT",
   "bugs": "https://github.com/pinpong/react-native-google-maps-plus/issues",
   "homepage": "https://github.com/pinpong/react-native-google-maps-plus#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "devDependencies": {
     "@commitlint/cli": "20.0.0",
     "@commitlint/config-conventional": "20.0.0",
