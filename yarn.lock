@@ -3376,30 +3376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/npm@npm:13.0.0-alpha.15":
-  version: 13.0.0-alpha.15
-  resolution: "@semantic-release/npm@npm:13.0.0-alpha.15"
-  dependencies:
-    "@semantic-release/error": ^4.0.0
-    aggregate-error: ^5.0.0
-    execa: ^9.0.0
-    fs-extra: ^11.0.0
-    lodash-es: ^4.17.21
-    nerf-dart: ^1.0.0
-    normalize-url: ^8.0.0
-    npm: ^11.5.1
-    rc: ^1.2.8
-    read-pkg: ^9.0.0
-    registry-auth-token: ^5.0.0
-    semver: ^7.1.2
-    tempy: ^3.0.0
-  peerDependencies:
-    semantic-release: ">=20.1.0"
-  checksum: 896e1eaa6093a9af3ee4f25097cb11192d2d5083f7324f361a025c888263392997a516a31457cc995465e54184673e2b8904c80cfa5b3e5120f4b6a8edc7d6bc
-  languageName: node
-  linkType: hard
-
-"@semantic-release/npm@npm:^13.0.0-beta.1":
+"@semantic-release/npm@npm:13.0.0-beta.1, @semantic-release/npm@npm:^13.0.0-beta.1":
   version: 13.0.0-beta.1
   resolution: "@semantic-release/npm@npm:13.0.0-beta.1"
   dependencies:
@@ -10457,7 +10434,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm@npm:^11.4.2, npm@npm:^11.5.1":
+"npm@npm:^11.4.2":
   version: 11.6.1
   resolution: "npm@npm:11.6.1"
   dependencies:
@@ -11495,7 +11472,7 @@ __metadata:
     "@react-native/eslint-config": 0.82.0-rc.4
     "@semantic-release/changelog": 6.0.3
     "@semantic-release/git": 10.0.1
-    "@semantic-release/npm": 13.0.0-alpha.15
+    "@semantic-release/npm": 13.0.0-beta.1
     "@types/jest": 30.0.0
     "@types/react": 19.1.15
     clang-format-node: 2.0.1
