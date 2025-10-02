@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.UiThreadUtil
@@ -10,9 +10,9 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 
 @DoNotStrip
-class HybridGoogleMapsNitroView(
+class RNGoogleMapsPlusView(
   val context: ThemedReactContext,
-) : HybridGoogleMapsNitroViewSpec() {
+) : HybridRNGoogleMapsPlusViewSpec() {
   private var currentCustomMapStyle: String = ""
   private var permissionHandler = PermissionHandler(context)
   private var locationHandler = LocationHandler(context)
@@ -20,7 +20,7 @@ class HybridGoogleMapsNitroView(
   private val markerOptions = MarkerOptions()
 
   override val view =
-    GoogleMapsNitroViewImpl(context, locationHandler, playServiceHandler, markerOptions)
+    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerOptions)
 
   private val polylineOptions = MapPolylineOptions()
   private val polygonOptions = MapPolygonOptions()

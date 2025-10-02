@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.location.Location
@@ -23,11 +23,11 @@ import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 
-class GoogleMapsNitroViewImpl(
+class GoogleMapsViewImpl(
   val reactContext: ThemedReactContext,
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
-  val markerOptions: com.googlemapsnitro.MarkerOptions,
+  val markerOptions: com.rngooglemapsplus.MarkerOptions,
 ) : MapView(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
@@ -104,7 +104,7 @@ class GoogleMapsNitroViewImpl(
     }
 
     onCreate(null)
-    getMapAsync(this@GoogleMapsNitroViewImpl)
+    getMapAsync(this@GoogleMapsViewImpl)
   }
 
   override fun onCameraMoveStarted(reason: Int) {
@@ -653,7 +653,7 @@ class GoogleMapsNitroViewImpl(
         setOnMarkerClickListener(null)
         setOnMapClickListener(null)
       }
-      this@GoogleMapsNitroViewImpl.onDestroy()
+      this@GoogleMapsViewImpl.onDestroy()
       googleMap = null
       reactContext.removeLifecycleEventListener(this)
     }
@@ -684,14 +684,14 @@ class GoogleMapsNitroViewImpl(
   override fun onHostResume() {
     onUi {
       locationHandler.start()
-      this@GoogleMapsNitroViewImpl.onResume()
+      this@GoogleMapsViewImpl.onResume()
     }
   }
 
   override fun onHostPause() {
     onUi {
       locationHandler.stop()
-      this@GoogleMapsNitroViewImpl.onPause()
+      this@GoogleMapsViewImpl.onPause()
     }
   }
 

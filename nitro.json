@@ -1,27 +1,27 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
-  "cxxNamespace": ["googlemapsnitro"],
+  "cxxNamespace": ["rngooglemapsplus"],
   "ios": {
-    "iosModuleName": "GoogleMapsNitro"
+    "iosModuleName": "RNGoogleMapsPlus"
   },
   "android": {
-    "androidNamespace": ["googlemapsnitro"],
-    "androidCxxLibName": "GoogleMapsNitro"
+    "androidNamespace": ["rngooglemapsplus"],
+    "androidCxxLibName": "RNGoogleMapsPlus"
   },
   "hybridViews": [
     {
-      "name": "GoogleMapsNitroView",
+      "name": "RNGoogleMapsPlusView",
       "platforms": ["ios", "android"]
     }
   ],
   "autolinking": {
-    "GoogleMapsNitroView": {
-      "swift": "HybridGoogleMapsNitroView",
-      "kotlin": "HybridGoogleMapsNitroView"
+    "RNGoogleMapsPlusView": {
+      "swift": "RNGoogleMapsPlusView",
+      "kotlin": "RNGoogleMapsPlusView"
     },
-    "GoogleMapsNitroModule": {
-      "swift": "HybridGoogleMapsNitroModule",
-      "kotlin": "HybridGoogleMapsNitroModule"
+    "RNGoogleMapsPlusModule": {
+      "swift": "RNGoogleMapsPlusModule",
+      "kotlin": "RNGoogleMapsPlusModule"
     }
   },
   "ignorePaths": ["**/node_modules"]

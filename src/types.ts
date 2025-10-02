@@ -1,7 +1,7 @@
-import type { GoogleMapsNitroViewMethods } from './GoogleMapsNitroView.nitro';
+import type { RNGoogleMapsPlusViewMethods } from './RNGoogleMapsPlusView.nitro';
 import type { HybridView } from 'react-native-nitro-modules';
 
-export type GoogleMapsViewRef = HybridView<GoogleMapsNitroViewMethods>;
+export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 
 export type RNLatLng = { latitude: number; longitude: number };
 

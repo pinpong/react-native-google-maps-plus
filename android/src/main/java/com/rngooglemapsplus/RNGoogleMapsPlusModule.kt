@@ -1,9 +1,9 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import com.margelo.nitro.core.Promise
 
-class HybridGoogleMapsNitroModule : HybridGoogleMapsNitroModuleSpec() {
-  val context = GoogleMapsNitroPackage.AppContextHolder.context
+class RNGoogleMapsPlusModule : HybridRNGoogleMapsPlusModuleSpec() {
+  val context = RNGoogleMapsPlusPackage.AppContextHolder.context
   private val locationHandler: LocationHandler = LocationHandler(context)
   private val permissionHandler: PermissionHandler = PermissionHandler(context)
   private val playServicesHandler: PlayServicesHandler = PlayServicesHandler(context)

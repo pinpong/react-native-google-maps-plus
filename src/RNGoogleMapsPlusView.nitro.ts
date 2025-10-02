@@ -18,7 +18,7 @@ import type {
   RNMapErrorCode,
 } from './types';
 
-export interface GoogleMapsNitroViewProps extends HybridViewProps {
+export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   buildingEnabled: boolean;
   trafficEnabled: boolean;
   customMapStyle: string;
@@ -53,7 +53,7 @@ export interface GoogleMapsNitroViewProps extends HybridViewProps {
   ) => void;
 }
 
-export interface GoogleMapsNitroViewMethods extends HybridViewMethods {
+export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
   setCamera(camera: RNCamera, animated?: boolean, durationMS?: number): void;
 
   setCameraToCoordinates(
@@ -72,7 +72,7 @@ export interface GoogleMapsNitroViewMethods extends HybridViewMethods {
   isGooglePlayServicesAvailable(): boolean;
 }
 
-export type GoogleMapsNitroView = HybridView<
-  GoogleMapsNitroViewProps,
-  GoogleMapsNitroViewMethods
+export type RNGoogleMapsPlusView = HybridView<
+  RNGoogleMapsPlusViewProps,
+  RNGoogleMapsPlusViewMethods
 >;

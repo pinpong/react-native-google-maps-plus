@@ -3,12 +3,12 @@ import Foundation
 import GoogleMaps
 import NitroModules
 
-final class HybridGoogleMapsNitroView: HybridGoogleMapsNitroViewSpec {
+final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
 
-  private let impl: GoogleMapsNitroViewImpl
+  private let impl: GoogleMapsViewImpl
 
   var view: UIView {
     return impl
@@ -22,7 +22,7 @@ final class HybridGoogleMapsNitroView: HybridGoogleMapsNitroViewSpec {
   override init() {
     self.permissionHandler = PermissionHandler()
     self.locationHandler = LocationHandler()
-    self.impl = GoogleMapsNitroViewImpl(
+    self.impl = GoogleMapsViewImpl(
       locationHandler: locationHandler,
       markerOptions: markerOptions
     )
