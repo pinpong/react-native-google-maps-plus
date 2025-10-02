@@ -36,6 +36,6 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-# TODO: remove NPM_TOKEN
+          # TODO: remove NPM_TOKEN
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn release
