@@ -15,23 +15,23 @@
 		50142BCB3C4DD87E00709364 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		89A7882DE3880107EB2CBBE5 /* Pods_GoogleMapsNitroExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsNitroExample.framework */; };
+		89A7882DE3880107EB2CBBE5 /* Pods_GoogleMapsPlusExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsPlusExample.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsNitroExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapsNitroExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07F961A680F5B00A75B9A /* GoogleMapsNitroExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleMapsNitroExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GoogleMapsNitroExample/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = GoogleMapsNitroExample/Info.plist; sourceTree = "<group>"; };
-		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = GoogleMapsNitroExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1C2CD62B2E2A54A300F92915 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = GoogleMapsNitroExample/Debug.xcconfig; sourceTree = "<group>"; };
-		1C2CD62C2E2A54A300F92915 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = GoogleMapsNitroExample/Release.xcconfig; sourceTree = "<group>"; };
+		0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsPlusExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapsPlusExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* GoogleMapsPlusExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleMapsPlusExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GoogleMapsPlusExample/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = GoogleMapsPlusExample/Info.plist; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = GoogleMapsPlusExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1C2CD62B2E2A54A300F92915 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = GoogleMapsPlusExample/Debug.xcconfig; sourceTree = "<group>"; };
+		1C2CD62C2E2A54A300F92915 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = GoogleMapsPlusExample/Release.xcconfig; sourceTree = "<group>"; };
 		1CFDC6A32E6CA144005652FB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
 		1CFDC6A62E6CA144005652FB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
-		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GoogleMapsNitroExample/AppDelegate.swift; sourceTree = "<group>"; };
-		784D90989C3F0C69A83034D7 /* Pods-GoogleMapsNitroExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapsNitroExample.debug.xcconfig"; path = "Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GoogleMapsNitroExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		CE69916FEF4DE92FC3CC2A4C /* Pods-GoogleMapsNitroExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapsNitroExample.release.xcconfig"; path = "Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample.release.xcconfig"; sourceTree = "<group>"; };
+		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GoogleMapsPlusExample/AppDelegate.swift; sourceTree = "<group>"; };
+		784D90989C3F0C69A83034D7 /* Pods-GoogleMapsPlusExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapsPlusExample.debug.xcconfig"; path = "Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample.debug.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GoogleMapsPlusExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CE69916FEF4DE92FC3CC2A4C /* Pods-GoogleMapsPlusExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapsPlusExample.release.xcconfig"; path = "Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -40,14 +40,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89A7882DE3880107EB2CBBE5 /* Pods_GoogleMapsNitroExample.framework in Frameworks */,
+				89A7882DE3880107EB2CBBE5 /* Pods_GoogleMapsPlusExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		13B07FAE1A68108700A75B9A /* GoogleMapsNitroExample */ = {
+		13B07FAE1A68108700A75B9A /* GoogleMapsPlusExample */ = {
 			isa = PBXGroup;
 			children = (
 				1C2CD62B2E2A54A300F92915 /* Debug.xcconfig */,
@@ -60,7 +60,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
-			name = GoogleMapsNitroExample;
+			name = GoogleMapsPlusExample;
 			sourceTree = "<group>";
 		};
 		1CFDC6A52E6CA144005652FB /* de.lproj */ = {
@@ -69,7 +69,7 @@
 				1CFDC6A32E6CA144005652FB /* InfoPlist.strings */,
 			);
 			name = de.lproj;
-			path = GoogleMapsNitroExample/de.lproj;
+			path = GoogleMapsPlusExample/de.lproj;
 			sourceTree = "<group>";
 		};
 		1CFDC6A82E6CA144005652FB /* en.lproj */ = {
@@ -78,14 +78,14 @@
 				1CFDC6A62E6CA144005652FB /* InfoPlist.strings */,
 			);
 			name = en.lproj;
-			path = GoogleMapsNitroExample/en.lproj;
+			path = GoogleMapsPlusExample/en.lproj;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsNitroExample.framework */,
+				0F220CF45106F6693F3EE2E0 /* Pods_GoogleMapsPlusExample.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -100,7 +100,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* GoogleMapsNitroExample */,
+				13B07FAE1A68108700A75B9A /* GoogleMapsPlusExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -114,7 +114,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* GoogleMapsNitroExample.app */,
+				13B07F961A680F5B00A75B9A /* GoogleMapsPlusExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,8 +122,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				784D90989C3F0C69A83034D7 /* Pods-GoogleMapsNitroExample.debug.xcconfig */,
-				CE69916FEF4DE92FC3CC2A4C /* Pods-GoogleMapsNitroExample.release.xcconfig */,
+				784D90989C3F0C69A83034D7 /* Pods-GoogleMapsPlusExample.debug.xcconfig */,
+				CE69916FEF4DE92FC3CC2A4C /* Pods-GoogleMapsPlusExample.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -131,9 +131,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* GoogleMapsNitroExample */ = {
+		13B07F861A680F5B00A75B9A /* GoogleMapsPlusExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "GoogleMapsNitroExample" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "GoogleMapsPlusExample" */;
 			buildPhases = (
 				4E15D3C08A668E0F5197AB1A /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -147,9 +147,9 @@
 			);
 			dependencies = (
 			);
-			name = GoogleMapsNitroExample;
-			productName = GoogleMapsNitroExample;
-			productReference = 13B07F961A680F5B00A75B9A /* GoogleMapsNitroExample.app */;
+			name = GoogleMapsPlusExample;
+			productName = GoogleMapsPlusExample;
+			productReference = 13B07F961A680F5B00A75B9A /* GoogleMapsPlusExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -165,7 +165,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "GoogleMapsNitroExample" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "GoogleMapsPlusExample" */;
 			compatibilityVersion = "Xcode 15.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -179,7 +179,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* GoogleMapsNitroExample */,
+				13B07F861A680F5B00A75B9A /* GoogleMapsPlusExample */,
 			);
 		};
 /* End PBXProject section */
@@ -233,7 +233,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-GoogleMapsNitroExample-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-GoogleMapsPlusExample-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -246,15 +246,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A4CAAB1E58D131C3CE20A532 /* [CP] Embed Pods Frameworks */ = {
@@ -263,15 +263,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsNitroExample/Pods-GoogleMapsNitroExample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -298,7 +298,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = GoogleMapsNitroExample/Info.plist;
+				INFOPLIST_FILE = GoogleMapsPlusExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -310,8 +310,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = googlemapsnitro.example;
-				PRODUCT_NAME = GoogleMapsNitroExample;
+				PRODUCT_BUNDLE_IDENTIFIER = rngooglemapsplus.example;
+				PRODUCT_NAME = GoogleMapsPlusExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -327,7 +327,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = GoogleMapsNitroExample/Info.plist;
+				INFOPLIST_FILE = GoogleMapsPlusExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -339,8 +339,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = googlemapsnitro.example;
-				PRODUCT_NAME = GoogleMapsNitroExample;
+				PRODUCT_BUNDLE_IDENTIFIER = rngooglemapsplus.example;
+				PRODUCT_NAME = GoogleMapsPlusExample;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -529,7 +529,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "GoogleMapsNitroExample" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "GoogleMapsPlusExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -538,7 +538,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "GoogleMapsNitroExample" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "GoogleMapsPlusExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

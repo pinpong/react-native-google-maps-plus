@@ -26,7 +26,13 @@
   },
   "keywords": [
     "react-native",
-    "react-native-google-maps-plus"
+    "google-maps",
+    "react-native-google-maps",
+    "react-native-google-maps-plus",
+    "google-maps-sdk",
+    "android",
+    "ios",
+    "maps"
   ],
   "files": [
     "src",

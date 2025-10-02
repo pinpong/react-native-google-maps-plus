@@ -3,7 +3,7 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name         = "GoogleMapsNitro"
+  s.name         = "RNGoogleMapsPlus"
   s.version      = package["version"]
   s.summary      = package["description"]
   s.homepage     = package["homepage"]
@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.dependency 'GoogleMaps', '10.3.0'
   s.dependency 'SVGKit', '3.0.0'
 
-  load 'nitrogen/generated/ios/GoogleMapsNitro+autolinking.rb'
+  load 'nitrogen/generated/ios/RNGoogleMapsPlus+autolinking.rb'
   add_nitrogen_files(s)
 
   install_modules_dependencies(s)

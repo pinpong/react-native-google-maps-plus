@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import android.Manifest
 import android.content.pm.PackageManager

@@ -11,38 +11,6 @@ PODS:
   - GoogleMaps (10.3.0):
     - GoogleMaps/Maps (= 10.3.0)
   - GoogleMaps/Maps (10.3.0)
-  - GoogleMapsNitro (0.1.0):
-    - boost
-    - DoubleConversion
-    - fast_float
-    - fmt
-    - glog
-    - GoogleMaps (= 10.3.0)
-    - hermes-engine
-    - NitroModules
-    - RCT-Folly
-    - RCT-Folly/Fabric
-    - RCTRequired
-    - RCTTypeSafety
-    - React-callinvoker
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - SocketRocket
-    - SVGKit (= 3.0.0)
-    - Yoga
   - hermes-engine (0.82.0-rc.4):
     - hermes-engine/Pre-built (= 0.82.0-rc.4)
   - hermes-engine/Pre-built (0.82.0-rc.4)
@@ -2388,6 +2356,38 @@ PODS:
     - React-perflogger (= 0.82.0-rc.4)
     - React-utils (= 0.82.0-rc.4)
     - SocketRocket
+  - RNGoogleMapsPlus (0.1.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - GoogleMaps (= 10.3.0)
+    - hermes-engine
+    - NitroModules
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - SVGKit (= 3.0.0)
+    - Yoga
   - SocketRocket (0.7.1)
   - SVGKit (3.0.0):
     - CocoaLumberjack (~> 3.0)
@@ -2400,7 +2400,6 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - GoogleMapsNitro (from `../..`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -2469,6 +2468,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - RNGoogleMapsPlus (from `../..`)
   - SocketRocket (~> 0.7.1)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -2492,8 +2492,6 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/fmt.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
-  GoogleMapsNitro:
-    :path: "../.."
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-09-01-RNv0.82.0-265ef62ff3eb7289d17e366664ac0da82303e101
@@ -2629,6 +2627,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNGoogleMapsPlus:
+    :path: "../.."
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -2641,7 +2641,6 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   GoogleMaps: 197af8911284ddf36db063c74faee4c4ab15e9d9
-  GoogleMapsNitro: 2077ee6500a1e9d4aead37b15e2d2f7dc7d1a290
   hermes-engine: 883ad6cdbcb152221038266a5908c1fa6c1002f7
   NitroModules: cfda296ca7e5f9092bd54477d5eb35416e78e6d8
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
@@ -2709,10 +2708,11 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 1202b833d8cca6c917dabcf679837c34a9ca5723
   ReactCodegen: 19febbd1fdc8928493972f8d5290f2952e14c9d2
   ReactCommon: 2caf7281b37aa1ca389e18839dd594099efb1489
+  RNGoogleMapsPlus: 8a1a26a15dcd3b87de67a86243f91030fc27e6dc
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   Yoga: 2fb906b2084fd388a52edae73c54c39c3f50e86c
 
-PODFILE CHECKSUM: 794b5b2c553b2c4b97d9e60f2a413280d5aa607d
+PODFILE CHECKSUM: ada9cd8bbcd5ad8a6a2eae598262b8f8bce77633
 
 COCOAPODS: 1.15.2

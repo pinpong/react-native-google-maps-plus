@@ -1,4 +1,4 @@
-package googlemapsnitro.example
+package rngooglemapsplus.example
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   View,
   StyleSheet,
@@ -19,7 +20,6 @@ import type {
 } from '../../src';
 import { GoogleMapsView, GoogleMapsModule } from '../../src';
 import { callback } from 'react-native-nitro-modules';
-import React from 'react';
 
 const standardMapStyle: RNMapStyleElement[] = [
   {

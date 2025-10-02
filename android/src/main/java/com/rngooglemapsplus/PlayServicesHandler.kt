@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import com.facebook.react.bridge.ReactContext
 import com.google.android.gms.common.ConnectionResult

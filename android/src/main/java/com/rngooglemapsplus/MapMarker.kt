@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

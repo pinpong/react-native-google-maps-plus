@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.content.Intent

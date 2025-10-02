@@ -1,24 +1,24 @@
 import { getHostComponent, NitroModules } from 'react-native-nitro-modules';
 
-const GoogleMapsNitroConfig = require('../nitrogen/generated/shared/json/GoogleMapsNitroViewConfig.json');
+import ViewConfig from '../nitrogen/generated/shared/json/RNGoogleMapsPlusViewConfig.json';
 
 import type {
-  GoogleMapsNitroViewMethods,
-  GoogleMapsNitroViewProps,
-} from './GoogleMapsNitroView.nitro';
+  RNGoogleMapsPlusViewMethods,
+  RNGoogleMapsPlusViewProps,
+} from './RNGoogleMapsPlusView.nitro';
 
-import type { GoogleMapsNitroModule } from './GoogleMapsNitroModule.nitro';
+import type { RNGoogleMapsPlusModule } from './RNGoogleMapsPlusModule.nitro';
 
 export * from './types';
 
-export type { GoogleMapsNitroViewMethods, GoogleMapsNitroViewProps };
+export type { RNGoogleMapsPlusViewMethods, RNGoogleMapsPlusViewProps };
 
 export const GoogleMapsView = getHostComponent<
-  GoogleMapsNitroViewProps,
-  GoogleMapsNitroViewMethods
->('GoogleMapsNitroView', () => GoogleMapsNitroConfig);
+  RNGoogleMapsPlusViewProps,
+  RNGoogleMapsPlusViewMethods
+>('RNGoogleMapsPlusView', () => ViewConfig);
 
 export const GoogleMapsModule =
-  NitroModules.createHybridObject<GoogleMapsNitroModule>(
-    'GoogleMapsNitroModule'
+  NitroModules.createHybridObject<RNGoogleMapsPlusModule>(
+    'RNGoogleMapsPlusModule'
   );
