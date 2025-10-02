@@ -2,7 +2,7 @@ import CoreLocation
 import GoogleMaps
 import UIKit
 
-final class GoogleMapsNitroViewImpl: UIView, GMSMapViewDelegate {
+final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   private let locationHandler: LocationHandler
   private let markerOptions: MapMarkerOptions

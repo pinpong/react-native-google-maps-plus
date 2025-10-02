@@ -1,6 +1,6 @@
 buildscript {
   ext.getExtOrDefault = {name ->
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['GoogleMapsNitro_' + name]
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['RNGoogleMapsPlus_' + name]
   }
 
   repositories {
@@ -22,17 +22,17 @@ def reactNativeArchitectures() {
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-apply from: '../nitrogen/generated/android/GoogleMapsNitro+autolinking.gradle'
+apply from: '../nitrogen/generated/android/RNGoogleMapsPlus+autolinking.gradle'
 apply from: "./fix-prefab.gradle"
 
 apply plugin: "com.facebook.react"
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["GoogleMapsNitro_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["RNGoogleMapsPlus_" + name]).toInteger()
 }
 
 android {
-  namespace "com.googlemapsnitro"
+  namespace "com.rngooglemapsplus"
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 

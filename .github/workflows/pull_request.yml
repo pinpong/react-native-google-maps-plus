@@ -3,6 +3,10 @@ on:
   pull_request:
     branches: [dev, main]
 
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: macos-latest
@@ -12,6 +16,9 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+
+      - name: Generate nitrogen code
+        run: yarn nitrogen
 
       - name: Install ktlint & swiftlint
         run: |

@@ -1,24 +1,24 @@
 /**
  * Recursively patches all generated Android files:
- *  - Replaces 'com.margelo.nitro.googlemapsnitro' -> 'com.googlemapsnitro'
- *  - Replaces 'com/margelo/nitro/googlemapsnitro' -> 'com/googlemapsnitro' (for C++ descriptors)
- *  - Removes 'margelo/nitro/' in GoogleMapsNitroOnLoad.cpp
+ *  - Replaces 'com.margelo.nitro.rngooglemapsplus' -> 'com.rngooglemapsplus'
+ *  - Replaces 'com/margelo/nitro/rngooglemapsplus' -> 'com/rngooglemapsplus' (for C++ descriptors)
+ *  - Removes 'margelo/nitro/' in GoogleMapsPlusOnLoad.cpp
  */
 const path = require('node:path');
 const { readdir, readFile, writeFile } = require('node:fs/promises');
 
 const ROOT_DIR = path.join(process.cwd(), 'nitrogen', 'generated', 'android');
 console.log(ROOT_DIR);
-const ANDROID_ONLOAD_FILE = path.join(ROOT_DIR, 'GoogleMapsNitroOnLoad.cpp');
+const ANDROID_ONLOAD_FILE = path.join(ROOT_DIR, 'RNGoogleMapsPlusOnLoad.cpp');
 
 const REPLACEMENTS = [
   {
-    regex: /com\.margelo\.nitro\.googlemapsnitro/g,
-    replacement: 'com.googlemapsnitro',
+    regex: /com\.margelo\.nitro\.rngooglemapsplus/g,
+    replacement: 'com.rngooglemapsplus',
   },
   {
-    regex: /com\/margelo\/nitro\/googlemapsnitro/g,
-    replacement: 'com/googlemapsnitro',
+    regex: /com\/margelo\/nitro\/rngooglemapsplus/g,
+    replacement: 'com/rngooglemapsplus',
   },
 ];
 

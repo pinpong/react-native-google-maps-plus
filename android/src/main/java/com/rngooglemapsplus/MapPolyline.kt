@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.ButtCap

@@ -1,4 +1,4 @@
-package com.googlemapsnitro
+package com.rngooglemapsplus
 
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
