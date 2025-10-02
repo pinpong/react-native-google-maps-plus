@@ -93,12 +93,12 @@
     "react-native": "0.82.0-rc.4",
     "react-native-builder-bob": "0.40.13",
     "react-native-nitro-modules": "0.29.6",
-    "semantic-release": "^25.0.0-alpha.6",
+    "semantic-release": "25.0.0-beta.6",
     "typescript": "5.9.2"
   },
   "overrides": {
     "@semantic-release/npm": "13.0.0-alpha.15",
-    "semantic-release": "^25.0.0-alpha.6"
+    "semantic-release": "25.0.0-beta.6"
   },
   "peerDependencies": {
     "react": "*",
