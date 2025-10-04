@@ -17,6 +17,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var pendingMinZoomLevel: Double?
   private var pendingMaxZoomLevel: Double?
   private var pendingMapPadding: RNMapPadding?
+  private var pendingMapType: GMSMapViewType?
 
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
@@ -129,6 +130,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
     if let style = pendingCustomMapStyle {
         mapView.mapStyle = style
+    }
+
+    if let mapType = pendingMapType {
+       mapView.mapType = mapType
     }
 
     if let buildings = pendingBuildingEnabled {
@@ -263,6 +268,14 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       } else {
         mapView.padding = .zero
       }
+    }
+  }
+
+  @MainActor var mapType: Int32? {
+    get { pendingMapType.map { Int32($0.rawValue) } }
+    set {
+      pendingMapType = GMSMapViewType(rawValue: UInt(newValue ?? 1))
+      mapView.mapType = pendingMapType ?? .normal
     }
   }
 
