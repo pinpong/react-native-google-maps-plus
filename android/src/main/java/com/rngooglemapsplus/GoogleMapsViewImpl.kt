@@ -14,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -45,6 +46,7 @@ class GoogleMapsViewImpl(
   private var pendingMinZoomLevel: Double? = null
   private var pendingMaxZoomLevel: Double? = null
   private var pendingMapPadding: RNMapPadding? = null
+  private var pendingMapType: Int? = null
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
@@ -245,6 +247,9 @@ class GoogleMapsViewImpl(
         googleMap?.isTrafficEnabled = it
       }
       googleMap?.setMapStyle(pendingCustomMapStyle)
+      pendingMapType?.let {
+        googleMap?.mapType = it
+      }
       pendingUserInterfaceStyle?.let {
         googleMap?.mapColorScheme = it
       }
@@ -282,10 +287,13 @@ class GoogleMapsViewImpl(
     get() = googleMap?.isBuildingsEnabled ?: pendingBuildingEnabled
     set(value) {
       pendingBuildingEnabled = value
-      value?.let {
-        onUi {
+      onUi {
+        value?.let {
           googleMap?.isBuildingsEnabled = it
         }
+          ?: run {
+            googleMap?.isBuildingsEnabled = false
+          }
       }
     }
 
@@ -293,9 +301,11 @@ class GoogleMapsViewImpl(
     get() = googleMap?.isTrafficEnabled ?: pendingTrafficEnabled
     set(value) {
       pendingTrafficEnabled = value
-      value?.let {
-        onUi {
+      onUi {
+        value?.let {
           googleMap?.isTrafficEnabled = it
+        } ?: run {
+          googleMap?.isTrafficEnabled = false
         }
       }
     }
@@ -319,10 +329,11 @@ class GoogleMapsViewImpl(
     get() = pendingUserInterfaceStyle
     set(value) {
       pendingUserInterfaceStyle = value
-
-      value?.let {
-        onUi {
+      onUi {
+        value?.let {
           googleMap?.mapColorScheme = it
+        } ?: run {
+          googleMap?.mapColorScheme = MapColorScheme.FOLLOW_SYSTEM
         }
       }
     }
@@ -331,9 +342,11 @@ class GoogleMapsViewImpl(
     get() = pendingMinZoomLevel
     set(value) {
       pendingMinZoomLevel = value
-      value?.let {
-        onUi {
+      onUi {
+        value?.let {
           googleMap?.setMinZoomPreference(it.toFloat())
+        } ?: run {
+          googleMap?.setMinZoomPreference(2.0f)
         }
       }
     }
@@ -342,9 +355,11 @@ class GoogleMapsViewImpl(
     get() = pendingMaxZoomLevel
     set(value) {
       pendingMaxZoomLevel = value
-      value?.let {
-        onUi {
+      onUi {
+        value?.let {
           googleMap?.setMaxZoomPreference(it.toFloat())
+        } ?: run {
+          googleMap?.setMaxZoomPreference(21.0f)
         }
       }
     }
@@ -361,6 +376,21 @@ class GoogleMapsViewImpl(
             it.right.dpToPx().toInt(),
             it.bottom.dpToPx().toInt(),
           )
+        }
+      } ?: run {
+        googleMap?.setPadding(0, 0, 0, 0)
+      }
+    }
+
+  var mapType: Int?
+    get() = pendingMapType
+    set(value) {
+      pendingMapType = value
+      onUi {
+        value?.let {
+          googleMap?.mapType = it
+        } ?: run {
+          googleMap?.mapType = 1
         }
       }
     }

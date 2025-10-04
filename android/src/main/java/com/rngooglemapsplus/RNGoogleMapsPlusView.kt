@@ -76,6 +76,14 @@ class RNGoogleMapsPlusView(
       view.mapPadding = value
     }
 
+  override var mapType: RNMapType?
+    get() = RNMapType.entries.firstOrNull { it.value == view.mapType }
+    set(value) {
+      value?.let {
+        view.mapType = it.value
+      }
+    }
+
   override var markers: Array<RNMarker>? = emptyArray()
     set(value) {
       val prevById = field?.associateBy { it.id } ?: emptyMap()
