@@ -9,20 +9,14 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var mapView: GMSMapView!
   private var mapReady = false
 
-  private var pendingBuildingEnabled: Bool = false
-  private var pendingTrafficEnabled: Bool = false
+  private var pendingBuildingEnabled: Bool?
+  private var pendingTrafficEnabled: Bool?
   private var pendingCustomMapStyle: GMSMapStyle?
-  private var pendingInitialCamera: GMSCameraPosition =
-    GMSCameraPosition.camera(withLatitude: 0, longitude: 0, zoom: 0)
-  private var pendingUserInterfaceStyle = UIUserInterfaceStyle.unspecified
-  private var pendingMinZoomLevel: Double = 0.0
-  private var pendingMaxZoomLevel: Double = 21.0
-  private var pendingMapPadding: RNMapPadding = .init(
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0
-  )
+  private var pendingInitialCamera: GMSCameraPosition?
+  private var pendingUserInterfaceStyle: UIUserInterfaceStyle?
+  private var pendingMinZoomLevel: Double?
+  private var pendingMaxZoomLevel: Double?
+  private var pendingMapPadding: RNMapPadding?
 
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
@@ -123,21 +117,35 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   private func applyPending() {
-    mapView.padding = UIEdgeInsets(
-      top: pendingMapPadding.top,
-      left: pendingMapPadding.left,
-      bottom: pendingMapPadding.bottom,
-      right: pendingMapPadding.right
-    )
 
-    mapView.mapStyle = pendingCustomMapStyle
-    mapView.isBuildingsEnabled = pendingBuildingEnabled
-    mapView.isTrafficEnabled = pendingTrafficEnabled
-    mapView.overrideUserInterfaceStyle = pendingUserInterfaceStyle
-    mapView.setMinZoom(
-      Float(pendingMinZoomLevel),
-      maxZoom: Float(pendingMaxZoomLevel)
-    )
+    if let padding = pendingMapPadding {
+        mapView.padding = UIEdgeInsets(
+            top: padding.top,
+            left: padding.left,
+            bottom: padding.bottom,
+            right: padding.right
+        )
+    }
+
+    if let style = pendingCustomMapStyle {
+        mapView.mapStyle = style
+    }
+
+    if let buildings = pendingBuildingEnabled {
+        mapView.isBuildingsEnabled = buildings
+    }
+
+    if let traffic = pendingTrafficEnabled {
+        mapView.isTrafficEnabled = traffic
+    }
+
+    if let uiStyle = pendingUserInterfaceStyle {
+        mapView.overrideUserInterfaceStyle = uiStyle
+    }
+
+    if let minZoom = pendingMinZoomLevel, let maxZoom = pendingMaxZoomLevel {
+        mapView.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
+    }
 
     if !pendingMarkers.isEmpty {
       pendingMarkers.forEach {
@@ -164,82 +172,98 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   @MainActor
-  var buildingEnabled: Bool {
-    get { mapView.isBuildingsEnabled }
-    set {
-      pendingBuildingEnabled = newValue
-      mapView.isBuildingsEnabled = newValue
-    }
+  var buildingEnabled: Bool? {
+      get { mapView.isBuildingsEnabled }
+      set {
+          pendingBuildingEnabled = newValue
+          if let value = newValue {
+              mapView.isBuildingsEnabled = value
+          }
+      }
   }
 
   @MainActor
-  var trafficEnabled: Bool {
-    get { mapView.isTrafficEnabled }
-    set {
-      pendingTrafficEnabled = newValue
-      mapView.isTrafficEnabled = newValue
-    }
+  var trafficEnabled: Bool? {
+      get { mapView.isTrafficEnabled }
+      set {
+          pendingTrafficEnabled = newValue
+          if let value = newValue {
+              mapView.isTrafficEnabled = value
+          }
+      }
   }
 
   @MainActor
   var customMapStyle: GMSMapStyle? {
-    get { pendingCustomMapStyle }
-    set {
-      pendingCustomMapStyle = newValue
-      mapView.mapStyle = newValue
-    }
-  }
-
-  @MainActor
-  var initialCamera: GMSCameraPosition {
-    get { pendingInitialCamera }
-    set {
-      pendingInitialCamera = newValue
-      if mapView != nil && !mapReady {
-        mapView.camera = newValue
+      get { pendingCustomMapStyle }
+      set {
+          pendingCustomMapStyle = newValue
+          if let style = newValue {
+              mapView.mapStyle = style
+          }
       }
-    }
   }
 
   @MainActor
-  var userInterfaceStyle: UIUserInterfaceStyle {
-    get { pendingUserInterfaceStyle }
-    set {
-      pendingUserInterfaceStyle = newValue
-      mapView.overrideUserInterfaceStyle = newValue
-    }
+  var initialCamera: GMSCameraPosition? {
+      get { pendingInitialCamera }
+      set {
+          pendingInitialCamera = newValue
+          if let camera = newValue, !mapReady {
+              mapView.camera = camera
+          }
+      }
   }
 
   @MainActor
-  var minZoomLevel: Double {
-    get { pendingMinZoomLevel }
-    set {
-      pendingMinZoomLevel = newValue
-      mapView.setMinZoom(Float(newValue), maxZoom: Float(pendingMaxZoomLevel))
-    }
+  var userInterfaceStyle: UIUserInterfaceStyle? {
+      get { pendingUserInterfaceStyle }
+      set {
+          pendingUserInterfaceStyle = newValue
+          if let style = newValue {
+              mapView.overrideUserInterfaceStyle = style
+          }
+      }
   }
 
   @MainActor
-  var maxZoomLevel: Double {
-    get { pendingMaxZoomLevel }
-    set {
-      pendingMaxZoomLevel = newValue
-      mapView.setMinZoom(Float(pendingMinZoomLevel), maxZoom: Float(newValue))
-    }
+  var minZoomLevel: Double? {
+      get { pendingMinZoomLevel }
+      set {
+          pendingMinZoomLevel = newValue
+          if let min = newValue, let max = pendingMaxZoomLevel {
+              mapView.setMinZoom(Float(min), maxZoom: Float(max))
+          }
+      }
   }
 
   @MainActor
-  var mapPadding: RNMapPadding {
-    get { pendingMapPadding }
-    set {
-      pendingMapPadding = newValue
-      mapView.padding = UIEdgeInsets(
-        top: newValue.top,
-        left: newValue.left,
-        bottom: newValue.bottom,
-        right: newValue.right
-      )
-    }
+  var maxZoomLevel: Double? {
+      get { pendingMaxZoomLevel }
+      set {
+          pendingMaxZoomLevel = newValue
+          if let max = newValue, let min = pendingMinZoomLevel {
+              mapView.setMinZoom(Float(min), maxZoom: Float(max))
+          }
+      }
+  }
+
+  @MainActor
+  var mapPadding: RNMapPadding? {
+      get { pendingMapPadding }
+      set {
+          pendingMapPadding = newValue
+          if let padding = newValue {
+              mapView.padding = UIEdgeInsets(
+                  top: padding.top,
+                  left: padding.left,
+                  bottom: padding.bottom,
+                  right: padding.right
+              )
+          } else {
+              mapView.padding = .zero
+          }
+      }
   }
 
   func setCamera(camera: RNCamera, animated: Bool, durationMS: Double) {

@@ -13,7 +13,7 @@ import com.margelo.nitro.core.Promise
 class RNGoogleMapsPlusView(
   val context: ThemedReactContext,
 ) : HybridRNGoogleMapsPlusViewSpec() {
-  private var currentCustomMapStyle: String = ""
+  private var currentCustomMapStyle: String? = null
   private var permissionHandler = PermissionHandler(context)
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
@@ -25,59 +25,61 @@ class RNGoogleMapsPlusView(
   private val polylineOptions = MapPolylineOptions()
   private val polygonOptions = MapPolygonOptions()
 
-  override var buildingEnabled: Boolean
+  override var buildingEnabled: Boolean?
     get() = view.buildingEnabled
     set(value) {
       view.buildingEnabled = value
     }
 
-  override var trafficEnabled: Boolean
+  override var trafficEnabled: Boolean?
     get() = view.trafficEnabled
     set(value) {
       view.trafficEnabled = value
     }
 
-  override var customMapStyle: String
+  override var customMapStyle: String?
     get() = currentCustomMapStyle
     set(value) {
       currentCustomMapStyle = value
-      view.customMapStyle = MapStyleOptions(value)
+      value?.let {
+        view.customMapStyle = MapStyleOptions(it)
+      }
     }
 
-  override var initialCamera: RNCamera
+  override var initialCamera: RNCamera?
     get() = mapCameraPotionToCamera(view.initialCamera)
     set(value) {
       view.initialCamera = mapCameraToCameraPosition(value)
     }
 
-  override var userInterfaceStyle: RNUserInterfaceStyle
+  override var userInterfaceStyle: RNUserInterfaceStyle?
     get() = mapColorSchemeToUserInterfaceStyle(view.userInterfaceStyle)
     set(value) {
       view.userInterfaceStyle = userInterfaceStyleToMapColorScheme(value)
     }
 
-  override var minZoomLevel: Double
+  override var minZoomLevel: Double?
     get() = view.minZoomLevel
     set(value) {
       view.minZoomLevel = value
     }
 
-  override var maxZoomLevel: Double
+  override var maxZoomLevel: Double?
     get() = view.maxZoomLevel
     set(value) {
       view.maxZoomLevel = value
     }
 
-  override var mapPadding: RNMapPadding
+  override var mapPadding: RNMapPadding?
     get() = view.mapPadding
     set(value) {
       view.mapPadding = value
     }
 
-  override var markers: Array<RNMarker> = emptyArray()
+  override var markers: Array<RNMarker>? = emptyArray()
     set(value) {
-      val prevById = field.associateBy { it.id }
-      val nextById = value.associateBy { it.id }
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
 
       (prevById.keys - nextById.keys).forEach { id ->
         markerOptions.cancelIconJob(id)
@@ -124,10 +126,10 @@ class RNGoogleMapsPlusView(
       field = value
     }
 
-  override var polylines: Array<RNPolyline> = emptyArray()
+  override var polylines: Array<RNPolyline>? = emptyArray()
     set(value) {
-      val prevById = field.associateBy { it.id }
-      val nextById = value.associateBy { it.id }
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
 
       (prevById.keys - nextById.keys).forEach { id ->
         view.removePolyline(id)
@@ -161,10 +163,10 @@ class RNGoogleMapsPlusView(
       field = value
     }
 
-  override var polygons: Array<RNPolygon> = emptyArray()
+  override var polygons: Array<RNPolygon>? = emptyArray()
     set(value) {
-      val prevById = field.associateBy { it.id }
-      val nextById = value.associateBy { it.id }
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
 
       (prevById.keys - nextById.keys).forEach { id ->
         view.removePolygon(id)
@@ -280,8 +282,9 @@ class RNGoogleMapsPlusView(
 
   override fun isGooglePlayServicesAvailable(): Boolean = playServiceHandler.isPlayServicesAvailable()
 
-  fun userInterfaceStyleToMapColorScheme(value: RNUserInterfaceStyle): Int =
-    when (value) {
+  fun userInterfaceStyleToMapColorScheme(value: RNUserInterfaceStyle?): Int? {
+    value ?: return null
+    return when (value) {
       RNUserInterfaceStyle.LIGHT -> {
         MapColorScheme.LIGHT
       }
@@ -294,8 +297,10 @@ class RNGoogleMapsPlusView(
         MapColorScheme.FOLLOW_SYSTEM
       }
     }
+  }
 
-  fun mapCameraToCameraPosition(camera: RNCamera): CameraPosition {
+  fun mapCameraToCameraPosition(camera: RNCamera?): CameraPosition? {
+    camera ?: return null
     val builder = CameraPosition.builder()
     camera.center?.let {
       builder.target(
@@ -312,15 +317,18 @@ class RNGoogleMapsPlusView(
     return builder.build()
   }
 
-  fun mapCameraPotionToCamera(cameraPosition: CameraPosition): RNCamera =
-    RNCamera(
+  fun mapCameraPotionToCamera(cameraPosition: CameraPosition?): RNCamera? {
+    cameraPosition ?: return null
+
+    return RNCamera(
       center = RNLatLng(cameraPosition.target.latitude, cameraPosition.target.longitude),
       zoom = cameraPosition.zoom.toDouble(),
       bearing = cameraPosition.bearing.toDouble(),
       tilt = cameraPosition.tilt.toDouble(),
     )
+  }
 
-  fun mapColorSchemeToUserInterfaceStyle(value: Int): RNUserInterfaceStyle =
+  fun mapColorSchemeToUserInterfaceStyle(value: Int?): RNUserInterfaceStyle =
     when (value) {
       MapColorScheme.LIGHT -> RNUserInterfaceStyle.LIGHT
       MapColorScheme.DARK -> RNUserInterfaceStyle.DARK

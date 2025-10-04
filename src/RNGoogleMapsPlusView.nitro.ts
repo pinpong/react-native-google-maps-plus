@@ -19,17 +19,17 @@ import type {
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
-  buildingEnabled: boolean;
-  trafficEnabled: boolean;
-  customMapStyle: string;
-  initialCamera: RNCamera;
-  userInterfaceStyle: RNUserInterfaceStyle;
-  minZoomLevel: number;
-  maxZoomLevel: number;
-  mapPadding: RNMapPadding;
-  markers: RNMarker[];
-  polygons: RNPolygon[];
-  polylines: RNPolyline[];
+  buildingEnabled?: boolean;
+  trafficEnabled?: boolean;
+  customMapStyle?: string;
+  initialCamera?: RNCamera;
+  userInterfaceStyle?: RNUserInterfaceStyle;
+  minZoomLevel?: number;
+  maxZoomLevel?: number;
+  mapPadding?: RNMapPadding;
+  markers?: RNMarker[];
+  polygons?: RNPolygon[];
+  polylines?: RNPolyline[];
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;

@@ -14,7 +14,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     return impl
   }
 
-  private var currentCustomMapStyle: String = ""
+  private var currentCustomMapStyle: String?
   private let markerOptions = MapMarkerOptions()
   private let polylineOptions = MapPolylineOptions()
   private let polygonOptions = MapPolygonOptions()
@@ -29,35 +29,37 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  var buildingEnabled: Bool {
+  var buildingEnabled: Bool? {
     get { impl.buildingEnabled }
     set { impl.buildingEnabled = newValue }
   }
 
   @MainActor
-  var trafficEnabled: Bool {
+  var trafficEnabled: Bool? {
     get { impl.trafficEnabled }
     set { impl.trafficEnabled = newValue }
   }
 
   @MainActor
-  var customMapStyle: String {
+  var customMapStyle: String? {
     get { currentCustomMapStyle }
     set {
       currentCustomMapStyle = newValue
-      impl.customMapStyle = try? GMSMapStyle(jsonString: newValue)
+      if let value = newValue {
+        impl.customMapStyle = try? GMSMapStyle(jsonString: value)
+      }
     }
   }
 
   @MainActor
-  var initialCamera: RNCamera {
+  var initialCamera: RNCamera? {
     get { mapCameraPositionToCamera(impl.initialCamera) }
     set { impl.initialCamera = mapCameraToGMSCamera(newValue) }
   }
 
   @MainActor
-  var userInterfaceStyle: RNUserInterfaceStyle {
-    get { mapUIUserInterfaceStyletoUserInterfaceStyle(impl.userInterfaceStyle) }
+  var userInterfaceStyle: RNUserInterfaceStyle? {
+    get { mapUIUserInterfaceStyleToUserInterfaceStyle(impl.userInterfaceStyle) }
     set {
       impl.userInterfaceStyle = mapUserInterfaceStyleToUIUserInterfaceStyle(
         newValue
@@ -66,32 +68,32 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  var minZoomLevel: Double {
+  var minZoomLevel: Double? {
     get { impl.minZoomLevel }
     set { impl.minZoomLevel = newValue }
   }
 
   @MainActor
-  var maxZoomLevel: Double {
+  var maxZoomLevel: Double? {
     get { impl.maxZoomLevel }
     set { impl.maxZoomLevel = newValue }
   }
 
   @MainActor
-  var mapPadding: RNMapPadding {
+  var mapPadding: RNMapPadding? {
     get { impl.mapPadding }
     set { impl.mapPadding = newValue }
   }
 
   @MainActor
-  var markers: [RNMarker] = [] {
+  var markers: [RNMarker]? {
     didSet {
       let prevById = Dictionary(
-        oldValue.map { ($0.id, $0) },
+        (oldValue ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
       let nextById = Dictionary(
-        markers.map { ($0.id, $0) },
+        (markers ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
 
@@ -123,14 +125,14 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  var polylines: [RNPolyline] = [] {
+  var polylines: [RNPolyline]? {
     didSet {
       let prevById = Dictionary(
-        oldValue.map { ($0.id, $0) },
+        (oldValue ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
       let nextById = Dictionary(
-        polylines.map { ($0.id, $0) },
+        (polylines ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
 
@@ -155,14 +157,14 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  var polygons: [RNPolygon] = [] {
+  var polygons: [RNPolygon]? {
     didSet {
       let prevById = Dictionary(
-        oldValue.map { ($0.id, $0) },
+        (oldValue ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
       let nextById = Dictionary(
-        polygons.map { ($0.id, $0) },
+        (polygons ?? []).map { ($0.id, $0) },
         uniquingKeysWith: { _, new in new }
       )
 
@@ -264,7 +266,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     return true
   }
 
-  private func mapCameraToGMSCamera(_ c: RNCamera) -> GMSCameraPosition {
+  private func mapCameraToGMSCamera(_ c: RNCamera?) -> GMSCameraPosition? {
+    guard let c = c else { return nil }
+
     let current = impl.currentCamera
     let center = CLLocationCoordinate2D(
       latitude: c.center?.latitude ?? current.target.latitude,
@@ -282,8 +286,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  private func mapCameraPositionToCamera(_ cp: GMSCameraPosition)
-    -> RNCamera {
+  private func mapCameraPositionToCamera(_ cp: GMSCameraPosition?)
+    -> RNCamera? {
+      guard let cp = cp else { return nil }
+
     return RNCamera(
       center: RNLatLng(
         latitude: cp.target.latitude,
@@ -296,25 +302,35 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   func mapUserInterfaceStyleToUIUserInterfaceStyle(
-    _ style: RNUserInterfaceStyle
-  )
-    -> UIUserInterfaceStyle {
-    switch style {
-    case .light: return .light
-    case .dark: return .dark
-    case .default: return .unspecified
-    }
+      _ style: RNUserInterfaceStyle?
+  ) -> UIUserInterfaceStyle? {
+      guard let style = style else { return nil }
+
+      switch style {
+      case .light:
+          return .light
+      case .dark:
+          return .dark
+      case .default:
+          return .unspecified
+      }
   }
 
-  func mapUIUserInterfaceStyletoUserInterfaceStyle(
-    _ uiStyle: UIUserInterfaceStyle
-  ) -> RNUserInterfaceStyle {
-    switch uiStyle {
-    case .light: return .light
-    case .dark: return .dark
-    case .unspecified: return .default
-    @unknown default: return .default
-    }
+  func mapUIUserInterfaceStyleToUserInterfaceStyle(
+      _ uiStyle: UIUserInterfaceStyle?
+  ) -> RNUserInterfaceStyle? {
+      guard let uiStyle = uiStyle else { return nil }
+
+      switch uiStyle {
+      case .light:
+          return .light
+      case .dark:
+          return .dark
+      case .unspecified:
+          return .default
+      @unknown default:
+          return .default
+      }
   }
 }
 

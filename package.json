@@ -14,7 +14,7 @@
     "lint:ios": "cd ios && swiftlint --quiet",
     "format": "yarn format:js && yarn format:ios && yarn format:android",
     "format:js": "prettier --write .",
-    "format:android": "cd android && ktlint ./**/*.kt*",
+    "format:android": "cd android && ktlint --format ./**/*.kt*",
     "format:ios": "cd ios && swiftlint --quiet --fix",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "test": "jest",

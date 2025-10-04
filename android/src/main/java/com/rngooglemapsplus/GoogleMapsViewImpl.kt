@@ -14,7 +14,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -38,25 +37,14 @@ class GoogleMapsViewImpl(
   LifecycleEventListener {
   private var googleMap: GoogleMap? = null
 
-  private var pendingBuildingEnabled: Boolean = false
-  private var pendingTrafficEnabled: Boolean = false
+  private var pendingBuildingEnabled: Boolean? = null
+  private var pendingTrafficEnabled: Boolean? = null
   private var pendingCustomMapStyle: MapStyleOptions? = null
-  private var pendingInitialCamera: CameraPosition =
-    CameraPosition
-      .builder()
-      .target(
-        LatLng(
-          0.0,
-          0.0,
-        ),
-      ).zoom(0f)
-      .bearing(0f)
-      .tilt(0f)
-      .build()
-  private var pendingUserInterfaceStyle: Int = MapColorScheme.FOLLOW_SYSTEM
-  private var pendingMinZoomLevel: Double = 0.0
-  private var pendingMaxZoomLevel: Double = 21.0
-  private var pendingMapPadding: RNMapPadding = RNMapPadding(0.0, 0.0, 0.0, 0.0)
+  private var pendingInitialCamera: CameraPosition? = null
+  private var pendingUserInterfaceStyle: Int? = null
+  private var pendingMinZoomLevel: Double? = null
+  private var pendingMaxZoomLevel: Double? = null
+  private var pendingMapPadding: RNMapPadding? = null
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
@@ -235,27 +223,37 @@ class GoogleMapsViewImpl(
 
   fun applyPending() {
     onUi {
-      googleMap?.setPadding(
-        pendingMapPadding.left.dpToPx().toInt(),
-        pendingMapPadding.top.dpToPx().toInt(),
-        pendingMapPadding.right.dpToPx().toInt(),
-        pendingMapPadding.bottom.dpToPx().toInt(),
-      )
-
-      pendingInitialCamera.let {
+      pendingMapPadding?.let {
+        googleMap?.setPadding(
+          it.left.dpToPx().toInt(),
+          it.top.dpToPx().toInt(),
+          it.right.dpToPx().toInt(),
+          it.bottom.dpToPx().toInt(),
+        )
+      }
+      pendingInitialCamera?.let {
         googleMap?.moveCamera(
           CameraUpdateFactory.newCameraPosition(
             it,
           ),
         )
       }
-
-      googleMap?.isBuildingsEnabled = pendingBuildingEnabled
-      googleMap?.isTrafficEnabled = pendingTrafficEnabled
+      pendingBuildingEnabled?.let {
+        googleMap?.isBuildingsEnabled = it
+      }
+      pendingTrafficEnabled?.let {
+        googleMap?.isTrafficEnabled = it
+      }
       googleMap?.setMapStyle(pendingCustomMapStyle)
-      googleMap?.mapColorScheme = pendingUserInterfaceStyle
-      googleMap?.setMinZoomPreference(pendingMinZoomLevel.toFloat())
-      googleMap?.setMaxZoomPreference(pendingMaxZoomLevel.toFloat())
+      pendingUserInterfaceStyle?.let {
+        googleMap?.mapColorScheme = it
+      }
+      pendingMinZoomLevel?.let {
+        googleMap?.setMinZoomPreference(it.toFloat())
+      }
+      pendingMaxZoomLevel?.let {
+        googleMap?.setMaxZoomPreference(it.toFloat())
+      }
     }
 
     if (pendingMarkers.isNotEmpty()) {
@@ -280,21 +278,25 @@ class GoogleMapsViewImpl(
     }
   }
 
-  var buildingEnabled: Boolean
+  var buildingEnabled: Boolean?
     get() = googleMap?.isBuildingsEnabled ?: pendingBuildingEnabled
     set(value) {
       pendingBuildingEnabled = value
-      onUi {
-        googleMap?.isBuildingsEnabled = value
+      value?.let {
+        onUi {
+          googleMap?.isBuildingsEnabled = it
+        }
       }
     }
 
-  var trafficEnabled: Boolean
+  var trafficEnabled: Boolean?
     get() = googleMap?.isTrafficEnabled ?: pendingTrafficEnabled
     set(value) {
       pendingTrafficEnabled = value
-      onUi {
-        googleMap?.isTrafficEnabled = value
+      value?.let {
+        onUi {
+          googleMap?.isTrafficEnabled = it
+        }
       }
     }
 
@@ -307,50 +309,59 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var initialCamera: CameraPosition
+  var initialCamera: CameraPosition?
     get() = pendingInitialCamera
     set(value) {
       pendingInitialCamera = value
     }
 
-  var userInterfaceStyle: Int
+  var userInterfaceStyle: Int?
     get() = pendingUserInterfaceStyle
     set(value) {
       pendingUserInterfaceStyle = value
-      onUi {
-        googleMap?.mapColorScheme = value
+
+      value?.let {
+        onUi {
+          googleMap?.mapColorScheme = it
+        }
       }
     }
 
-  var minZoomLevel: Double
+  var minZoomLevel: Double?
     get() = pendingMinZoomLevel
     set(value) {
       pendingMinZoomLevel = value
-      onUi {
-        googleMap?.setMinZoomPreference(value.toFloat())
+      value?.let {
+        onUi {
+          googleMap?.setMinZoomPreference(it.toFloat())
+        }
       }
     }
 
-  var maxZoomLevel: Double
+  var maxZoomLevel: Double?
     get() = pendingMaxZoomLevel
     set(value) {
       pendingMaxZoomLevel = value
-      onUi {
-        googleMap?.setMaxZoomPreference(value.toFloat())
+      value?.let {
+        onUi {
+          googleMap?.setMaxZoomPreference(it.toFloat())
+        }
       }
     }
 
-  var mapPadding: RNMapPadding
+  var mapPadding: RNMapPadding?
     get() = pendingMapPadding
     set(value) {
       pendingMapPadding = value
-      onUi {
-        googleMap?.setPadding(
-          value.left.dpToPx().toInt(),
-          value.top.dpToPx().toInt(),
-          value.right.dpToPx().toInt(),
-          value.bottom.dpToPx().toInt(),
-        )
+      value?.let {
+        onUi {
+          googleMap?.setPadding(
+            it.left.dpToPx().toInt(),
+            it.top.dpToPx().toInt(),
+            it.right.dpToPx().toInt(),
+            it.bottom.dpToPx().toInt(),
+          )
+        }
       }
     }
 
