@@ -173,97 +173,97 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   var buildingEnabled: Bool? {
-      get { mapView.isBuildingsEnabled }
-      set {
-          pendingBuildingEnabled = newValue
-          if let value = newValue {
-              mapView.isBuildingsEnabled = value
-          }
+    get { mapView.isBuildingsEnabled }
+    set {
+      pendingBuildingEnabled = newValue
+      if let value = newValue {
+        mapView.isBuildingsEnabled = value
       }
+    }
   }
 
   @MainActor
   var trafficEnabled: Bool? {
-      get { mapView.isTrafficEnabled }
-      set {
-          pendingTrafficEnabled = newValue
-          if let value = newValue {
-              mapView.isTrafficEnabled = value
-          }
+    get { mapView.isTrafficEnabled }
+    set {
+      pendingTrafficEnabled = newValue
+      if let value = newValue {
+        mapView.isTrafficEnabled = value
       }
+    }
   }
 
   @MainActor
   var customMapStyle: GMSMapStyle? {
-      get { pendingCustomMapStyle }
-      set {
-          pendingCustomMapStyle = newValue
-          if let style = newValue {
-              mapView.mapStyle = style
-          }
+    get { pendingCustomMapStyle }
+    set {
+      pendingCustomMapStyle = newValue
+      if let style = newValue {
+        mapView.mapStyle = style
       }
+    }
   }
 
   @MainActor
   var initialCamera: GMSCameraPosition? {
-      get { pendingInitialCamera }
-      set {
-          pendingInitialCamera = newValue
-          if let camera = newValue, !mapReady {
-              mapView.camera = camera
-          }
+    get { pendingInitialCamera }
+    set {
+      pendingInitialCamera = newValue
+      if let camera = newValue, !mapReady {
+        mapView.camera = camera
       }
+    }
   }
 
   @MainActor
   var userInterfaceStyle: UIUserInterfaceStyle? {
-      get { pendingUserInterfaceStyle }
-      set {
-          pendingUserInterfaceStyle = newValue
-          if let style = newValue {
-              mapView.overrideUserInterfaceStyle = style
-          }
+    get { pendingUserInterfaceStyle }
+    set {
+      pendingUserInterfaceStyle = newValue
+      if let style = newValue {
+        mapView.overrideUserInterfaceStyle = style
       }
+    }
   }
 
   @MainActor
   var minZoomLevel: Double? {
-      get { pendingMinZoomLevel }
-      set {
-          pendingMinZoomLevel = newValue
-          if let min = newValue, let max = pendingMaxZoomLevel {
-              mapView.setMinZoom(Float(min), maxZoom: Float(max))
-          }
+    get { pendingMinZoomLevel }
+    set {
+      pendingMinZoomLevel = newValue
+      if let min = newValue, let max = pendingMaxZoomLevel {
+        mapView.setMinZoom(Float(min), maxZoom: Float(max))
       }
+    }
   }
 
   @MainActor
   var maxZoomLevel: Double? {
-      get { pendingMaxZoomLevel }
-      set {
-          pendingMaxZoomLevel = newValue
-          if let max = newValue, let min = pendingMinZoomLevel {
-              mapView.setMinZoom(Float(min), maxZoom: Float(max))
-          }
+    get { pendingMaxZoomLevel }
+    set {
+      pendingMaxZoomLevel = newValue
+      if let max = newValue, let min = pendingMinZoomLevel {
+        mapView.setMinZoom(Float(min), maxZoom: Float(max))
       }
+    }
   }
 
   @MainActor
   var mapPadding: RNMapPadding? {
-      get { pendingMapPadding }
-      set {
-          pendingMapPadding = newValue
-          if let padding = newValue {
-              mapView.padding = UIEdgeInsets(
-                  top: padding.top,
-                  left: padding.left,
-                  bottom: padding.bottom,
-                  right: padding.right
-              )
-          } else {
-              mapView.padding = .zero
-          }
+    get { pendingMapPadding }
+    set {
+      pendingMapPadding = newValue
+      if let padding = newValue {
+        mapView.padding = UIEdgeInsets(
+        top: padding.top,
+        left: padding.left,
+        bottom: padding.bottom,
+        right: padding.right
+        )
+      } else {
+        mapView.padding = .zero
       }
+    }
   }
 
   func setCamera(camera: RNCamera, animated: Bool, durationMS: Double) {

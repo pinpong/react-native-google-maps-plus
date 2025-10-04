@@ -86,6 +86,17 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
+  var mapType: RNMapType? {
+    get {
+      guard let value = impl.mapType else { return nil }
+      return RNMapType(rawValue: value)
+    }
+    set {
+      impl.mapType = newValue.map { Int32($0.rawValue) }
+    }
+  }
+
+  @MainActor
   var markers: [RNMarker]? {
     didSet {
       let prevById = Dictionary(
