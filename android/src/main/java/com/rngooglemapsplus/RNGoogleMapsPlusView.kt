@@ -5,6 +5,7 @@ import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
@@ -21,6 +22,7 @@ class RNGoogleMapsPlusView(
   private val markerOptions = MarkerOptions()
   private val polylineOptions = MapPolylineOptions()
   private val polygonOptions = MapPolygonOptions()
+  private val circleOptions = MapCircleOptions()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerOptions)
@@ -101,27 +103,24 @@ class RNGoogleMapsPlusView(
         } else if (!prev.markerEquals(next)) {
           view.updateMarker(id) { m ->
             onUi {
-              if (prev.coordinate != next.coordinate) {
-                m.position =
-                  com.google.android.gms.maps.model.LatLng(
-                    next.coordinate.latitude,
-                    next.coordinate.longitude,
-                  )
+              m.position =
+                LatLng(
+                  next.coordinate.latitude,
+                  next.coordinate.longitude,
+                )
+              next.zIndex?.let { m.zIndex = it.toFloat() } ?: run {
+                m.zIndex = 0f
               }
-              if (prev.zIndex != next.zIndex) {
-                m.zIndex = next.zIndex.toFloat()
-              }
+
               if (!prev.markerStyleEquals(next)) {
                 markerOptions.buildIconAsync(id, next) { icon ->
                   m.setIcon(icon)
                 }
               }
-              if (prev.anchor != next.anchor) {
-                m.setAnchor(
-                  (next.anchor?.x ?: 0.5).toFloat(),
-                  (next.anchor?.y ?: 0.5).toFloat(),
-                )
-              }
+              m.setAnchor(
+                (next.anchor?.x ?: 0.5).toFloat(),
+                (next.anchor?.y ?: 0.5).toFloat(),
+              )
             }
           }
         }
@@ -147,8 +146,8 @@ class RNGoogleMapsPlusView(
             onUi {
               gms.points =
                 next.coordinates.map {
-                  com.google.android.gms.maps.model
-                    .LatLng(it.latitude, it.longitude)
+
+                  LatLng(it.latitude, it.longitude)
                 }
               next.width?.let { gms.width = it.dpToPx() }
               next.lineCap?.let {
@@ -158,7 +157,7 @@ class RNGoogleMapsPlusView(
               }
               next.lineJoin?.let { gms.jointType = polylineOptions.mapLineJoin(it) }
               next.color?.let { gms.color = it.toColor() }
-              gms.zIndex = next.zIndex.toFloat()
+              next.zIndex?.let { gms.zIndex = it.toFloat() }
             }
           }
         }
@@ -190,7 +189,36 @@ class RNGoogleMapsPlusView(
               next.fillColor?.let { gmsPoly.fillColor = it.toColor() }
               next.strokeColor?.let { gmsPoly.strokeColor = it.toColor() }
               next.strokeWidth?.let { gmsPoly.strokeWidth = it.dpToPx() }
-              gmsPoly.zIndex = next.zIndex.toFloat()
+              next.zIndex?.let { gmsPoly.zIndex = it.toFloat() }
+            }
+          }
+        }
+      }
+      field = value
+    }
+
+  override var circles: Array<RNCircle>? = null
+    set(value) {
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeCircle(id)
+      }
+
+      nextById.forEach { (id, next) ->
+        val prev = prevById[id]
+        if (prev == null) {
+          view.addCircle(id, circleOptions.buildCircleOptions(next))
+        } else if (!prev.circleEquals(next)) {
+          view.updateCircle(id) { gmsCircle ->
+            onUi {
+              gmsCircle.center = LatLng(next.center.latitude, next.center.longitude)
+              next.radius?.let { gmsCircle.radius = it }
+              next.strokeWidth?.let { gmsCircle.strokeWidth = it.dpToPx() }
+              next.strokeColor?.let { gmsCircle.strokeColor = it.toColor() }
+              next.fillColor?.let { gmsCircle.fillColor = it.toColor() }
+              next.zIndex?.let { gmsCircle.zIndex = it.toFloat() } ?: run { gmsCircle.zIndex = 0f }
             }
           }
         }
@@ -225,6 +253,21 @@ class RNGoogleMapsPlusView(
   override var onMarkerPress: ((String) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
+    }
+
+  override var onPolylinePress: ((String) -> Unit)? = null
+    set(cb) {
+      view.onPolylinePress = cb
+    }
+
+  override var onPolygonPress: ((String) -> Unit)? = null
+    set(cb) {
+      view.onPolygonPress = cb
+    }
+
+  override var onCirclePress: ((String) -> Unit)? = null
+    set(cb) {
+      view.onCirclePress = cb
     }
 
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null

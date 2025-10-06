@@ -22,7 +22,8 @@ class MapPolylineOptions {
       pl.lineCap?.let { endCap(mapLineCap(it)) }
       pl.lineJoin?.let { jointType(mapLineJoin(it)) }
       pl.color?.let { color(it.toColor()) }
-      zIndex(pl.zIndex.toFloat())
+      pl.pressable?.let { clickable(it) }
+      pl.zIndex?.let { zIndex(it.toFloat()) }
     }
 
   fun mapLineCap(type: RNLineCapType?): Cap =
@@ -43,6 +44,7 @@ class MapPolylineOptions {
 
 fun RNPolyline.polylineEquals(b: RNPolyline): Boolean {
   if (zIndex != b.zIndex) return false
+  if (pressable != b.pressable) return false
   if ((width ?: 0.0) != (b.width ?: 0.0)) return false
   if (lineCap != b.lineCap) return false
   if (lineJoin != b.lineJoin) return false

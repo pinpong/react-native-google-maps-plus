@@ -12,6 +12,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
@@ -34,20 +36,26 @@ class GoogleMapsViewImpl(
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
   GoogleMap.OnMarkerClickListener,
+  GoogleMap.OnPolylineClickListener,
+  GoogleMap.OnPolygonClickListener,
+  GoogleMap.OnCircleClickListener,
   LifecycleEventListener {
   private var initialized = false
   private var mapReady = false
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
-  private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
-  private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
+
   private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
-  private var cameraMoveReason = -1
+  private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
+  private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
+  private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
 
-  private val polygonsById = mutableMapOf<String, Polygon>()
-  private val polylinesById = mutableMapOf<String, Polyline>()
   private val markersById = mutableMapOf<String, Marker>()
+  private val polylinesById = mutableMapOf<String, Polyline>()
+  private val polygonsById = mutableMapOf<String, Polygon>()
+  private val circlesById = mutableMapOf<String, Circle>()
 
+  private var cameraMoveReason = -1
   private var lastSubmittedLocation: Location? = null
   private var lastSubmittedCameraPosition: CameraPosition? = null
 
@@ -112,6 +120,9 @@ class GoogleMapsViewImpl(
         googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
         googleMap?.setOnCameraIdleListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPolylineClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
       }
       initLocationCallbacks()
@@ -282,6 +293,13 @@ class GoogleMapsViewImpl(
       }
       pendingPolygons.clear()
     }
+
+    if (pendingCircles.isNotEmpty()) {
+      pendingCircles.forEach { (id, opts) ->
+        internalAddCircle(id, opts)
+      }
+      pendingCircles.clear()
+    }
   }
 
   var buildingEnabled: Boolean? = null
@@ -388,6 +406,9 @@ class GoogleMapsViewImpl(
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMarkerPress: ((String) -> Unit)? = null
+  var onPolylinePress: ((String) -> Unit)? = null
+  var onPolygonPress: ((String) -> Unit)? = null
+  var onCirclePress: ((String) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -669,18 +690,76 @@ class GoogleMapsViewImpl(
     pendingPolygons.clear()
   }
 
+  fun addCircle(
+    id: String,
+    opts: CircleOptions,
+  ) {
+    if (googleMap == null) {
+      pendingCircles.add(id to opts)
+      return
+    }
+
+    onUi {
+      circlesById.remove(id)?.remove()
+    }
+    internalAddCircle(id, opts)
+  }
+
+  private fun internalAddCircle(
+    id: String,
+    opts: CircleOptions,
+  ) {
+    onUi {
+      val circle =
+        googleMap?.addCircle(opts).also {
+          it?.tag = id
+        }
+      if (circle != null) {
+        circlesById[id] = circle
+      }
+    }
+  }
+
+  fun updateCircle(
+    id: String,
+    block: (Circle) -> Unit,
+  ) {
+    val circle = circlesById[id] ?: return
+    onUi {
+      block(circle)
+    }
+  }
+
+  fun removeCircle(id: String) {
+    onUi {
+      circlesById.remove(id)?.remove()
+    }
+  }
+
+  fun clearCircles() {
+    onUi {
+      circlesById.values.forEach { it.remove() }
+    }
+    circlesById.clear()
+    pendingCircles.clear()
+  }
+
   fun destroyInternal() {
     onUi {
       markerOptions.cancelAllJobs()
       clearMarkers()
       clearPolylines()
       clearPolygons()
+      clearCircles()
       locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
         setOnCameraIdleListener(null)
         setOnMarkerClickListener(null)
+        setOnPolylineClickListener(null)
+        setOnPolygonClickListener(null)
+        setOnCircleClickListener(null)
         setOnMapClickListener(null)
       }
       googleMap = null
@@ -738,6 +817,18 @@ class GoogleMapsViewImpl(
   override fun onMarkerClick(marker: Marker): Boolean {
     onMarkerPress?.invoke(marker.tag?.toString() ?: "unknown")
     return true
+  }
+
+  override fun onPolylineClick(polyline: Polyline) {
+    onPolylinePress?.invoke(polyline.tag?.toString() ?: "unknown")
+  }
+
+  override fun onPolygonClick(polygon: Polygon) {
+    onPolygonPress?.invoke(polygon.tag?.toString() ?: "unknown")
+  }
+
+  override fun onCircleClick(circle: Circle) {
+    onCirclePress?.invoke(circle.tag?.toString() ?: "unknown")
   }
 
   override fun onMapClick(coordinates: LatLng) {

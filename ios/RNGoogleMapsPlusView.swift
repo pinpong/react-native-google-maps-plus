@@ -11,6 +11,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let markerOptions = MapMarkerOptions()
   private let polylineOptions = MapPolylineOptions()
   private let polygonOptions = MapPolygonOptions()
+  private let circleOptions = MapCircleOptions()
 
   private let impl: GoogleMapsViewImpl
 
@@ -154,15 +155,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.polylineEquals(next) {
-            impl.updatePolyline(id: id) { gms in
-              prev.updatePolyline(next, gms)
+            impl.updatePolyline(id: id) { pl in
+              prev.updatePolyline(next, pl)
             }
-          } else {
-            impl.addPolyline(
-              id: id,
-              polyline: polylineOptions.buildPolyline(next)
-            )
           }
+        } else {
+          impl.addPolyline(
+            id: id,
+            polyline: polylineOptions.buildPolyline(next)
+          )
         }
       }
     }
@@ -192,6 +193,35 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
           }
         } else {
           impl.addPolygon(id: id, polygon: polygonOptions.buildPolygon(next))
+        }
+      }
+    }
+  }
+
+  @MainActor
+  var circles: [RNCircle]? {
+    didSet {
+      let prevById = Dictionary(
+        (oldValue ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+      let nextById = Dictionary(
+        (circles ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+
+      let removed = Set(prevById.keys).subtracting(nextById.keys)
+      removed.forEach { impl.removeCircle(id: $0) }
+
+      for (id, next) in nextById {
+        if let prev = prevById[id] {
+          if !prev.circleEquals(next) {
+            impl.updateCircle(id: id) { circle in
+              prev.updateCircle(next, circle)
+            }
+          }
+        } else {
+          impl.addCircle(id: id, circle: circleOptions.buildCircle(next))
         }
       }
     }
@@ -257,6 +287,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
   var onMarkerPress: ((String) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
+  }
+  var onPolylinePress: ((String) -> Void)? {
+    didSet { impl.onPolylinePress = onPolylinePress }
+  }
+  var onPolygonPress: ((String) -> Void)? {
+    didSet { impl.onPolygonPress = onPolygonPress }
+  }
+  var onCirclePress: ((String) -> Void)? {
+    didSet { impl.onCirclePress = onCirclePress }
   }
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }

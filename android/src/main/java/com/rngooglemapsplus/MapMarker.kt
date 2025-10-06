@@ -36,11 +36,12 @@ class MarkerOptions(
     m: RNMarker,
     icon: BitmapDescriptor,
   ): MarkerOptions =
-    MarkerOptions()
-      .position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
-      .zIndex(m.zIndex.toFloat())
-      .icon(icon)
-      .anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
+    MarkerOptions().apply {
+      position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
+      anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
+      icon(icon)
+      m.zIndex?.let { zIndex(it.toFloat()) }
+    }
 
   fun buildIconAsync(
     id: String,

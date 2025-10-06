@@ -11,13 +11,14 @@ class MapPolylineOptions {
     let pl = GMSPolyline(path: path)
     if let w = p.width { pl.strokeWidth = CGFloat(w) }
     if let c = p.color?.toUIColor() { pl.strokeColor = c }
-    pl.zIndex = Int32(p.zIndex)
     if let cap = p.lineCap {
       /// pl.lineCap = mapLineCap(cap)
     }
     if let join = p.lineJoin {
       /// pl.strokeJoin = mapLineJoin(join)
     }
+    if let pr = p.pressable { pl.isTappable = pr }
+    if let zi = p.zIndex { pl.zIndex = Int32(zi) }
     return pl
   }
 }
@@ -61,7 +62,8 @@ extension RNPolyline {
     if let c = next.color?.toUIColor() {
       pl.strokeColor = c
     }
-    pl.zIndex = Int32(next.zIndex)
+    if let pr = next.pressable { pl.isTappable = pr }
+    if let zi = next.zIndex { pl.zIndex = Int32(zi) }
   }
 
   func polylineEquals(_ b: RNPolyline) -> Bool {
