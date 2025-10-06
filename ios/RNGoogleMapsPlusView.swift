@@ -8,16 +8,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
 
+  private let markerOptions = MapMarkerOptions()
+  private let polylineOptions = MapPolylineOptions()
+  private let polygonOptions = MapPolygonOptions()
+
   private let impl: GoogleMapsViewImpl
 
   var view: UIView {
     return impl
   }
-
-  private var currentCustomMapStyle: String?
-  private let markerOptions = MapMarkerOptions()
-  private let polylineOptions = MapPolylineOptions()
-  private let polygonOptions = MapPolygonOptions()
 
   override init() {
     self.permissionHandler = PermissionHandler()
@@ -28,71 +27,73 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
+  /*
+     /// TODO: prepareForRecycle
+    override func prepareForRecycle() {
+      impl.clearAll()
+    }
+   */
+
+  @MainActor
+  var initialProps: RNInitialProps? {
+    didSet {
+      impl.initMapView(
+        mapId: initialProps?.mapId,
+        liteMode: initialProps?.liteMode,
+        camera: mapCameraToGMSCamera(initialProps?.initialCamera)
+      )
+    }
+  }
+
   @MainActor
   var buildingEnabled: Bool? {
-    get { impl.buildingEnabled }
-    set { impl.buildingEnabled = newValue }
+    didSet { impl.buildingEnabled = buildingEnabled }
   }
 
   @MainActor
   var trafficEnabled: Bool? {
-    get { impl.trafficEnabled }
-    set { impl.trafficEnabled = newValue }
+    didSet { impl.trafficEnabled = trafficEnabled }
   }
 
   @MainActor
   var customMapStyle: String? {
-    get { currentCustomMapStyle }
-    set {
-      currentCustomMapStyle = newValue
-      if let value = newValue {
+    didSet {
+      if let value = customMapStyle {
         impl.customMapStyle = try? GMSMapStyle(jsonString: value)
       }
     }
   }
 
   @MainActor
-  var initialCamera: RNCamera? {
-    get { mapCameraPositionToCamera(impl.initialCamera) }
-    set { impl.initialCamera = mapCameraToGMSCamera(newValue) }
-  }
-
-  @MainActor
   var userInterfaceStyle: RNUserInterfaceStyle? {
-    get { mapUIUserInterfaceStyleToUserInterfaceStyle(impl.userInterfaceStyle) }
-    set {
+    didSet {
       impl.userInterfaceStyle = mapUserInterfaceStyleToUIUserInterfaceStyle(
-        newValue
+        userInterfaceStyle
       )
     }
   }
 
   @MainActor
   var minZoomLevel: Double? {
-    get { impl.minZoomLevel }
-    set { impl.minZoomLevel = newValue }
+    didSet { impl.minZoomLevel = minZoomLevel }
   }
 
   @MainActor
   var maxZoomLevel: Double? {
-    get { impl.maxZoomLevel }
-    set { impl.maxZoomLevel = newValue }
+    didSet { impl.maxZoomLevel = maxZoomLevel }
   }
 
   @MainActor
   var mapPadding: RNMapPadding? {
-    get { impl.mapPadding }
-    set { impl.mapPadding = newValue }
+    didSet { impl.mapPadding = mapPadding }
   }
 
   @MainActor
   var mapType: RNMapType? {
-    get {
-      guard let value = impl.mapType else { return nil }
-      return RNMapType(rawValue: value)
-    }
-    set {
-      impl.mapType = newValue.map { Int32($0.rawValue) }
+    didSet {
+      impl.mapType = mapType.map {
+        GMSMapViewType(rawValue: UInt($0.rawValue)) ?? .normal
+      }
     }
   }
 
@@ -197,9 +198,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   func setCamera(camera: RNCamera, animated: Bool?, durationMS: Double?) {
+    let current = impl.currentCamera
+
+    let zoom = Float(camera.zoom ?? Double(current?.zoom ?? 0))
+    let bearing = camera.bearing ?? current?.bearing ?? 0
+    let viewingAngle = camera.bearing ?? current?.viewingAngle ?? 0
+
+    let target = CLLocationCoordinate2D(
+      latitude: camera.center?.latitude ?? current?.target.latitude ?? 0,
+      longitude: camera.center?.longitude ?? current?.target.longitude ?? 0
+    )
+
+    let cam = GMSCameraPosition.camera(
+      withTarget: target,
+      zoom: zoom,
+      bearing: bearing,
+      viewingAngle: viewingAngle
+    )
     onMain {
       self.impl.setCamera(
-        camera: camera,
+        camera: cam,
         animated: animated ?? true,
         durationMS: durationMS ?? 3000
       )
@@ -223,40 +241,31 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   var onMapError: ((RNMapErrorCode) -> Void)? {
-    get { impl.onMapError }
-    set { impl.onMapError = newValue }
+    didSet { impl.onMapError = onMapError }
   }
   var onMapReady: ((Bool) -> Void)? {
-    get { impl.onMapReady }
-    set { impl.onMapReady = newValue }
+    didSet { impl.onMapReady = onMapReady }
   }
   var onLocationUpdate: ((RNLocation) -> Void)? {
-    get { impl.onLocationUpdate }
-    set { impl.onLocationUpdate = newValue }
+    didSet { impl.onLocationUpdate = onLocationUpdate }
   }
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)? {
-    get { impl.onLocationError }
-    set { impl.onLocationError = newValue }
+    didSet { impl.onLocationError = onLocationError }
   }
   var onMapPress: ((RNLatLng) -> Void)? {
-    get { impl.onMapPress }
-    set { impl.onMapPress = newValue }
+    didSet { impl.onMapPress = onMapPress }
   }
   var onMarkerPress: ((String) -> Void)? {
-    get { impl.onMarkerPress }
-    set { impl.onMarkerPress = newValue }
+    didSet { impl.onMarkerPress = onMarkerPress }
   }
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
-    get { impl.onCameraChangeStart }
-    set { impl.onCameraChangeStart = newValue }
+    didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
-    get { impl.onCameraChange }
-    set { impl.onCameraChange = newValue }
+    didSet { impl.onCameraChange = onCameraChange }
   }
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
-    get { impl.onCameraChangeComplete }
-    set { impl.onCameraChangeComplete = newValue }
+    didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
   func showLocationDialog() {
@@ -282,33 +291,18 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
     let current = impl.currentCamera
     let center = CLLocationCoordinate2D(
-      latitude: c.center?.latitude ?? current.target.latitude,
-      longitude: c.center?.longitude ?? current.target.longitude
+      latitude: c.center?.latitude ?? current?.target.latitude ?? 0,
+      longitude: c.center?.longitude ?? current?.target.longitude ?? 0
     )
-    let z = Float(c.zoom ?? Double(current.zoom))
-    let b = c.bearing ?? current.bearing
-    let t = c.tilt ?? current.viewingAngle
+    let z = Float(c.zoom ?? Double(current?.zoom ?? 0))
+    let b = c.bearing ?? current?.bearing ?? 0
+    let t = c.tilt ?? current?.viewingAngle ?? 0
 
     return GMSCameraPosition.camera(
       withTarget: center,
       zoom: z,
       bearing: b,
       viewingAngle: t
-    )
-  }
-
-  private func mapCameraPositionToCamera(_ cp: GMSCameraPosition?)
-  -> RNCamera? {
-    guard let cp = cp else { return nil }
-
-    return RNCamera(
-      center: RNLatLng(
-        latitude: cp.target.latitude,
-        longitude: cp.target.longitude
-      ),
-      zoom: Double(cp.zoom),
-      bearing: cp.bearing,
-      tilt: cp.viewingAngle
     )
   }
 
@@ -324,23 +318,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       return .dark
     case .default:
       return .unspecified
-    }
-  }
-
-  func mapUIUserInterfaceStyleToUserInterfaceStyle(
-    _ uiStyle: UIUserInterfaceStyle?
-  ) -> RNUserInterfaceStyle? {
-    guard let uiStyle = uiStyle else { return nil }
-
-    switch uiStyle {
-    case .light:
-      return .light
-    case .dark:
-      return .dark
-    case .unspecified:
-      return .default
-    @unknown default:
-      return .default
     }
   }
 }

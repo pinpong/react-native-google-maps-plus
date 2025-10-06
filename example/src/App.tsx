@@ -353,6 +353,17 @@ export default function App() {
             mapRef.current = ref;
           },
         }}
+        initialProps={{
+          /// mapStyle not working with mapId
+          /// mapId: '111',
+          initialCamera: {
+            center: {
+              latitude: 37.7749,
+              longitude: -122.4194,
+            },
+            zoom: 15,
+          },
+        }}
         onMapReady={callback((ready) => console.log('Map is ready! ' + ready))}
         style={styles.map}
         buildingEnabled={true}
@@ -360,13 +371,6 @@ export default function App() {
         customMapStyle={JSON.stringify(
           normalStyle ? standardMapStyle : silverMapStyle
         )}
-        initialCamera={{
-          center: {
-            latitude: 37.7749,
-            longitude: -122.4194,
-          },
-          zoom: 15,
-        }}
         userInterfaceStyle={'light'}
         mapType={'normal'}
         maxZoomLevel={20}
