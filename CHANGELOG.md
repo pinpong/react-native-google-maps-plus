@@ -1,3 +1,9 @@
+## [1.0.0-dev.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2025-10-06)
+
+### 🐛 Bug Fixes
+
+* dev package version ([1317f23](https://github.com/pinpong/react-native-google-maps-plus/commit/1317f234d832a623c6e5dbce4dafd9154da73857))
+
 ## 1.0.0-dev.1 (2025-10-06)
 
 ### ✨ Features
