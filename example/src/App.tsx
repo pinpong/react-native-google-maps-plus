@@ -368,6 +368,7 @@ export default function App() {
           zoom: 15,
         }}
         userInterfaceStyle={'light'}
+        mapType={'normal'}
         maxZoomLevel={20}
         minZoomLevel={0}
         mapPadding={{

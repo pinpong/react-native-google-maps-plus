@@ -16,6 +16,7 @@ import type {
   RNRegion,
   RNLocation,
   RNMapErrorCode,
+  RNMapType,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -27,6 +28,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   minZoomLevel?: number;
   maxZoomLevel?: number;
   mapPadding?: RNMapPadding;
+  mapType?: RNMapType;
   markers?: RNMarker[];
   polygons?: RNPolygon[];
   polylines?: RNPolyline[];
