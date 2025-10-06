@@ -1,6 +1,6 @@
 {
   "name": "react-native-google-maps-plus",
-  "version": "1.0.3-dev.0",
+  "version": "1.0.3-dev.1",
   "description": "React-native wrapper for android & IOS google maps sdk",
   "main": "./lib/module/index.js",
   "module": "./lib/module/index.js",
