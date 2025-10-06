@@ -14,7 +14,7 @@ final class PermissionHandler: NSObject, CLLocationManagerDelegate {
   }
 
   func requestLocationPermission()
-    -> NitroModules.Promise<RNLocationPermissionResult> {
+  -> NitroModules.Promise<RNLocationPermissionResult> {
     let promise = NitroModules.Promise<RNLocationPermissionResult>()
 
     let status = manager.authorizationStatus

@@ -268,7 +268,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   func requestLocationPermission()
-    -> NitroModules.Promise<RNLocationPermissionResult> {
+  -> NitroModules.Promise<RNLocationPermissionResult> {
     return permissionHandler.requestLocationPermission()
   }
 
@@ -298,8 +298,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   private func mapCameraPositionToCamera(_ cp: GMSCameraPosition?)
-    -> RNCamera? {
-      guard let cp = cp else { return nil }
+  -> RNCamera? {
+    guard let cp = cp else { return nil }
 
     return RNCamera(
       center: RNLatLng(
@@ -313,35 +313,35 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   func mapUserInterfaceStyleToUIUserInterfaceStyle(
-      _ style: RNUserInterfaceStyle?
+    _ style: RNUserInterfaceStyle?
   ) -> UIUserInterfaceStyle? {
-      guard let style = style else { return nil }
+    guard let style = style else { return nil }
 
-      switch style {
-      case .light:
-          return .light
-      case .dark:
-          return .dark
-      case .default:
-          return .unspecified
-      }
+    switch style {
+    case .light:
+      return .light
+    case .dark:
+      return .dark
+    case .default:
+      return .unspecified
+    }
   }
 
   func mapUIUserInterfaceStyleToUserInterfaceStyle(
-      _ uiStyle: UIUserInterfaceStyle?
+    _ uiStyle: UIUserInterfaceStyle?
   ) -> RNUserInterfaceStyle? {
-      guard let uiStyle = uiStyle else { return nil }
+    guard let uiStyle = uiStyle else { return nil }
 
-      switch uiStyle {
-      case .light:
-          return .light
-      case .dark:
-          return .dark
-      case .unspecified:
-          return .default
-      @unknown default:
-          return .default
-      }
+    switch uiStyle {
+    case .light:
+      return .light
+    case .dark:
+      return .dark
+    case .unspecified:
+      return .default
+    @unknown default:
+      return .default
+    }
   }
 }
 

@@ -66,11 +66,11 @@ extension RNPolyline {
 
   func polylineEquals(_ b: RNPolyline) -> Bool {
     guard zIndex == b.zIndex,
-      (width ?? 0) == (b.width ?? 0),
-      lineCap == b.lineCap,
-      lineJoin == b.lineJoin,
-      color == b.color,
-      coordinates.count == b.coordinates.count
+          (width ?? 0) == (b.width ?? 0),
+          lineCap == b.lineCap,
+          lineJoin == b.lineJoin,
+          color == b.color,
+          coordinates.count == b.coordinates.count
     else { return false }
     for i in 0..<coordinates.count {
       if coordinates[i].latitude != b.coordinates[i].latitude

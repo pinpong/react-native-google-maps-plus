@@ -39,10 +39,10 @@ extension RNPolygon {
 
   func polygonEquals(_ b: RNPolygon) -> Bool {
     guard zIndex == b.zIndex,
-      strokeWidth == b.strokeWidth,
-      fillColor == b.fillColor,
-      strokeColor == b.strokeColor,
-      coordinates.count == b.coordinates.count
+          strokeWidth == b.strokeWidth,
+          fillColor == b.fillColor,
+          strokeColor == b.strokeColor,
+          coordinates.count == b.coordinates.count
     else { return false }
     for i in 0..<coordinates.count {
       if coordinates[i].latitude != b.coordinates[i].latitude
