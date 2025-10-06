@@ -41,17 +41,17 @@ extension UIColor {
   private static func fromRGBFunction(_ s: String) -> UIColor? {
     let nums =
       s
-      .replacingOccurrences(of: "rgba", with: "")
-      .replacingOccurrences(of: "rgb", with: "")
-      .replacingOccurrences(of: "(", with: "")
-      .replacingOccurrences(of: ")", with: "")
-      .split(separator: ",")
-      .map { $0.trimmingCharacters(in: .whitespaces) }
+        .replacingOccurrences(of: "rgba", with: "")
+        .replacingOccurrences(of: "rgb", with: "")
+        .replacingOccurrences(of: "(", with: "")
+        .replacingOccurrences(of: ")", with: "")
+        .split(separator: ",")
+        .map { $0.trimmingCharacters(in: .whitespaces) }
 
     guard nums.count == 3 || nums.count == 4,
-      let r = Double(nums[0]),
-      let g = Double(nums[1]),
-      let b = Double(nums[2])
+          let r = Double(nums[0]),
+          let g = Double(nums[1]),
+          let b = Double(nums[2])
     else { return nil }
     let a = (nums.count == 4) ? (Double(nums[3]) ?? 1.0) : 1.0
     return UIColor(
@@ -65,18 +65,18 @@ extension UIColor {
   private static func fromHSLFunction(_ s: String) -> UIColor? {
     let parts =
       s
-      .replacingOccurrences(of: "hsla", with: "")
-      .replacingOccurrences(of: "hsl", with: "")
-      .replacingOccurrences(of: "(", with: "")
-      .replacingOccurrences(of: ")", with: "")
-      .replacingOccurrences(of: "%", with: "")
-      .split(separator: ",")
-      .map { $0.trimmingCharacters(in: .whitespaces) }
+        .replacingOccurrences(of: "hsla", with: "")
+        .replacingOccurrences(of: "hsl", with: "")
+        .replacingOccurrences(of: "(", with: "")
+        .replacingOccurrences(of: ")", with: "")
+        .replacingOccurrences(of: "%", with: "")
+        .split(separator: ",")
+        .map { $0.trimmingCharacters(in: .whitespaces) }
 
     guard parts.count == 3 || parts.count == 4,
-      let h = Double(parts[0]),
-      let sPerc = Double(parts[1]),
-      let lPerc = Double(parts[2])
+          let h = Double(parts[0]),
+          let sPerc = Double(parts[1]),
+          let lPerc = Double(parts[2])
     else { return nil }
 
     let a = (parts.count == 4) ? (Double(parts[3]) ?? 1.0) : 1.0
@@ -87,7 +87,7 @@ extension UIColor {
     let x = c * (1 - Swift.abs((h / 60).truncatingRemainder(dividingBy: 2) - 1))
     let m = l - c / 2
 
-// swiftlint:disable:next large_tuple
+    // swiftlint:disable:next large_tuple
     let (r1, g1, b1): (Double, Double, Double)
     switch h {
     case 0..<60: (r1, g1, b1) = (c, x, 0)

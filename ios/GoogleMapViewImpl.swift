@@ -97,7 +97,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       if self.lastSubmittedLocation?.coordinate.latitude
         != loc.coordinate.latitude
         || self.lastSubmittedLocation?.coordinate.longitude
-          != loc.coordinate.longitude {
+        != loc.coordinate.longitude {
         self.onLocationUpdate?(
           RNLocation(
             RNLatLng(
@@ -120,36 +120,36 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private func applyPending() {
 
     if let padding = pendingMapPadding {
-        mapView.padding = UIEdgeInsets(
-            top: padding.top,
-            left: padding.left,
-            bottom: padding.bottom,
-            right: padding.right
-        )
+      mapView.padding = UIEdgeInsets(
+        top: padding.top,
+        left: padding.left,
+        bottom: padding.bottom,
+        right: padding.right
+      )
     }
 
     if let style = pendingCustomMapStyle {
-        mapView.mapStyle = style
+      mapView.mapStyle = style
     }
 
     if let mapType = pendingMapType {
-       mapView.mapType = mapType
+      mapView.mapType = mapType
     }
 
     if let buildings = pendingBuildingEnabled {
-        mapView.isBuildingsEnabled = buildings
+      mapView.isBuildingsEnabled = buildings
     }
 
     if let traffic = pendingTrafficEnabled {
-        mapView.isTrafficEnabled = traffic
+      mapView.isTrafficEnabled = traffic
     }
 
     if let uiStyle = pendingUserInterfaceStyle {
-        mapView.overrideUserInterfaceStyle = uiStyle
+      mapView.overrideUserInterfaceStyle = uiStyle
     }
 
     if let minZoom = pendingMinZoomLevel, let maxZoom = pendingMaxZoomLevel {
-        mapView.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
+      mapView.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
     }
 
     if !pendingMarkers.isEmpty {
@@ -260,10 +260,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingMapPadding = newValue
       if let padding = newValue {
         mapView.padding = UIEdgeInsets(
-        top: padding.top,
-        left: padding.left,
-        bottom: padding.bottom,
-        right: padding.right
+          top: padding.top,
+          left: padding.left,
+          bottom: padding.bottom,
+          right: padding.right
         )
       } else {
         mapView.padding = .zero
@@ -494,7 +494,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     super.didMoveToWindow()
     if window != nil {
       if mapView != nil && mapReady {
-       onMapReady?(true)
+        onMapReady?(true)
       }
       locationHandler.start()
     } else {
@@ -541,11 +541,11 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
     if let last = lastSubmittedCameraPosition,
-      last.target.latitude == position.target.latitude,
-      last.target.longitude == position.target.longitude,
-      last.zoom == position.zoom,
-      last.bearing == position.bearing,
-      last.viewingAngle == position.viewingAngle {
+       last.target.latitude == position.target.latitude,
+       last.target.longitude == position.target.longitude,
+       last.zoom == position.zoom,
+       last.bearing == position.bearing,
+       last.viewingAngle == position.viewingAngle {
       return
     }
     let visibleRegion = mapView.projection.visibleRegion()
@@ -613,10 +613,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     didTapAt coordinate: CLLocationCoordinate2D
   ) {
     onMapPress?(
-    RNLatLng(
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude
-    ))
+      RNLatLng(
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude
+      ))
   }
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {

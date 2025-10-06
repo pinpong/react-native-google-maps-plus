@@ -1,0 +1,17 @@
+--swiftversion 5.10
+--disable conditionalAssignment
+--disable redundantType
+--disable unusedArguments
+--binary-grouping none
+--decimal-grouping none
+--hex-literal-case lowercase
+--indent 2
+--no-space-operators
+--semicolons never
+--trailing-commas never
+--rules braces,indent
+--wrap-arguments preserve
+--wrap-parameters preserve
+--wrap-collections preserve
+--closing-paren same-line
+--xcode-indentation enabled
