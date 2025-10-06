@@ -21,7 +21,7 @@
     "git:clean": "git clean -dfX",
     "release": "semantic-release",
     "build": "yarn nitrogen && bob build",
-    "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/post-script.js",
+    "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
     "prepare": "bob build"
   },
   "keywords": [

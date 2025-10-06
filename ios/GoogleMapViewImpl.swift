@@ -6,18 +6,9 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   private let locationHandler: LocationHandler
   private let markerOptions: MapMarkerOptions
-  private var mapView: GMSMapView!
+  private var mapView: GMSMapView?
+  private var initialized = false
   private var mapReady = false
-
-  private var pendingBuildingEnabled: Bool?
-  private var pendingTrafficEnabled: Bool?
-  private var pendingCustomMapStyle: GMSMapStyle?
-  private var pendingInitialCamera: GMSCameraPosition?
-  private var pendingUserInterfaceStyle: UIUserInterfaceStyle?
-  private var pendingMinZoomLevel: Double?
-  private var pendingMaxZoomLevel: Double?
-  private var pendingMapPadding: RNMapPadding?
-  private var pendingMapType: GMSMapViewType?
 
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
@@ -50,15 +41,6 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     self.markerOptions = markerOptions
     super.init(frame: frame)
     setupAppLifecycleObservers()
-    setupMap()
-
-    /// wait 1 second if alle setter called
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-      self?.initLocationCallbacks()
-      self?.applyPending()
-      self?.onMapReady?(true)
-      self?.mapReady = true
-    }
   }
 
   private func setupAppLifecycleObservers() {
@@ -81,14 +63,31 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   @MainActor
-  private func setupMap() {
+  func initMapView(mapId: String?, liteMode: Bool?, camera: GMSCameraPosition?) {
+    if(initialized) {return}
+    initialized = true
     let options = GMSMapViewOptions()
     options.frame = bounds
+    if let mapId = mapId {
+      options.mapID = GMSMapID(identifier: mapId)
+    }
+    if let liteMode = liteMode {
+      /// not supported
+    }
+    if let camera = camera {
+      options.camera = camera
+    }
     mapView = GMSMapView.init(options: options)
-    mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    mapView.paddingAdjustmentBehavior = .never
-    mapView.delegate = self
-    addSubview(mapView)
+    mapView?.delegate = self
+    mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    mapView?.paddingAdjustmentBehavior = .never
+    if let mapView = mapView {
+      addSubview(mapView)
+    }
+    initLocationCallbacks()
+    applyPending()
+    onMapReady?(true)
+    mapReady = true
   }
 
   private func initLocationCallbacks() {
@@ -119,8 +118,8 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   @MainActor
   private func applyPending() {
 
-    if let padding = pendingMapPadding {
-      mapView.padding = UIEdgeInsets(
+    if let padding = mapPadding {
+      mapView?.padding = UIEdgeInsets(
         top: padding.top,
         left: padding.left,
         bottom: padding.bottom,
@@ -128,28 +127,28 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       )
     }
 
-    if let style = pendingCustomMapStyle {
-      mapView.mapStyle = style
+    if let style = customMapStyle {
+      mapView?.mapStyle = style
     }
 
-    if let mapType = pendingMapType {
-      mapView.mapType = mapType
+    if let mapType = mapType {
+      mapView?.mapType = mapType
     }
 
-    if let buildings = pendingBuildingEnabled {
-      mapView.isBuildingsEnabled = buildings
+    if let buildings = buildingEnabled {
+      mapView?.isBuildingsEnabled = buildings
     }
 
-    if let traffic = pendingTrafficEnabled {
-      mapView.isTrafficEnabled = traffic
+    if let traffic = trafficEnabled {
+      mapView?.isTrafficEnabled = traffic
     }
 
-    if let uiStyle = pendingUserInterfaceStyle {
-      mapView.overrideUserInterfaceStyle = uiStyle
+    if let uiStyle = userInterfaceStyle {
+      mapView?.overrideUserInterfaceStyle = uiStyle
     }
 
-    if let minZoom = pendingMinZoomLevel, let maxZoom = pendingMaxZoomLevel {
-      mapView.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
+    if let minZoom = minZoomLevel, let maxZoom = maxZoomLevel {
+      mapView?.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
     }
 
     if !pendingMarkers.isEmpty {
@@ -172,141 +171,98 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     }
   }
 
-  var currentCamera: GMSCameraPosition {
-    mapView.camera
+  var currentCamera: GMSCameraPosition? {
+    mapView?.camera
   }
 
   @MainActor
   var buildingEnabled: Bool? {
-    get { mapView.isBuildingsEnabled }
-    set {
-      pendingBuildingEnabled = newValue
-      if let value = newValue {
-        mapView.isBuildingsEnabled = value
+    didSet {
+      if let value = buildingEnabled {
+        mapView?.isBuildingsEnabled = value
       }
     }
   }
 
   @MainActor
   var trafficEnabled: Bool? {
-    get { mapView.isTrafficEnabled }
-    set {
-      pendingTrafficEnabled = newValue
-      if let value = newValue {
-        mapView.isTrafficEnabled = value
+    didSet {
+      if let value = trafficEnabled {
+        mapView?.isTrafficEnabled = value
       }
     }
   }
 
   @MainActor
   var customMapStyle: GMSMapStyle? {
-    get { pendingCustomMapStyle }
-    set {
-      pendingCustomMapStyle = newValue
-      if let style = newValue {
-        mapView.mapStyle = style
-      }
-    }
-  }
-
-  @MainActor
-  var initialCamera: GMSCameraPosition? {
-    get { pendingInitialCamera }
-    set {
-      pendingInitialCamera = newValue
-      if let camera = newValue, !mapReady {
-        mapView.camera = camera
+    didSet {
+      if let style = customMapStyle {
+        mapView?.mapStyle = style
       }
     }
   }
 
   @MainActor
   var userInterfaceStyle: UIUserInterfaceStyle? {
-    get { pendingUserInterfaceStyle }
-    set {
-      pendingUserInterfaceStyle = newValue
-      if let style = newValue {
-        mapView.overrideUserInterfaceStyle = style
+    didSet {
+      if let style = userInterfaceStyle {
+        mapView?.overrideUserInterfaceStyle = style
       }
     }
   }
 
   @MainActor
   var minZoomLevel: Double? {
-    get { pendingMinZoomLevel }
-    set {
-      pendingMinZoomLevel = newValue
-      if let min = newValue, let max = pendingMaxZoomLevel {
-        mapView.setMinZoom(Float(min), maxZoom: Float(max))
+    didSet {
+      if let min = minZoomLevel, let max = maxZoomLevel {
+        mapView?.setMinZoom(Float(min), maxZoom: Float(max))
       }
     }
   }
 
   @MainActor
   var maxZoomLevel: Double? {
-    get { pendingMaxZoomLevel }
-    set {
-      pendingMaxZoomLevel = newValue
-      if let max = newValue, let min = pendingMinZoomLevel {
-        mapView.setMinZoom(Float(min), maxZoom: Float(max))
+    didSet {
+      if let max = maxZoomLevel, let min = minZoomLevel {
+        mapView?.setMinZoom(Float(min), maxZoom: Float(max))
       }
     }
   }
 
   @MainActor
   var mapPadding: RNMapPadding? {
-    get { pendingMapPadding }
-    set {
-      pendingMapPadding = newValue
-      if let padding = newValue {
-        mapView.padding = UIEdgeInsets(
+    didSet {
+      mapPadding
+      if let padding = mapPadding {
+        mapView?.padding = UIEdgeInsets(
           top: padding.top,
           left: padding.left,
           bottom: padding.bottom,
           right: padding.right
         )
       } else {
-        mapView.padding = .zero
+        mapView?.padding = .zero
       }
     }
   }
 
-  @MainActor var mapType: Int32? {
-    get { pendingMapType.map { Int32($0.rawValue) } }
-    set {
-      pendingMapType = GMSMapViewType(rawValue: UInt(newValue ?? 1))
-      mapView.mapType = pendingMapType ?? .normal
+  @MainActor var mapType: GMSMapViewType? {
+    didSet {
+      mapView?.mapType = mapType ?? .normal
     }
   }
 
-  func setCamera(camera: RNCamera, animated: Bool, durationMS: Double) {
-    let current = mapView.camera
-
-    let zoom = Float(camera.zoom ?? Double(current.zoom))
-    let bearing = camera.bearing ?? current.bearing
-    let viewingAngle = camera.bearing ?? current.viewingAngle
-
-    let target = CLLocationCoordinate2D(
-      latitude: camera.center?.latitude ?? mapView.camera.target.latitude,
-      longitude: camera.center?.longitude ?? mapView.camera.target.longitude
-    )
-
-    let cam = GMSCameraPosition.camera(
-      withTarget: target,
-      zoom: zoom,
-      bearing: bearing,
-      viewingAngle: viewingAngle
-    )
+  func setCamera(camera: GMSCameraPosition, animated: Bool, durationMS: Double) {
     if animated {
       withCATransaction(
         disableActions: false,
         duration: durationMS / 1000.0
       ) {
-        mapView.animate(to: cam)
+        mapView?.animate(to: camera)
       }
     } else {
-      let update = GMSCameraUpdate.setCamera(cam)
-      mapView.moveCamera(update)
+      let update = GMSCameraUpdate.setCamera(camera)
+      mapView?.moveCamera(update)
     }
   }
 
@@ -352,10 +308,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
         disableActions: false,
         duration: durationMS / 1000.0
       ) {
-        mapView.animate(with: update)
+        mapView?.animate(with: update)
       }
     } else {
-      mapView.moveCamera(update)
+      mapView?.moveCamera(update)
     }
   }
 
@@ -464,19 +420,14 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     pendingPolygons.removeAll()
   }
 
-  func clearAll() {
+  func deinitInternal() {
     markerOptions.cancelAllIconTasks()
     clearMarkers()
     clearPolylines()
     clearPolygons()
     locationHandler.stop()
-    clearMap()
-  }
-
-  @MainActor
-  func clearMap() {
-    mapView.clear()
-    mapView.delegate = nil
+    mapView?.clear()
+    mapView?.delegate = nil
     mapView = nil
   }
 
@@ -504,7 +455,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   deinit {
     NotificationCenter.default.removeObserver(self)
-    clearAll()
+    deinitInternal()
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {

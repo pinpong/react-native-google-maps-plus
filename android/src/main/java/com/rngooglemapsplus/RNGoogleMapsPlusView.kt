@@ -17,28 +17,34 @@ class RNGoogleMapsPlusView(
   private var permissionHandler = PermissionHandler(context)
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
+
   private val markerOptions = MarkerOptions()
+  private val polylineOptions = MapPolylineOptions()
+  private val polygonOptions = MapPolygonOptions()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerOptions)
 
-  private val polylineOptions = MapPolylineOptions()
-  private val polygonOptions = MapPolygonOptions()
+  override var initialProps: RNInitialProps? = null
+    set(value) {
+      view.initMapView(
+        value?.mapId,
+        value?.liteMode,
+        mapCameraToCameraPosition(value?.initialCamera),
+      )
+    }
 
-  override var buildingEnabled: Boolean?
-    get() = view.buildingEnabled
+  override var buildingEnabled: Boolean? = null
     set(value) {
       view.buildingEnabled = value
     }
 
-  override var trafficEnabled: Boolean?
-    get() = view.trafficEnabled
+  override var trafficEnabled: Boolean? = null
     set(value) {
       view.trafficEnabled = value
     }
 
-  override var customMapStyle: String?
-    get() = currentCustomMapStyle
+  override var customMapStyle: String? = null
     set(value) {
       currentCustomMapStyle = value
       value?.let {
@@ -46,45 +52,34 @@ class RNGoogleMapsPlusView(
       }
     }
 
-  override var initialCamera: RNCamera?
-    get() = mapCameraPotionToCamera(view.initialCamera)
-    set(value) {
-      view.initialCamera = mapCameraToCameraPosition(value)
-    }
-
-  override var userInterfaceStyle: RNUserInterfaceStyle?
-    get() = mapColorSchemeToUserInterfaceStyle(view.userInterfaceStyle)
+  override var userInterfaceStyle: RNUserInterfaceStyle? = null
     set(value) {
       view.userInterfaceStyle = userInterfaceStyleToMapColorScheme(value)
     }
 
-  override var minZoomLevel: Double?
-    get() = view.minZoomLevel
+  override var minZoomLevel: Double? = null
     set(value) {
       view.minZoomLevel = value
     }
 
-  override var maxZoomLevel: Double?
-    get() = view.maxZoomLevel
+  override var maxZoomLevel: Double? = null
     set(value) {
       view.maxZoomLevel = value
     }
 
-  override var mapPadding: RNMapPadding?
-    get() = view.mapPadding
+  override var mapPadding: RNMapPadding? = null
     set(value) {
       view.mapPadding = value
     }
 
-  override var mapType: RNMapType?
-    get() = RNMapType.entries.firstOrNull { it.value == view.mapType }
+  override var mapType: RNMapType? = null
     set(value) {
       value?.let {
         view.mapType = it.value
       }
     }
 
-  override var markers: Array<RNMarker>? = emptyArray()
+  override var markers: Array<RNMarker>? = null
     set(value) {
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
@@ -134,7 +129,7 @@ class RNGoogleMapsPlusView(
       field = value
     }
 
-  override var polylines: Array<RNPolyline>? = emptyArray()
+  override var polylines: Array<RNPolyline>? = null
     set(value) {
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
@@ -171,7 +166,7 @@ class RNGoogleMapsPlusView(
       field = value
     }
 
-  override var polygons: Array<RNPolygon>? = emptyArray()
+  override var polygons: Array<RNPolygon>? = null
     set(value) {
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
@@ -203,55 +198,46 @@ class RNGoogleMapsPlusView(
       field = value
     }
 
-  override var onMapError: ((RNMapErrorCode) -> Unit)?
-    get() = view.onMapError
+  override var onMapError: ((RNMapErrorCode) -> Unit)? = null
     set(cb) {
       view.onMapError = cb
     }
 
-  override var onMapReady: ((Boolean) -> Unit)?
-    get() = view.onMapReady
+  override var onMapReady: ((Boolean) -> Unit)? = null
     set(cb) {
       view.onMapReady = cb
     }
-  override var onLocationUpdate: ((RNLocation) -> Unit)?
-    get() = view.onLocationUpdate
+  override var onLocationUpdate: ((RNLocation) -> Unit)? = null
     set(cb) {
       view.onLocationUpdate = cb
     }
 
-  override var onLocationError: ((RNLocationErrorCode) -> Unit)?
-    get() = view.onLocationError
+  override var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
     set(cb) {
       view.onLocationError = cb
     }
 
-  override var onMapPress: ((RNLatLng) -> Unit)?
-    get() = view.onMapPress
+  override var onMapPress: ((RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMapPress = cb
     }
 
-  override var onMarkerPress: ((String) -> Unit)?
-    get() = view.onMarkerPress
+  override var onMarkerPress: ((String) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
     }
 
-  override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)?
-    get() = view.onCameraChangeStart
+  override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeStart = cb
     }
 
-  override var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)?
-    get() = view.onCameraChange
+  override var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChange = cb
     }
 
-  override var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)?
-    get() = view.onCameraChangeComplete
+  override var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeComplete = cb
     }
@@ -324,24 +310,6 @@ class RNGoogleMapsPlusView(
 
     return builder.build()
   }
-
-  fun mapCameraPotionToCamera(cameraPosition: CameraPosition?): RNCamera? {
-    cameraPosition ?: return null
-
-    return RNCamera(
-      center = RNLatLng(cameraPosition.target.latitude, cameraPosition.target.longitude),
-      zoom = cameraPosition.zoom.toDouble(),
-      bearing = cameraPosition.bearing.toDouble(),
-      tilt = cameraPosition.tilt.toDouble(),
-    )
-  }
-
-  fun mapColorSchemeToUserInterfaceStyle(value: Int?): RNUserInterfaceStyle =
-    when (value) {
-      MapColorScheme.LIGHT -> RNUserInterfaceStyle.LIGHT
-      MapColorScheme.DARK -> RNUserInterfaceStyle.DARK
-      else -> RNUserInterfaceStyle.DEFAULT
-    }
 }
 
 private inline fun onUi(crossinline block: () -> Unit) {

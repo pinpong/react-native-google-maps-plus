@@ -1,7 +1,7 @@
 package com.rngooglemapsplus
 
-import android.annotation.SuppressLint
 import android.location.Location
+import android.widget.FrameLayout
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -9,8 +9,8 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -28,25 +28,17 @@ class GoogleMapsViewImpl(
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
   val markerOptions: com.rngooglemapsplus.MarkerOptions,
-) : MapView(reactContext),
+) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
-  OnMapReadyCallback,
   GoogleMap.OnMarkerClickListener,
   LifecycleEventListener {
+  private var initialized = false
+  private var mapReady = false
   private var googleMap: GoogleMap? = null
-
-  private var pendingBuildingEnabled: Boolean? = null
-  private var pendingTrafficEnabled: Boolean? = null
-  private var pendingCustomMapStyle: MapStyleOptions? = null
-  private var pendingInitialCamera: CameraPosition? = null
-  private var pendingUserInterfaceStyle: Int? = null
-  private var pendingMinZoomLevel: Double? = null
-  private var pendingMaxZoomLevel: Double? = null
-  private var pendingMapPadding: RNMapPadding? = null
-  private var pendingMapType: Int? = null
+  private var mapView: MapView? = null
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
@@ -61,10 +53,15 @@ class GoogleMapsViewImpl(
 
   init {
     reactContext.addLifecycleEventListener(this)
-    getMap()
   }
 
-  private fun getMap() {
+  fun initMapView(
+    mapId: String?,
+    liteMode: Boolean?,
+    cameraPosition: CameraPosition?,
+  ) {
+    if (initialized) return
+    initialized = true
     val result = playServiceHandler.playServicesAvailability()
 
     when (result) {
@@ -93,8 +90,35 @@ class GoogleMapsViewImpl(
         onMapError?.invoke(RNMapErrorCode.UNKNOWN)
     }
 
-    onCreate(null)
-    getMapAsync(this@GoogleMapsViewImpl)
+    mapView =
+      MapView(
+        reactContext,
+        GoogleMapOptions().apply {
+          mapId?.let { mapId(it) }
+          liteMode?.let { liteMode(it) }
+          cameraPosition?.let {
+            camera(it)
+          }
+        },
+      )
+
+    super.addView(mapView)
+
+    mapView?.onCreate(null)
+    mapView?.getMapAsync { map ->
+      googleMap = map
+      googleMap?.setOnMapLoadedCallback {
+        googleMap?.setOnCameraMoveStartedListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCameraIdleListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMarkerClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+      }
+      initLocationCallbacks()
+      applyPending()
+    }
+    mapReady = true
+    onMapReady?.invoke(true)
   }
 
   override fun onCameraMoveStarted(reason: Int) {
@@ -185,22 +209,6 @@ class GoogleMapsViewImpl(
     )
   }
 
-  @SuppressLint("PotentialBehaviorOverride")
-  override fun onMapReady(map: GoogleMap) {
-    googleMap = map
-    googleMap?.setOnMapLoadedCallback {
-      googleMap?.setOnCameraMoveStartedListener(this)
-      googleMap?.setOnCameraMoveListener(this)
-      googleMap?.setOnCameraIdleListener(this)
-      googleMap?.setOnMarkerClickListener(this)
-      googleMap?.setOnMapClickListener(this)
-    }
-    initLocationCallbacks()
-    applyPending()
-
-    onMapReady?.invoke(true)
-  }
-
   fun initLocationCallbacks() {
     locationHandler.onUpdate = { location ->
       // / only the coordinated are relevant right now
@@ -225,7 +233,7 @@ class GoogleMapsViewImpl(
 
   fun applyPending() {
     onUi {
-      pendingMapPadding?.let {
+      mapPadding?.let {
         googleMap?.setPadding(
           it.left.dpToPx().toInt(),
           it.top.dpToPx().toInt(),
@@ -233,30 +241,23 @@ class GoogleMapsViewImpl(
           it.bottom.dpToPx().toInt(),
         )
       }
-      pendingInitialCamera?.let {
-        googleMap?.moveCamera(
-          CameraUpdateFactory.newCameraPosition(
-            it,
-          ),
-        )
-      }
-      pendingBuildingEnabled?.let {
+      buildingEnabled?.let {
         googleMap?.isBuildingsEnabled = it
       }
-      pendingTrafficEnabled?.let {
+      trafficEnabled?.let {
         googleMap?.isTrafficEnabled = it
       }
-      googleMap?.setMapStyle(pendingCustomMapStyle)
-      pendingMapType?.let {
+      googleMap?.setMapStyle(customMapStyle)
+      mapType?.let {
         googleMap?.mapType = it
       }
-      pendingUserInterfaceStyle?.let {
+      userInterfaceStyle?.let {
         googleMap?.mapColorScheme = it
       }
-      pendingMinZoomLevel?.let {
+      minZoomLevel?.let {
         googleMap?.setMinZoomPreference(it.toFloat())
       }
-      pendingMaxZoomLevel?.let {
+      maxZoomLevel?.let {
         googleMap?.setMaxZoomPreference(it.toFloat())
       }
     }
@@ -283,10 +284,9 @@ class GoogleMapsViewImpl(
     }
   }
 
-  var buildingEnabled: Boolean?
-    get() = googleMap?.isBuildingsEnabled ?: pendingBuildingEnabled
+  var buildingEnabled: Boolean? = null
     set(value) {
-      pendingBuildingEnabled = value
+      field = value
       onUi {
         value?.let {
           googleMap?.isBuildingsEnabled = it
@@ -297,10 +297,9 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var trafficEnabled: Boolean?
-    get() = googleMap?.isTrafficEnabled ?: pendingTrafficEnabled
+  var trafficEnabled: Boolean? = null
     set(value) {
-      pendingTrafficEnabled = value
+      field = value
       onUi {
         value?.let {
           googleMap?.isTrafficEnabled = it
@@ -310,25 +309,17 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var customMapStyle: MapStyleOptions?
-    get() = pendingCustomMapStyle
+  var customMapStyle: MapStyleOptions? = null
     set(value) {
-      pendingCustomMapStyle = value
+      field = value
       onUi {
         googleMap?.setMapStyle(value)
       }
     }
 
-  var initialCamera: CameraPosition?
-    get() = pendingInitialCamera
+  var userInterfaceStyle: Int? = null
     set(value) {
-      pendingInitialCamera = value
-    }
-
-  var userInterfaceStyle: Int?
-    get() = pendingUserInterfaceStyle
-    set(value) {
-      pendingUserInterfaceStyle = value
+      field = value
       onUi {
         value?.let {
           googleMap?.mapColorScheme = it
@@ -338,10 +329,9 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var minZoomLevel: Double?
-    get() = pendingMinZoomLevel
+  var minZoomLevel: Double? = null
     set(value) {
-      pendingMinZoomLevel = value
+      field = value
       onUi {
         value?.let {
           googleMap?.setMinZoomPreference(it.toFloat())
@@ -351,10 +341,9 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var maxZoomLevel: Double?
-    get() = pendingMaxZoomLevel
+  var maxZoomLevel: Double? = null
     set(value) {
-      pendingMaxZoomLevel = value
+      field = value
       onUi {
         value?.let {
           googleMap?.setMaxZoomPreference(it.toFloat())
@@ -364,10 +353,9 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var mapPadding: RNMapPadding?
-    get() = pendingMapPadding
+  var mapPadding: RNMapPadding? = null
     set(value) {
-      pendingMapPadding = value
+      field = value
       value?.let {
         onUi {
           googleMap?.setPadding(
@@ -382,10 +370,9 @@ class GoogleMapsViewImpl(
       }
     }
 
-  var mapType: Int?
-    get() = pendingMapType
+  var mapType: Int? = null
     set(value) {
-      pendingMapType = value
+      field = value
       onUi {
         value?.let {
           googleMap?.mapType = it
@@ -470,8 +457,8 @@ class GoogleMapsViewImpl(
       val latSpan = bounds.northeast.latitude - bounds.southwest.latitude
       val lngSpan = bounds.northeast.longitude - bounds.southwest.longitude
 
-      val latPerPixel = latSpan / height
-      val lngPerPixel = lngSpan / width
+      val latPerPixel = latSpan / (mapView?.height ?: 0)
+      val lngPerPixel = lngSpan / (mapView?.width ?: 0)
 
       builder.include(
         LatLng(
@@ -500,8 +487,10 @@ class GoogleMapsViewImpl(
 
       val paddedBounds = builder.build()
 
-      val adjustedWidth = (width - padding.left.dpToPx() - padding.right.dpToPx()).toInt()
-      val adjustedHeight = (height - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt()
+      val adjustedWidth =
+        ((mapView?.width ?: 0) - padding.left.dpToPx() - padding.right.dpToPx()).toInt()
+      val adjustedHeight =
+        ((mapView?.height ?: 0) - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt()
 
       val update =
         CameraUpdateFactory.newLatLngBounds(
@@ -680,7 +669,7 @@ class GoogleMapsViewImpl(
     pendingPolygons.clear()
   }
 
-  fun clearAll() {
+  fun destroyInternal() {
     onUi {
       markerOptions.cancelAllJobs()
       clearMarkers()
@@ -694,8 +683,14 @@ class GoogleMapsViewImpl(
         setOnMarkerClickListener(null)
         setOnMapClickListener(null)
       }
-      this@GoogleMapsViewImpl.onDestroy()
       googleMap = null
+      mapView?.apply {
+        onPause()
+        onStop()
+        onDestroy()
+        removeAllViews()
+      }
+      super.removeAllViews()
       reactContext.removeLifecycleEventListener(this)
     }
   }
@@ -725,19 +720,19 @@ class GoogleMapsViewImpl(
   override fun onHostResume() {
     onUi {
       locationHandler.start()
-      this@GoogleMapsViewImpl.onResume()
+      mapView?.onResume()
     }
   }
 
   override fun onHostPause() {
     onUi {
       locationHandler.stop()
-      this@GoogleMapsViewImpl.onPause()
+      mapView?.onPause()
     }
   }
 
   override fun onHostDestroy() {
-    clearAll()
+    destroyInternal()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {

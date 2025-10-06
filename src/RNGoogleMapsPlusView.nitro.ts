@@ -17,13 +17,14 @@ import type {
   RNLocation,
   RNMapErrorCode,
   RNMapType,
+  RNInitialProps,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
+  initialProps?: RNInitialProps;
   buildingEnabled?: boolean;
   trafficEnabled?: boolean;
   customMapStyle?: string;
-  initialCamera?: RNCamera;
   userInterfaceStyle?: RNUserInterfaceStyle;
   minZoomLevel?: number;
   maxZoomLevel?: number;

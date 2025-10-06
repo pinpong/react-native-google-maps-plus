@@ -3,6 +3,12 @@ import type { HybridView } from 'react-native-nitro-modules';
 
 export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 
+export type RNInitialProps = {
+  mapId?: string;
+  liteMode?: boolean;
+  initialCamera?: RNCamera;
+};
+
 export type RNLatLng = { latitude: number; longitude: number };
 
 export type RNBoundingBox = { northEast: RNLatLng; southWest: RNLatLng };
