@@ -10,13 +10,15 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var initialized = false
   private var mapReady = false
 
-  private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
-  private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
+  private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
+  private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
+  private var pendingCircles: [(id: String, circle: GMSCircle)] = []
 
-  private var polygonsById: [String: GMSPolygon] = [:]
-  private var polylinesById: [String: GMSPolyline] = [:]
   private var markersById: [String: GMSMarker] = [:]
+  private var polylinesById: [String: GMSPolyline] = [:]
+  private var polygonsById: [String: GMSPolygon] = [:]
+  private var circlesById: [String: GMSCircle] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
@@ -28,6 +30,9 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
   var onMarkerPress: ((String) -> Void)?
+  var onPolylinePress: ((String) -> Void)?
+  var onPolygonPress: ((String) -> Void)?
+  var onCirclePress: ((String) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -64,7 +69,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func initMapView(mapId: String?, liteMode: Bool?, camera: GMSCameraPosition?) {
-    if(initialized) {return}
+    if initialized { return }
     initialized = true
     let options = GMSMapViewOptions()
     options.frame = bounds
@@ -168,6 +173,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
         addPolygonInternal(id: $0.id, polygon: $0.polygon)
       }
       pendingPolygons.removeAll()
+    }
+    if !pendingCircles.isEmpty {
+      pendingCircles.forEach {
+        addCircleInternal(id: $0.id, circle: $0.circle)
+      }
+      pendingCircles.removeAll()
     }
   }
 
@@ -420,11 +431,47 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     pendingPolygons.removeAll()
   }
 
+  @MainActor
+  func addCircle(id: String, circle: GMSCircle) {
+    if mapView == nil {
+      pendingCircles.append((id, circle))
+      return
+    }
+    if let old = circlesById.removeValue(forKey: id) { old.map = nil }
+    addCircleInternal(id: id, circle: circle)
+  }
+
+  @MainActor
+  private func addCircleInternal(id: String, circle: GMSCircle) {
+    circle.map = mapView
+    circle.userData = id
+    circlesById[id] = circle
+  }
+
+  @MainActor
+  func updateCircle(id: String, block: @escaping (GMSCircle) -> Void) {
+    guard let circle = circlesById[id] else { return }
+    block(circle)
+  }
+
+  @MainActor
+  func removeCircle(id: String) {
+    if let circle = circlesById.removeValue(forKey: id) { circle.map = nil }
+  }
+
+  @MainActor
+  func clearCircles() {
+    circlesById.values.forEach { $0.map = nil }
+    circlesById.removeAll()
+    pendingCircles.removeAll()
+  }
+
   func deinitInternal() {
     markerOptions.cancelAllIconTasks()
     clearMarkers()
     clearPolylines()
     clearPolygons()
+    clearCircles()
     locationHandler.stop()
     mapView?.clear()
     mapView?.delegate = nil
@@ -567,12 +614,32 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       RNLatLng(
         latitude: coordinate.latitude,
         longitude: coordinate.longitude
-      ))
+      )
+    )
   }
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
     let id = (marker.userData as? String) ?? "unknown"
     onMarkerPress?(id)
     return true
+  }
+
+  func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
+    switch overlay {
+    case let circle as GMSCircle:
+      let id = (circle.userData as? String) ?? "unknown"
+      onCirclePress?(id)
+
+    case let polygon as GMSPolygon:
+      let id = (polygon.userData as? String) ?? "unknown"
+      onPolygonPress?(id)
+
+    case let polyline as GMSPolyline:
+      let id = (polyline.userData as? String) ?? "unknown"
+      onPolylinePress?(id)
+
+    default:
+      break
+    }
   }
 }

@@ -15,12 +15,14 @@ class MapPolygonOptions {
       poly.fillColor?.let { fillColor(it.toColor()) }
       poly.strokeColor?.let { strokeColor(it.toColor()) }
       poly.strokeWidth?.let { strokeWidth(it.dpToPx()) }
-      zIndex(poly.zIndex.toFloat())
+      poly.pressable?.let { clickable(it) }
+      poly.zIndex?.let { zIndex(it.toFloat()) }
     }
 }
 
 fun RNPolygon.polygonEquals(b: RNPolygon): Boolean {
   if (zIndex != b.zIndex) return false
+  if (pressable != b.pressable) return false
   if (strokeWidth != b.strokeWidth) return false
   if (fillColor != b.fillColor) return false
   if (strokeColor != b.strokeColor) return false

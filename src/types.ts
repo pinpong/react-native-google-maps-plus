@@ -114,7 +114,7 @@ export type RNLineJoinType = 'miter' | 'round' | 'bevel';
 
 export type RNMarker = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
   width: number;
@@ -124,7 +124,8 @@ export type RNMarker = {
 
 export type RNPolygon = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
+  pressable?: boolean;
   coordinates: RNLatLng[];
   fillColor?: string;
   strokeColor?: string;
@@ -133,12 +134,24 @@ export type RNPolygon = {
 
 export type RNPolyline = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
+  pressable?: boolean;
   coordinates: RNLatLng[];
   lineCap?: RNLineCapType;
   lineJoin?: RNLineJoinType;
   color?: string;
   width?: number;
+};
+
+export type RNCircle = {
+  id: string;
+  pressable?: boolean;
+  zIndex?: number;
+  center: RNLatLng;
+  radius?: number;
+  strokeWidth?: number;
+  strokeColor?: string;
+  fillColor?: string;
 };
 
 export type RNLocationPermissionResult = {

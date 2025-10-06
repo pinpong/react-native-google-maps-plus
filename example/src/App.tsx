@@ -17,6 +17,7 @@ import type {
   GoogleMapsViewRef,
   RNRegion,
   RNLatLng,
+  RNCircle,
 } from '../../src';
 import { GoogleMapsView, GoogleMapsModule } from '../../src';
 import { callback } from 'react-native-nitro-modules';
@@ -205,6 +206,7 @@ const randomCoordinates = (
 const makePolygon = (id: number): RNPolygon => ({
   id: id.toString(),
   zIndex: id,
+  pressable: true,
   coordinates: [
     randomCoordinates(37.7749, -122.4194, 0.01),
     randomCoordinates(37.7749, -122.4194, 0.01),
@@ -219,6 +221,7 @@ const makePolygon = (id: number): RNPolygon => ({
 const makePolyline = (id: number): RNPolyline => ({
   id: id.toString(),
   zIndex: id,
+  pressable: true,
   coordinates: [
     randomCoordinates(37.7749, -122.4194, 0.02),
     randomCoordinates(37.7749, -122.4194, 0.02),
@@ -227,8 +230,19 @@ const makePolyline = (id: number): RNPolyline => ({
 
   lineCap: id % 2 === 0 ? 'round' : 'square',
   lineJoin: id % 3 === 0 ? 'bevel' : 'round',
-  color: id % 2 === 0 ? '#ff0000' : '#0000ff',
-  width: 1 + (id % 4),
+  color: id % 2 === 0 ? '#00ff00' : '#ff0000',
+  width: 2 + (id % 4),
+});
+
+const makeCircle = (id: number): RNCircle => ({
+  id: id.toString(),
+  zIndex: id,
+  pressable: true,
+  center: randomCoordinates(37.7749, -122.4194, 0.02),
+  radius: 100 + (id % 5),
+  strokeWidth: 1 + (id % 5),
+  strokeColor: '#ff0000',
+  fillColor: '#0000ff',
 });
 
 export const makeMarker = (id: number): RNMarker => ({
@@ -258,6 +272,10 @@ export default function App() {
 
   const [polylines] = useState(
     Array.from({ length: 1 }, (_, i) => makePolyline(i + 1))
+  );
+
+  const [circles] = useState(
+    Array.from({ length: 1 }, (_, i) => makeCircle(i + 1))
   );
 
   useEffect(() => {
@@ -391,6 +409,21 @@ export default function App() {
             console.log('Marker pressed', id);
           },
         }}
+        onPolylinePress={{
+          f: function (id: string): void {
+            console.log('Polyline pressed', id);
+          },
+        }}
+        onPolygonPress={{
+          f: function (id: string): void {
+            console.log('Polygon pressed', id);
+          },
+        }}
+        onCirclePress={{
+          f: function (id: string): void {
+            console.log('Circle pressed', id);
+          },
+        }}
         onCameraChangeStart={{
           f: function (
             region: RNRegion,
@@ -431,6 +464,7 @@ export default function App() {
         markers={show ? [...markers] : []}
         polygons={show ? polygons : []}
         polylines={show ? polylines : []}
+        circles={show ? circles : []}
       />
 
       <ScrollView style={styles.scrollView}>

@@ -18,7 +18,6 @@ final class MapMarkerOptions {
         longitude: m.coordinate.longitude
       )
     )
-    marker.zIndex = Int32(m.zIndex)
     marker.userData = m.id
     marker.tracksViewChanges = true
     marker.icon = icon
@@ -26,6 +25,7 @@ final class MapMarkerOptions {
       x: m.anchor?.x ?? 0.5,
       y: m.anchor?.y ?? 0.5
     )
+    if let zi = m.zIndex { marker.zIndex = Int32(zi) }
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak marker] in
       marker?.tracksViewChanges = false
     }
@@ -71,24 +71,17 @@ final class MapMarkerOptions {
 
   @MainActor
   func updateMarker(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    if prev.coordinate.latitude != next.coordinate.latitude
-      || prev.coordinate.longitude != next.coordinate.longitude {
-      m.position = CLLocationCoordinate2D(
-        latitude: next.coordinate.latitude,
-        longitude: next.coordinate.longitude
-      )
-    }
+    m.position = CLLocationCoordinate2D(
+      latitude: next.coordinate.latitude,
+      longitude: next.coordinate.longitude
+    )
 
-    if prev.zIndex != next.zIndex {
-      m.zIndex = Int32(next.zIndex)
-    }
+    if let zi = next.zIndex { m.zIndex = Int32(zi) }
 
-    if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
-      m.groundAnchor = CGPoint(
-        x: next.anchor?.x ?? 0.5,
-        y: next.anchor?.y ?? 0.5
-      )
-    }
+    m.groundAnchor = CGPoint(
+      x: next.anchor?.x ?? 0.5,
+      y: next.anchor?.y ?? 0.5
+    )
 
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next.id, next) { img in

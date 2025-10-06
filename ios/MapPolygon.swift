@@ -13,7 +13,8 @@ class MapPolygonOptions {
     if let fc = p.fillColor?.toUIColor() { pg.fillColor = fc }
     if let sc = p.strokeColor?.toUIColor() { pg.strokeColor = sc }
     if let sw = p.strokeWidth { pg.strokeWidth = CGFloat(sw) }
-    pg.zIndex = Int32(p.zIndex)
+    if let pr = p.pressable { pg.isTappable = pr }
+    if let zi = p.zIndex { pg.zIndex = Int32(zi) }
     return pg
   }
 }
@@ -34,11 +35,13 @@ extension RNPolygon {
     if let fc = next.fillColor?.toUIColor() { pg.fillColor = fc }
     if let sc = next.strokeColor?.toUIColor() { pg.strokeColor = sc }
     if let sw = next.strokeWidth { pg.strokeWidth = CGFloat(sw) }
-    pg.zIndex = Int32(next.zIndex)
+    if let pr = next.pressable { pg.isTappable = pr }
+    if let zi = next.zIndex { pg.zIndex = Int32(zi) }
   }
 
   func polygonEquals(_ b: RNPolygon) -> Bool {
     guard zIndex == b.zIndex,
+          pressable == b.pressable,
           strokeWidth == b.strokeWidth,
           fillColor == b.fillColor,
           strokeColor == b.strokeColor,

@@ -18,6 +18,7 @@ import type {
   RNMapErrorCode,
   RNMapType,
   RNInitialProps,
+  RNCircle,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -33,12 +34,16 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   markers?: RNMarker[];
   polygons?: RNPolygon[];
   polylines?: RNPolyline[];
+  circles?: RNCircle[];
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
   onMarkerPress?: (id: string) => void;
+  onPolylinePress?: (id: string) => void;
+  onPolygonPress?: (id: string) => void;
+  onCirclePress?: (id: string) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,
