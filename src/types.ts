@@ -131,9 +131,13 @@ export type RNMarker = {
   zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
+  iconSvg?: RNMarkerSvg;
+};
+
+export type RNMarkerSvg = {
   width: number;
   height: number;
-  iconSvg: string;
+  svgString: string;
 };
 
 export type RNPolygon = {

@@ -32,7 +32,7 @@ class GoogleMapsViewImpl(
   val reactContext: ThemedReactContext,
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
-  val markerBuilder: MarkerBuilder,
+  val markerBuilder: MapMarkerBuilder,
 ) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,

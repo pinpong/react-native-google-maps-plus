@@ -8,6 +8,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
+import com.rngooglemapsplus.extensions.markerEquals
+import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.polygonEquals
 import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
@@ -23,7 +25,7 @@ class RNGoogleMapsPlusView(
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MarkerBuilder()
+  private val markerBuilder = MapMarkerBuilder()
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
