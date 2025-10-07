@@ -8,10 +8,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
 
-  private let markerOptions = MapMarkerOptions()
-  private let polylineOptions = MapPolylineOptions()
-  private let polygonOptions = MapPolygonOptions()
-  private let circleOptions = MapCircleOptions()
+  private let markerBuilder = MapMarkerBuilder()
+  private let polylineBuilder = MapPolylineBuilder()
+  private let polygonBuilder = MapPolygonBuilder()
+  private let circleBuilder = MapCircleBuilder()
 
   private let impl: GoogleMapsViewImpl
 
@@ -24,15 +24,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     self.locationHandler = LocationHandler()
     self.impl = GoogleMapsViewImpl(
       locationHandler: locationHandler,
-      markerOptions: markerOptions
+      markerBuilder: markerBuilder
     )
   }
 
   /*
-     /// TODO: prepareForRecycle
-    override func prepareForRecycle() {
-      impl.clearAll()
-    }
+   /// TODO: prepareForRecycle
+   override func prepareForRecycle() {
+   impl.clearAll()
+   }
    */
 
   @MainActor
@@ -41,9 +41,19 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       impl.initMapView(
         mapId: initialProps?.mapId,
         liteMode: initialProps?.liteMode,
-        camera: mapCameraToGMSCamera(initialProps?.initialCamera)
+        camera: initialProps?.camera?.toGMSCameraPosition(current: nil)
       )
     }
+  }
+
+  @MainActor
+  var uiSettings: RNMapUiSettings? {
+    didSet { impl.uiSettings = uiSettings }
+  }
+
+  @MainActor
+  var myLocationEnabled: Bool? {
+    didSet { impl.myLocationEnabled = myLocationEnabled }
   }
 
   @MainActor
@@ -54,6 +64,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var trafficEnabled: Bool? {
     didSet { impl.trafficEnabled = trafficEnabled }
+  }
+
+  @MainActor
+  var indoorEnabled: Bool? {
+    didSet { impl.indoorEnabled = indoorEnabled }
   }
 
   @MainActor
@@ -68,9 +83,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var userInterfaceStyle: RNUserInterfaceStyle? {
     didSet {
-      impl.userInterfaceStyle = mapUserInterfaceStyleToUIUserInterfaceStyle(
-        userInterfaceStyle
-      )
+      impl.userInterfaceStyle = userInterfaceStyle?.toUIUserInterfaceStyle
     }
   }
 
@@ -115,20 +128,20 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
         removed.forEach {
           impl.removeMarker(id: $0)
-          markerOptions.cancelIconTask($0)
+          markerBuilder.cancelIconTask($0)
         }
 
         for (id, next) in nextById {
           if let prev = prevById[id] {
             if !prev.markerEquals(next) {
               impl.updateMarker(id: id) { m in
-                self.markerOptions.updateMarker(prev, next, m)
+                self.markerBuilder.updateMarker(prev, next, m)
               }
             }
           } else {
-            markerOptions.buildIconAsync(next.id, next) { icon in
+            markerBuilder.buildIconAsync(next.id, next) { icon in
               guard let icon else { return }
-              let marker = self.markerOptions.build(next, icon: icon)
+              let marker = self.markerBuilder.build(next, icon: icon)
               self.impl.addMarker(id: id, marker: marker)
             }
           }
@@ -162,7 +175,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         } else {
           impl.addPolyline(
             id: id,
-            polyline: polylineOptions.buildPolyline(next)
+            polyline: polylineBuilder.buildPolyline(next)
           )
         }
       }
@@ -192,7 +205,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
             }
           }
         } else {
-          impl.addPolygon(id: id, polygon: polygonOptions.buildPolygon(next))
+          impl.addPolygon(id: id, polygon: polygonBuilder.buildPolygon(next))
         }
       }
     }
@@ -221,52 +234,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
             }
           }
         } else {
-          impl.addCircle(id: id, circle: circleOptions.buildCircle(next))
+          impl.addCircle(id: id, circle: circleBuilder.buildCircle(next))
         }
       }
     }
   }
 
-  func setCamera(camera: RNCamera, animated: Bool?, durationMS: Double?) {
-    let current = impl.currentCamera
-
-    let zoom = Float(camera.zoom ?? Double(current?.zoom ?? 0))
-    let bearing = camera.bearing ?? current?.bearing ?? 0
-    let viewingAngle = camera.bearing ?? current?.viewingAngle ?? 0
-
-    let target = CLLocationCoordinate2D(
-      latitude: camera.center?.latitude ?? current?.target.latitude ?? 0,
-      longitude: camera.center?.longitude ?? current?.target.longitude ?? 0
-    )
-
-    let cam = GMSCameraPosition.camera(
-      withTarget: target,
-      zoom: zoom,
-      bearing: bearing,
-      viewingAngle: viewingAngle
-    )
-    onMain {
-      self.impl.setCamera(
-        camera: cam,
-        animated: animated ?? true,
-        durationMS: durationMS ?? 3000
-      )
-    }
-  }
-
-  func setCameraToCoordinates(
-    coordinates: [RNLatLng],
-    padding: RNMapPadding?,
-    animated: Bool?,
-    durationMS: Double?
-  ) {
-    onMain {
-      self.impl.setCameraToCoordinates(
-        coordinates: coordinates,
-        padding: padding ?? RNMapPadding(0, 0, 0, 0),
-        animated: animated ?? true,
-        durationMS: durationMS ?? 3000
-      )
+  @MainActor var locationConfig: RNLocationConfig? {
+    didSet {
+      impl.locationConfig = locationConfig
     }
   }
 
@@ -307,6 +283,33 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
+  func setCamera(camera: RNCamera, animated: Bool?, durationMS: Double?) {
+    let cam = camera.toGMSCameraPosition(current: impl.currentCamera)
+    onMain {
+      self.impl.setCamera(
+        camera: cam,
+        animated: animated ?? true,
+        durationMS: durationMS ?? 3000
+      )
+    }
+  }
+
+  func setCameraToCoordinates(
+    coordinates: [RNLatLng],
+    padding: RNMapPadding?,
+    animated: Bool?,
+    durationMS: Double?
+  ) {
+    onMain {
+      self.impl.setCameraToCoordinates(
+        coordinates: coordinates,
+        padding: padding ?? RNMapPadding(0, 0, 0, 0),
+        animated: animated ?? true,
+        durationMS: durationMS ?? 3000
+      )
+    }
+  }
+
   func showLocationDialog() {
     locationHandler.showLocationDialog()
   }
@@ -323,61 +326,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   func isGooglePlayServicesAvailable() -> Bool {
     /// not supported
     return true
-  }
-
-  private func mapCameraToGMSCamera(_ c: RNCamera?) -> GMSCameraPosition? {
-    guard let c = c else { return nil }
-
-    let current = impl.currentCamera
-    let center = CLLocationCoordinate2D(
-      latitude: c.center?.latitude ?? current?.target.latitude ?? 0,
-      longitude: c.center?.longitude ?? current?.target.longitude ?? 0
-    )
-    let z = Float(c.zoom ?? Double(current?.zoom ?? 0))
-    let b = c.bearing ?? current?.bearing ?? 0
-    let t = c.tilt ?? current?.viewingAngle ?? 0
-
-    return GMSCameraPosition.camera(
-      withTarget: center,
-      zoom: z,
-      bearing: b,
-      viewingAngle: t
-    )
-  }
-
-  func mapUserInterfaceStyleToUIUserInterfaceStyle(
-    _ style: RNUserInterfaceStyle?
-  ) -> UIUserInterfaceStyle? {
-    guard let style = style else { return nil }
-
-    switch style {
-    case .light:
-      return .light
-    case .dark:
-      return .dark
-    case .default:
-      return .unspecified
-    }
-  }
-}
-
-extension UIUserInterfaceStyle {
-  init?(fromString string: String) {
-    switch string.lowercased() {
-    case "light": self = .light
-    case "dark": self = .dark
-    case "default": self = .unspecified
-    default: return nil
-    }
-  }
-
-  var stringValue: String {
-    switch self {
-    case .light: return "light"
-    case .dark: return "dark"
-    case .unspecified: return "default"
-    @unknown default: return "default"
-    }
   }
 }
 

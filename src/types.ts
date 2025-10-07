@@ -6,7 +6,21 @@ export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 export type RNInitialProps = {
   mapId?: string;
   liteMode?: boolean;
-  initialCamera?: RNCamera;
+  camera?: RNCamera;
+};
+
+export type RNMapUiSettings = {
+  allGesturesEnabled?: boolean;
+  compassEnabled?: boolean;
+  indoorLevelPickerEnabled?: boolean;
+  mapToolbarEnabled?: boolean;
+  myLocationButtonEnabled?: boolean;
+  rotateEnabled?: boolean;
+  scrollEnabled?: boolean;
+  scrollDuringRotateOrZoomEnabled?: boolean;
+  tiltEnabled?: boolean;
+  zoomControlsEnabled?: boolean;
+  zoomGesturesEnabled?: boolean;
 };
 
 export type RNLatLng = { latitude: number; longitude: number };
@@ -153,6 +167,35 @@ export type RNCircle = {
   strokeColor?: string;
   fillColor?: string;
 };
+
+export type RNLocationConfig = {
+  android?: RNAndroidLocationConfig;
+  ios?: RNIOSLocationConfig;
+};
+export type RNAndroidLocationConfig = {
+  priority?: RNAndroidLocationPriority;
+  interval?: number;
+  minUpdateInterval?: number;
+};
+
+export enum RNAndroidLocationPriority {
+  PRIORITY_HIGH_ACCURACY = 0,
+  PRIORITY_BALANCED_POWER_ACCURACY = 1,
+  PRIORITY_LOW_POWER = 2,
+  PRIORITY_PASSIVE = 3,
+}
+
+export type RNIOSLocationConfig = {
+  desiredAccuracy?: RNIOSLocationAccuracy;
+  distanceFilterMeters?: number;
+};
+
+export enum RNIOSLocationAccuracy {
+  ACCURACY_BEST = 0,
+  ACCURACY_NEAREST_TEN_METER = 1,
+  ACCURACY_NEAREST_HUNDRED_METER = 2,
+  ACCURACY_KILOMETER = 3,
+}
 
 export type RNLocationPermissionResult = {
   android?: RNAndroidLocationPermissionResult;
