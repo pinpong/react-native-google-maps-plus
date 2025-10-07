@@ -1,3 +1,15 @@
+## [1.1.0-dev.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2025-10-07)
+
+### ✨ Features
+
+* optional marker svg ([d9bd19d](https://github.com/pinpong/react-native-google-maps-plus/commit/d9bd19d72916ec697acc9cecc58219a3df8c5d54))
+* optional marker svg ([#30](https://github.com/pinpong/react-native-google-maps-plus/issues/30)) ([5f8852c](https://github.com/pinpong/react-native-google-maps-plus/commit/5f8852c85741b75959f1d1e16240704cca042bb5))
+
+### 🐛 Bug Fixes
+
+* add ios privacy manifest ([175bfdf](https://github.com/pinpong/react-native-google-maps-plus/commit/175bfdf0a932aa7dcc789ac9287eb2e91a9d0bf6))
+* add ios privacy manifest ([#31](https://github.com/pinpong/react-native-google-maps-plus/issues/31)) ([acc394e](https://github.com/pinpong/react-native-google-maps-plus/commit/acc394e49ca5bc9eaa5e67942fd2ed645dc2332c))
+
 ## [1.1.0-dev.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.3-dev.1...v1.1.0-dev.1) (2025-10-07)
 
 ### ✨ Features
