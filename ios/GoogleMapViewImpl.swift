@@ -5,7 +5,7 @@ import UIKit
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   private let locationHandler: LocationHandler
-  private let markerOptions: MapMarkerOptions
+  private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
   private var initialized = false
   private var mapReady = false
@@ -24,26 +24,13 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var lastSubmittedCameraPosition: GMSCameraPosition?
   private var lastSubmittedLocation: CLLocation?
 
-  var onMapError: ((RNMapErrorCode) -> Void)?
-  var onMapReady: ((Bool) -> Void)?
-  var onLocationUpdate: ((RNLocation) -> Void)?
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
-  var onMapPress: ((RNLatLng) -> Void)?
-  var onMarkerPress: ((String) -> Void)?
-  var onPolylinePress: ((String) -> Void)?
-  var onPolygonPress: ((String) -> Void)?
-  var onCirclePress: ((String) -> Void)?
-  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
-
   init(
     frame: CGRect = .zero,
     locationHandler: LocationHandler,
-    markerOptions: MapMarkerOptions
+    markerBuilder: MapMarkerBuilder
   ) {
     self.locationHandler = locationHandler
-    self.markerOptions = markerOptions
+    self.markerBuilder = markerBuilder
     super.init(frame: frame)
     setupAppLifecycleObservers()
   }
@@ -132,12 +119,46 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       )
     }
 
-    if let style = customMapStyle {
-      mapView?.mapStyle = style
+    if let uiSettings = uiSettings {
+      if let allGesturesEnabled = uiSettings.allGesturesEnabled {
+        mapView?.settings.setAllGesturesEnabled(allGesturesEnabled)
+      }
+      if let compassEnabled = uiSettings.compassEnabled {
+        mapView?.settings.compassButton = compassEnabled
+      }
+      if let indoorLevelPickerEnabled = uiSettings.indoorLevelPickerEnabled {
+        mapView?.settings.indoorPicker = indoorLevelPickerEnabled
+      }
+      if let mapToolbarEnabled = uiSettings.mapToolbarEnabled {
+        /// not supported
+      }
+      if let myLocationButtonEnabled = uiSettings.myLocationButtonEnabled {
+        mapView?.settings.myLocationButton = myLocationButtonEnabled
+      }
+      if let rotateEnabled = uiSettings.rotateEnabled {
+        mapView?.settings.rotateGestures = rotateEnabled
+      }
+      if let scrollEnabled = uiSettings.scrollEnabled {
+        mapView?.settings.scrollGestures = scrollEnabled
+      }
+      if let scrollDuringRotateOrZoomEnabled = uiSettings
+        .scrollDuringRotateOrZoomEnabled {
+        mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
+          scrollDuringRotateOrZoomEnabled
+      }
+      if let tiltEnabled = uiSettings.tiltEnabled {
+        mapView?.settings.tiltGestures = tiltEnabled
+      }
+      if let zoomControlsEnabled = uiSettings.zoomControlsEnabled {
+        /// not supported
+      }
+      if let zoomGesturesEnabled = uiSettings.zoomGesturesEnabled {
+        mapView?.settings.zoomGestures = zoomGesturesEnabled
+      }
     }
 
-    if let mapType = mapType {
-      mapView?.mapType = mapType
+    if let myLocation = myLocationEnabled {
+      mapView?.isMyLocationEnabled = myLocation
     }
 
     if let buildings = buildingEnabled {
@@ -148,12 +169,31 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       mapView?.isTrafficEnabled = traffic
     }
 
+    if let indoor = indoorEnabled {
+      mapView?.isIndoorEnabled = indoor
+    }
+
+    if let style = customMapStyle {
+      mapView?.mapStyle = style
+    }
+
+    if let mapType = mapType {
+      mapView?.mapType = mapType
+    }
+
     if let uiStyle = userInterfaceStyle {
       mapView?.overrideUserInterfaceStyle = uiStyle
     }
 
     if let minZoom = minZoomLevel, let maxZoom = maxZoomLevel {
       mapView?.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
+    }
+
+    if let locationConfig = locationConfig {
+      locationHandler.desiredAccuracy =
+        locationConfig.ios?.desiredAccuracy?.toCLLocationAccuracy
+      locationHandler.distanceFilterMeters =
+        locationConfig.ios?.distanceFilterMeters
     }
 
     if !pendingMarkers.isEmpty {
@@ -187,10 +227,79 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   @MainActor
+  var uiSettings: RNMapUiSettings? {
+    didSet {
+      guard let mapView = mapView else { return }
+      let settings = mapView.settings
+
+      if let v = uiSettings {
+        if let allGesturesEnabled = v.allGesturesEnabled {
+          settings.setAllGesturesEnabled(allGesturesEnabled)
+        }
+        if let compassEnabled = v.compassEnabled {
+          settings.compassButton = compassEnabled
+        }
+        if let indoorLevelPickerEnabled = v.indoorLevelPickerEnabled {
+          settings.indoorPicker = indoorLevelPickerEnabled
+        }
+        if let mapToolbarEnabled = v.mapToolbarEnabled {
+          /// not supported
+        }
+        if let myLocationButtonEnabled = v.myLocationButtonEnabled {
+          settings.myLocationButton = myLocationButtonEnabled
+        }
+        if let rotateEnabled = v.rotateEnabled {
+          settings.rotateGestures = rotateEnabled
+        }
+        if let scrollEnabled = v.scrollEnabled {
+          settings.scrollGestures = scrollEnabled
+        }
+        if let scrollDuringRotateOrZoomEnabled = v
+          .scrollDuringRotateOrZoomEnabled {
+          settings.allowScrollGesturesDuringRotateOrZoom =
+            scrollDuringRotateOrZoomEnabled
+        }
+        if let tiltEnabled = v.tiltEnabled {
+          settings.tiltGestures = tiltEnabled
+        }
+        if let zoomControlsEnabled = v.zoomControlsEnabled {
+          /// not supported
+        }
+        if let zoomGesturesEnabled = v.zoomGesturesEnabled {
+          settings.zoomGestures = zoomGesturesEnabled
+        }
+      } else {
+        settings.setAllGesturesEnabled(true)
+        settings.compassButton = false
+        settings.indoorPicker = false
+        settings.myLocationButton = false
+        settings.rotateGestures = true
+        settings.scrollGestures = true
+        settings.allowScrollGesturesDuringRotateOrZoom = true
+        settings.tiltGestures = true
+        settings.zoomGestures = false
+      }
+    }
+  }
+
+  @MainActor
+  var myLocationEnabled: Bool? {
+    didSet {
+      if let value = myLocationEnabled {
+        mapView?.isMyLocationEnabled = value
+      } else {
+        mapView?.isMyLocationEnabled = false
+      }
+    }
+  }
+
+  @MainActor
   var buildingEnabled: Bool? {
     didSet {
       if let value = buildingEnabled {
         mapView?.isBuildingsEnabled = value
+      } else {
+        mapView?.isBuildingsEnabled = false
       }
     }
   }
@@ -200,6 +309,19 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     didSet {
       if let value = trafficEnabled {
         mapView?.isTrafficEnabled = value
+      } else {
+        mapView?.isTrafficEnabled = false
+      }
+    }
+  }
+
+  @MainActor
+  var indoorEnabled: Bool? {
+    didSet {
+      if let value = indoorEnabled {
+        mapView?.isIndoorEnabled = value
+      } else {
+        mapView?.isIndoorEnabled = false
       }
     }
   }
@@ -243,7 +365,6 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   @MainActor
   var mapPadding: RNMapPadding? {
     didSet {
-      mapPadding
       if let padding = mapPadding {
         mapView?.padding = UIEdgeInsets(
           top: padding.top,
@@ -262,6 +383,28 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       mapView?.mapType = mapType ?? .normal
     }
   }
+
+  @MainActor var locationConfig: RNLocationConfig? {
+    didSet {
+      locationHandler.desiredAccuracy =
+        locationConfig?.ios?.desiredAccuracy?.toCLLocationAccuracy
+      locationHandler.distanceFilterMeters =
+        locationConfig?.ios?.distanceFilterMeters
+    }
+  }
+
+  var onMapError: ((RNMapErrorCode) -> Void)?
+  var onMapReady: ((Bool) -> Void)?
+  var onLocationUpdate: ((RNLocation) -> Void)?
+  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
+  var onMapPress: ((RNLatLng) -> Void)?
+  var onMarkerPress: ((String) -> Void)?
+  var onPolylinePress: ((String) -> Void)?
+  var onPolygonPress: ((String) -> Void)?
+  var onCirclePress: ((String) -> Void)?
+  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
+  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
+  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
 
   func setCamera(camera: GMSCameraPosition, animated: Bool, durationMS: Double) {
     if animated {
@@ -467,7 +610,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   func deinitInternal() {
-    markerOptions.cancelAllIconTasks()
+    markerBuilder.cancelAllIconTasks()
     clearMarkers()
     clearPolylines()
     clearPolygons()

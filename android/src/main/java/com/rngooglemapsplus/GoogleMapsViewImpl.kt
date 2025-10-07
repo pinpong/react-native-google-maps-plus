@@ -1,5 +1,6 @@
 package com.rngooglemapsplus
 
+import android.annotation.SuppressLint
 import android.location.Location
 import android.widget.FrameLayout
 import com.facebook.react.bridge.LifecycleEventListener
@@ -24,12 +25,14 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.rngooglemapsplus.extensions.toGooglePriority
+import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 class GoogleMapsViewImpl(
   val reactContext: ThemedReactContext,
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
-  val markerOptions: com.rngooglemapsplus.MarkerOptions,
+  val markerBuilder: MarkerBuilder,
 ) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
@@ -252,11 +255,36 @@ class GoogleMapsViewImpl(
           it.bottom.dpToPx().toInt(),
         )
       }
+
+      uiSettings?.let { v ->
+        googleMap?.uiSettings?.apply {
+          v.allGesturesEnabled?.let { setAllGesturesEnabled(it) }
+          v.compassEnabled?.let { isCompassEnabled = it }
+          v.indoorLevelPickerEnabled?.let { isIndoorLevelPickerEnabled = it }
+          v.mapToolbarEnabled?.let { isMapToolbarEnabled = it }
+          v.myLocationButtonEnabled?.let {
+            googleMap?.setLocationSource(locationHandler)
+            isMyLocationButtonEnabled = it
+          }
+          v.rotateEnabled?.let { isRotateGesturesEnabled = it }
+          v.scrollEnabled?.let { isScrollGesturesEnabled = it }
+          v.scrollDuringRotateOrZoomEnabled?.let {
+            isScrollGesturesEnabledDuringRotateOrZoom = it
+          }
+          v.tiltEnabled?.let { isTiltGesturesEnabled = it }
+          v.zoomControlsEnabled?.let { isZoomControlsEnabled = it }
+          v.zoomGesturesEnabled?.let { isZoomGesturesEnabled = it }
+        }
+      }
+
       buildingEnabled?.let {
         googleMap?.isBuildingsEnabled = it
       }
       trafficEnabled?.let {
         googleMap?.isTrafficEnabled = it
+      }
+      indoorEnabled?.let {
+        googleMap?.isIndoorEnabled = it
       }
       googleMap?.setMapStyle(customMapStyle)
       mapType?.let {
@@ -271,6 +299,12 @@ class GoogleMapsViewImpl(
       maxZoomLevel?.let {
         googleMap?.setMaxZoomPreference(it.toFloat())
       }
+    }
+
+    locationConfig?.let {
+      locationHandler.priority = it.android?.priority?.toGooglePriority()
+      locationHandler.interval = it.android?.interval?.toLong()
+      locationHandler.minUpdateInterval = it.android?.minUpdateInterval?.toLong()
     }
 
     if (pendingMarkers.isNotEmpty()) {
@@ -302,6 +336,69 @@ class GoogleMapsViewImpl(
     }
   }
 
+  var uiSettings: RNMapUiSettings? = null
+    set(value) {
+      field = value
+      onUi {
+        value?.let { v ->
+          googleMap?.uiSettings?.apply {
+            v.allGesturesEnabled?.let { setAllGesturesEnabled(it) }
+            v.compassEnabled?.let { isCompassEnabled = it }
+            v.indoorLevelPickerEnabled?.let { isIndoorLevelPickerEnabled = it }
+            v.mapToolbarEnabled?.let { isMapToolbarEnabled = it }
+            v.myLocationButtonEnabled?.let {
+              googleMap?.setLocationSource(locationHandler)
+              isMyLocationButtonEnabled = it
+            }
+            v.rotateEnabled?.let { isRotateGesturesEnabled = it }
+            v.scrollEnabled?.let { isScrollGesturesEnabled = it }
+            v.scrollDuringRotateOrZoomEnabled?.let {
+              isScrollGesturesEnabledDuringRotateOrZoom = it
+            }
+            v.tiltEnabled?.let { isTiltGesturesEnabled = it }
+            v.zoomControlsEnabled?.let { isZoomControlsEnabled = it }
+            v.zoomGesturesEnabled?.let { isZoomGesturesEnabled = it }
+          }
+        }
+          ?: run {
+            googleMap?.uiSettings?.apply {
+              setAllGesturesEnabled(true)
+              isCompassEnabled = false
+              isIndoorLevelPickerEnabled = false
+              isMapToolbarEnabled = false
+              isMyLocationButtonEnabled = false
+              googleMap?.setLocationSource(null)
+              isRotateGesturesEnabled = true
+              isScrollGesturesEnabled = true
+              isScrollGesturesEnabledDuringRotateOrZoom = true
+              isTiltGesturesEnabled = true
+              isZoomControlsEnabled = false
+              isZoomGesturesEnabled = false
+            }
+          }
+      }
+    }
+
+  @SuppressLint("MissingPermission")
+  var myLocationEnabled: Boolean? = null
+    set(value) {
+      onUi {
+        try {
+          value?.let {
+            googleMap?.isMyLocationEnabled = it
+          }
+            ?: run {
+              googleMap?.isMyLocationEnabled = false
+            }
+        } catch (se: SecurityException) {
+          onLocationError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
+        } catch (ex: Exception) {
+          val error = ex.toLocationErrorCode(context)
+          onLocationError?.invoke(error)
+        }
+      }
+    }
+
   var buildingEnabled: Boolean? = null
     set(value) {
       field = value
@@ -324,6 +421,19 @@ class GoogleMapsViewImpl(
         } ?: run {
           googleMap?.isTrafficEnabled = false
         }
+      }
+    }
+
+  var indoorEnabled: Boolean? = null
+    set(value) {
+      field = value
+      onUi {
+        value?.let {
+          googleMap?.isIndoorEnabled = it
+        }
+          ?: run {
+            googleMap?.isIndoorEnabled = false
+          }
       }
     }
 
@@ -400,6 +510,14 @@ class GoogleMapsViewImpl(
       }
     }
 
+  var locationConfig: RNLocationConfig? = null
+    set(value) {
+      field = value
+      locationHandler.priority = value?.android?.priority?.toGooglePriority()
+      locationHandler.interval = value?.android?.interval?.toLong()
+      locationHandler.minUpdateInterval = value?.android?.minUpdateInterval?.toLong()
+    }
+
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
@@ -414,7 +532,7 @@ class GoogleMapsViewImpl(
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
 
   fun setCamera(
-    camera: RNCamera,
+    cameraPosition: CameraPosition,
     animated: Boolean,
     durationMS: Int,
   ) {
@@ -423,33 +541,8 @@ class GoogleMapsViewImpl(
       if (current == null) {
         return@onUi
       }
-      val camPosBuilder =
-        CameraPosition.Builder(
-          current,
-        )
 
-      camera.center?.let {
-        camPosBuilder.target(
-          LatLng(
-            it.latitude,
-            it.longitude,
-          ),
-        )
-      }
-
-      camera.zoom?.let {
-        camPosBuilder.zoom(it.toFloat())
-      }
-      camera.bearing?.let {
-        camPosBuilder.bearing(it.toFloat())
-      }
-      camera.tilt?.let {
-        camPosBuilder.tilt(it.toFloat())
-      }
-
-      val camPos = camPosBuilder.build()
-
-      val update = CameraUpdateFactory.newCameraPosition(camPos)
+      val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
 
       if (animated) {
         googleMap?.animateCamera(update, durationMS, null)
@@ -746,7 +839,7 @@ class GoogleMapsViewImpl(
 
   fun destroyInternal() {
     onUi {
-      markerOptions.cancelAllJobs()
+      markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
       clearPolygons()

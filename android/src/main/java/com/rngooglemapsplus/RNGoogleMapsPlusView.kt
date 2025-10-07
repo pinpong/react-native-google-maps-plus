@@ -4,11 +4,15 @@ import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
+import com.rngooglemapsplus.extensions.circleEquals
+import com.rngooglemapsplus.extensions.polygonEquals
+import com.rngooglemapsplus.extensions.polylineEquals
+import com.rngooglemapsplus.extensions.toCameraPosition
+import com.rngooglemapsplus.extensions.toColor
+import com.rngooglemapsplus.extensions.toMapColorScheme
 
 @DoNotStrip
 class RNGoogleMapsPlusView(
@@ -19,21 +23,31 @@ class RNGoogleMapsPlusView(
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerOptions = MarkerOptions()
-  private val polylineOptions = MapPolylineOptions()
-  private val polygonOptions = MapPolygonOptions()
-  private val circleOptions = MapCircleOptions()
+  private val markerBuilder = MarkerBuilder()
+  private val polylineBuilder = MapPolylineBuilder()
+  private val polygonBuilder = MapPolygonBuilder()
+  private val circleBuilder = MapCircleBuilder()
 
   override val view =
-    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerOptions)
+    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
 
   override var initialProps: RNInitialProps? = null
     set(value) {
       view.initMapView(
         value?.mapId,
         value?.liteMode,
-        mapCameraToCameraPosition(value?.initialCamera),
+        value?.camera?.toCameraPosition(),
       )
+    }
+
+  override var uiSettings: RNMapUiSettings? = null
+    set(value) {
+      view.uiSettings = value
+    }
+
+  override var myLocationEnabled: Boolean? = null
+    set(value) {
+      view.myLocationEnabled = value
     }
 
   override var buildingEnabled: Boolean? = null
@@ -46,6 +60,11 @@ class RNGoogleMapsPlusView(
       view.trafficEnabled = value
     }
 
+  override var indoorEnabled: Boolean? = null
+    set(value) {
+      view.indoorEnabled = value
+    }
+
   override var customMapStyle: String? = null
     set(value) {
       currentCustomMapStyle = value
@@ -56,7 +75,7 @@ class RNGoogleMapsPlusView(
 
   override var userInterfaceStyle: RNUserInterfaceStyle? = null
     set(value) {
-      view.userInterfaceStyle = userInterfaceStyleToMapColorScheme(value)
+      view.userInterfaceStyle = value.toMapColorScheme()
     }
 
   override var minZoomLevel: Double? = null
@@ -87,17 +106,17 @@ class RNGoogleMapsPlusView(
       val nextById = value?.associateBy { it.id } ?: emptyMap()
 
       (prevById.keys - nextById.keys).forEach { id ->
-        markerOptions.cancelIconJob(id)
+        markerBuilder.cancelIconJob(id)
         view.removeMarker(id)
       }
 
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          markerOptions.buildIconAsync(id, next) { icon ->
+          markerBuilder.buildIconAsync(id, next) { icon ->
             view.addMarker(
               id,
-              markerOptions.build(next, icon),
+              markerBuilder.build(next, icon),
             )
           }
         } else if (!prev.markerEquals(next)) {
@@ -113,7 +132,7 @@ class RNGoogleMapsPlusView(
               }
 
               if (!prev.markerStyleEquals(next)) {
-                markerOptions.buildIconAsync(id, next) { icon ->
+                markerBuilder.buildIconAsync(id, next) { icon ->
                   m.setIcon(icon)
                 }
               }
@@ -140,7 +159,7 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addPolyline(id, polylineOptions.buildPolylineOptions(next))
+          view.addPolyline(id, polylineBuilder.buildPolylineOptions(next))
         } else if (!prev.polylineEquals(next)) {
           view.updatePolyline(id) { gms ->
             onUi {
@@ -151,11 +170,11 @@ class RNGoogleMapsPlusView(
                 }
               next.width?.let { gms.width = it.dpToPx() }
               next.lineCap?.let {
-                val cap = polylineOptions.mapLineCap(it)
+                val cap = polylineBuilder.mapLineCap(it)
                 gms.startCap = cap
                 gms.endCap = cap
               }
-              next.lineJoin?.let { gms.jointType = polylineOptions.mapLineJoin(it) }
+              next.lineJoin?.let { gms.jointType = polylineBuilder.mapLineJoin(it) }
               next.color?.let { gms.color = it.toColor() }
               next.zIndex?.let { gms.zIndex = it.toFloat() }
             }
@@ -177,7 +196,7 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addPolygon(id, polygonOptions.buildPolygonOptions(next))
+          view.addPolygon(id, polygonBuilder.buildPolygonOptions(next))
         } else if (!prev.polygonEquals(next)) {
           view.updatePolygon(id) { gmsPoly ->
             onUi {
@@ -209,7 +228,7 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addCircle(id, circleOptions.buildCircleOptions(next))
+          view.addCircle(id, circleBuilder.buildCircleOptions(next))
         } else if (!prev.circleEquals(next)) {
           view.updateCircle(id) { gmsCircle ->
             onUi {
@@ -224,6 +243,11 @@ class RNGoogleMapsPlusView(
         }
       }
       field = value
+    }
+
+  override var locationConfig: RNLocationConfig? = null
+    set(value) {
+      view.locationConfig = value
     }
 
   override var onMapError: ((RNMapErrorCode) -> Unit)? = null
@@ -290,7 +314,7 @@ class RNGoogleMapsPlusView(
     animated: Boolean?,
     durationMS: Double?,
   ) {
-    view.setCamera(camera, animated == true, durationMS?.toInt() ?: 3000)
+    view.setCamera(camera.toCameraPosition(), animated == true, durationMS?.toInt() ?: 3000)
   }
 
   override fun setCameraToCoordinates(
@@ -318,41 +342,6 @@ class RNGoogleMapsPlusView(
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 
   override fun isGooglePlayServicesAvailable(): Boolean = playServiceHandler.isPlayServicesAvailable()
-
-  fun userInterfaceStyleToMapColorScheme(value: RNUserInterfaceStyle?): Int? {
-    value ?: return null
-    return when (value) {
-      RNUserInterfaceStyle.LIGHT -> {
-        MapColorScheme.LIGHT
-      }
-
-      RNUserInterfaceStyle.DARK -> {
-        MapColorScheme.DARK
-      }
-
-      RNUserInterfaceStyle.DEFAULT -> {
-        MapColorScheme.FOLLOW_SYSTEM
-      }
-    }
-  }
-
-  fun mapCameraToCameraPosition(camera: RNCamera?): CameraPosition? {
-    camera ?: return null
-    val builder = CameraPosition.builder()
-    camera.center?.let {
-      builder.target(
-        com.google.android.gms.maps.model.LatLng(
-          camera.center.latitude,
-          camera.center.longitude,
-        ),
-      )
-    }
-    camera.zoom?.let { builder.zoom(it.toFloat()) }
-    camera.bearing?.let { builder.bearing(it.toFloat()) }
-    camera.tilt?.let { builder.tilt(it.toFloat()) }
-
-    return builder.build()
-  }
 }
 
 private inline fun onUi(crossinline block: () -> Unit) {

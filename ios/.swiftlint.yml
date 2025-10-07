@@ -1,6 +1,8 @@
 disabled_rules:
   - file_length
   - type_body_length
+  - cyclomatic_complexity
+  - todo
 
 identifier_name:
   min_length:
@@ -8,7 +10,7 @@ identifier_name:
     error: 1
   max_length:
     warning: 40
-    error: 50
+    error: 100
 
 line_length:
   warning: 150

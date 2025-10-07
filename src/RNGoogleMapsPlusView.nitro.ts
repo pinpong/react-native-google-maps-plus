@@ -19,12 +19,17 @@ import type {
   RNMapType,
   RNInitialProps,
   RNCircle,
+  RNMapUiSettings,
+  RNLocationConfig,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   initialProps?: RNInitialProps;
+  uiSettings?: RNMapUiSettings;
+  myLocationEnabled?: boolean;
   buildingEnabled?: boolean;
   trafficEnabled?: boolean;
+  indoorEnabled?: boolean;
   customMapStyle?: string;
   userInterfaceStyle?: RNUserInterfaceStyle;
   minZoomLevel?: number;
@@ -35,6 +40,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   polygons?: RNPolygon[];
   polylines?: RNPolyline[];
   circles?: RNCircle[];
+  locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;

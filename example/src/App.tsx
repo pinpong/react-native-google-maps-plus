@@ -7,6 +7,7 @@ import {
   Text,
 } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { RNAndroidLocationPriority, RNIOSLocationAccuracy } from '../../src';
 import type {
   RNCamera,
   RNMapStyleElement,
@@ -374,7 +375,7 @@ export default function App() {
         initialProps={{
           /// mapStyle not working with mapId
           /// mapId: '111',
-          initialCamera: {
+          camera: {
             center: {
               latitude: 37.7749,
               longitude: -122.4194,
@@ -382,10 +383,25 @@ export default function App() {
             zoom: 15,
           },
         }}
+        uiSettings={{
+          allGesturesEnabled: true,
+          compassEnabled: true,
+          indoorLevelPickerEnabled: true,
+          mapToolbarEnabled: true,
+          myLocationButtonEnabled: true,
+          rotateEnabled: true,
+          scrollEnabled: true,
+          scrollDuringRotateOrZoomEnabled: true,
+          tiltEnabled: true,
+          zoomControlsEnabled: true,
+          zoomGesturesEnabled: true,
+        }}
         onMapReady={callback((ready) => console.log('Map is ready! ' + ready))}
         style={styles.map}
+        myLocationEnabled={true}
         buildingEnabled={true}
         trafficEnabled={true}
+        indoorEnabled={true}
         customMapStyle={JSON.stringify(
           normalStyle ? standardMapStyle : silverMapStyle
         )}
@@ -398,6 +414,18 @@ export default function App() {
           left: 20,
           bottom: 20,
           right: 20,
+        }}
+        locationConfig={{
+          android: {
+            priority:
+              RNAndroidLocationPriority.PRIORITY_BALANCED_POWER_ACCURACY,
+            interval: 5000,
+            minUpdateInterval: 5000,
+          },
+          ios: {
+            desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
+            distanceFilterMeters: 10,
+          },
         }}
         onMapPress={{
           f: function (coordinate: RNLatLng): void {
