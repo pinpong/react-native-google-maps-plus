@@ -11,7 +11,7 @@ final class MapMarkerBuilder {
     attributes: .concurrent
   )
 
-  func build(_ m: RNMarker, icon: UIImage) -> GMSMarker {
+  func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
       position: CLLocationCoordinate2D(
         latitude: m.coordinate.latitude,
@@ -39,6 +39,11 @@ final class MapMarkerBuilder {
     onReady: @escaping (UIImage?) -> Void
   ) {
     tasks[id]?.cancel()
+
+    if m.iconSvg == nil {
+      onReady(nil)
+      return
+    }
 
     let key = m.styleHash()
     if let cached = iconCache.object(forKey: key) {
@@ -85,7 +90,6 @@ final class MapMarkerBuilder {
 
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next.id, next) { img in
-        guard let img else { return }
         m.tracksViewChanges = true
         m.icon = img
         if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
@@ -117,21 +121,26 @@ final class MapMarkerBuilder {
   }
 
   private func renderUIImage(_ m: RNMarker) async -> UIImage? {
-    await withTaskCancellationHandler(
+    guard let iconSvg = m.iconSvg else {
+      return nil
+    }
+
+    return await withTaskCancellationHandler(
       operation: {
-        await withCheckedContinuation { cont in
+        await withCheckedContinuation {
+          (cont: CheckedContinuation<UIImage?, Never>) in
           queue.async {
             if Task.isCancelled {
               cont.resume(returning: nil)
               return
             }
 
-            let targetW = max(1, Int(CGFloat(m.width)))
-            let targetH = max(1, Int(CGFloat(m.height)))
+            let targetW = max(1, Int(CGFloat(iconSvg.width)))
+            let targetH = max(1, Int(CGFloat(iconSvg.height)))
             let size = CGSize(width: targetW, height: targetH)
 
             guard
-              let data = m.iconSvg.data(using: .utf8),
+              let data = iconSvg.svgString.data(using: .utf8),
               let svgImg = SVGKImage(data: data)
             else {
               cont.resume(returning: nil)

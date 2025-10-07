@@ -140,7 +140,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
             }
           } else {
             markerBuilder.buildIconAsync(next.id, next) { icon in
-              guard let icon else { return }
               let marker = self.markerBuilder.build(next, icon: icon)
               self.impl.addMarker(id: id, marker: marker)
             }

@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.styleHash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
 
-class MarkerBuilder(
+class MapMarkerBuilder(
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
@@ -34,7 +35,7 @@ class MarkerBuilder(
 
   fun build(
     m: RNMarker,
-    icon: BitmapDescriptor,
+    icon: BitmapDescriptor?,
   ): MarkerOptions =
     MarkerOptions().apply {
       position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
@@ -46,10 +47,13 @@ class MarkerBuilder(
   fun buildIconAsync(
     id: String,
     m: RNMarker,
-    onReady: (BitmapDescriptor) -> Unit,
+    onReady: (BitmapDescriptor?) -> Unit,
   ) {
     jobsById[id]?.cancel()
-
+    if (m.iconSvg == null) {
+      onReady(null)
+      return
+    }
     val key = m.styleHash()
     iconCache.get(key)?.let { cached ->
       onReady(cached)
@@ -98,17 +102,28 @@ class MarkerBuilder(
 
   private suspend fun renderBitmap(m: RNMarker): Bitmap? {
     var bmp: Bitmap? = null
+    if (m.iconSvg == null) {
+      return null
+    }
     try {
       coroutineContext.ensureActive()
-      val svg = SVG.getFromString(m.iconSvg)
+      val svg = SVG.getFromString(m.iconSvg.svgString)
 
       coroutineContext.ensureActive()
-      svg.setDocumentWidth(m.width.dpToPx())
-      svg.setDocumentHeight(m.height.dpToPx())
+      svg.setDocumentWidth(m.iconSvg.width.dpToPx())
+      svg.setDocumentHeight(m.iconSvg.height.dpToPx())
 
       coroutineContext.ensureActive()
       bmp =
-        createBitmap(m.width.dpToPx().toInt(), m.height.dpToPx().toInt(), Bitmap.Config.ARGB_8888)
+        createBitmap(
+          m.iconSvg.width
+            .dpToPx()
+            .toInt(),
+          m.iconSvg.height
+            .dpToPx()
+            .toInt(),
+          Bitmap.Config.ARGB_8888,
+        )
 
       coroutineContext.ensureActive()
       val canvas = Canvas(bmp)
@@ -125,22 +140,3 @@ class MarkerBuilder(
     }
   }
 }
-
-fun RNMarker.markerEquals(b: RNMarker): Boolean =
-  id == b.id &&
-    zIndex == b.zIndex &&
-    coordinate == b.coordinate &&
-    anchor == b.anchor &&
-    markerStyleEquals(b)
-
-fun RNMarker.markerStyleEquals(b: RNMarker): Boolean =
-  width == b.width &&
-    height == b.height &&
-    iconSvg == b.iconSvg
-
-fun RNMarker.styleHash(): Int =
-  arrayOf<Any?>(
-    width,
-    height,
-    iconSvg,
-  ).contentHashCode()
