@@ -2,18 +2,14 @@ package com.rngooglemapsplus
 
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.UiThreadUtil
-import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
 import com.rngooglemapsplus.extensions.markerEquals
-import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.polygonEquals
 import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
-import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toMapColorScheme
 
 @DoNotStrip
@@ -35,6 +31,8 @@ class RNGoogleMapsPlusView(
 
   override var initialProps: RNInitialProps? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.initMapView(
         value?.mapId,
         value?.liteMode,
@@ -44,31 +42,43 @@ class RNGoogleMapsPlusView(
 
   override var uiSettings: RNMapUiSettings? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.uiSettings = value
     }
 
   override var myLocationEnabled: Boolean? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.myLocationEnabled = value
     }
 
   override var buildingEnabled: Boolean? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.buildingEnabled = value
     }
 
   override var trafficEnabled: Boolean? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.trafficEnabled = value
     }
 
   override var indoorEnabled: Boolean? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.indoorEnabled = value
     }
 
   override var customMapStyle: String? = null
     set(value) {
+      if (field == value) return
+      field = value
       currentCustomMapStyle = value
       value?.let {
         view.customMapStyle = MapStyleOptions(it)
@@ -77,26 +87,29 @@ class RNGoogleMapsPlusView(
 
   override var userInterfaceStyle: RNUserInterfaceStyle? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.userInterfaceStyle = value.toMapColorScheme()
     }
 
-  override var minZoomLevel: Double? = null
+  override var mapZoomConfig: RNMapZoomConfig? = null
     set(value) {
-      view.minZoomLevel = value
-    }
-
-  override var maxZoomLevel: Double? = null
-    set(value) {
-      view.maxZoomLevel = value
+      if (field == value) return
+      field = value
+      view.mapZoomConfig = value
     }
 
   override var mapPadding: RNMapPadding? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.mapPadding = value
     }
 
   override var mapType: RNMapType? = null
     set(value) {
+      if (field == value) return
+      field = value
       value?.let {
         view.mapType = it.value
       }
@@ -104,8 +117,10 @@ class RNGoogleMapsPlusView(
 
   override var markers: Array<RNMarker>? = null
     set(value) {
+      if (field.contentEquals(value)) return
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
 
       (prevById.keys - nextById.keys).forEach { id ->
         markerBuilder.cancelIconJob(id)
@@ -122,38 +137,21 @@ class RNGoogleMapsPlusView(
             )
           }
         } else if (!prev.markerEquals(next)) {
-          view.updateMarker(id) { m ->
+          view.updateMarker(id) { marker ->
             onUi {
-              m.position =
-                LatLng(
-                  next.coordinate.latitude,
-                  next.coordinate.longitude,
-                )
-              next.zIndex?.let { m.zIndex = it.toFloat() } ?: run {
-                m.zIndex = 0f
-              }
-
-              if (!prev.markerStyleEquals(next)) {
-                markerBuilder.buildIconAsync(id, next) { icon ->
-                  m.setIcon(icon)
-                }
-              }
-              m.setAnchor(
-                (next.anchor?.x ?: 0.5).toFloat(),
-                (next.anchor?.y ?: 0.5).toFloat(),
-              )
+              markerBuilder.update(marker, next, prev)
             }
           }
         }
       }
-      field = value
     }
 
   override var polylines: Array<RNPolyline>? = null
     set(value) {
+      if (field.contentEquals(value)) return
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
-
+      field = value
       (prevById.keys - nextById.keys).forEach { id ->
         view.removePolyline(id)
       }
@@ -161,35 +159,23 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addPolyline(id, polylineBuilder.buildPolylineOptions(next))
+          view.addPolyline(id, polylineBuilder.build(next))
         } else if (!prev.polylineEquals(next)) {
-          view.updatePolyline(id) { gms ->
+          view.updatePolyline(id) { polyline ->
             onUi {
-              gms.points =
-                next.coordinates.map {
-
-                  LatLng(it.latitude, it.longitude)
-                }
-              next.width?.let { gms.width = it.dpToPx() }
-              next.lineCap?.let {
-                val cap = polylineBuilder.mapLineCap(it)
-                gms.startCap = cap
-                gms.endCap = cap
-              }
-              next.lineJoin?.let { gms.jointType = polylineBuilder.mapLineJoin(it) }
-              next.color?.let { gms.color = it.toColor() }
-              next.zIndex?.let { gms.zIndex = it.toFloat() }
+              polylineBuilder.update(polyline, next)
             }
           }
         }
       }
-      field = value
     }
 
   override var polygons: Array<RNPolygon>? = null
     set(value) {
+      if (field.contentEquals(value)) return
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
 
       (prevById.keys - nextById.keys).forEach { id ->
         view.removePolygon(id)
@@ -198,30 +184,21 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addPolygon(id, polygonBuilder.buildPolygonOptions(next))
+          view.addPolygon(id, polygonBuilder.build(next))
         } else if (!prev.polygonEquals(next)) {
-          view.updatePolygon(id) { gmsPoly ->
-            onUi {
-              gmsPoly.points =
-                next.coordinates.map {
-                  com.google.android.gms.maps.model
-                    .LatLng(it.latitude, it.longitude)
-                }
-              next.fillColor?.let { gmsPoly.fillColor = it.toColor() }
-              next.strokeColor?.let { gmsPoly.strokeColor = it.toColor() }
-              next.strokeWidth?.let { gmsPoly.strokeWidth = it.dpToPx() }
-              next.zIndex?.let { gmsPoly.zIndex = it.toFloat() }
-            }
+          view.updatePolygon(id) { polygon ->
+            onUi { polygonBuilder.update(polygon, next) }
           }
         }
       }
-      field = value
     }
 
   override var circles: Array<RNCircle>? = null
     set(value) {
+      if (field.contentEquals(value)) return
       val prevById = field?.associateBy { it.id } ?: emptyMap()
       val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
 
       (prevById.keys - nextById.keys).forEach { id ->
         view.removeCircle(id)
@@ -230,25 +207,21 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         if (prev == null) {
-          view.addCircle(id, circleBuilder.buildCircleOptions(next))
+          view.addCircle(id, circleBuilder.build(next))
         } else if (!prev.circleEquals(next)) {
-          view.updateCircle(id) { gmsCircle ->
+          view.updateCircle(id) { circle ->
             onUi {
-              gmsCircle.center = LatLng(next.center.latitude, next.center.longitude)
-              next.radius?.let { gmsCircle.radius = it }
-              next.strokeWidth?.let { gmsCircle.strokeWidth = it.dpToPx() }
-              next.strokeColor?.let { gmsCircle.strokeColor = it.toColor() }
-              next.fillColor?.let { gmsCircle.fillColor = it.toColor() }
-              next.zIndex?.let { gmsCircle.zIndex = it.toFloat() } ?: run { gmsCircle.zIndex = 0f }
+              circleBuilder.update(circle, next)
             }
           }
         }
       }
-      field = value
     }
 
   override var locationConfig: RNLocationConfig? = null
     set(value) {
+      if (field == value) return
+      field = value
       view.locationConfig = value
     }
 
@@ -261,6 +234,7 @@ class RNGoogleMapsPlusView(
     set(cb) {
       view.onMapReady = cb
     }
+
   override var onLocationUpdate: ((RNLocation) -> Unit)? = null
     set(cb) {
       view.onLocationUpdate = cb

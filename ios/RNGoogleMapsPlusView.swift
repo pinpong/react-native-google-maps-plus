@@ -88,13 +88,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  var minZoomLevel: Double? {
-    didSet { impl.minZoomLevel = minZoomLevel }
-  }
-
-  @MainActor
-  var maxZoomLevel: Double? {
-    didSet { impl.maxZoomLevel = maxZoomLevel }
+  var mapZoomConfig: RNMapZoomConfig? {
+    didSet { impl.mapZoomConfig = mapZoomConfig }
   }
 
   @MainActor
@@ -135,7 +130,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
           if let prev = prevById[id] {
             if !prev.markerEquals(next) {
               impl.updateMarker(id: id) { m in
-                self.markerBuilder.updateMarker(prev, next, m)
+                self.markerBuilder.update(prev, next, m)
               }
             }
           } else {
@@ -168,13 +163,13 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.polylineEquals(next) {
             impl.updatePolyline(id: id) { pl in
-              prev.updatePolyline(next, pl)
+              self.polylineBuilder.update(next, pl)
             }
           }
         } else {
           impl.addPolyline(
             id: id,
-            polyline: polylineBuilder.buildPolyline(next)
+            polyline: polylineBuilder.build(next)
           )
         }
       }
@@ -200,11 +195,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.polygonEquals(next) {
             impl.updatePolygon(id: id) { pg in
-              prev.updatePolygon(next, pg)
+              self.polygonBuilder.update(next, pg)
             }
           }
         } else {
-          impl.addPolygon(id: id, polygon: polygonBuilder.buildPolygon(next))
+          impl.addPolygon(id: id, polygon: polygonBuilder.build(next))
         }
       }
     }
@@ -229,11 +224,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.circleEquals(next) {
             impl.updateCircle(id: id) { circle in
-              prev.updateCircle(next, circle)
+              self.circleBuilder.update(next, circle)
             }
           }
         } else {
-          impl.addCircle(id: id, circle: circleBuilder.buildCircle(next))
+          impl.addCircle(id: id, circle: circleBuilder.build(next))
         }
       }
     }

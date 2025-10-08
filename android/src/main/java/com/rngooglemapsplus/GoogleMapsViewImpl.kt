@@ -293,11 +293,9 @@ class GoogleMapsViewImpl(
       userInterfaceStyle?.let {
         googleMap?.mapColorScheme = it
       }
-      minZoomLevel?.let {
-        googleMap?.setMinZoomPreference(it.toFloat())
-      }
-      maxZoomLevel?.let {
-        googleMap?.setMaxZoomPreference(it.toFloat())
+      mapZoomConfig?.let {
+        googleMap?.setMinZoomPreference(it.min?.toFloat() ?: 2.0f)
+        googleMap?.setMaxZoomPreference(it.max?.toFloat() ?: 21.0f)
       }
     }
 
@@ -340,56 +338,34 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let { v ->
-          googleMap?.uiSettings?.apply {
-            v.allGesturesEnabled?.let { setAllGesturesEnabled(it) }
-            v.compassEnabled?.let { isCompassEnabled = it }
-            v.indoorLevelPickerEnabled?.let { isIndoorLevelPickerEnabled = it }
-            v.mapToolbarEnabled?.let { isMapToolbarEnabled = it }
-            v.myLocationButtonEnabled?.let {
-              googleMap?.setLocationSource(locationHandler)
-              isMyLocationButtonEnabled = it
-            }
-            v.rotateEnabled?.let { isRotateGesturesEnabled = it }
-            v.scrollEnabled?.let { isScrollGesturesEnabled = it }
-            v.scrollDuringRotateOrZoomEnabled?.let {
-              isScrollGesturesEnabledDuringRotateOrZoom = it
-            }
-            v.tiltEnabled?.let { isTiltGesturesEnabled = it }
-            v.zoomControlsEnabled?.let { isZoomControlsEnabled = it }
-            v.zoomGesturesEnabled?.let { isZoomGesturesEnabled = it }
-          }
+        googleMap?.uiSettings?.apply {
+          setAllGesturesEnabled(value?.allGesturesEnabled ?: true)
+          isCompassEnabled = value?.compassEnabled ?: false
+          isIndoorLevelPickerEnabled = value?.indoorLevelPickerEnabled ?: false
+          isMapToolbarEnabled = value?.mapToolbarEnabled ?: false
+
+          val myLocationEnabled = value?.myLocationButtonEnabled ?: false
+          googleMap?.setLocationSource(if (myLocationEnabled) locationHandler else null)
+          isMyLocationButtonEnabled = myLocationEnabled
+
+          isRotateGesturesEnabled = value?.rotateEnabled ?: true
+          isScrollGesturesEnabled = value?.scrollEnabled ?: true
+          isScrollGesturesEnabledDuringRotateOrZoom =
+            value?.scrollDuringRotateOrZoomEnabled ?: true
+          isTiltGesturesEnabled = value?.tiltEnabled ?: true
+          isZoomControlsEnabled = value?.zoomControlsEnabled ?: false
+          isZoomGesturesEnabled = value?.zoomGesturesEnabled ?: false
         }
-          ?: run {
-            googleMap?.uiSettings?.apply {
-              setAllGesturesEnabled(true)
-              isCompassEnabled = false
-              isIndoorLevelPickerEnabled = false
-              isMapToolbarEnabled = false
-              isMyLocationButtonEnabled = false
-              googleMap?.setLocationSource(null)
-              isRotateGesturesEnabled = true
-              isScrollGesturesEnabled = true
-              isScrollGesturesEnabledDuringRotateOrZoom = true
-              isTiltGesturesEnabled = true
-              isZoomControlsEnabled = false
-              isZoomGesturesEnabled = false
-            }
-          }
       }
     }
 
   @SuppressLint("MissingPermission")
   var myLocationEnabled: Boolean? = null
     set(value) {
+      field = value
       onUi {
         try {
-          value?.let {
-            googleMap?.isMyLocationEnabled = it
-          }
-            ?: run {
-              googleMap?.isMyLocationEnabled = false
-            }
+          googleMap?.isMyLocationEnabled = value ?: false
         } catch (se: SecurityException) {
           onLocationError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
         } catch (ex: Exception) {
@@ -403,12 +379,7 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.isBuildingsEnabled = it
-        }
-          ?: run {
-            googleMap?.isBuildingsEnabled = false
-          }
+        googleMap?.isBuildingsEnabled = value ?: false
       }
     }
 
@@ -416,11 +387,7 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.isTrafficEnabled = it
-        } ?: run {
-          googleMap?.isTrafficEnabled = false
-        }
+        googleMap?.isTrafficEnabled = value ?: false
       }
     }
 
@@ -428,12 +395,7 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.isIndoorEnabled = it
-        }
-          ?: run {
-            googleMap?.isIndoorEnabled = false
-          }
+        googleMap?.isIndoorEnabled = value ?: false
       }
     }
 
@@ -449,52 +411,29 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.mapColorScheme = it
-        } ?: run {
-          googleMap?.mapColorScheme = MapColorScheme.FOLLOW_SYSTEM
-        }
+        googleMap?.mapColorScheme = value ?: MapColorScheme.FOLLOW_SYSTEM
       }
     }
 
-  var minZoomLevel: Double? = null
+  var mapZoomConfig: RNMapZoomConfig? = null
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.setMinZoomPreference(it.toFloat())
-        } ?: run {
-          googleMap?.setMinZoomPreference(2.0f)
-        }
-      }
-    }
-
-  var maxZoomLevel: Double? = null
-    set(value) {
-      field = value
-      onUi {
-        value?.let {
-          googleMap?.setMaxZoomPreference(it.toFloat())
-        } ?: run {
-          googleMap?.setMaxZoomPreference(21.0f)
-        }
+        googleMap?.setMinZoomPreference(value?.min?.toFloat() ?: 2.0f)
+        googleMap?.setMaxZoomPreference(value?.max?.toFloat() ?: 21.0f)
       }
     }
 
   var mapPadding: RNMapPadding? = null
     set(value) {
       field = value
-      value?.let {
-        onUi {
-          googleMap?.setPadding(
-            it.left.dpToPx().toInt(),
-            it.top.dpToPx().toInt(),
-            it.right.dpToPx().toInt(),
-            it.bottom.dpToPx().toInt(),
-          )
-        }
-      } ?: run {
-        googleMap?.setPadding(0, 0, 0, 0)
+      onUi {
+        googleMap?.setPadding(
+          value?.left?.dpToPx()?.toInt() ?: 0,
+          value?.top?.dpToPx()?.toInt() ?: 0,
+          value?.right?.dpToPx()?.toInt() ?: 0,
+          value?.bottom?.dpToPx()?.toInt() ?: 0,
+        )
       }
     }
 
@@ -502,11 +441,7 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi {
-        value?.let {
-          googleMap?.mapType = it
-        } ?: run {
-          googleMap?.mapType = 1
-        }
+        googleMap?.mapType = value ?: 1
       }
     }
 

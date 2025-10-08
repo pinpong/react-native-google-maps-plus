@@ -21,6 +21,7 @@ import type {
   RNCircle,
   RNMapUiSettings,
   RNLocationConfig,
+  RNMapZoomConfig,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -32,8 +33,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   indoorEnabled?: boolean;
   customMapStyle?: string;
   userInterfaceStyle?: RNUserInterfaceStyle;
-  minZoomLevel?: number;
-  maxZoomLevel?: number;
+  mapZoomConfig?: RNMapZoomConfig;
   mapPadding?: RNMapPadding;
   mapType?: RNMapType;
   markers?: RNMarker[];

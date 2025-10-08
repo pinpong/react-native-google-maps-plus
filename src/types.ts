@@ -123,6 +123,11 @@ export type RNPosition = {
   y: number;
 };
 
+export type RNMapZoomConfig = {
+  min?: number;
+  max?: number;
+};
+
 export type RNLineCapType = 'butt' | 'round' | 'square';
 export type RNLineJoinType = 'miter' | 'round' | 'bevel';
 
@@ -166,7 +171,7 @@ export type RNCircle = {
   pressable?: boolean;
   zIndex?: number;
   center: RNLatLng;
-  radius?: number;
+  radius: number;
   strokeWidth?: number;
   strokeColor?: string;
   fillColor?: string;

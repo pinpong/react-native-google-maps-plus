@@ -9,7 +9,9 @@ import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,29 @@ class MapMarkerBuilder(
       icon(icon)
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
+
+  fun update(
+    marker: Marker,
+    prev: RNMarker,
+    next: RNMarker,
+  ) {
+    marker.position =
+      LatLng(
+        next.coordinate.latitude,
+        next.coordinate.longitude,
+      )
+    marker.zIndex = next.zIndex?.toFloat() ?: 0f
+
+    if (!prev.markerStyleEquals(next)) {
+      buildIconAsync(marker.id, next) { icon ->
+        marker.setIcon(icon)
+      }
+    }
+    marker.setAnchor(
+      (next.anchor?.x ?: 0.5).toFloat(),
+      (next.anchor?.y ?: 0.5).toFloat(),
+    )
+  }
 
   fun buildIconAsync(
     id: String,

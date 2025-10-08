@@ -25,11 +25,47 @@ final class MapMarkerBuilder {
       x: m.anchor?.x ?? 0.5,
       y: m.anchor?.y ?? 0.5
     )
-    if let zi = m.zIndex { marker.zIndex = Int32(zi) }
+
+    m.zIndex.map { marker.zIndex = Int32($0) }
+
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak marker] in
       marker?.tracksViewChanges = false
     }
+
     return marker
+  }
+
+  @MainActor
+  func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
+    m.position = CLLocationCoordinate2D(
+      latitude: next.coordinate.latitude,
+      longitude: next.coordinate.longitude
+    )
+
+    m.zIndex = Int32(next.zIndex ?? 0)
+
+    m.groundAnchor = CGPoint(
+      x: next.anchor?.x ?? 0.5,
+      y: next.anchor?.y ?? 0.5
+    )
+
+    if !prev.markerStyleEquals(next) {
+      buildIconAsync(next.id, next) { img in
+        m.tracksViewChanges = true
+        m.icon = img
+
+        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
+          m.groundAnchor = CGPoint(
+            x: next.anchor?.x ?? 0.5,
+            y: next.anchor?.y ?? 0.5
+          )
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak m] in
+          m?.tracksViewChanges = false
+        }
+      }
+    }
   }
 
   @MainActor
@@ -53,14 +89,10 @@ final class MapMarkerBuilder {
 
     let task = Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
-      defer {
-        self.tasks.removeValue(forKey: id)
-      }
+      defer { self.tasks.removeValue(forKey: id) }
 
       let img = await self.renderUIImage(m)
-      guard let img, !Task.isCancelled else {
-        return
-      }
+      guard let img, !Task.isCancelled else { return }
 
       self.iconCache.setObject(img, forKey: key)
 
@@ -68,42 +100,9 @@ final class MapMarkerBuilder {
         guard !Task.isCancelled else { return }
         onReady(img)
       }
-
     }
 
     tasks[id] = task
-  }
-
-  @MainActor
-  func updateMarker(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    m.position = CLLocationCoordinate2D(
-      latitude: next.coordinate.latitude,
-      longitude: next.coordinate.longitude
-    )
-
-    if let zi = next.zIndex { m.zIndex = Int32(zi) }
-
-    m.groundAnchor = CGPoint(
-      x: next.anchor?.x ?? 0.5,
-      y: next.anchor?.y ?? 0.5
-    )
-
-    if !prev.markerStyleEquals(next) {
-      buildIconAsync(next.id, next) { img in
-        m.tracksViewChanges = true
-        m.icon = img
-        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
-          m.groundAnchor = CGPoint(
-            x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 0.5
-          )
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak m] in
-          m?.tracksViewChanges = false
-        }
-      }
-    }
   }
 
   func cancelIconTask(_ id: String) {
@@ -181,5 +180,4 @@ final class MapMarkerBuilder {
       onCancel: {}
     )
   }
-
 }
