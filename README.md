@@ -10,7 +10,7 @@
 [![Lint](https://img.shields.io/badge/lint-eslint-green.svg?logo=eslint&logoColor=white)](https://eslint.org/)
 [![React Native](https://img.shields.io/badge/react--native-%3E%3D0.81.0-61dafb.svg?logo=react)](https://reactnative.dev/)
 [![Platform: Android](https://img.shields.io/badge/platform-android-green.svg?logo=android&logoColor=white)](https://developer.android.com/)
-[![Platform: iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg?logo=apple&logoColor=black)](https://developer.apple.com/ios/)
+[![Pla[Dependencies.md](../../Downloads/Dependencies.md)tform: iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg?logo=apple&logoColor=black)](https://developer.apple.com/ios/)
 
 React-native wrapper for android & IOS google maps sdk
 
@@ -22,13 +22,15 @@ React-native wrapper for android & IOS google maps sdk
 yarn add react-native-google-maps-plus react-native-nitro-modules
 ```
 
-Dependencies
+# Dependencies
 
-This package builds on native SVG rendering libraries:
+This package builds on native libraries for SVG rendering and Google Maps integration:
 
-iOS: [SVGKit](https://github.com/SVGKit/SVGKit)
-
-Android: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
+- **iOS**: [SVGKit](https://github.com/SVGKit/SVGKit)
+- **Android**: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
+- **iOS Maps SDK**: [Google Maps SDK for iOS](https://developers.google.com/maps/documentation/ios-sdk)
+- **Android Maps SDK**: [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk)
+- **Maps Utility Libraries**: [Google Maps Utils for iOS](https://developers.google.com/maps/documentation/ios-sdk/utility) and [Google Maps Utils for Android](https://developers.google.com/maps/documentation/android-sdk/utility)
 
 These are automatically linked when you install the package, but you may need to clean/rebuild your native projects after first install.
 

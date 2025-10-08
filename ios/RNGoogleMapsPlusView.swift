@@ -12,6 +12,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let polylineBuilder = MapPolylineBuilder()
   private let polygonBuilder = MapPolygonBuilder()
   private let circleBuilder = MapCircleBuilder()
+  private let heatmapBuilder = MapHeatmapBuilder()
 
   private let impl: GoogleMapsViewImpl
 
@@ -230,6 +231,27 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         } else {
           impl.addCircle(id: id, circle: circleBuilder.build(next))
         }
+      }
+    }
+  }
+
+  @MainActor
+  var heatmaps: [RNHeatmap]? {
+    didSet {
+      let prevById = Dictionary(
+        (oldValue ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+      let nextById = Dictionary(
+        (heatmaps ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+
+      let removed = Set(prevById.keys).subtracting(nextById.keys)
+      removed.forEach { impl.removeHeatmap(id: $0) }
+
+      for (id, next) in nextById {
+        impl.addHeatmap(id: id, heatmap: heatmapBuilder.build(next))
       }
     }
   }

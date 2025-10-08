@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => 16.0 }
+  s.platforms    = { :ios => 15.1 }
   s.source       = { :git => "https://github.com/pinpong/react-native-google-maps-plus.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
@@ -26,7 +26,8 @@ Pod::Spec.new do |s|
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
 
-  s.dependency 'GoogleMaps', '10.3.0'
+  s.dependency 'GoogleMaps', '10.4.0'
+  s.dependency 'Google-Maps-iOS-Utils', '6.1.3'
   s.dependency 'SVGKit', '3.0.0'
 
   load 'nitrogen/generated/ios/RNGoogleMapsPlus+autolinking.rb'

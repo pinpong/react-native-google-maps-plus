@@ -1,5 +1,6 @@
 import CoreLocation
 import GoogleMaps
+import GoogleMapsUtils
 import UIKit
 
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
@@ -14,11 +15,13 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
+  private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
 
   private var markersById: [String: GMSMarker] = [:]
   private var polylinesById: [String: GMSPolyline] = [:]
   private var polygonsById: [String: GMSPolygon] = [:]
   private var circlesById: [String: GMSCircle] = [:]
+  private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
@@ -148,29 +151,31 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
         $0.ios?.desiredAccuracy?.toCLLocationAccuracy
       locationHandler.distanceFilterMeters = $0.ios?.distanceFilterMeters
     }
-
     if !pendingMarkers.isEmpty {
       pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
       pendingMarkers.removeAll()
     }
-
     if !pendingPolylines.isEmpty {
       pendingPolylines.forEach {
         addPolylineInternal(id: $0.id, polyline: $0.polyline)
       }
       pendingPolylines.removeAll()
     }
-
     if !pendingPolygons.isEmpty {
       pendingPolygons.forEach {
         addPolygonInternal(id: $0.id, polygon: $0.polygon)
       }
       pendingPolygons.removeAll()
     }
-
     if !pendingCircles.isEmpty {
       pendingCircles.forEach { addCircleInternal(id: $0.id, circle: $0.circle) }
       pendingCircles.removeAll()
+    }
+    if !pendingHeatmaps.isEmpty {
+      pendingHeatmaps.forEach {
+        addHeatmapInternal(id: $0.id, heatmap: $0.heatmap)
+      }
+      pendingHeatmaps.removeAll()
     }
   }
 
@@ -491,12 +496,41 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     pendingCircles.removeAll()
   }
 
+  @MainActor
+  func addHeatmap(id: String, heatmap: GMUHeatmapTileLayer) {
+    if mapView == nil {
+      pendingHeatmaps.append((id, heatmap))
+      return
+    }
+    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+    addHeatmapInternal(id: id, heatmap: heatmap)
+  }
+
+  @MainActor
+  private func addHeatmapInternal(id: String, heatmap: GMUHeatmapTileLayer) {
+    heatmap.map = mapView
+    heatmapsById[id] = heatmap
+  }
+
+  @MainActor
+  func removeHeatmap(id: String) {
+    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+  }
+
+  @MainActor
+  func clearHeatmaps() {
+    heatmapsById.values.forEach { $0.map = nil }
+    heatmapsById.removeAll()
+    pendingHeatmaps.removeAll()
+  }
+
   func deinitInternal() {
     markerBuilder.cancelAllIconTasks()
     clearMarkers()
     clearPolylines()
     clearPolygons()
     clearCircles()
+    clearHeatmaps()
     locationHandler.stop()
     mapView?.clear()
     mapView?.delegate = nil

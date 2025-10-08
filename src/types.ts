@@ -177,6 +177,28 @@ export type RNCircle = {
   fillColor?: string;
 };
 
+export type RNHeatmap = {
+  id: string;
+  pressable?: boolean;
+  zIndex?: number;
+  weightedData: RNHeatmapPoint[];
+  radius?: number;
+  opacity?: number;
+  gradient?: RNHeatmapGradient;
+};
+
+export type RNHeatmapPoint = {
+  latitude: number;
+  longitude: number;
+  weight: number;
+};
+
+export type RNHeatmapGradient = {
+  colors: string[];
+  startPoints: number[];
+  colorMapSize: number;
+};
+
 export type RNLocationConfig = {
   android?: RNAndroidLocationConfig;
   ios?: RNIOSLocationConfig;
