@@ -60,22 +60,16 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     initialized = true
     let options = GMSMapViewOptions()
     options.frame = bounds
-    if let mapId = mapId {
-      options.mapID = GMSMapID(identifier: mapId)
-    }
-    if let liteMode = liteMode {
-      /// not supported
-    }
-    if let camera = camera {
-      options.camera = camera
-    }
+
+    mapId.map { options.mapID = GMSMapID(identifier: $0) }
+    liteMode.map { _ in /* not supported */ }
+    camera.map { options.camera = $0 }
+
     mapView = GMSMapView.init(options: options)
     mapView?.delegate = self
     mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     mapView?.paddingAdjustmentBehavior = .never
-    if let mapView = mapView {
-      addSubview(mapView)
-    }
+    mapView.map { addSubview($0) }
     initLocationCallbacks()
     applyPending()
     onMapReady?(true)
@@ -109,115 +103,73 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   private func applyPending() {
-
-    if let padding = mapPadding {
+    mapPadding.map {
       mapView?.padding = UIEdgeInsets(
-        top: padding.top,
-        left: padding.left,
-        bottom: padding.bottom,
-        right: padding.right
+        top: $0.top,
+        left: $0.left,
+        bottom: $0.bottom,
+        right: $0.right
       )
     }
 
-    if let uiSettings = uiSettings {
-      if let allGesturesEnabled = uiSettings.allGesturesEnabled {
-        mapView?.settings.setAllGesturesEnabled(allGesturesEnabled)
+    if let v = uiSettings {
+      v.allGesturesEnabled.map { mapView?.settings.setAllGesturesEnabled($0) }
+      v.compassEnabled.map { mapView?.settings.compassButton = $0 }
+      v.indoorLevelPickerEnabled.map { mapView?.settings.indoorPicker = $0 }
+      v.mapToolbarEnabled.map { _ in /* not supported */ }
+      v.myLocationButtonEnabled.map { mapView?.settings.myLocationButton = $0 }
+      v.rotateEnabled.map { mapView?.settings.rotateGestures = $0 }
+      v.scrollEnabled.map { mapView?.settings.scrollGestures = $0 }
+      v.scrollDuringRotateOrZoomEnabled.map {
+        mapView?.settings.allowScrollGesturesDuringRotateOrZoom = $0
       }
-      if let compassEnabled = uiSettings.compassEnabled {
-        mapView?.settings.compassButton = compassEnabled
-      }
-      if let indoorLevelPickerEnabled = uiSettings.indoorLevelPickerEnabled {
-        mapView?.settings.indoorPicker = indoorLevelPickerEnabled
-      }
-      if let mapToolbarEnabled = uiSettings.mapToolbarEnabled {
-        /// not supported
-      }
-      if let myLocationButtonEnabled = uiSettings.myLocationButtonEnabled {
-        mapView?.settings.myLocationButton = myLocationButtonEnabled
-      }
-      if let rotateEnabled = uiSettings.rotateEnabled {
-        mapView?.settings.rotateGestures = rotateEnabled
-      }
-      if let scrollEnabled = uiSettings.scrollEnabled {
-        mapView?.settings.scrollGestures = scrollEnabled
-      }
-      if let scrollDuringRotateOrZoomEnabled = uiSettings
-        .scrollDuringRotateOrZoomEnabled {
-        mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
-          scrollDuringRotateOrZoomEnabled
-      }
-      if let tiltEnabled = uiSettings.tiltEnabled {
-        mapView?.settings.tiltGestures = tiltEnabled
-      }
-      if let zoomControlsEnabled = uiSettings.zoomControlsEnabled {
-        /// not supported
-      }
-      if let zoomGesturesEnabled = uiSettings.zoomGesturesEnabled {
-        mapView?.settings.zoomGestures = zoomGesturesEnabled
-      }
+      v.tiltEnabled.map { mapView?.settings.tiltGestures = $0 }
+      v.zoomControlsEnabled.map { _ in /* not supported */ }
+      v.zoomGesturesEnabled.map { mapView?.settings.zoomGestures = $0 }
     }
 
-    if let myLocation = myLocationEnabled {
-      mapView?.isMyLocationEnabled = myLocation
+    myLocationEnabled.map { mapView?.isMyLocationEnabled = $0 }
+    buildingEnabled.map { mapView?.isBuildingsEnabled = $0 }
+    trafficEnabled.map { mapView?.isTrafficEnabled = $0 }
+    indoorEnabled.map { mapView?.isIndoorEnabled = $0 }
+    customMapStyle.map { mapView?.mapStyle = $0 }
+    mapType.map { mapView?.mapType = $0 }
+    userInterfaceStyle.map { mapView?.overrideUserInterfaceStyle = $0 }
+
+    mapZoomConfig.map {
+      mapView?.setMinZoom(
+        Float($0.min ?? 2),
+        maxZoom: Float($0.max ?? 21)
+      )
     }
 
-    if let buildings = buildingEnabled {
-      mapView?.isBuildingsEnabled = buildings
-    }
-
-    if let traffic = trafficEnabled {
-      mapView?.isTrafficEnabled = traffic
-    }
-
-    if let indoor = indoorEnabled {
-      mapView?.isIndoorEnabled = indoor
-    }
-
-    if let style = customMapStyle {
-      mapView?.mapStyle = style
-    }
-
-    if let mapType = mapType {
-      mapView?.mapType = mapType
-    }
-
-    if let uiStyle = userInterfaceStyle {
-      mapView?.overrideUserInterfaceStyle = uiStyle
-    }
-
-    if let minZoom = minZoomLevel, let maxZoom = maxZoomLevel {
-      mapView?.setMinZoom(Float(minZoom), maxZoom: Float(maxZoom))
-    }
-
-    if let locationConfig = locationConfig {
+    locationConfig.map {
       locationHandler.desiredAccuracy =
-        locationConfig.ios?.desiredAccuracy?.toCLLocationAccuracy
-      locationHandler.distanceFilterMeters =
-        locationConfig.ios?.distanceFilterMeters
+        $0.ios?.desiredAccuracy?.toCLLocationAccuracy
+      locationHandler.distanceFilterMeters = $0.ios?.distanceFilterMeters
     }
 
     if !pendingMarkers.isEmpty {
-      pendingMarkers.forEach {
-        addMarkerInternal(id: $0.id, marker: $0.marker)
-      }
+      pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
       pendingMarkers.removeAll()
     }
+
     if !pendingPolylines.isEmpty {
       pendingPolylines.forEach {
         addPolylineInternal(id: $0.id, polyline: $0.polyline)
       }
       pendingPolylines.removeAll()
     }
+
     if !pendingPolygons.isEmpty {
       pendingPolygons.forEach {
         addPolygonInternal(id: $0.id, polygon: $0.polygon)
       }
       pendingPolygons.removeAll()
     }
+
     if !pendingCircles.isEmpty {
-      pendingCircles.forEach {
-        addCircleInternal(id: $0.id, circle: $0.circle)
-      }
+      pendingCircles.forEach { addCircleInternal(id: $0.id, circle: $0.circle) }
       pendingCircles.removeAll()
     }
   }
@@ -229,152 +181,86 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   @MainActor
   var uiSettings: RNMapUiSettings? {
     didSet {
-      guard let mapView = mapView else { return }
-      let settings = mapView.settings
-
-      if let v = uiSettings {
-        if let allGesturesEnabled = v.allGesturesEnabled {
-          settings.setAllGesturesEnabled(allGesturesEnabled)
-        }
-        if let compassEnabled = v.compassEnabled {
-          settings.compassButton = compassEnabled
-        }
-        if let indoorLevelPickerEnabled = v.indoorLevelPickerEnabled {
-          settings.indoorPicker = indoorLevelPickerEnabled
-        }
-        if let mapToolbarEnabled = v.mapToolbarEnabled {
-          /// not supported
-        }
-        if let myLocationButtonEnabled = v.myLocationButtonEnabled {
-          settings.myLocationButton = myLocationButtonEnabled
-        }
-        if let rotateEnabled = v.rotateEnabled {
-          settings.rotateGestures = rotateEnabled
-        }
-        if let scrollEnabled = v.scrollEnabled {
-          settings.scrollGestures = scrollEnabled
-        }
-        if let scrollDuringRotateOrZoomEnabled = v
-          .scrollDuringRotateOrZoomEnabled {
-          settings.allowScrollGesturesDuringRotateOrZoom =
-            scrollDuringRotateOrZoomEnabled
-        }
-        if let tiltEnabled = v.tiltEnabled {
-          settings.tiltGestures = tiltEnabled
-        }
-        if let zoomControlsEnabled = v.zoomControlsEnabled {
-          /// not supported
-        }
-        if let zoomGesturesEnabled = v.zoomGesturesEnabled {
-          settings.zoomGestures = zoomGesturesEnabled
-        }
-      } else {
-        settings.setAllGesturesEnabled(true)
-        settings.compassButton = false
-        settings.indoorPicker = false
-        settings.myLocationButton = false
-        settings.rotateGestures = true
-        settings.scrollGestures = true
-        settings.allowScrollGesturesDuringRotateOrZoom = true
-        settings.tiltGestures = true
-        settings.zoomGestures = false
-      }
+      mapView?.settings.setAllGesturesEnabled(
+        uiSettings?.allGesturesEnabled ?? true
+      )
+      mapView?.settings.compassButton = uiSettings?.compassEnabled ?? false
+      mapView?.settings.indoorPicker =
+        uiSettings?.indoorLevelPickerEnabled ?? false
+      mapView?.settings.myLocationButton =
+        uiSettings?.myLocationButtonEnabled ?? false
+      mapView?.settings.rotateGestures = uiSettings?.rotateEnabled ?? true
+      mapView?.settings.scrollGestures = uiSettings?.scrollEnabled ?? true
+      mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
+        uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
+      mapView?.settings.tiltGestures = uiSettings?.tiltEnabled ?? true
+      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? false
     }
   }
 
   @MainActor
   var myLocationEnabled: Bool? {
     didSet {
-      if let value = myLocationEnabled {
-        mapView?.isMyLocationEnabled = value
-      } else {
-        mapView?.isMyLocationEnabled = false
-      }
+      mapView?.isMyLocationEnabled = myLocationEnabled ?? false
     }
   }
 
   @MainActor
   var buildingEnabled: Bool? {
     didSet {
-      if let value = buildingEnabled {
-        mapView?.isBuildingsEnabled = value
-      } else {
-        mapView?.isBuildingsEnabled = false
-      }
+      mapView?.isBuildingsEnabled = buildingEnabled ?? false
     }
   }
 
   @MainActor
   var trafficEnabled: Bool? {
     didSet {
-      if let value = trafficEnabled {
-        mapView?.isTrafficEnabled = value
-      } else {
-        mapView?.isTrafficEnabled = false
-      }
+      mapView?.isTrafficEnabled = false
     }
   }
 
   @MainActor
   var indoorEnabled: Bool? {
     didSet {
-      if let value = indoorEnabled {
-        mapView?.isIndoorEnabled = value
-      } else {
-        mapView?.isIndoorEnabled = false
-      }
+      mapView?.isIndoorEnabled = indoorEnabled ?? false
     }
   }
 
   @MainActor
   var customMapStyle: GMSMapStyle? {
     didSet {
-      if let style = customMapStyle {
-        mapView?.mapStyle = style
-      }
+      mapView?.mapStyle = customMapStyle
     }
   }
 
   @MainActor
   var userInterfaceStyle: UIUserInterfaceStyle? {
     didSet {
-      if let style = userInterfaceStyle {
-        mapView?.overrideUserInterfaceStyle = style
-      }
+      mapView?.overrideUserInterfaceStyle = userInterfaceStyle ?? .unspecified
     }
   }
 
   @MainActor
-  var minZoomLevel: Double? {
+  var mapZoomConfig: RNMapZoomConfig? {
     didSet {
-      if let min = minZoomLevel, let max = maxZoomLevel {
-        mapView?.setMinZoom(Float(min), maxZoom: Float(max))
-      }
+      mapView?.setMinZoom(
+        Float(mapZoomConfig?.min ?? 2),
+        maxZoom: Float(mapZoomConfig?.max ?? 21)
+      )
     }
   }
 
-  @MainActor
-  var maxZoomLevel: Double? {
+  @MainActor var mapPadding: RNMapPadding? {
     didSet {
-      if let max = maxZoomLevel, let min = minZoomLevel {
-        mapView?.setMinZoom(Float(min), maxZoom: Float(max))
-      }
-    }
-  }
-
-  @MainActor
-  var mapPadding: RNMapPadding? {
-    didSet {
-      if let padding = mapPadding {
-        mapView?.padding = UIEdgeInsets(
-          top: padding.top,
-          left: padding.left,
-          bottom: padding.bottom,
-          right: padding.right
-        )
-      } else {
-        mapView?.padding = .zero
-      }
+      mapView?.padding =
+        mapPadding.map {
+          UIEdgeInsets(
+            top: $0.top,
+            left: $0.left,
+            bottom: $0.bottom,
+            right: $0.right
+          )
+        } ?? .zero
     }
   }
 
@@ -475,7 +361,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingMarkers.append((id, marker))
       return
     }
-    if let old = markersById.removeValue(forKey: id) { old.map = nil }
+    markersById.removeValue(forKey: id).map { $0.map = nil }
     addMarkerInternal(id: id, marker: marker)
   }
 
@@ -488,13 +374,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
-    guard let m = markersById[id] else { return }
-    block(m)
+    markersById[id].map { block($0) }
   }
 
   @MainActor
   func removeMarker(id: String) {
-    if let m = markersById.removeValue(forKey: id) { m.map = nil }
+    markersById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -510,7 +395,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingPolylines.append((id, polyline))
       return
     }
-    if let old = polylinesById.removeValue(forKey: id) { old.map = nil }
+    polylinesById.removeValue(forKey: id).map { $0.map = nil }
     addPolylineInternal(id: id, polyline: polyline)
   }
 
@@ -523,13 +408,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updatePolyline(id: String, block: @escaping (GMSPolyline) -> Void) {
-    guard let pl = polylinesById[id] else { return }
-    block(pl)
+    polylinesById[id].map { block($0) }
   }
 
   @MainActor
   func removePolyline(id: String) {
-    if let pl = polylinesById.removeValue(forKey: id) { pl.map = nil }
+    polylinesById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -545,7 +429,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingPolygons.append((id, polygon))
       return
     }
-    if let old = polygonsById.removeValue(forKey: id) { old.map = nil }
+    polygonsById.removeValue(forKey: id).map { $0.map = nil }
     addPolygonInternal(id: id, polygon: polygon)
   }
 
@@ -558,13 +442,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updatePolygon(id: String, block: @escaping (GMSPolygon) -> Void) {
-    guard let pg = polygonsById[id] else { return }
-    block(pg)
+    polygonsById[id].map { block($0) }
   }
 
   @MainActor
   func removePolygon(id: String) {
-    if let pg = polygonsById.removeValue(forKey: id) { pg.map = nil }
+    polygonsById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -580,7 +463,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingCircles.append((id, circle))
       return
     }
-    if let old = circlesById.removeValue(forKey: id) { old.map = nil }
+    circlesById.removeValue(forKey: id).map { $0.map = nil }
     addCircleInternal(id: id, circle: circle)
   }
 
@@ -593,13 +476,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updateCircle(id: String, block: @escaping (GMSCircle) -> Void) {
-    guard let circle = circlesById[id] else { return }
-    block(circle)
+    circlesById[id].map { block($0) }
   }
 
   @MainActor
   func removeCircle(id: String) {
-    if let circle = circlesById.removeValue(forKey: id) { circle.map = nil }
+    circlesById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor

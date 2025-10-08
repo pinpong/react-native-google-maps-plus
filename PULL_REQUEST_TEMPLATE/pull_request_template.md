@@ -14,29 +14,33 @@ CI already runs linting, formatting, and build checks automatically.
 ---
 
 ### Summary
+
 Short description of what this PR changes or adds.
 
 ---
 
 ### Type of change
-- [ ] Feature  
-- [ ] Fix  
-- [ ] Refactor  
-- [ ] Internal / CI  
-- [ ] Documentation  
+
+- [ ] Feature
+- [ ] Fix
+- [ ] Refactor
+- [ ] Internal / CI
+- [ ] Documentation
 
 ---
 
 ### Scope
-- [ ] Android  
-- [ ] iOS  
-- [ ] Core  
-- [ ] Example App  
-- [ ] Docs  
+
+- [ ] Android
+- [ ] iOS
+- [ ] Core
+- [ ] Example App
+- [ ] Docs
 
 ---
 
 ### Related
+
 List any related issues, pull requests, or discussions.  
 Use the format:  
 `Fixes #123`, `Refs #456`, `Close #789`
@@ -44,4 +48,5 @@ Use the format:
 ---
 
 ### Additional notes
+
 _(Optional – anything relevant for the reviewer)_

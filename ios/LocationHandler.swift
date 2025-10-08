@@ -13,21 +13,13 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   var desiredAccuracy: CLLocationAccuracy? = kCLLocationAccuracyDefault {
     didSet {
-      if let desiredAccuracy = desiredAccuracy {
-        manager.desiredAccuracy = desiredAccuracy
-      } else {
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-      }
+      manager.desiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyBest
     }
   }
 
   var distanceFilterMeters: CLLocationDistance? = kCLDistanceFilterNoneDefault {
     didSet {
-      if let distanceFilterMeters = distanceFilterMeters {
-        manager.distanceFilter = distanceFilterMeters
-      } else {
-        manager.distanceFilter = kCLDistanceFilterNone
-      }
+      manager.distanceFilter = distanceFilterMeters ?? kCLDistanceFilterNone
     }
   }
 

@@ -9,10 +9,12 @@ func withCATransaction(
   _ body: () -> Void
 ) {
   CATransaction.begin()
-  if disableActions { CATransaction.setDisableActions(true) }
-  if let d = duration { CATransaction.setAnimationDuration(d) }
-  if let tf = timingFunction { CATransaction.setAnimationTimingFunction(tf) }
-  if let c = completion { CATransaction.setCompletionBlock(c) }
+
+  CATransaction.setDisableActions(disableActions)
+  duration.map { CATransaction.setAnimationDuration($0) }
+  timingFunction.map { CATransaction.setAnimationTimingFunction($0) }
+  completion.map { CATransaction.setCompletionBlock($0) }
+
   body()
   CATransaction.commit()
 }

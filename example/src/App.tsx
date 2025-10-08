@@ -263,10 +263,59 @@ export const makeMarker = (id: number): RNMarker => ({
 
 export default function App() {
   const mapRef = useRef<GoogleMapsViewRef>(null);
-  const [show, setShow] = useState(false);
   const [stressTest, setStressTest] = useState(false);
   const [normalStyle, setNormalStyle] = useState(true);
   const [controlButtonsExpanded, setControlButtonsExpanded] = useState(false);
+
+  const [initialProps] = useState({
+    /// mapStyle not working with mapId
+    /// mapId: '111',
+    camera: {
+      center: {
+        latitude: 37.7749,
+        longitude: -122.4194,
+      },
+      zoom: 15,
+    },
+  });
+
+  const [uiSettings] = useState({
+    allGesturesEnabled: true,
+    compassEnabled: true,
+    indoorLevelPickerEnabled: true,
+    mapToolbarEnabled: true,
+    myLocationButtonEnabled: true,
+    rotateEnabled: true,
+    scrollEnabled: true,
+    scrollDuringRotateOrZoomEnabled: true,
+    tiltEnabled: true,
+    zoomControlsEnabled: true,
+    zoomGesturesEnabled: true,
+  });
+
+  const [mapPadding] = useState({
+    top: 20,
+    left: 20,
+    bottom: 20,
+    right: 20,
+  });
+
+  const [mapZoomConfig] = useState({
+    min: 0,
+    max: 20,
+  });
+
+  const [locationConfig] = useState({
+    android: {
+      priority: RNAndroidLocationPriority.PRIORITY_BALANCED_POWER_ACCURACY,
+      interval: 5000,
+      minUpdateInterval: 5000,
+    },
+    ios: {
+      desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
+      distanceFilterMeters: 10,
+    },
+  });
 
   const [markers, setMaker] = useState(
     Array.from({ length: 0 }, (_, i) => makeMarker(i + 1))
@@ -285,25 +334,29 @@ export default function App() {
   );
 
   useEffect(() => {
+    if (!stressTest) return;
+
     const interval = setInterval(() => {
-      if (stressTest) {
-        setMaker((m) => {
-          let newMarkers = [...m];
+      setMaker((m) => {
+        const newMarkers = [...m];
+        while (newMarkers.length > 100) {
+          newMarkers.shift();
+        }
+        for (let i = 0; i < 500; i++) {
+          newMarkers.push(makeMarker(newMarkers.length + 1));
+        }
 
-          while (newMarkers.length > 100) {
-            newMarkers.shift();
-          }
-
-          for (let i = 0; i < 500; i++) {
-            newMarkers.push(makeMarker(newMarkers.length + 1));
-          }
-
-          return newMarkers;
-        });
-      }
+        return newMarkers;
+      });
     }, 100);
+
     return () => clearInterval(interval);
   }, [stressTest]);
+
+  const mapStyle = useMemo(
+    () => JSON.stringify(normalStyle ? standardMapStyle : silverMapStyle),
+    [normalStyle]
+  );
 
   const buttons = useMemo(() => {
     return [
@@ -327,10 +380,6 @@ export default function App() {
             350
           );
         },
-      },
-      {
-        title: `${show ? 'Hide' : 'Show'} Marker`,
-        onPress: () => setShow(!show),
       },
       {
         title: `${stressTest ? 'Stop' : 'Start'} stress test`,
@@ -367,7 +416,7 @@ export default function App() {
           console.log(mapRef.current?.isGooglePlayServicesAvailable()),
       },
     ];
-  }, [markers, normalStyle, show, stressTest]);
+  }, [markers, normalStyle, stressTest]);
 
   return (
     <View style={styles.container}>
@@ -377,61 +426,20 @@ export default function App() {
             mapRef.current = ref;
           },
         }}
-        initialProps={{
-          /// mapStyle not working with mapId
-          /// mapId: '111',
-          camera: {
-            center: {
-              latitude: 37.7749,
-              longitude: -122.4194,
-            },
-            zoom: 15,
-          },
-        }}
-        uiSettings={{
-          allGesturesEnabled: true,
-          compassEnabled: true,
-          indoorLevelPickerEnabled: true,
-          mapToolbarEnabled: true,
-          myLocationButtonEnabled: true,
-          rotateEnabled: true,
-          scrollEnabled: true,
-          scrollDuringRotateOrZoomEnabled: true,
-          tiltEnabled: true,
-          zoomControlsEnabled: true,
-          zoomGesturesEnabled: true,
-        }}
+        initialProps={initialProps}
+        uiSettings={uiSettings}
         onMapReady={callback((ready) => console.log('Map is ready! ' + ready))}
         style={styles.map}
         myLocationEnabled={true}
         buildingEnabled={true}
         trafficEnabled={true}
         indoorEnabled={true}
-        customMapStyle={JSON.stringify(
-          normalStyle ? standardMapStyle : silverMapStyle
-        )}
+        customMapStyle={mapStyle}
         userInterfaceStyle={'light'}
         mapType={'normal'}
-        maxZoomLevel={20}
-        minZoomLevel={0}
-        mapPadding={{
-          top: 20,
-          left: 20,
-          bottom: 20,
-          right: 20,
-        }}
-        locationConfig={{
-          android: {
-            priority:
-              RNAndroidLocationPriority.PRIORITY_BALANCED_POWER_ACCURACY,
-            interval: 5000,
-            minUpdateInterval: 5000,
-          },
-          ios: {
-            desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
-            distanceFilterMeters: 10,
-          },
-        }}
+        mapZoomConfig={mapZoomConfig}
+        mapPadding={mapPadding}
+        locationConfig={locationConfig}
         onMapPress={{
           f: function (coordinate: RNLatLng): void {
             console.log('Map pressed', coordinate);
@@ -494,10 +502,10 @@ export default function App() {
             console.log('Location error:', error);
           },
         }}
-        markers={show ? [...markers] : []}
-        polygons={show ? polygons : []}
-        polylines={show ? polylines : []}
-        circles={show ? circles : []}
+        markers={markers}
+        polygons={polygons}
+        polylines={polylines}
+        circles={circles}
       />
 
       <ScrollView style={styles.scrollView}>
@@ -507,7 +515,7 @@ export default function App() {
           activeOpacity={0.8}
         >
           <Text style={styles.headerText}>
-            {controlButtonsExpanded ? '▼ Hide Controls' : '▶ Show Controls'}
+            {controlButtonsExpanded ? 'Hide Controls' : 'Show Controls'}
           </Text>
         </TouchableOpacity>
 

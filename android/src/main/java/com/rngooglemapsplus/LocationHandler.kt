@@ -38,19 +38,19 @@ class LocationHandler(
 
   var priority: Int? = PRIORITY_DEFAULT
     set(value) {
-      field = value
+      field = value ?: PRIORITY_DEFAULT
       start()
     }
 
   var interval: Long? = INTERVAL_DEFAULT
     set(value) {
-      field = value
+      field = value ?: INTERVAL_DEFAULT
       buildLocationRequest()
     }
 
   var minUpdateInterval: Long? = MIN_UPDATE_INTERVAL
     set(value) {
-      field = value
+      field = value ?: MIN_UPDATE_INTERVAL
       buildLocationRequest()
     }
 
