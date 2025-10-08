@@ -2,6 +2,8 @@ disabled_rules:
   - file_length
   - type_body_length
   - cyclomatic_complexity
+  - function_body_length
+  - closure_parameter_position
   - todo
 
 identifier_name:

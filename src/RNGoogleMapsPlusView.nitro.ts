@@ -22,6 +22,7 @@ import type {
   RNMapUiSettings,
   RNLocationConfig,
   RNMapZoomConfig,
+  RNHeatmap,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -40,6 +41,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   polygons?: RNPolygon[];
   polylines?: RNPolyline[];
   circles?: RNCircle[];
+  heatmaps?: RNHeatmap[];
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
