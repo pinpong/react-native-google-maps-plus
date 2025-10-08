@@ -3,6 +3,26 @@ import type { HybridView } from 'react-native-nitro-modules';
 
 export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 
+export type RNInitialProps = {
+  mapId?: string;
+  liteMode?: boolean;
+  camera?: RNCamera;
+};
+
+export type RNMapUiSettings = {
+  allGesturesEnabled?: boolean;
+  compassEnabled?: boolean;
+  indoorLevelPickerEnabled?: boolean;
+  mapToolbarEnabled?: boolean;
+  myLocationButtonEnabled?: boolean;
+  rotateEnabled?: boolean;
+  scrollEnabled?: boolean;
+  scrollDuringRotateOrZoomEnabled?: boolean;
+  tiltEnabled?: boolean;
+  zoomControlsEnabled?: boolean;
+  zoomGesturesEnabled?: boolean;
+};
+
 export type RNLatLng = { latitude: number; longitude: number };
 
 export type RNBoundingBox = { northEast: RNLatLng; southWest: RNLatLng };
@@ -13,6 +33,8 @@ export type RNMapPadding = {
   bottom: number;
   right: number;
 };
+
+export type RNMapType = 'none' | 'normal' | 'hybrid' | 'satellite' | 'terrain';
 
 export type RNUserInterfaceStyle = 'light' | 'dark' | 'default';
 
@@ -101,22 +123,32 @@ export type RNPosition = {
   y: number;
 };
 
+export type RNMapZoomConfig = {
+  min?: number;
+  max?: number;
+};
+
 export type RNLineCapType = 'butt' | 'round' | 'square';
 export type RNLineJoinType = 'miter' | 'round' | 'bevel';
 
 export type RNMarker = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
+  iconSvg?: RNMarkerSvg;
+};
+
+export type RNMarkerSvg = {
   width: number;
   height: number;
-  iconSvg: string;
+  svgString: string;
 };
 
 export type RNPolygon = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
+  pressable?: boolean;
   coordinates: RNLatLng[];
   fillColor?: string;
   strokeColor?: string;
@@ -125,13 +157,76 @@ export type RNPolygon = {
 
 export type RNPolyline = {
   id: string;
-  zIndex: number;
+  zIndex?: number;
+  pressable?: boolean;
   coordinates: RNLatLng[];
   lineCap?: RNLineCapType;
   lineJoin?: RNLineJoinType;
   color?: string;
   width?: number;
 };
+
+export type RNCircle = {
+  id: string;
+  pressable?: boolean;
+  zIndex?: number;
+  center: RNLatLng;
+  radius: number;
+  strokeWidth?: number;
+  strokeColor?: string;
+  fillColor?: string;
+};
+
+export type RNHeatmap = {
+  id: string;
+  pressable?: boolean;
+  zIndex?: number;
+  weightedData: RNHeatmapPoint[];
+  radius?: number;
+  opacity?: number;
+  gradient?: RNHeatmapGradient;
+};
+
+export type RNHeatmapPoint = {
+  latitude: number;
+  longitude: number;
+  weight: number;
+};
+
+export type RNHeatmapGradient = {
+  colors: string[];
+  startPoints: number[];
+  colorMapSize: number;
+};
+
+export type RNLocationConfig = {
+  android?: RNAndroidLocationConfig;
+  ios?: RNIOSLocationConfig;
+};
+export type RNAndroidLocationConfig = {
+  priority?: RNAndroidLocationPriority;
+  interval?: number;
+  minUpdateInterval?: number;
+};
+
+export enum RNAndroidLocationPriority {
+  PRIORITY_HIGH_ACCURACY = 0,
+  PRIORITY_BALANCED_POWER_ACCURACY = 1,
+  PRIORITY_LOW_POWER = 2,
+  PRIORITY_PASSIVE = 3,
+}
+
+export type RNIOSLocationConfig = {
+  desiredAccuracy?: RNIOSLocationAccuracy;
+  distanceFilterMeters?: number;
+};
+
+export enum RNIOSLocationAccuracy {
+  ACCURACY_BEST = 0,
+  ACCURACY_NEAREST_TEN_METER = 1,
+  ACCURACY_NEAREST_HUNDRED_METER = 2,
+  ACCURACY_KILOMETER = 3,
+}
 
 export type RNLocationPermissionResult = {
   android?: RNAndroidLocationPermissionResult;

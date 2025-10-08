@@ -6,14 +6,14 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "ios:pods": "bundle install && bundle exec pod repo update --verbose && bundle exec pod install --project-directory=ios",
+    "ios:pods": "bundle install && bundle exec pod repo update --verbose && bundle exec pod install --repo-update --project-directory=ios",
     "build:android": "react-native build-android",
     "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=\"\" EXPANDED_CODE_SIGN_IDENTITY=\"\" DEVELOPMENT_TEAM=\"\" COCOAPODS_PARALLEL_CODE_SIGN=false'"
   },
   "dependencies": {
     "react": "19.1.1",
-    "react-native": "0.82.0-rc.4",
-    "react-native-nitro-modules": "0.29.6"
+    "react-native": "0.82.0",
+    "react-native-nitro-modules": "0.29.8"
   },
   "devDependencies": {
     "@babel/core": "7.28.4",
@@ -22,10 +22,10 @@
     "@react-native-community/cli": "20.0.2",
     "@react-native-community/cli-platform-android": "20.0.2",
     "@react-native-community/cli-platform-ios": "20.0.2",
-    "@react-native/babel-preset": "0.82.0-rc.4",
-    "@react-native/metro-config": "0.82.0-rc.4",
-    "@react-native/typescript-config": "0.82.0-rc.4",
-    "@types/react": "19.1.15",
+    "@react-native/babel-preset": "0.82.0",
+    "@react-native/metro-config": "0.82.0",
+    "@react-native/typescript-config": "0.82.0",
+    "@types/react": "19.1.1",
     "react-native-builder-bob": "0.40.13",
     "react-native-monorepo-config": "0.2.1"
   },

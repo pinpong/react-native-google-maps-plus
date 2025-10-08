@@ -1,69 +1,41 @@
 import CoreLocation
 import GoogleMaps
+import GoogleMapsUtils
 import UIKit
 
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   private let locationHandler: LocationHandler
-  private let markerOptions: MapMarkerOptions
-  private var mapView: GMSMapView!
+  private let markerBuilder: MapMarkerBuilder
+  private var mapView: GMSMapView?
+  private var initialized = false
   private var mapReady = false
 
-  private var pendingBuildingEnabled: Bool = false
-  private var pendingTrafficEnabled: Bool = false
-  private var pendingCustomMapStyle: GMSMapStyle?
-  private var pendingInitialCamera: GMSCameraPosition =
-    GMSCameraPosition.camera(withLatitude: 0, longitude: 0, zoom: 0)
-  private var pendingUserInterfaceStyle = UIUserInterfaceStyle.unspecified
-  private var pendingMinZoomLevel: Double = 0.0
-  private var pendingMaxZoomLevel: Double = 21.0
-  private var pendingMapPadding: RNMapPadding = .init(
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0
-  )
-
-  private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
-  private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
+  private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
+  private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
+  private var pendingCircles: [(id: String, circle: GMSCircle)] = []
+  private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
 
-  private var polygonsById: [String: GMSPolygon] = [:]
-  private var polylinesById: [String: GMSPolyline] = [:]
   private var markersById: [String: GMSMarker] = [:]
+  private var polylinesById: [String: GMSPolyline] = [:]
+  private var polygonsById: [String: GMSPolygon] = [:]
+  private var circlesById: [String: GMSCircle] = [:]
+  private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
   private var lastSubmittedLocation: CLLocation?
 
-  var onMapError: ((RNMapErrorCode) -> Void)?
-  var onMapReady: ((Bool) -> Void)?
-  var onLocationUpdate: ((RNLocation) -> Void)?
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
-  var onMapPress: ((RNLatLng) -> Void)?
-  var onMarkerPress: ((String) -> Void)?
-  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
-
   init(
     frame: CGRect = .zero,
     locationHandler: LocationHandler,
-    markerOptions: MapMarkerOptions
+    markerBuilder: MapMarkerBuilder
   ) {
     self.locationHandler = locationHandler
-    self.markerOptions = markerOptions
+    self.markerBuilder = markerBuilder
     super.init(frame: frame)
     setupAppLifecycleObservers()
-    setupMap()
-
-    /// wait 1 second if alle setter called
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-      self?.initLocationCallbacks()
-      self?.applyPending()
-      self?.onMapReady?(true)
-      self?.mapReady = true
-    }
   }
 
   private func setupAppLifecycleObservers() {
@@ -86,14 +58,25 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   @MainActor
-  private func setupMap() {
+  func initMapView(mapId: String?, liteMode: Bool?, camera: GMSCameraPosition?) {
+    if initialized { return }
+    initialized = true
     let options = GMSMapViewOptions()
     options.frame = bounds
+
+    mapId.map { options.mapID = GMSMapID(identifier: $0) }
+    liteMode.map { _ in /* not supported */ }
+    camera.map { options.camera = $0 }
+
     mapView = GMSMapView.init(options: options)
-    mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    mapView.paddingAdjustmentBehavior = .never
-    mapView.delegate = self
-    addSubview(mapView)
+    mapView?.delegate = self
+    mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    mapView?.paddingAdjustmentBehavior = .never
+    mapView.map { addSubview($0) }
+    initLocationCallbacks()
+    applyPending()
+    onMapReady?(true)
+    mapReady = true
   }
 
   private func initLocationCallbacks() {
@@ -102,7 +85,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       if self.lastSubmittedLocation?.coordinate.latitude
         != loc.coordinate.latitude
         || self.lastSubmittedLocation?.coordinate.longitude
-          != loc.coordinate.longitude {
+        != loc.coordinate.longitude {
         self.onLocationUpdate?(
           RNLocation(
             RNLatLng(
@@ -123,26 +106,53 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   private func applyPending() {
-    mapView.padding = UIEdgeInsets(
-      top: pendingMapPadding.top,
-      left: pendingMapPadding.left,
-      bottom: pendingMapPadding.bottom,
-      right: pendingMapPadding.right
-    )
+    mapPadding.map {
+      mapView?.padding = UIEdgeInsets(
+        top: $0.top,
+        left: $0.left,
+        bottom: $0.bottom,
+        right: $0.right
+      )
+    }
 
-    mapView.mapStyle = pendingCustomMapStyle
-    mapView.isBuildingsEnabled = pendingBuildingEnabled
-    mapView.isTrafficEnabled = pendingTrafficEnabled
-    mapView.overrideUserInterfaceStyle = pendingUserInterfaceStyle
-    mapView.setMinZoom(
-      Float(pendingMinZoomLevel),
-      maxZoom: Float(pendingMaxZoomLevel)
-    )
-
-    if !pendingMarkers.isEmpty {
-      pendingMarkers.forEach {
-        addMarkerInternal(id: $0.id, marker: $0.marker)
+    if let v = uiSettings {
+      v.allGesturesEnabled.map { mapView?.settings.setAllGesturesEnabled($0) }
+      v.compassEnabled.map { mapView?.settings.compassButton = $0 }
+      v.indoorLevelPickerEnabled.map { mapView?.settings.indoorPicker = $0 }
+      v.mapToolbarEnabled.map { _ in /* not supported */ }
+      v.myLocationButtonEnabled.map { mapView?.settings.myLocationButton = $0 }
+      v.rotateEnabled.map { mapView?.settings.rotateGestures = $0 }
+      v.scrollEnabled.map { mapView?.settings.scrollGestures = $0 }
+      v.scrollDuringRotateOrZoomEnabled.map {
+        mapView?.settings.allowScrollGesturesDuringRotateOrZoom = $0
       }
+      v.tiltEnabled.map { mapView?.settings.tiltGestures = $0 }
+      v.zoomControlsEnabled.map { _ in /* not supported */ }
+      v.zoomGesturesEnabled.map { mapView?.settings.zoomGestures = $0 }
+    }
+
+    myLocationEnabled.map { mapView?.isMyLocationEnabled = $0 }
+    buildingEnabled.map { mapView?.isBuildingsEnabled = $0 }
+    trafficEnabled.map { mapView?.isTrafficEnabled = $0 }
+    indoorEnabled.map { mapView?.isIndoorEnabled = $0 }
+    customMapStyle.map { mapView?.mapStyle = $0 }
+    mapType.map { mapView?.mapType = $0 }
+    userInterfaceStyle.map { mapView?.overrideUserInterfaceStyle = $0 }
+
+    mapZoomConfig.map {
+      mapView?.setMinZoom(
+        Float($0.min ?? 2),
+        maxZoom: Float($0.max ?? 21)
+      )
+    }
+
+    locationConfig.map {
+      locationHandler.desiredAccuracy =
+        $0.ios?.desiredAccuracy?.toCLLocationAccuracy
+      locationHandler.distanceFilterMeters = $0.ios?.distanceFilterMeters
+    }
+    if !pendingMarkers.isEmpty {
+      pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
       pendingMarkers.removeAll()
     }
     if !pendingPolylines.isEmpty {
@@ -157,119 +167,147 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       }
       pendingPolygons.removeAll()
     }
+    if !pendingCircles.isEmpty {
+      pendingCircles.forEach { addCircleInternal(id: $0.id, circle: $0.circle) }
+      pendingCircles.removeAll()
+    }
+    if !pendingHeatmaps.isEmpty {
+      pendingHeatmaps.forEach {
+        addHeatmapInternal(id: $0.id, heatmap: $0.heatmap)
+      }
+      pendingHeatmaps.removeAll()
+    }
   }
 
-  var currentCamera: GMSCameraPosition {
-    mapView.camera
+  var currentCamera: GMSCameraPosition? {
+    mapView?.camera
   }
 
   @MainActor
-  var buildingEnabled: Bool {
-    get { mapView.isBuildingsEnabled }
-    set {
-      pendingBuildingEnabled = newValue
-      mapView.isBuildingsEnabled = newValue
+  var uiSettings: RNMapUiSettings? {
+    didSet {
+      mapView?.settings.setAllGesturesEnabled(
+        uiSettings?.allGesturesEnabled ?? true
+      )
+      mapView?.settings.compassButton = uiSettings?.compassEnabled ?? false
+      mapView?.settings.indoorPicker =
+        uiSettings?.indoorLevelPickerEnabled ?? false
+      mapView?.settings.myLocationButton =
+        uiSettings?.myLocationButtonEnabled ?? false
+      mapView?.settings.rotateGestures = uiSettings?.rotateEnabled ?? true
+      mapView?.settings.scrollGestures = uiSettings?.scrollEnabled ?? true
+      mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
+        uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
+      mapView?.settings.tiltGestures = uiSettings?.tiltEnabled ?? true
+      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? false
     }
   }
 
   @MainActor
-  var trafficEnabled: Bool {
-    get { mapView.isTrafficEnabled }
-    set {
-      pendingTrafficEnabled = newValue
-      mapView.isTrafficEnabled = newValue
+  var myLocationEnabled: Bool? {
+    didSet {
+      mapView?.isMyLocationEnabled = myLocationEnabled ?? false
+    }
+  }
+
+  @MainActor
+  var buildingEnabled: Bool? {
+    didSet {
+      mapView?.isBuildingsEnabled = buildingEnabled ?? false
+    }
+  }
+
+  @MainActor
+  var trafficEnabled: Bool? {
+    didSet {
+      mapView?.isTrafficEnabled = false
+    }
+  }
+
+  @MainActor
+  var indoorEnabled: Bool? {
+    didSet {
+      mapView?.isIndoorEnabled = indoorEnabled ?? false
     }
   }
 
   @MainActor
   var customMapStyle: GMSMapStyle? {
-    get { pendingCustomMapStyle }
-    set {
-      pendingCustomMapStyle = newValue
-      mapView.mapStyle = newValue
+    didSet {
+      mapView?.mapStyle = customMapStyle
     }
   }
 
   @MainActor
-  var initialCamera: GMSCameraPosition {
-    get { pendingInitialCamera }
-    set {
-      pendingInitialCamera = newValue
-      if mapView != nil && !mapReady {
-        mapView.camera = newValue
-      }
+  var userInterfaceStyle: UIUserInterfaceStyle? {
+    didSet {
+      mapView?.overrideUserInterfaceStyle = userInterfaceStyle ?? .unspecified
     }
   }
 
   @MainActor
-  var userInterfaceStyle: UIUserInterfaceStyle {
-    get { pendingUserInterfaceStyle }
-    set {
-      pendingUserInterfaceStyle = newValue
-      mapView.overrideUserInterfaceStyle = newValue
-    }
-  }
-
-  @MainActor
-  var minZoomLevel: Double {
-    get { pendingMinZoomLevel }
-    set {
-      pendingMinZoomLevel = newValue
-      mapView.setMinZoom(Float(newValue), maxZoom: Float(pendingMaxZoomLevel))
-    }
-  }
-
-  @MainActor
-  var maxZoomLevel: Double {
-    get { pendingMaxZoomLevel }
-    set {
-      pendingMaxZoomLevel = newValue
-      mapView.setMinZoom(Float(pendingMinZoomLevel), maxZoom: Float(newValue))
-    }
-  }
-
-  @MainActor
-  var mapPadding: RNMapPadding {
-    get { pendingMapPadding }
-    set {
-      pendingMapPadding = newValue
-      mapView.padding = UIEdgeInsets(
-        top: newValue.top,
-        left: newValue.left,
-        bottom: newValue.bottom,
-        right: newValue.right
+  var mapZoomConfig: RNMapZoomConfig? {
+    didSet {
+      mapView?.setMinZoom(
+        Float(mapZoomConfig?.min ?? 2),
+        maxZoom: Float(mapZoomConfig?.max ?? 21)
       )
     }
   }
 
-  func setCamera(camera: RNCamera, animated: Bool, durationMS: Double) {
-    let current = mapView.camera
+  @MainActor var mapPadding: RNMapPadding? {
+    didSet {
+      mapView?.padding =
+        mapPadding.map {
+          UIEdgeInsets(
+            top: $0.top,
+            left: $0.left,
+            bottom: $0.bottom,
+            right: $0.right
+          )
+        } ?? .zero
+    }
+  }
 
-    let zoom = Float(camera.zoom ?? Double(current.zoom))
-    let bearing = camera.bearing ?? current.bearing
-    let viewingAngle = camera.bearing ?? current.viewingAngle
+  @MainActor var mapType: GMSMapViewType? {
+    didSet {
+      mapView?.mapType = mapType ?? .normal
+    }
+  }
 
-    let target = CLLocationCoordinate2D(
-      latitude: camera.center?.latitude ?? mapView.camera.target.latitude,
-      longitude: camera.center?.longitude ?? mapView.camera.target.longitude
-    )
+  @MainActor var locationConfig: RNLocationConfig? {
+    didSet {
+      locationHandler.desiredAccuracy =
+        locationConfig?.ios?.desiredAccuracy?.toCLLocationAccuracy
+      locationHandler.distanceFilterMeters =
+        locationConfig?.ios?.distanceFilterMeters
+    }
+  }
 
-    let cam = GMSCameraPosition.camera(
-      withTarget: target,
-      zoom: zoom,
-      bearing: bearing,
-      viewingAngle: viewingAngle
-    )
+  var onMapError: ((RNMapErrorCode) -> Void)?
+  var onMapReady: ((Bool) -> Void)?
+  var onLocationUpdate: ((RNLocation) -> Void)?
+  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
+  var onMapPress: ((RNLatLng) -> Void)?
+  var onMarkerPress: ((String) -> Void)?
+  var onPolylinePress: ((String) -> Void)?
+  var onPolygonPress: ((String) -> Void)?
+  var onCirclePress: ((String) -> Void)?
+  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
+  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
+  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
+
+  func setCamera(camera: GMSCameraPosition, animated: Bool, durationMS: Double) {
     if animated {
       withCATransaction(
         disableActions: false,
         duration: durationMS / 1000.0
       ) {
-        mapView.animate(to: cam)
+        mapView?.animate(to: camera)
       }
     } else {
-      let update = GMSCameraUpdate.setCamera(cam)
-      mapView.moveCamera(update)
+      let update = GMSCameraUpdate.setCamera(camera)
+      mapView?.moveCamera(update)
     }
   }
 
@@ -315,10 +353,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
         disableActions: false,
         duration: durationMS / 1000.0
       ) {
-        mapView.animate(with: update)
+        mapView?.animate(with: update)
       }
     } else {
-      mapView.moveCamera(update)
+      mapView?.moveCamera(update)
     }
   }
 
@@ -328,7 +366,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingMarkers.append((id, marker))
       return
     }
-    if let old = markersById.removeValue(forKey: id) { old.map = nil }
+    markersById.removeValue(forKey: id).map { $0.map = nil }
     addMarkerInternal(id: id, marker: marker)
   }
 
@@ -341,13 +379,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
-    guard let m = markersById[id] else { return }
-    block(m)
+    markersById[id].map { block($0) }
   }
 
   @MainActor
   func removeMarker(id: String) {
-    if let m = markersById.removeValue(forKey: id) { m.map = nil }
+    markersById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -363,7 +400,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingPolylines.append((id, polyline))
       return
     }
-    if let old = polylinesById.removeValue(forKey: id) { old.map = nil }
+    polylinesById.removeValue(forKey: id).map { $0.map = nil }
     addPolylineInternal(id: id, polyline: polyline)
   }
 
@@ -376,13 +413,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updatePolyline(id: String, block: @escaping (GMSPolyline) -> Void) {
-    guard let pl = polylinesById[id] else { return }
-    block(pl)
+    polylinesById[id].map { block($0) }
   }
 
   @MainActor
   func removePolyline(id: String) {
-    if let pl = polylinesById.removeValue(forKey: id) { pl.map = nil }
+    polylinesById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -398,7 +434,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       pendingPolygons.append((id, polygon))
       return
     }
-    if let old = polygonsById.removeValue(forKey: id) { old.map = nil }
+    polygonsById.removeValue(forKey: id).map { $0.map = nil }
     addPolygonInternal(id: id, polygon: polygon)
   }
 
@@ -411,13 +447,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func updatePolygon(id: String, block: @escaping (GMSPolygon) -> Void) {
-    guard let pg = polygonsById[id] else { return }
-    block(pg)
+    polygonsById[id].map { block($0) }
   }
 
   @MainActor
   func removePolygon(id: String) {
-    if let pg = polygonsById.removeValue(forKey: id) { pg.map = nil }
+    polygonsById.removeValue(forKey: id).map { $0.map = nil }
   }
 
   @MainActor
@@ -427,19 +462,78 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     pendingPolygons.removeAll()
   }
 
-  func clearAll() {
-    markerOptions.cancelAllIconTasks()
-    clearMarkers()
-    clearPolylines()
-    clearPolygons()
-    locationHandler.stop()
-    clearMap()
+  @MainActor
+  func addCircle(id: String, circle: GMSCircle) {
+    if mapView == nil {
+      pendingCircles.append((id, circle))
+      return
+    }
+    circlesById.removeValue(forKey: id).map { $0.map = nil }
+    addCircleInternal(id: id, circle: circle)
   }
 
   @MainActor
-  func clearMap() {
-    mapView.clear()
-    mapView.delegate = nil
+  private func addCircleInternal(id: String, circle: GMSCircle) {
+    circle.map = mapView
+    circle.userData = id
+    circlesById[id] = circle
+  }
+
+  @MainActor
+  func updateCircle(id: String, block: @escaping (GMSCircle) -> Void) {
+    circlesById[id].map { block($0) }
+  }
+
+  @MainActor
+  func removeCircle(id: String) {
+    circlesById.removeValue(forKey: id).map { $0.map = nil }
+  }
+
+  @MainActor
+  func clearCircles() {
+    circlesById.values.forEach { $0.map = nil }
+    circlesById.removeAll()
+    pendingCircles.removeAll()
+  }
+
+  @MainActor
+  func addHeatmap(id: String, heatmap: GMUHeatmapTileLayer) {
+    if mapView == nil {
+      pendingHeatmaps.append((id, heatmap))
+      return
+    }
+    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+    addHeatmapInternal(id: id, heatmap: heatmap)
+  }
+
+  @MainActor
+  private func addHeatmapInternal(id: String, heatmap: GMUHeatmapTileLayer) {
+    heatmap.map = mapView
+    heatmapsById[id] = heatmap
+  }
+
+  @MainActor
+  func removeHeatmap(id: String) {
+    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+  }
+
+  @MainActor
+  func clearHeatmaps() {
+    heatmapsById.values.forEach { $0.map = nil }
+    heatmapsById.removeAll()
+    pendingHeatmaps.removeAll()
+  }
+
+  func deinitInternal() {
+    markerBuilder.cancelAllIconTasks()
+    clearMarkers()
+    clearPolylines()
+    clearPolygons()
+    clearCircles()
+    clearHeatmaps()
+    locationHandler.stop()
+    mapView?.clear()
+    mapView?.delegate = nil
     mapView = nil
   }
 
@@ -457,7 +551,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     super.didMoveToWindow()
     if window != nil {
       if mapView != nil && mapReady {
-       onMapReady?(true)
+        onMapReady?(true)
       }
       locationHandler.start()
     } else {
@@ -467,7 +561,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   deinit {
     NotificationCenter.default.removeObserver(self)
-    clearAll()
+    deinitInternal()
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
@@ -504,11 +598,11 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
     if let last = lastSubmittedCameraPosition,
-      last.target.latitude == position.target.latitude,
-      last.target.longitude == position.target.longitude,
-      last.zoom == position.zoom,
-      last.bearing == position.bearing,
-      last.viewingAngle == position.viewingAngle {
+       last.target.latitude == position.target.latitude,
+       last.target.longitude == position.target.longitude,
+       last.zoom == position.zoom,
+       last.bearing == position.bearing,
+       last.viewingAngle == position.viewingAngle {
       return
     }
     let visibleRegion = mapView.projection.visibleRegion()
@@ -576,15 +670,35 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     didTapAt coordinate: CLLocationCoordinate2D
   ) {
     onMapPress?(
-    RNLatLng(
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude
-    ))
+      RNLatLng(
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude
+      )
+    )
   }
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
     let id = (marker.userData as? String) ?? "unknown"
     onMarkerPress?(id)
     return true
+  }
+
+  func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
+    switch overlay {
+    case let circle as GMSCircle:
+      let id = (circle.userData as? String) ?? "unknown"
+      onCirclePress?(id)
+
+    case let polygon as GMSPolygon:
+      let id = (polygon.userData as? String) ?? "unknown"
+      onPolygonPress?(id)
+
+    case let polyline as GMSPolyline:
+      let id = (polyline.userData as? String) ?? "unknown"
+      onPolylinePress?(id)
+
+    default:
+      break
+    }
   }
 }

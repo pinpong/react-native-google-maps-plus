@@ -21,10 +21,13 @@ Pod::Spec.new do |s|
     "cpp/**/*.{hpp,cpp}",
   ]
 
+  s.resource_bundles = {'RNGoogleMapsPlusPrivacy' => ['Resources/PrivacyInfo.xcprivacy']}
+
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
 
-  s.dependency 'GoogleMaps', '10.3.0'
+  s.dependency 'GoogleMaps', '10.4.0'
+  s.dependency 'Google-Maps-iOS-Utils', '6.1.3'
   s.dependency 'SVGKit', '3.0.0'
 
   load 'nitrogen/generated/ios/RNGoogleMapsPlus+autolinking.rb'

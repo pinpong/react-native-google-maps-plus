@@ -16,26 +16,42 @@ import type {
   RNRegion,
   RNLocation,
   RNMapErrorCode,
+  RNMapType,
+  RNInitialProps,
+  RNCircle,
+  RNMapUiSettings,
+  RNLocationConfig,
+  RNMapZoomConfig,
+  RNHeatmap,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
-  buildingEnabled: boolean;
-  trafficEnabled: boolean;
-  customMapStyle: string;
-  initialCamera: RNCamera;
-  userInterfaceStyle: RNUserInterfaceStyle;
-  minZoomLevel: number;
-  maxZoomLevel: number;
-  mapPadding: RNMapPadding;
-  markers: RNMarker[];
-  polygons: RNPolygon[];
-  polylines: RNPolyline[];
+  initialProps?: RNInitialProps;
+  uiSettings?: RNMapUiSettings;
+  myLocationEnabled?: boolean;
+  buildingEnabled?: boolean;
+  trafficEnabled?: boolean;
+  indoorEnabled?: boolean;
+  customMapStyle?: string;
+  userInterfaceStyle?: RNUserInterfaceStyle;
+  mapZoomConfig?: RNMapZoomConfig;
+  mapPadding?: RNMapPadding;
+  mapType?: RNMapType;
+  markers?: RNMarker[];
+  polygons?: RNPolygon[];
+  polylines?: RNPolyline[];
+  circles?: RNCircle[];
+  heatmaps?: RNHeatmap[];
+  locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
   onMarkerPress?: (id: string) => void;
+  onPolylinePress?: (id: string) => void;
+  onPolygonPress?: (id: string) => void;
+  onCirclePress?: (id: string) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,

@@ -7,6 +7,7 @@ import {
   Text,
 } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { RNAndroidLocationPriority, RNIOSLocationAccuracy } from '../../src';
 import type {
   RNCamera,
   RNMapStyleElement,
@@ -17,6 +18,8 @@ import type {
   GoogleMapsViewRef,
   RNRegion,
   RNLatLng,
+  RNCircle,
+  RNHeatmap,
 } from '../../src';
 import { GoogleMapsView, GoogleMapsModule } from '../../src';
 import { callback } from 'react-native-nitro-modules';
@@ -202,9 +205,20 @@ const randomCoordinates = (
   longitude: baseLng + (Math.random() - 0.5) * offset,
 });
 
+const randomWeightedCoordinates = (
+  baseLat: number,
+  baseLng: number,
+  offset = 0.01
+) => ({
+  latitude: baseLat + (Math.random() - 0.5) * offset,
+  longitude: baseLng + (Math.random() - 0.5) * offset,
+  weight: Math.floor(Math.random() * (100 - 10 + 1)) + 10,
+});
+
 const makePolygon = (id: number): RNPolygon => ({
   id: id.toString(),
   zIndex: id,
+  pressable: true,
   coordinates: [
     randomCoordinates(37.7749, -122.4194, 0.01),
     randomCoordinates(37.7749, -122.4194, 0.01),
@@ -219,6 +233,7 @@ const makePolygon = (id: number): RNPolygon => ({
 const makePolyline = (id: number): RNPolyline => ({
   id: id.toString(),
   zIndex: id,
+  pressable: true,
   coordinates: [
     randomCoordinates(37.7749, -122.4194, 0.02),
     randomCoordinates(37.7749, -122.4194, 0.02),
@@ -227,8 +242,40 @@ const makePolyline = (id: number): RNPolyline => ({
 
   lineCap: id % 2 === 0 ? 'round' : 'square',
   lineJoin: id % 3 === 0 ? 'bevel' : 'round',
-  color: id % 2 === 0 ? '#ff0000' : '#0000ff',
-  width: 1 + (id % 4),
+  color: id % 2 === 0 ? '#00ff00' : '#ff0000',
+  width: 2 + (id % 4),
+});
+
+const makeCircle = (id: number): RNCircle => ({
+  id: id.toString(),
+  zIndex: id,
+  pressable: true,
+  center: randomCoordinates(37.7749, -122.4194, 0.02),
+  radius: 100 + (id % 5),
+  strokeWidth: 1 + (id % 5),
+  strokeColor: '#ff0000',
+  fillColor: '#0000ff',
+});
+
+const makeHeatmap = (id: number): RNHeatmap => ({
+  id: id.toString(),
+  zIndex: id,
+  weightedData: [
+    randomWeightedCoordinates(37.7749, -122.4194, 0.02),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.03),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.05),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.01),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.08),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.03),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.09),
+  ],
+  gradient: {
+    colors: ['#00f', '#0ff', '#0f0', '#ff0', '#f00'],
+    startPoints: [0.1, 0.3, 0.5, 0.7, 1],
+    colorMapSize: 256,
+  },
+  radius: 100,
+  opacity: 1,
 });
 
 export const makeMarker = (id: number): RNMarker => ({
@@ -236,17 +283,71 @@ export const makeMarker = (id: number): RNMarker => ({
   zIndex: id,
   coordinate: randomCoordinates(37.7749, -122.4194, 0.2),
   anchor: { x: 0.5, y: 1.0 },
-  width: (64 / 100) * 50,
-  height: (88 / 100) * 50,
-  iconSvg: makeSvgIcon(64, 88),
+  iconSvg:
+    id % 2 === 0
+      ? {
+          width: (64 / 100) * 50,
+          height: (88 / 100) * 50,
+          svgString: makeSvgIcon(64, 88),
+        }
+      : undefined,
 });
 
 export default function App() {
   const mapRef = useRef<GoogleMapsViewRef>(null);
-  const [show, setShow] = useState(false);
   const [stressTest, setStressTest] = useState(false);
   const [normalStyle, setNormalStyle] = useState(true);
   const [controlButtonsExpanded, setControlButtonsExpanded] = useState(false);
+
+  const [initialProps] = useState({
+    /// mapStyle not working with mapId
+    /// mapId: '111',
+    camera: {
+      center: {
+        latitude: 37.7749,
+        longitude: -122.4194,
+      },
+      zoom: 15,
+    },
+  });
+
+  const [uiSettings] = useState({
+    allGesturesEnabled: true,
+    compassEnabled: true,
+    indoorLevelPickerEnabled: true,
+    mapToolbarEnabled: true,
+    myLocationButtonEnabled: true,
+    rotateEnabled: true,
+    scrollEnabled: true,
+    scrollDuringRotateOrZoomEnabled: true,
+    tiltEnabled: true,
+    zoomControlsEnabled: true,
+    zoomGesturesEnabled: true,
+  });
+
+  const [mapPadding] = useState({
+    top: 20,
+    left: 20,
+    bottom: 20,
+    right: 20,
+  });
+
+  const [mapZoomConfig] = useState({
+    min: 0,
+    max: 20,
+  });
+
+  const [locationConfig] = useState({
+    android: {
+      priority: RNAndroidLocationPriority.PRIORITY_BALANCED_POWER_ACCURACY,
+      interval: 5000,
+      minUpdateInterval: 5000,
+    },
+    ios: {
+      desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
+      distanceFilterMeters: 10,
+    },
+  });
 
   const [markers, setMaker] = useState(
     Array.from({ length: 0 }, (_, i) => makeMarker(i + 1))
@@ -260,26 +361,38 @@ export default function App() {
     Array.from({ length: 1 }, (_, i) => makePolyline(i + 1))
   );
 
+  const [circles] = useState(
+    Array.from({ length: 1 }, (_, i) => makeCircle(i + 1))
+  );
+
+  const [heatmaps] = useState(
+    Array.from({ length: 1 }, (_, i) => makeHeatmap(i + 1))
+  );
+
   useEffect(() => {
+    if (!stressTest) return;
+
     const interval = setInterval(() => {
-      if (stressTest) {
-        setMaker((m) => {
-          let newMarkers = [...m];
+      setMaker((m) => {
+        const newMarkers = [...m];
+        while (newMarkers.length > 100) {
+          newMarkers.shift();
+        }
+        for (let i = 0; i < 500; i++) {
+          newMarkers.push(makeMarker(newMarkers.length + 1));
+        }
 
-          while (newMarkers.length > 100) {
-            newMarkers.shift();
-          }
-
-          for (let i = 0; i < 500; i++) {
-            newMarkers.push(makeMarker(newMarkers.length + 1));
-          }
-
-          return newMarkers;
-        });
-      }
+        return newMarkers;
+      });
     }, 100);
+
     return () => clearInterval(interval);
   }, [stressTest]);
+
+  const mapStyle = useMemo(
+    () => JSON.stringify(normalStyle ? standardMapStyle : silverMapStyle),
+    [normalStyle]
+  );
 
   const buttons = useMemo(() => {
     return [
@@ -303,10 +416,6 @@ export default function App() {
             350
           );
         },
-      },
-      {
-        title: `${show ? 'Hide' : 'Show'} Marker`,
-        onPress: () => setShow(!show),
       },
       {
         title: `${stressTest ? 'Stop' : 'Start'} stress test`,
@@ -343,7 +452,7 @@ export default function App() {
           console.log(mapRef.current?.isGooglePlayServicesAvailable()),
       },
     ];
-  }, [markers, normalStyle, show, stressTest]);
+  }, [markers, normalStyle, stressTest]);
 
   return (
     <View style={styles.container}>
@@ -353,29 +462,20 @@ export default function App() {
             mapRef.current = ref;
           },
         }}
+        initialProps={initialProps}
+        uiSettings={uiSettings}
         onMapReady={callback((ready) => console.log('Map is ready! ' + ready))}
         style={styles.map}
+        myLocationEnabled={true}
         buildingEnabled={true}
         trafficEnabled={true}
-        customMapStyle={JSON.stringify(
-          normalStyle ? standardMapStyle : silverMapStyle
-        )}
-        initialCamera={{
-          center: {
-            latitude: 37.7749,
-            longitude: -122.4194,
-          },
-          zoom: 15,
-        }}
+        indoorEnabled={true}
+        customMapStyle={mapStyle}
         userInterfaceStyle={'light'}
-        maxZoomLevel={20}
-        minZoomLevel={0}
-        mapPadding={{
-          top: 20,
-          left: 20,
-          bottom: 20,
-          right: 20,
-        }}
+        mapType={'normal'}
+        mapZoomConfig={mapZoomConfig}
+        mapPadding={mapPadding}
+        locationConfig={locationConfig}
         onMapPress={{
           f: function (coordinate: RNLatLng): void {
             console.log('Map pressed', coordinate);
@@ -384,6 +484,21 @@ export default function App() {
         onMarkerPress={{
           f: function (id: string): void {
             console.log('Marker pressed', id);
+          },
+        }}
+        onPolylinePress={{
+          f: function (id: string): void {
+            console.log('Polyline pressed', id);
+          },
+        }}
+        onPolygonPress={{
+          f: function (id: string): void {
+            console.log('Polygon pressed', id);
+          },
+        }}
+        onCirclePress={{
+          f: function (id: string): void {
+            console.log('Circle pressed', id);
           },
         }}
         onCameraChangeStart={{
@@ -423,9 +538,11 @@ export default function App() {
             console.log('Location error:', error);
           },
         }}
-        markers={show ? [...markers] : []}
-        polygons={show ? polygons : []}
-        polylines={show ? polylines : []}
+        markers={markers}
+        polygons={polygons}
+        polylines={polylines}
+        circles={circles}
+        heatmaps={heatmaps}
       />
 
       <ScrollView style={styles.scrollView}>
@@ -435,7 +552,7 @@ export default function App() {
           activeOpacity={0.8}
         >
           <Text style={styles.headerText}>
-            {controlButtonsExpanded ? '▼ Hide Controls' : '▶ Show Controls'}
+            {controlButtonsExpanded ? 'Hide Controls' : 'Show Controls'}
           </Text>
         </TouchableOpacity>
 

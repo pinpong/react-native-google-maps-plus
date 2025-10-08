@@ -1,37 +1,165 @@
-## [1.0.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.1...v1.0.2) (2025-10-02)
+## [1.1.0-dev.5](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2025-10-08)
 
 ### 🐛 Bug Fixes
 
 * build script ([d1f11f2](https://github.com/pinpong/react-native-google-maps-plus/commit/d1f11f237900f929689b72dfb41054dac0790a37))
-* build script ([98e194e](https://github.com/pinpong/react-native-google-maps-plus/commit/98e194e61d08af96ce75e156a6f5e3a5378c1b4c))
-* name conflict ([faf8d5e](https://github.com/pinpong/react-native-google-maps-plus/commit/faf8d5e7a0f79bfceb8454510e8e5ad3771fdbd2))
-* name conflict ([7217c11](https://github.com/pinpong/react-native-google-maps-plus/commit/7217c113bc2e5742bbc4b119eec7672c0b240cba))
-* react type ([36e22d5](https://github.com/pinpong/react-native-google-maps-plus/commit/36e22d59f0746ad9759799465eefed8f66a19049))
-
-## [1.0.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.0...v1.0.1) (2025-10-02)
-
-### 🐛 Bug Fixes
-
-* release ([afbb9cd](https://github.com/pinpong/react-native-google-maps-plus/commit/afbb9cdf0261c35fcd4c6423096fbecaa482f704))
 * release ([#18](https://github.com/pinpong/react-native-google-maps-plus/issues/18)) ([b271ccc](https://github.com/pinpong/react-native-google-maps-plus/commit/b271ccc69f9cb3e48c865801bdd104fd6065b557))
 
-### 🛠️ Other changes
+# react-native-google-maps-plus
 
-* format ([e67d939](https://github.com/pinpong/react-native-google-maps-plus/commit/e67d939e23a8db82432334c767f780ebe2320d6c))
+[![npm version](https://img.shields.io/npm/v/react-native-google-maps-plus.svg?logo=npm&color=cb0000)](https://www.npmjs.com/package/react-native-google-maps-plus)
+[![Dev Release](https://img.shields.io/npm/v/react-native-google-maps-plus/dev.svg?label=dev%20release&color=orange&logo=githubactions)](https://www.npmjs.com/package/react-native-google-maps-plus)
+[![Release](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml/badge.svg)](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml)
+[![Issues](https://img.shields.io/github/issues/pinpong/react-native-google-maps-plus?logo=github)](https://github.com/pinpong/react-native-google-maps-plus/issues)
+[![License](https://img.shields.io/github/license/pinpong/react-native-google-maps-plus?logo=open-source-initiative&logoColor=green)](./LICENSE)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?logo=prettier&logoColor=white)](https://prettier.io/)
+[![TypeScript](https://img.shields.io/badge/%3C/%3E-TypeScript-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![Lint](https://img.shields.io/badge/lint-eslint-green.svg?logo=eslint&logoColor=white)](https://eslint.org/)
+[![React Native](https://img.shields.io/badge/react--native-%3E%3D0.81.0-61dafb.svg?logo=react)](https://reactnative.dev/)
+[![Platform: Android](https://img.shields.io/badge/platform-android-green.svg?logo=android&logoColor=white)](https://developer.android.com/)
+[![Platform: iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg?logo=apple&logoColor=black)](https://developer.apple.com/ios/)
 
-## 1.0.0 (2025-10-02)
+React-native wrapper for android & IOS google maps sdk
 
-### 🐛 Bug Fixes
+## Installation
 
-* set npm publish to true ([ed7544b](https://github.com/pinpong/react-native-google-maps-plus/commit/ed7544b5c0b39cec418a83842e215253ac7b6eef))
+`react-native-nitro-modules` is required as this library relies on [Nitro Modules](https://nitro.margelo.com/).
 
-### 📚 Documentation
+```sh
+yarn add react-native-google-maps-plus react-native-nitro-modules
+```
 
-* update README.md ([60936c9](https://github.com/pinpong/react-native-google-maps-plus/commit/60936c9351f95e590b779883d161aad1272f4a1b))
-* update README.md ([00d3f65](https://github.com/pinpong/react-native-google-maps-plus/commit/00d3f656679415a8105fff2ae52fd0bd3106e472))
-* update README.md ([7354d38](https://github.com/pinpong/react-native-google-maps-plus/commit/7354d3822298b75ad28024f5488cc25e70891b9c))
-* update README.md ([bb2bf47](https://github.com/pinpong/react-native-google-maps-plus/commit/bb2bf47d7b273e1dd02a44425713ebe7c9bfb612))
+### Dependencies
 
-### 🛠️ Other changes
+This package builds on native libraries for SVG rendering and Google Maps integration:
 
-* initial commit ([d240a87](https://github.com/pinpong/react-native-google-maps-plus/commit/d240a870fa08e5a01ef8b3e981f7e78c7e113fef))
+- **iOS**: [SVGKit](https://github.com/SVGKit/SVGKit)
+- **Android**: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
+- **iOS Maps SDK**: [Google Maps SDK for iOS](https://developers.google.com/maps/documentation/ios-sdk)
+- **Android Maps SDK**: [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk)
+- **Maps Utility Libraries**: [Google Maps Utils for iOS](https://developers.google.com/maps/documentation/ios-sdk/utility) and [Google Maps Utils for Android](https://developers.google.com/maps/documentation/android-sdk/utility)
+
+These are automatically linked when you install the package, but you may need to clean/rebuild your native projects after first install.
+
+## Setup API Key
+
+You will need a valid **Google Maps API Key** from the [Google Cloud Console](https://console.cloud.google.com/).
+
+### Android
+
+It's recommend to use [Secrets Gradle Plugin](https://developers.google.com/maps/documentation/android-sdk/secrets-gradle-plugin) to securely manage your Google Maps API Key.
+
+---
+
+### iOS
+
+See the official [Google Maps iOS SDK configuration guide](https://developers.google.com/maps/documentation/ios-sdk/config#get-key) for more details.
+
+1. Create a `Secrets.xcconfig` file inside the **ios/** folder:
+
+   ```properties
+   MAPS_API_KEY=YOUR_IOS_MAPS_API_KEY
+   ```
+
+   Include it in your project configuration file:
+
+   ```xcconfig
+   #include? "Secrets.xcconfig"
+   ```
+
+2. Reference the API key in your **Info.plist**:
+
+   ```xml
+   <key>MAPS_API_KEY</key>
+   <string>$(MAPS_API_KEY)</string>
+   ```
+
+3. Provide the key programmatically in **AppDelegate.swift**:
+
+   ```swift
+   import GoogleMaps
+
+   @UIApplicationMain
+   class AppDelegate: UIResponder, UIApplicationDelegate {
+     func application(_ application: UIApplication,
+                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+       if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MAPS_API_KEY") as? String {
+           GMSServices.provideAPIKey(apiKey)
+       }
+       return true
+     }
+   }
+   ```
+
+---
+
+## Usage
+
+Checkout the example app in the [example](./example) folder.
+
+# Troubleshooting
+
+## Android
+
+- **API key not found**
+  Make sure `secrets.properties` exists under `android/` and contains your `MAPS_API_KEY`.
+  Run `./gradlew clean` and rebuild.
+
+## iOS
+
+- **`GMSServices must be configured before use`**
+  Ensure your key is in `Info.plist` and/or provided via `GMSServices.provideAPIKey(...)` in `AppDelegate.swift`.
+
+- **Build fails with `Node.h` import error from SVGKit**
+  SVGKit uses a header `Node.h` which can conflict with iOS system headers.
+  You can patch it automatically in your **Podfile** inside the `post_install` hook:
+
+  ```ruby
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+    )
+    # Force iOS 16+ to avoid deployment target warnings
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+      end
+    end
+
+    # Patch SVGKit includes to avoid Node.h conflicts
+    require 'fileutils'
+    svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+    end
+  end
+  ```
+
+  After applying this, run:
+
+  ```sh
+  cd ios && pod install --repo-update
+  ```
+
+- **Maps not rendering**
+  - Check that your API key has **Maps SDK for Android/iOS** enabled in Google Cloud Console.
+  - Make sure the key is not restricted to wrong bundle IDs or SHA1 fingerprints.
+
+## Contributing
+
+- [Development workflow](CONTRIBUTING.md#development-workflow)
+- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
+- [Code of conduct](CODE_OF_CONDUCT.md)
+
+## License
+
+MIT
+
+---
+
+Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

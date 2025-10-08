@@ -1,8 +1,14 @@
 name: Release Package
+
 on:
   push:
     branches:
       - main
+      - dev
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -15,12 +21,12 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
         with:
-          ref: main
-          fetch-depth: 0
+          fetch-depth: 0 # wichtig für semantic-release, damit alle Tags vorhanden sind
 
       - name: Setup
         uses: ./.github/actions/setup

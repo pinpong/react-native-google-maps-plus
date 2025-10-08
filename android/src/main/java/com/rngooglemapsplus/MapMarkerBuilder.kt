@@ -9,7 +9,10 @@ import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.markerStyleEquals
+import com.rngooglemapsplus.extensions.styleHash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
 
-class MarkerOptions(
+class MapMarkerBuilder(
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
@@ -34,21 +37,48 @@ class MarkerOptions(
 
   fun build(
     m: RNMarker,
-    icon: BitmapDescriptor,
+    icon: BitmapDescriptor?,
   ): MarkerOptions =
-    MarkerOptions()
-      .position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
-      .zIndex(m.zIndex.toFloat())
-      .icon(icon)
-      .anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
+    MarkerOptions().apply {
+      position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
+      anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
+      icon(icon)
+      m.zIndex?.let { zIndex(it.toFloat()) }
+    }
+
+  fun update(
+    marker: Marker,
+    prev: RNMarker,
+    next: RNMarker,
+  ) {
+    marker.position =
+      LatLng(
+        next.coordinate.latitude,
+        next.coordinate.longitude,
+      )
+    marker.zIndex = next.zIndex?.toFloat() ?: 0f
+
+    if (!prev.markerStyleEquals(next)) {
+      buildIconAsync(marker.id, next) { icon ->
+        marker.setIcon(icon)
+      }
+    }
+    marker.setAnchor(
+      (next.anchor?.x ?: 0.5).toFloat(),
+      (next.anchor?.y ?: 0.5).toFloat(),
+    )
+  }
 
   fun buildIconAsync(
     id: String,
     m: RNMarker,
-    onReady: (BitmapDescriptor) -> Unit,
+    onReady: (BitmapDescriptor?) -> Unit,
   ) {
     jobsById[id]?.cancel()
-
+    if (m.iconSvg == null) {
+      onReady(null)
+      return
+    }
     val key = m.styleHash()
     iconCache.get(key)?.let { cached ->
       onReady(cached)
@@ -97,17 +127,28 @@ class MarkerOptions(
 
   private suspend fun renderBitmap(m: RNMarker): Bitmap? {
     var bmp: Bitmap? = null
+    if (m.iconSvg == null) {
+      return null
+    }
     try {
       coroutineContext.ensureActive()
-      val svg = SVG.getFromString(m.iconSvg)
+      val svg = SVG.getFromString(m.iconSvg.svgString)
 
       coroutineContext.ensureActive()
-      svg.setDocumentWidth(m.width.dpToPx())
-      svg.setDocumentHeight(m.height.dpToPx())
+      svg.setDocumentWidth(m.iconSvg.width.dpToPx())
+      svg.setDocumentHeight(m.iconSvg.height.dpToPx())
 
       coroutineContext.ensureActive()
       bmp =
-        createBitmap(m.width.dpToPx().toInt(), m.height.dpToPx().toInt(), Bitmap.Config.ARGB_8888)
+        createBitmap(
+          m.iconSvg.width
+            .dpToPx()
+            .toInt(),
+          m.iconSvg.height
+            .dpToPx()
+            .toInt(),
+          Bitmap.Config.ARGB_8888,
+        )
 
       coroutineContext.ensureActive()
       val canvas = Canvas(bmp)
@@ -124,22 +165,3 @@ class MarkerOptions(
     }
   }
 }
-
-fun RNMarker.markerEquals(b: RNMarker): Boolean =
-  id == b.id &&
-    zIndex == b.zIndex &&
-    coordinate == b.coordinate &&
-    anchor == b.anchor &&
-    markerStyleEquals(b)
-
-fun RNMarker.markerStyleEquals(b: RNMarker): Boolean =
-  width == b.width &&
-    height == b.height &&
-    iconSvg == b.iconSvg
-
-fun RNMarker.styleHash(): Int =
-  arrayOf<Any?>(
-    width,
-    height,
-    iconSvg,
-  ).contentHashCode()

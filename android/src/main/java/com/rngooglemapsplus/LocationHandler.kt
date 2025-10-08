@@ -10,8 +10,6 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -19,22 +17,43 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.tasks.OnSuccessListener
+import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 private const val REQ_LOCATION_SETTINGS = 2001
+private const val PRIORITY_DEFAULT = Priority.PRIORITY_BALANCED_POWER_ACCURACY
+private const val INTERVAL_DEFAULT = 600000L
+private const val MIN_UPDATE_INTERVAL = 3600000L
 
 class LocationHandler(
   val context: ReactContext,
-) {
+) : LocationSource {
   private val fusedLocationClientProviderClient: FusedLocationProviderClient =
     LocationServices.getFusedLocationProviderClient(context)
+  private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
-  private var priority = Priority.PRIORITY_HIGH_ACCURACY
-  private var interval: Long = 5000
-  private var minUpdateInterval: Long = 5000
+
+  var priority: Int? = PRIORITY_DEFAULT
+    set(value) {
+      field = value ?: PRIORITY_DEFAULT
+      start()
+    }
+
+  var interval: Long? = INTERVAL_DEFAULT
+    set(value) {
+      field = value ?: INTERVAL_DEFAULT
+      buildLocationRequest()
+    }
+
+  var minUpdateInterval: Long? = MIN_UPDATE_INTERVAL
+    set(value) {
+      field = value ?: MIN_UPDATE_INTERVAL
+      buildLocationRequest()
+    }
+
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
 
@@ -90,6 +109,10 @@ class LocationHandler(
 
   @Suppress("deprecation")
   private fun buildLocationRequest() {
+    val priority = priority ?: Priority.PRIORITY_BALANCED_POWER_ACCURACY
+    val interval = interval ?: INTERVAL_DEFAULT
+    val minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
+
     locationRequest =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         LocationRequest
@@ -104,21 +127,6 @@ class LocationHandler(
           .setFastestInterval(minUpdateInterval)
       }
     restartLocationUpdates()
-  }
-
-  fun setPriority(priority: Int) {
-    this.priority = priority
-    buildLocationRequest()
-  }
-
-  fun setInterval(interval: Int) {
-    this.interval = interval.toLong()
-    buildLocationRequest()
-  }
-
-  fun setFastestInterval(fastestInterval: Int) {
-    this.minUpdateInterval = fastestInterval.toLong()
-    buildLocationRequest()
   }
 
   private fun restartLocationUpdates() {
@@ -146,7 +154,7 @@ class LocationHandler(
             }
           },
         ).addOnFailureListener { e ->
-          val error = mapThrowableToCode(e)
+          val error = e.toLocationErrorCode(context)
           onError?.invoke(error)
         }
       locationCallback =
@@ -154,6 +162,7 @@ class LocationHandler(
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
+              listener?.onLocationChanged(location)
               onUpdate?.invoke(location)
             } else {
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
@@ -166,40 +175,31 @@ class LocationHandler(
           locationCallback!!,
           Looper.getMainLooper(),
         ).addOnFailureListener { e ->
-          val error = mapThrowableToCode(e)
+          val error = e.toLocationErrorCode(context)
           onError?.invoke(error)
         }
     } catch (se: SecurityException) {
       onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {
-      val error = mapThrowableToCode(ex)
+      val error = ex.toLocationErrorCode(context)
       onError?.invoke(error)
     }
   }
 
-  private fun mapThrowableToCode(t: Throwable): RNLocationErrorCode {
-    if (t is SecurityException) return RNLocationErrorCode.PERMISSION_DENIED
-    if (t.message?.contains("GoogleApi", ignoreCase = true) == true) {
-      val gms = GoogleApiAvailability.getInstance()
-      val status = gms.isGooglePlayServicesAvailable(context)
-      if (status != ConnectionResult.SUCCESS) return RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE
-    }
-    if (t is ApiException) {
-      when (t.statusCode) {
-        CommonStatusCodes.NETWORK_ERROR -> return RNLocationErrorCode.POSITION_UNAVAILABLE
-        LocationSettingsStatusCodes.RESOLUTION_REQUIRED,
-        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE,
-        -> return RNLocationErrorCode.SETTINGS_NOT_SATISFIED
-      }
-      return RNLocationErrorCode.INTERNAL_ERROR
-    }
-    return RNLocationErrorCode.INTERNAL_ERROR
-  }
-
   fun stop() {
+    listener = null
     if (locationCallback != null) {
       fusedLocationClientProviderClient.removeLocationUpdates(locationCallback!!)
       locationCallback = null
     }
+  }
+
+  override fun activate(listener: LocationSource.OnLocationChangedListener) {
+    this.listener = listener
+    start()
+  }
+
+  override fun deactivate() {
+    stop()
   }
 }

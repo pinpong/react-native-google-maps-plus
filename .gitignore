@@ -89,4 +89,8 @@ nitrogen/
 example/ios/Secrets.xcconfig
 example/android/secrets.properties
 
+# Kotlin
+android/.kotlin/
+android/.kotlinc/
+
 tsconfig.tsbuildinfo

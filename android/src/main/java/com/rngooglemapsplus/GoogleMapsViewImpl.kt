@@ -2,6 +2,7 @@ package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.location.Location
+import android.widget.FrameLayout
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -9,9 +10,11 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
@@ -22,59 +25,58 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.TileOverlay
+import com.google.android.gms.maps.model.TileOverlayOptions
+import com.rngooglemapsplus.extensions.toGooglePriority
+import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 class GoogleMapsViewImpl(
   val reactContext: ThemedReactContext,
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
-  val markerOptions: com.rngooglemapsplus.MarkerOptions,
-) : MapView(reactContext),
+  val markerBuilder: MapMarkerBuilder,
+) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
-  OnMapReadyCallback,
   GoogleMap.OnMarkerClickListener,
+  GoogleMap.OnPolylineClickListener,
+  GoogleMap.OnPolygonClickListener,
+  GoogleMap.OnCircleClickListener,
   LifecycleEventListener {
+  private var initialized = false
+  private var mapReady = false
   private var googleMap: GoogleMap? = null
+  private var mapView: MapView? = null
 
-  private var pendingBuildingEnabled: Boolean = false
-  private var pendingTrafficEnabled: Boolean = false
-  private var pendingCustomMapStyle: MapStyleOptions? = null
-  private var pendingInitialCamera: CameraPosition =
-    CameraPosition
-      .builder()
-      .target(
-        LatLng(
-          0.0,
-          0.0,
-        ),
-      ).zoom(0f)
-      .bearing(0f)
-      .tilt(0f)
-      .build()
-  private var pendingUserInterfaceStyle: Int = MapColorScheme.FOLLOW_SYSTEM
-  private var pendingMinZoomLevel: Double = 0.0
-  private var pendingMaxZoomLevel: Double = 21.0
-  private var pendingMapPadding: RNMapPadding = RNMapPadding(0.0, 0.0, 0.0, 0.0)
-  private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
-  private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
-  private var cameraMoveReason = -1
+  private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
+  private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
+  private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
+  private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
 
-  private val polygonsById = mutableMapOf<String, Polygon>()
-  private val polylinesById = mutableMapOf<String, Polyline>()
   private val markersById = mutableMapOf<String, Marker>()
+  private val polylinesById = mutableMapOf<String, Polyline>()
+  private val polygonsById = mutableMapOf<String, Polygon>()
+  private val circlesById = mutableMapOf<String, Circle>()
+  private val heatmapsById = mutableMapOf<String, TileOverlay>()
 
+  private var cameraMoveReason = -1
   private var lastSubmittedLocation: Location? = null
   private var lastSubmittedCameraPosition: CameraPosition? = null
 
   init {
     reactContext.addLifecycleEventListener(this)
-    getMap()
   }
 
-  private fun getMap() {
+  fun initMapView(
+    mapId: String?,
+    liteMode: Boolean?,
+    cameraPosition: CameraPosition?,
+  ) {
+    if (initialized) return
+    initialized = true
     val result = playServiceHandler.playServicesAvailability()
 
     when (result) {
@@ -103,8 +105,38 @@ class GoogleMapsViewImpl(
         onMapError?.invoke(RNMapErrorCode.UNKNOWN)
     }
 
-    onCreate(null)
-    getMapAsync(this@GoogleMapsViewImpl)
+    mapView =
+      MapView(
+        reactContext,
+        GoogleMapOptions().apply {
+          mapId?.let { mapId(it) }
+          liteMode?.let { liteMode(it) }
+          cameraPosition?.let {
+            camera(it)
+          }
+        },
+      )
+
+    super.addView(mapView)
+
+    mapView?.onCreate(null)
+    mapView?.getMapAsync { map ->
+      googleMap = map
+      googleMap?.setOnMapLoadedCallback {
+        googleMap?.setOnCameraMoveStartedListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCameraIdleListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMarkerClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPolylineClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+      }
+      initLocationCallbacks()
+      applyPending()
+    }
+    mapReady = true
+    onMapReady?.invoke(true)
   }
 
   override fun onCameraMoveStarted(reason: Int) {
@@ -195,22 +227,6 @@ class GoogleMapsViewImpl(
     )
   }
 
-  @SuppressLint("PotentialBehaviorOverride")
-  override fun onMapReady(map: GoogleMap) {
-    googleMap = map
-    googleMap?.setOnMapLoadedCallback {
-      googleMap?.setOnCameraMoveStartedListener(this)
-      googleMap?.setOnCameraMoveListener(this)
-      googleMap?.setOnCameraIdleListener(this)
-      googleMap?.setOnMarkerClickListener(this)
-      googleMap?.setOnMapClickListener(this)
-    }
-    initLocationCallbacks()
-    applyPending()
-
-    onMapReady?.invoke(true)
-  }
-
   fun initLocationCallbacks() {
     locationHandler.onUpdate = { location ->
       // / only the coordinated are relevant right now
@@ -235,27 +251,62 @@ class GoogleMapsViewImpl(
 
   fun applyPending() {
     onUi {
-      googleMap?.setPadding(
-        pendingMapPadding.left.dpToPx().toInt(),
-        pendingMapPadding.top.dpToPx().toInt(),
-        pendingMapPadding.right.dpToPx().toInt(),
-        pendingMapPadding.bottom.dpToPx().toInt(),
-      )
-
-      pendingInitialCamera.let {
-        googleMap?.moveCamera(
-          CameraUpdateFactory.newCameraPosition(
-            it,
-          ),
+      mapPadding?.let {
+        googleMap?.setPadding(
+          it.left.dpToPx().toInt(),
+          it.top.dpToPx().toInt(),
+          it.right.dpToPx().toInt(),
+          it.bottom.dpToPx().toInt(),
         )
       }
 
-      googleMap?.isBuildingsEnabled = pendingBuildingEnabled
-      googleMap?.isTrafficEnabled = pendingTrafficEnabled
-      googleMap?.setMapStyle(pendingCustomMapStyle)
-      googleMap?.mapColorScheme = pendingUserInterfaceStyle
-      googleMap?.setMinZoomPreference(pendingMinZoomLevel.toFloat())
-      googleMap?.setMaxZoomPreference(pendingMaxZoomLevel.toFloat())
+      uiSettings?.let { v ->
+        googleMap?.uiSettings?.apply {
+          v.allGesturesEnabled?.let { setAllGesturesEnabled(it) }
+          v.compassEnabled?.let { isCompassEnabled = it }
+          v.indoorLevelPickerEnabled?.let { isIndoorLevelPickerEnabled = it }
+          v.mapToolbarEnabled?.let { isMapToolbarEnabled = it }
+          v.myLocationButtonEnabled?.let {
+            googleMap?.setLocationSource(locationHandler)
+            isMyLocationButtonEnabled = it
+          }
+          v.rotateEnabled?.let { isRotateGesturesEnabled = it }
+          v.scrollEnabled?.let { isScrollGesturesEnabled = it }
+          v.scrollDuringRotateOrZoomEnabled?.let {
+            isScrollGesturesEnabledDuringRotateOrZoom = it
+          }
+          v.tiltEnabled?.let { isTiltGesturesEnabled = it }
+          v.zoomControlsEnabled?.let { isZoomControlsEnabled = it }
+          v.zoomGesturesEnabled?.let { isZoomGesturesEnabled = it }
+        }
+      }
+
+      buildingEnabled?.let {
+        googleMap?.isBuildingsEnabled = it
+      }
+      trafficEnabled?.let {
+        googleMap?.isTrafficEnabled = it
+      }
+      indoorEnabled?.let {
+        googleMap?.isIndoorEnabled = it
+      }
+      googleMap?.setMapStyle(customMapStyle)
+      mapType?.let {
+        googleMap?.mapType = it
+      }
+      userInterfaceStyle?.let {
+        googleMap?.mapColorScheme = it
+      }
+      mapZoomConfig?.let {
+        googleMap?.setMinZoomPreference(it.min?.toFloat() ?: 2.0f)
+        googleMap?.setMaxZoomPreference(it.max?.toFloat() ?: 21.0f)
+      }
+    }
+
+    locationConfig?.let {
+      locationHandler.priority = it.android?.priority?.toGooglePriority()
+      locationHandler.interval = it.android?.interval?.toLong()
+      locationHandler.minUpdateInterval = it.android?.minUpdateInterval?.toLong()
     }
 
     if (pendingMarkers.isNotEmpty()) {
@@ -278,80 +329,139 @@ class GoogleMapsViewImpl(
       }
       pendingPolygons.clear()
     }
+
+    if (pendingCircles.isNotEmpty()) {
+      pendingCircles.forEach { (id, opts) ->
+        internalAddCircle(id, opts)
+      }
+      pendingCircles.clear()
+    }
+
+    if (pendingHeatmaps.isNotEmpty()) {
+      pendingHeatmaps.forEach { (id, opts) ->
+        internalAddHeatmap(id, opts)
+      }
+      pendingHeatmaps.clear()
+    }
   }
 
-  var buildingEnabled: Boolean
-    get() = googleMap?.isBuildingsEnabled ?: pendingBuildingEnabled
+  var uiSettings: RNMapUiSettings? = null
     set(value) {
-      pendingBuildingEnabled = value
+      field = value
       onUi {
-        googleMap?.isBuildingsEnabled = value
+        googleMap?.uiSettings?.apply {
+          setAllGesturesEnabled(value?.allGesturesEnabled ?: true)
+          isCompassEnabled = value?.compassEnabled ?: false
+          isIndoorLevelPickerEnabled = value?.indoorLevelPickerEnabled ?: false
+          isMapToolbarEnabled = value?.mapToolbarEnabled ?: false
+
+          val myLocationEnabled = value?.myLocationButtonEnabled ?: false
+          googleMap?.setLocationSource(if (myLocationEnabled) locationHandler else null)
+          isMyLocationButtonEnabled = myLocationEnabled
+
+          isRotateGesturesEnabled = value?.rotateEnabled ?: true
+          isScrollGesturesEnabled = value?.scrollEnabled ?: true
+          isScrollGesturesEnabledDuringRotateOrZoom =
+            value?.scrollDuringRotateOrZoomEnabled ?: true
+          isTiltGesturesEnabled = value?.tiltEnabled ?: true
+          isZoomControlsEnabled = value?.zoomControlsEnabled ?: false
+          isZoomGesturesEnabled = value?.zoomGesturesEnabled ?: false
+        }
       }
     }
 
-  var trafficEnabled: Boolean
-    get() = googleMap?.isTrafficEnabled ?: pendingTrafficEnabled
+  @SuppressLint("MissingPermission")
+  var myLocationEnabled: Boolean? = null
     set(value) {
-      pendingTrafficEnabled = value
+      field = value
       onUi {
-        googleMap?.isTrafficEnabled = value
+        try {
+          googleMap?.isMyLocationEnabled = value ?: false
+        } catch (se: SecurityException) {
+          onLocationError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
+        } catch (ex: Exception) {
+          val error = ex.toLocationErrorCode(context)
+          onLocationError?.invoke(error)
+        }
       }
     }
 
-  var customMapStyle: MapStyleOptions?
-    get() = pendingCustomMapStyle
+  var buildingEnabled: Boolean? = null
     set(value) {
-      pendingCustomMapStyle = value
+      field = value
+      onUi {
+        googleMap?.isBuildingsEnabled = value ?: false
+      }
+    }
+
+  var trafficEnabled: Boolean? = null
+    set(value) {
+      field = value
+      onUi {
+        googleMap?.isTrafficEnabled = value ?: false
+      }
+    }
+
+  var indoorEnabled: Boolean? = null
+    set(value) {
+      field = value
+      onUi {
+        googleMap?.isIndoorEnabled = value ?: false
+      }
+    }
+
+  var customMapStyle: MapStyleOptions? = null
+    set(value) {
+      field = value
       onUi {
         googleMap?.setMapStyle(value)
       }
     }
 
-  var initialCamera: CameraPosition
-    get() = pendingInitialCamera
+  var userInterfaceStyle: Int? = null
     set(value) {
-      pendingInitialCamera = value
-    }
-
-  var userInterfaceStyle: Int
-    get() = pendingUserInterfaceStyle
-    set(value) {
-      pendingUserInterfaceStyle = value
+      field = value
       onUi {
-        googleMap?.mapColorScheme = value
+        googleMap?.mapColorScheme = value ?: MapColorScheme.FOLLOW_SYSTEM
       }
     }
 
-  var minZoomLevel: Double
-    get() = pendingMinZoomLevel
+  var mapZoomConfig: RNMapZoomConfig? = null
     set(value) {
-      pendingMinZoomLevel = value
+      field = value
       onUi {
-        googleMap?.setMinZoomPreference(value.toFloat())
+        googleMap?.setMinZoomPreference(value?.min?.toFloat() ?: 2.0f)
+        googleMap?.setMaxZoomPreference(value?.max?.toFloat() ?: 21.0f)
       }
     }
 
-  var maxZoomLevel: Double
-    get() = pendingMaxZoomLevel
+  var mapPadding: RNMapPadding? = null
     set(value) {
-      pendingMaxZoomLevel = value
-      onUi {
-        googleMap?.setMaxZoomPreference(value.toFloat())
-      }
-    }
-
-  var mapPadding: RNMapPadding
-    get() = pendingMapPadding
-    set(value) {
-      pendingMapPadding = value
+      field = value
       onUi {
         googleMap?.setPadding(
-          value.left.dpToPx().toInt(),
-          value.top.dpToPx().toInt(),
-          value.right.dpToPx().toInt(),
-          value.bottom.dpToPx().toInt(),
+          value?.left?.dpToPx()?.toInt() ?: 0,
+          value?.top?.dpToPx()?.toInt() ?: 0,
+          value?.right?.dpToPx()?.toInt() ?: 0,
+          value?.bottom?.dpToPx()?.toInt() ?: 0,
         )
       }
+    }
+
+  var mapType: Int? = null
+    set(value) {
+      field = value
+      onUi {
+        googleMap?.mapType = value ?: 1
+      }
+    }
+
+  var locationConfig: RNLocationConfig? = null
+    set(value) {
+      field = value
+      locationHandler.priority = value?.android?.priority?.toGooglePriority()
+      locationHandler.interval = value?.android?.interval?.toLong()
+      locationHandler.minUpdateInterval = value?.android?.minUpdateInterval?.toLong()
     }
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
@@ -360,12 +470,15 @@ class GoogleMapsViewImpl(
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMarkerPress: ((String) -> Unit)? = null
+  var onPolylinePress: ((String) -> Unit)? = null
+  var onPolygonPress: ((String) -> Unit)? = null
+  var onCirclePress: ((String) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
 
   fun setCamera(
-    camera: RNCamera,
+    cameraPosition: CameraPosition,
     animated: Boolean,
     durationMS: Int,
   ) {
@@ -374,33 +487,8 @@ class GoogleMapsViewImpl(
       if (current == null) {
         return@onUi
       }
-      val camPosBuilder =
-        CameraPosition.Builder(
-          current,
-        )
 
-      camera.center?.let {
-        camPosBuilder.target(
-          LatLng(
-            it.latitude,
-            it.longitude,
-          ),
-        )
-      }
-
-      camera.zoom?.let {
-        camPosBuilder.zoom(it.toFloat())
-      }
-      camera.bearing?.let {
-        camPosBuilder.bearing(it.toFloat())
-      }
-      camera.tilt?.let {
-        camPosBuilder.tilt(it.toFloat())
-      }
-
-      val camPos = camPosBuilder.build()
-
-      val update = CameraUpdateFactory.newCameraPosition(camPos)
+      val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
 
       if (animated) {
         googleMap?.animateCamera(update, durationMS, null)
@@ -429,8 +517,8 @@ class GoogleMapsViewImpl(
       val latSpan = bounds.northeast.latitude - bounds.southwest.latitude
       val lngSpan = bounds.northeast.longitude - bounds.southwest.longitude
 
-      val latPerPixel = latSpan / height
-      val lngPerPixel = lngSpan / width
+      val latPerPixel = latSpan / (mapView?.height ?: 0)
+      val lngPerPixel = lngSpan / (mapView?.width ?: 0)
 
       builder.include(
         LatLng(
@@ -459,8 +547,10 @@ class GoogleMapsViewImpl(
 
       val paddedBounds = builder.build()
 
-      val adjustedWidth = (width - padding.left.dpToPx() - padding.right.dpToPx()).toInt()
-      val adjustedHeight = (height - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt()
+      val adjustedWidth =
+        ((mapView?.width ?: 0) - padding.left.dpToPx() - padding.right.dpToPx()).toInt()
+      val adjustedHeight =
+        ((mapView?.height ?: 0) - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt()
 
       val update =
         CameraUpdateFactory.newLatLngBounds(
@@ -639,22 +729,129 @@ class GoogleMapsViewImpl(
     pendingPolygons.clear()
   }
 
-  fun clearAll() {
+  fun addCircle(
+    id: String,
+    opts: CircleOptions,
+  ) {
+    if (googleMap == null) {
+      pendingCircles.add(id to opts)
+      return
+    }
+
     onUi {
-      markerOptions.cancelAllJobs()
+      circlesById.remove(id)?.remove()
+    }
+    internalAddCircle(id, opts)
+  }
+
+  private fun internalAddCircle(
+    id: String,
+    opts: CircleOptions,
+  ) {
+    onUi {
+      val circle =
+        googleMap?.addCircle(opts).also {
+          it?.tag = id
+        }
+      if (circle != null) {
+        circlesById[id] = circle
+      }
+    }
+  }
+
+  fun updateCircle(
+    id: String,
+    block: (Circle) -> Unit,
+  ) {
+    val circle = circlesById[id] ?: return
+    onUi {
+      block(circle)
+    }
+  }
+
+  fun removeCircle(id: String) {
+    onUi {
+      circlesById.remove(id)?.remove()
+    }
+  }
+
+  fun clearCircles() {
+    onUi {
+      circlesById.values.forEach { it.remove() }
+    }
+    circlesById.clear()
+    pendingCircles.clear()
+  }
+
+  fun addHeatmap(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    if (googleMap == null) {
+      pendingHeatmaps.add(id to opts)
+      return
+    }
+
+    onUi {
+      heatmapsById.remove(id)?.remove()
+    }
+    internalAddHeatmap(id, opts)
+  }
+
+  private fun internalAddHeatmap(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    onUi {
+      val heatmap =
+        googleMap?.addTileOverlay(opts)
+      if (heatmap != null) {
+        heatmapsById[id] = heatmap
+      }
+    }
+  }
+
+  fun removeHeatmap(id: String) {
+    onUi {
+      heatmapsById.remove(id)?.remove()
+    }
+  }
+
+  fun clearHeatmaps() {
+    onUi {
+      heatmapsById.values.forEach { it.remove() }
+    }
+    circlesById.clear()
+    pendingHeatmaps.clear()
+  }
+
+  fun destroyInternal() {
+    onUi {
+      markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
       clearPolygons()
+      clearCircles()
+      clearHeatmaps()
       locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
         setOnCameraIdleListener(null)
         setOnMarkerClickListener(null)
+        setOnPolylineClickListener(null)
+        setOnPolygonClickListener(null)
+        setOnCircleClickListener(null)
         setOnMapClickListener(null)
       }
-      this@GoogleMapsViewImpl.onDestroy()
       googleMap = null
+      mapView?.apply {
+        onPause()
+        onStop()
+        onDestroy()
+        removeAllViews()
+      }
+      super.removeAllViews()
       reactContext.removeLifecycleEventListener(this)
     }
   }
@@ -684,24 +881,36 @@ class GoogleMapsViewImpl(
   override fun onHostResume() {
     onUi {
       locationHandler.start()
-      this@GoogleMapsViewImpl.onResume()
+      mapView?.onResume()
     }
   }
 
   override fun onHostPause() {
     onUi {
       locationHandler.stop()
-      this@GoogleMapsViewImpl.onPause()
+      mapView?.onPause()
     }
   }
 
   override fun onHostDestroy() {
-    clearAll()
+    destroyInternal()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
     onMarkerPress?.invoke(marker.tag?.toString() ?: "unknown")
     return true
+  }
+
+  override fun onPolylineClick(polyline: Polyline) {
+    onPolylinePress?.invoke(polyline.tag?.toString() ?: "unknown")
+  }
+
+  override fun onPolygonClick(polygon: Polygon) {
+    onPolygonPress?.invoke(polygon.tag?.toString() ?: "unknown")
+  }
+
+  override fun onCircleClick(circle: Circle) {
+    onCirclePress?.invoke(circle.tag?.toString() ?: "unknown")
   }
 
   override fun onMapClick(coordinates: LatLng) {

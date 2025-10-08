@@ -2,43 +2,35 @@ import CoreLocation
 import Foundation
 import UIKit
 
+private let kCLLocationAccuracyDefault: CLLocationAccuracy =
+  kCLLocationAccuracyBest
+private let kCLDistanceFilterNoneDefault: CLLocationDistance =
+  kCLDistanceFilterNone
+
 final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   private let manager = CLLocationManager()
-  private var priority: Int = Priority.highAccuracy.rawValue
-  private var interval: TimeInterval = 5.0
-  private var minUpdateInterval: TimeInterval = 5.0
-  private var distanceFilterMeters: CLLocationDistance = kCLDistanceFilterNone
+
+  var desiredAccuracy: CLLocationAccuracy? = kCLLocationAccuracyDefault {
+    didSet {
+      manager.desiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyBest
+    }
+  }
+
+  var distanceFilterMeters: CLLocationDistance? = kCLDistanceFilterNoneDefault {
+    didSet {
+      manager.distanceFilter = distanceFilterMeters ?? kCLDistanceFilterNone
+    }
+  }
 
   var onUpdate: ((CLLocation) -> Void)?
   var onError: ((_ error: RNLocationErrorCode) -> Void)?
-
-  private var lastEmit: Date?
 
   override init() {
     super.init()
     manager.delegate = self
     manager.pausesLocationUpdatesAutomatically = true
     manager.activityType = .other
-    applyPriority()
-  }
-
-  func setPriority(_ priority: Int) {
-    self.priority = priority
-    applyPriority()
-  }
-
-  func setInterval(_ seconds: Int) {
-    self.interval = max(0, TimeInterval(seconds))
-  }
-
-  func setFastestInterval(_ seconds: Int) {
-    self.minUpdateInterval = max(0, TimeInterval(seconds))
-  }
-
-  func setDistanceFilter(_ meters: Double) {
-    self.distanceFilterMeters = meters >= 0 ? meters : kCLDistanceFilterNone
-    manager.distanceFilter = distanceFilterMeters
   }
 
   func showLocationDialog() {
@@ -110,34 +102,11 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     }
   }
 
-  private func applyPriority() {
-    guard let p = Priority(rawValue: priority) else {
-      manager.desiredAccuracy = kCLLocationAccuracyBest
-      return
-    }
-    switch p {
-    case .highAccuracy:
-      manager.desiredAccuracy = kCLLocationAccuracyBest
-    case .balanced:
-      manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-    case .lowPower:
-      manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-    case .passive:
-      manager.desiredAccuracy = kCLLocationAccuracyKilometer
-    }
-  }
-
   private func startUpdates() {
-    manager.distanceFilter = distanceFilterMeters
+    manager.desiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyDefault
+    manager.distanceFilter =
+      distanceFilterMeters ?? kCLDistanceFilterNoneDefault
     manager.startUpdatingLocation()
-  }
-
-  private func shouldEmit(now: Date) -> Bool {
-    if let last = lastEmit {
-      let delta = now.timeIntervalSince(last)
-      if delta < minUpdateInterval { return false }
-    }
-    return true
   }
 
   func locationManager(
@@ -166,12 +135,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     didUpdateLocations locations: [CLLocation]
   ) {
     guard let loc = locations.last else { return }
-    let now = Date()
-
-    if shouldEmit(now: now) {
-      lastEmit = now
-      onUpdate?(loc)
-    }
+    onUpdate?(loc)
   }
 
   private static func topMostViewController() -> UIViewController? {
@@ -190,16 +154,4 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     return top
   }
 
-}
-
-extension LocationHandler {
-  enum Priority: Int {
-    case highAccuracy = 100
-    /// Android: PRIORITY_BALANCED_POWER_ACCURACY
-    case balanced = 102
-    /// Android: PRIORITY_LOW_POWER
-    case lowPower = 104
-    /// Android: PRIORITY_PASSIVE
-    case passive = 105
-  }
 }
