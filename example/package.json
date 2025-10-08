@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "ios:pods": "bundle install && bundle exec pod repo update --verbose && bundle exec pod install --project-directory=ios",
+    "ios:pods": "bundle install && bundle exec pod repo update --verbose && bundle exec pod install --repo-update --project-directory=ios",
     "build:android": "react-native build-android",
     "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=\"\" EXPANDED_CODE_SIGN_IDENTITY=\"\" DEVELOPMENT_TEAM=\"\" COCOAPODS_PARALLEL_CODE_SIGN=false'"
   },

@@ -24,6 +24,16 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['node_modules/', 'lib/', '.yarn', 'eslint.config.mjs'],
+    ignores: [
+      'node_modules/',
+      'lib/',
+      '**/build/**',
+      '**/ios/**',
+      '**/android/**',
+      'nitrogen/',
+      'example/vendor/',
+      '.yarn',
+      'eslint.config.mjs',
+    ],
   },
 ]);
