@@ -1,3 +1,10 @@
+## [1.1.0-dev.4](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2025-10-08)
+
+### ✨ Features
+
+* add heatmap support ([ddcfccf](https://github.com/pinpong/react-native-google-maps-plus/commit/ddcfccf4cbb08b2756c20ca7215a8fe45e30befb))
+* add heatmap support ([96a3a08](https://github.com/pinpong/react-native-google-maps-plus/commit/96a3a08696e38f77db356d9e0e71a6e6b98a589f))
+
 ## [1.1.0-dev.3](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2025-10-08)
 
 ### 🐛 Bug Fixes
