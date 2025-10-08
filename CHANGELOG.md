@@ -1,3 +1,19 @@
+## [1.1.0-dev.3](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2025-10-08)
+
+### 🐛 Bug Fixes
+
+* **example:** update Podfile.lock ([0eb9a09](https://github.com/pinpong/react-native-google-maps-plus/commit/0eb9a09bca8b13241b13851c4af0857545284229))
+
+### 🔄 Code Refactors
+
+* **map:** unify update logic and defaults across Android and iOS ([cdaa01a](https://github.com/pinpong/react-native-google-maps-plus/commit/cdaa01af77ae93f9e9652dd018fe18f0ca6309b4))
+* **map:** unify update logic and defaults across Android and iOS ([f15d638](https://github.com/pinpong/react-native-google-maps-plus/commit/f15d6388911943b5abdfd9d5f61e3423af33f064))
+
+### 🛠️ Other changes
+
+* update to react-native 0.82.0 ([31d5ff5](https://github.com/pinpong/react-native-google-maps-plus/commit/31d5ff5157ec8357b9d699d4dcc09bda09e11afb))
+* update to react-native 0.82.0 ([8c8e8ae](https://github.com/pinpong/react-native-google-maps-plus/commit/8c8e8ae1c4fcf97e04059d873461f083e4c346cf))
+
 ## [1.1.0-dev.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2025-10-07)
 
 ### ✨ Features
