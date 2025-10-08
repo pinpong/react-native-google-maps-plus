@@ -234,6 +234,20 @@ class RNGoogleMapsPlusView(
       }
     }
 
+  override var kmlLayers: Array<RNKMLayer>? = null
+    set(value) {
+      if (field.contentEquals(value)) return
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeKmlLayer(id)
+      }
+      nextById.forEach { (id, next) ->
+        view.addKmlLayer(id, next.kmlString)
+      }
+    }
+
   override var locationConfig: RNLocationConfig? = null
     set(value) {
       if (field == value) return
