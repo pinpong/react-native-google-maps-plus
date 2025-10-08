@@ -93,7 +93,7 @@
     "eslint-plugin-prettier": "5.5.4",
     "jest": "30.2.0",
     "lefthook": "1.13.6",
-    "nitrogen": "0.29.8",
+    "nitrogen": "0.29.6",
     "prettier": "3.6.2",
     "react": "19.2.0",
     "react-native": "0.82.0",

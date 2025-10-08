@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.TileOverlay
+import com.google.android.gms.maps.model.TileOverlayOptions
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 
@@ -52,11 +54,13 @@ class GoogleMapsViewImpl(
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
+  private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
 
   private val markersById = mutableMapOf<String, Marker>()
   private val polylinesById = mutableMapOf<String, Polyline>()
   private val polygonsById = mutableMapOf<String, Polygon>()
   private val circlesById = mutableMapOf<String, Circle>()
+  private val heatmapsById = mutableMapOf<String, TileOverlay>()
 
   private var cameraMoveReason = -1
   private var lastSubmittedLocation: Location? = null
@@ -331,6 +335,13 @@ class GoogleMapsViewImpl(
         internalAddCircle(id, opts)
       }
       pendingCircles.clear()
+    }
+
+    if (pendingHeatmaps.isNotEmpty()) {
+      pendingHeatmaps.forEach { (id, opts) ->
+        internalAddHeatmap(id, opts)
+      }
+      pendingHeatmaps.clear()
     }
   }
 
@@ -772,6 +783,48 @@ class GoogleMapsViewImpl(
     pendingCircles.clear()
   }
 
+  fun addHeatmap(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    if (googleMap == null) {
+      pendingHeatmaps.add(id to opts)
+      return
+    }
+
+    onUi {
+      heatmapsById.remove(id)?.remove()
+    }
+    internalAddHeatmap(id, opts)
+  }
+
+  private fun internalAddHeatmap(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    onUi {
+      val heatmap =
+        googleMap?.addTileOverlay(opts)
+      if (heatmap != null) {
+        heatmapsById[id] = heatmap
+      }
+    }
+  }
+
+  fun removeHeatmap(id: String) {
+    onUi {
+      heatmapsById.remove(id)?.remove()
+    }
+  }
+
+  fun clearHeatmaps() {
+    onUi {
+      heatmapsById.values.forEach { it.remove() }
+    }
+    circlesById.clear()
+    pendingHeatmaps.clear()
+  }
+
   fun destroyInternal() {
     onUi {
       markerBuilder.cancelAllJobs()
@@ -779,6 +832,7 @@ class GoogleMapsViewImpl(
       clearPolylines()
       clearPolygons()
       clearCircles()
+      clearHeatmaps()
       locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)

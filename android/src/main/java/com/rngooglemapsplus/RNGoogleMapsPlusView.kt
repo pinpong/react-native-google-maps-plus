@@ -25,6 +25,7 @@ class RNGoogleMapsPlusView(
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
+  private val heatmapBuilder = MapHeatmapBuilder()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
@@ -215,6 +216,21 @@ class RNGoogleMapsPlusView(
             }
           }
         }
+      }
+    }
+
+  override var heatmaps: Array<RNHeatmap>? = null
+    set(value) {
+      if (field.contentEquals(value)) return
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeHeatmap(id)
+      }
+
+      nextById.forEach { (id, next) ->
+        view.addHeatmap(id, heatmapBuilder.build(next))
       }
     }
 

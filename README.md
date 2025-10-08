@@ -22,13 +22,15 @@ React-native wrapper for android & IOS google maps sdk
 yarn add react-native-google-maps-plus react-native-nitro-modules
 ```
 
-Dependencies
+# Dependencies
 
-This package builds on native SVG rendering libraries:
+This package builds on native libraries for SVG rendering and Google Maps integration:
 
-iOS: [SVGKit](https://github.com/SVGKit/SVGKit)
-
-Android: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
+- **iOS**: [SVGKit](https://github.com/SVGKit/SVGKit)
+- **Android**: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
+- **iOS Maps SDK**: [Google Maps SDK for iOS](https://developers.google.com/maps/documentation/ios-sdk)
+- **Android Maps SDK**: [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk)
+- **Maps Utility Libraries**: [Google Maps Utils for iOS](https://developers.google.com/maps/documentation/ios-sdk/utility) and [Google Maps Utils for Android](https://developers.google.com/maps/documentation/android-sdk/utility)
 
 These are automatically linked when you install the package, but you may need to clean/rebuild your native projects after first install.
 

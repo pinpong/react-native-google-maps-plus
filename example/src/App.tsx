@@ -19,6 +19,7 @@ import type {
   RNRegion,
   RNLatLng,
   RNCircle,
+  RNHeatmap,
 } from '../../src';
 import { GoogleMapsView, GoogleMapsModule } from '../../src';
 import { callback } from 'react-native-nitro-modules';
@@ -204,6 +205,16 @@ const randomCoordinates = (
   longitude: baseLng + (Math.random() - 0.5) * offset,
 });
 
+const randomWeightedCoordinates = (
+  baseLat: number,
+  baseLng: number,
+  offset = 0.01
+) => ({
+  latitude: baseLat + (Math.random() - 0.5) * offset,
+  longitude: baseLng + (Math.random() - 0.5) * offset,
+  weight: Math.floor(Math.random() * (100 - 10 + 1)) + 10,
+});
+
 const makePolygon = (id: number): RNPolygon => ({
   id: id.toString(),
   zIndex: id,
@@ -244,6 +255,27 @@ const makeCircle = (id: number): RNCircle => ({
   strokeWidth: 1 + (id % 5),
   strokeColor: '#ff0000',
   fillColor: '#0000ff',
+});
+
+const makeHeatmap = (id: number): RNHeatmap => ({
+  id: id.toString(),
+  zIndex: id,
+  weightedData: [
+    randomWeightedCoordinates(37.7749, -122.4194, 0.02),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.03),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.05),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.01),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.08),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.03),
+    randomWeightedCoordinates(37.7749, -122.4194, 0.09),
+  ],
+  gradient: {
+    colors: ['#00f', '#0ff', '#0f0', '#ff0', '#f00'],
+    startPoints: [0.1, 0.3, 0.5, 0.7, 1],
+    colorMapSize: 256,
+  },
+  radius: 100,
+  opacity: 1,
 });
 
 export const makeMarker = (id: number): RNMarker => ({
@@ -331,6 +363,10 @@ export default function App() {
 
   const [circles] = useState(
     Array.from({ length: 1 }, (_, i) => makeCircle(i + 1))
+  );
+
+  const [heatmaps] = useState(
+    Array.from({ length: 1 }, (_, i) => makeHeatmap(i + 1))
   );
 
   useEffect(() => {
@@ -506,6 +542,7 @@ export default function App() {
         polygons={polygons}
         polylines={polylines}
         circles={circles}
+        heatmaps={heatmaps}
       />
 
       <ScrollView style={styles.scrollView}>
