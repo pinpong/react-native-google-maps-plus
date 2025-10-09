@@ -2358,7 +2358,7 @@ PODS:
     - React-perflogger (= 0.82.0)
     - React-utils (= 0.82.0)
     - SocketRocket
-  - RNGoogleMapsPlus (1.1.0-dev.2):
+  - RNGoogleMapsPlus (1.1.0-dev.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -2713,7 +2713,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: c5c4f5280e4ae0f9f4a739c64c4260fe0b3edaf1
   ReactCodegen: 3873d7ac09960375f7845384ff47d53e478462dc
   ReactCommon: f5527f5d97a9957ab46eb5db78875d3579e03b97
-  RNGoogleMapsPlus: 9b638ea84ab0231430a8b5a109a20130ad4a722a
+  RNGoogleMapsPlus: cdea400ea1e69740d91e07dbb5882d93be4c0a77
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   Yoga: ce55ebb197c21e22b6700cd36e3f36b7ec26e6f8

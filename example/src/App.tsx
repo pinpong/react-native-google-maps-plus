@@ -178,6 +178,78 @@ const silverMapStyle: RNMapStyleElement[] = [
   },
 ];
 
+const kmlString = `
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Example KML Data</name>
+    <description>Example with marker, polygon and circle shifted further northeast of San Francisco</description>
+
+    <Placemark>
+      <name>Center Point</name>
+      <Point>
+        <coordinates>-122.4156,37.7781,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Example Polygon</name>
+      <Style>
+        <LineStyle>
+          <color>ff0000ff</color>
+          <width>2</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>7d00ff00</color>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -122.4206,37.7826,0
+              -122.4106,37.7826,0
+              -122.4106,37.7746,0
+              -122.4206,37.7746,0
+              -122.4206,37.7826,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+
+    <Placemark>
+      <name>Approximate Circle</name>
+      <Style>
+        <LineStyle>
+          <color>ffff0000</color>
+          <width>2</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>3dff0000</color>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -122.4156,37.7801,0
+              -122.4136,37.7801,0
+              -122.4136,37.7761,0
+              -122.4156,37.7761,0
+              -122.4176,37.7761,0
+              -122.4176,37.7801,0
+              -122.4156,37.7801,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+
+  </Document>
+</kml>
+`.trim();
+
 function makeSvgIcon(width: number, height: number): string {
   const color = randomColor();
   return `
@@ -369,6 +441,8 @@ export default function App() {
     Array.from({ length: 1 }, (_, i) => makeHeatmap(i + 1))
   );
 
+  const [kmlLayers] = useState([{ id: '21', zIndex: 1, kmlString }]);
+
   useEffect(() => {
     if (!stressTest) return;
 
@@ -543,6 +617,7 @@ export default function App() {
         polylines={polylines}
         circles={circles}
         heatmaps={heatmaps}
+        kmlLayers={kmlLayers}
       />
 
       <ScrollView style={styles.scrollView}>

@@ -256,6 +256,27 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
+  @MainActor
+  var kmlLayers: [RNKMLayer]? {
+    didSet {
+      let prevById = Dictionary(
+        (oldValue ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+      let nextById = Dictionary(
+        (kmlLayers ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+
+      let removed = Set(prevById.keys).subtracting(nextById.keys)
+      removed.forEach { impl.removeKmlLayer(id: $0) }
+
+      for (id, next) in nextById {
+        impl.addKmlLayer(id: id, kmlString: next.kmlString)
+      }
+    }
+  }
+
   @MainActor var locationConfig: RNLocationConfig? {
     didSet {
       impl.locationConfig = locationConfig
