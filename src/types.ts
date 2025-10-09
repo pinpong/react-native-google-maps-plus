@@ -199,6 +199,11 @@ export type RNHeatmapGradient = {
   colorMapSize: number;
 };
 
+export type RNKMLayer = {
+  id: string;
+  kmlString: string;
+};
+
 export type RNLocationConfig = {
   android?: RNAndroidLocationConfig;
   ios?: RNIOSLocationConfig;

@@ -16,12 +16,14 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
   private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
+  private var pendingKmlLayers: [(id: String, kmlString: String)] = []
 
   private var markersById: [String: GMSMarker] = [:]
   private var polylinesById: [String: GMSPolyline] = [:]
   private var polygonsById: [String: GMSPolygon] = [:]
   private var circlesById: [String: GMSCircle] = [:]
   private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
+  private var kmlLayerById: [String: GMUGeometryRenderer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
@@ -176,6 +178,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
         addHeatmapInternal(id: $0.id, heatmap: $0.heatmap)
       }
       pendingHeatmaps.removeAll()
+    }
+    if !pendingKmlLayers.isEmpty {
+      pendingKmlLayers.forEach {
+        addKmlLayerInternal(id: $0.id, kmlString: $0.kmlString)
+      }
+      pendingKmlLayers.removeAll()
     }
   }
 
@@ -522,6 +530,42 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     heatmapsById.values.forEach { $0.map = nil }
     heatmapsById.removeAll()
     pendingHeatmaps.removeAll()
+  }
+
+  @MainActor
+  func addKmlLayer(id: String, kmlString: String) {
+    if mapView == nil {
+      pendingKmlLayers.append((id, kmlString))
+      return
+    }
+    kmlLayerById.removeValue(forKey: id).map { $0.clear() }
+    addKmlLayerInternal(id: id, kmlString: kmlString)
+  }
+
+  @MainActor
+  private func addKmlLayerInternal(id: String, kmlString: String) {
+    guard let data = kmlString.data(using: .utf8) else { return }
+    let parser = GMUKMLParser(data: data)
+    parser.parse()
+    mapView.map { mapView in
+      let renderer = GMUGeometryRenderer(
+        map: mapView,
+        geometries: parser.placemarks
+      )
+      renderer.render()
+    }
+  }
+
+  @MainActor
+  func removeKmlLayer(id: String) {
+    kmlLayerById.removeValue(forKey: id).map { $0.clear() }
+  }
+
+  @MainActor
+  func clearKmlLayers() {
+    kmlLayerById.values.forEach { $0.clear() }
+    kmlLayerById.removeAll()
+    pendingKmlLayers.removeAll()
   }
 
   func deinitInternal() {

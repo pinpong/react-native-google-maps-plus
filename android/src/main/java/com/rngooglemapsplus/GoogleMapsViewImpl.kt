@@ -27,8 +27,11 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
+import com.google.maps.android.data.kml.KmlLayer
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
   val reactContext: ThemedReactContext,
@@ -55,12 +58,14 @@ class GoogleMapsViewImpl(
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
   private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
+  private val pendingKmlLayers = mutableListOf<Pair<String, String>>()
 
   private val markersById = mutableMapOf<String, Marker>()
   private val polylinesById = mutableMapOf<String, Polyline>()
   private val polygonsById = mutableMapOf<String, Polygon>()
   private val circlesById = mutableMapOf<String, Circle>()
   private val heatmapsById = mutableMapOf<String, TileOverlay>()
+  private val kmlLayersById = mutableMapOf<String, KmlLayer>()
 
   private var cameraMoveReason = -1
   private var lastSubmittedLocation: Location? = null
@@ -342,6 +347,13 @@ class GoogleMapsViewImpl(
         internalAddHeatmap(id, opts)
       }
       pendingHeatmaps.clear()
+    }
+
+    if (pendingKmlLayers.isNotEmpty()) {
+      pendingKmlLayers.forEach { (id, string) ->
+        internalAddKmlLayer(id, string)
+      }
+      pendingKmlLayers.clear()
     }
   }
 
@@ -825,6 +837,50 @@ class GoogleMapsViewImpl(
     pendingHeatmaps.clear()
   }
 
+  fun addKmlLayer(
+    id: String,
+    kmlString: String,
+  ) {
+    if (googleMap == null) {
+      pendingKmlLayers.add(id to kmlString)
+      return
+    }
+    onUi {
+      kmlLayersById.remove(id)?.removeLayerFromMap()
+    }
+    internalAddKmlLayer(id, kmlString)
+  }
+
+  private fun internalAddKmlLayer(
+    id: String,
+    kmlString: String,
+  ) {
+    onUi {
+      try {
+        val inputStream = ByteArrayInputStream(kmlString.toByteArray(StandardCharsets.UTF_8))
+        val layer = KmlLayer(googleMap, inputStream, context)
+        kmlLayersById[id] = layer
+        layer.addLayerToMap()
+      } catch (e: Exception) {
+        // / ignore
+      }
+    }
+  }
+
+  fun removeKmlLayer(id: String) {
+    onUi {
+      kmlLayersById.remove(id)?.removeLayerFromMap()
+    }
+  }
+
+  fun clearKmlLayer() {
+    onUi {
+      kmlLayersById.values.forEach { it.removeLayerFromMap() }
+    }
+    kmlLayersById.clear()
+    pendingKmlLayers.clear()
+  }
+
   fun destroyInternal() {
     onUi {
       markerBuilder.cancelAllJobs()
@@ -833,6 +889,7 @@ class GoogleMapsViewImpl(
       clearPolygons()
       clearCircles()
       clearHeatmaps()
+      clearKmlLayer()
       locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)

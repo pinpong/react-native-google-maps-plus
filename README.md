@@ -103,9 +103,10 @@ Checkout the example app in the [example](./example) folder.
 - **`GMSServices must be configured before use`**
   Ensure your key is in `Info.plist` and/or provided via `GMSServices.provideAPIKey(...)` in `AppDelegate.swift`.
 
-- **Build fails with `Node.h` import error from SVGKit**
-  SVGKit uses a header `Node.h` which can conflict with iOS system headers.
-  You can patch it automatically in your **Podfile** inside the `post_install` hook:
+- **Build fails with `Node.h`, `CSSValue.h`, or `SVGLength.h` import errors from SVGKit**
+  SVGKit includes headers (`Node.h`, `CSSValue.h`, `SVGLength.h`) that can conflict with
+  iOS system headers and React Native Reanimated’s internal types.
+  You can patch them automatically in your **Podfile** inside the `post_install`
 
   ```ruby
   post_install do |installer|
@@ -121,14 +122,35 @@ Checkout the example app in the [example](./example) folder.
       end
     end
 
-    # Patch SVGKit includes to avoid Node.h conflicts
+    # --- SVGKit Patch ---
     require 'fileutils'
     svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
+
+    # node fix
     Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
       FileUtils.chmod("u+w", file)
       text = File.read(file)
       new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
       File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched Node import in: #{file}"
+    end
+
+    # import CSSValue.h
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched CSSValue import in: #{file}"
+    end
+
+    # import SVGLength.h
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched SVGLength import in: #{file}"
     end
   end
   ```

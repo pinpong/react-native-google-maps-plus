@@ -33,13 +33,36 @@ target 'GoogleMapsPlusExample' do
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
       end
     end
-      require 'fileutils'
-      svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
-      Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-        FileUtils.chmod("u+w", file)
-        text = File.read(file)
-        new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
-        File.open(file, 'w') { |f| f.write(new_contents) }
-      end
+
+    # --- SVGKit Patch ---
+    require 'fileutils'
+    svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
+
+    # node fix
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched Node import in: #{file}"
+    end
+
+    # import CSSValue.h
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched CSSValue import in: #{file}"
+    end
+
+    # import SVGLength.h
+    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+      FileUtils.chmod("u+w", file)
+      text = File.read(file)
+      new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
+      File.open(file, 'w') { |f| f.write(new_contents) }
+      # puts "Patched SVGLength import in: #{file}"
+    end
   end
 end
