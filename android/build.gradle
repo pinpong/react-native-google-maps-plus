@@ -25,7 +25,11 @@ apply plugin: "kotlin-android"
 apply from: '../nitrogen/generated/android/RNGoogleMapsPlus+autolinking.gradle'
 apply from: "./fix-prefab.gradle"
 
-apply plugin: "com.facebook.react"
+if (rootProject.name != "rngooglemapsplus.example") {
+    apply plugin: "com.facebook.react"
+} else {
+    println("\u001B[33m⚠️  Skipping React Native Gradle plugin in library (example build detected)\u001B[0m")
+}
 
 def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["RNGoogleMapsPlus_" + name]).toInteger()
