@@ -15,6 +15,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 import { useAppTheme } from '../theme';
+import { useNavigation } from '@react-navigation/native';
+import type { RootNavigationProp } from '../types/navigation';
 
 export type ButtonItem = { title: string; onPress: () => void };
 
@@ -25,6 +27,7 @@ type Props = {
 
 export default function ControlPanel({ mapRef, buttons }: Props) {
   const theme = useAppTheme();
+  const navigation = useNavigation<RootNavigationProp>();
   const progress = useSharedValue(0);
 
   const toggle = () => {
@@ -36,6 +39,10 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   const finalButtons = useMemo(
     () => [
       ...buttons,
+      {
+        title: `Navigate to blank screen`,
+        onPress: () => navigation.navigate('Blank'),
+      },
       {
         title: 'Request location permission',
         onPress: async () => {
@@ -57,7 +64,7 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
           console.log(mapRef.current?.isGooglePlayServicesAvailable()),
       },
     ],
-    [buttons, mapRef]
+    [buttons, mapRef, navigation]
   );
 
   const buttonHeight = 52;

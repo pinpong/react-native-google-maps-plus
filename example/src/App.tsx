@@ -19,8 +19,10 @@ import CustomStyleScreen from './screens/CustomStyleScreen';
 import StressTestScreen from './screens/StressTestScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from 'react-native';
+import BlankScreen from './screens/BlankScreen';
+import type { RootStackParamList } from './types/navigation';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   const scheme = useColorScheme();
@@ -42,7 +44,11 @@ export default function App() {
             component={HomeScreen}
             options={{ title: 'Google Maps Examples' }}
           />
-
+          <Stack.Screen
+            name="Blank"
+            component={BlankScreen}
+            options={{ title: 'Blank Screen' }}
+          />
           <Stack.Screen
             name="BasicMap"
             component={BasicMapScreen}
