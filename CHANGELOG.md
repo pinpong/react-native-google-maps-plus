@@ -17,24 +17,6 @@
 * fix CHANGELOG.md ([2f2bb2c](https://github.com/pinpong/react-native-google-maps-plus/commit/2f2bb2c617260166551abbc07dfa9a8ae27cf31e))
 * merge dev into main ([a510e2a](https://github.com/pinpong/react-native-google-maps-plus/commit/a510e2a1bebabde03e319256b2a1246f10ce1b95))
 
-## [1.2.0-dev.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0...v1.2.0-dev.1) (2025-10-09)
-
-### ✨ Features
-
-* add kml layer support ([4faf558](https://github.com/pinpong/react-native-google-maps-plus/commit/4faf558425831cc18a6e9c9e2d20ef0c4f42e702))
-* add kml layer support ([35098bd](https://github.com/pinpong/react-native-google-maps-plus/commit/35098bd4c75b825f96f58696cbb37a4fcdebbdb8))
-
-### 🐛 Bug Fixes
-
-* **example:** build issues ([cee0708](https://github.com/pinpong/react-native-google-maps-plus/commit/cee0708dfdee185ee4c8bb2836abd2a3c022fc93))
-
-### 🛠️ Other changes
-
-* **ci:** move PR template to root for auto-apply ([03e8a84](https://github.com/pinpong/react-native-google-maps-plus/commit/03e8a8438b0d5edab80fcdf2f2c8abf3372288c2))
-* **example:** beautify example app UI ([4f390ec](https://github.com/pinpong/react-native-google-maps-plus/commit/4f390ecd9ebc2f3e559913882ac56d33a30ac45b))
-* **example:** beautify example app UI ([73c997c](https://github.com/pinpong/react-native-google-maps-plus/commit/73c997c69f23deeb48eb9b2be5df76a36ff0afea))
-* fix CHANGELOG.md ([2f2bb2c](https://github.com/pinpong/react-native-google-maps-plus/commit/2f2bb2c617260166551abbc07dfa9a8ae27cf31e))
-
 ## [1.1.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.2...v1.1.0) (2025-10-08)
 
 ### ✨ Features
@@ -77,18 +59,6 @@
 * update .gitignore ([c15be5e](https://github.com/pinpong/react-native-google-maps-plus/commit/c15be5eb436d05f1f5a25fe7c8249e7c23eea3b2))
 * update to react-native 0.82.0 ([31d5ff5](https://github.com/pinpong/react-native-google-maps-plus/commit/31d5ff5157ec8357b9d699d4dcc09bda09e11afb))
 * update to react-native 0.82.0 ([8c8e8ae](https://github.com/pinpong/react-native-google-maps-plus/commit/8c8e8ae1c4fcf97e04059d873461f083e4c346cf))
-
-## [1.1.0-dev.5](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2025-10-08)
-
-### 🐛 Bug Fixes
-
-* **example:** build issues ([cee0708](https://github.com/pinpong/react-native-google-maps-plus/commit/cee0708dfdee185ee4c8bb2836abd2a3c022fc93))
-
-### 🛠️ Other changes
-
-* **example:** beautify example app UI ([4f390ec](https://github.com/pinpong/react-native-google-maps-plus/commit/4f390ecd9ebc2f3e559913882ac56d33a30ac45b))
-* **example:** beautify example app UI ([73c997c](https://github.com/pinpong/react-native-google-maps-plus/commit/73c997c69f23deeb48eb9b2be5df76a36ff0afea))
-* fix CHANGELOG.md ([2f2bb2c](https://github.com/pinpong/react-native-google-maps-plus/commit/2f2bb2c617260166551abbc07dfa9a8ae27cf31e))
 
 ## [1.1.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.0.2...v1.1.0) (2025-10-08)
 
