@@ -69,10 +69,15 @@ module.exports = {
     ],
     [
       '@semantic-release/git',
-      {
-        assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
-        message:
-          '🔖 release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+      (context) => {
+        if (context.branch.name === 'dev') {
+          return false;
+        }
+        return {
+          assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
+          message:
+            '🔖 release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+        };
       },
     ],
   ],
