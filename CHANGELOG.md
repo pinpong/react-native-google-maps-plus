@@ -1,3 +1,14 @@
+## [1.1.0-dev.6](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.5...v1.1.0-dev.6) (2025-10-09)
+
+### ✨ Features
+
+* add kml layer support ([4faf558](https://github.com/pinpong/react-native-google-maps-plus/commit/4faf558425831cc18a6e9c9e2d20ef0c4f42e702))
+* add kml layer support ([35098bd](https://github.com/pinpong/react-native-google-maps-plus/commit/35098bd4c75b825f96f58696cbb37a4fcdebbdb8))
+
+### 🛠️ Other changes
+
+* **ci:** move PR template to root for auto-apply ([03e8a84](https://github.com/pinpong/react-native-google-maps-plus/commit/03e8a8438b0d5edab80fcdf2f2c8abf3372288c2))
+
 ## [1.1.0-dev.5](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2025-10-08)
 
 ### 🐛 Bug Fixes
