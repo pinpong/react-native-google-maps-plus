@@ -15,6 +15,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.IndoorBuilding
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
@@ -30,6 +31,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import com.rngooglemapsplus.extensions.toRNIndoorBuilding
+import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
@@ -48,6 +51,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnPolygonClickListener,
   GoogleMap.OnCircleClickListener,
   GoogleMap.OnMarkerDragListener,
+  GoogleMap.OnIndoorStateChangeListener,
   LifecycleEventListener {
   private var initialized = false
   private var mapReady = false
@@ -490,6 +494,8 @@ class GoogleMapsViewImpl(
   var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
   var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
   var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+  var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
+  var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -1001,6 +1007,21 @@ class GoogleMapsViewImpl(
     onMarkerDragEnd?.invoke(
       marker.tag?.toString(),
       RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onIndoorBuildingFocused() {
+    val building = googleMap?.focusedBuilding ?: return
+    onIndoorBuildingFocused?.invoke(building.toRNIndoorBuilding())
+  }
+
+  override fun onIndoorLevelActivated(indoorBuilding: IndoorBuilding) {
+    val activeLevel = indoorBuilding.levels.getOrNull(indoorBuilding.activeLevelIndex) ?: return
+    onIndoorLevelActivated?.invoke(
+      activeLevel.toRNIndoorLevel(
+        indoorBuilding.activeLevelIndex,
+        true,
+      ),
     )
   }
 }

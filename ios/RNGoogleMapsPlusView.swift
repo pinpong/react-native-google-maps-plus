@@ -319,6 +319,12 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onMarkerDragEnd: ((String?, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
+  var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)? {
+    didSet { impl.onIndoorBuildingFocused = onIndoorBuildingFocused }
+  }
+  var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)? {
+    didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
+  }
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }

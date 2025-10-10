@@ -20,6 +20,7 @@ import StressTestScreen from './screens/StressTestScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from 'react-native';
 import BlankScreen from './screens/BlankScreen';
+import IndoorLevelMapScreen from './screens/IndoorLevelMapScreen';
 import type { RootStackParamList } from './types/navigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -93,6 +94,11 @@ export default function App() {
             name="CustomStyle"
             component={CustomStyleScreen}
             options={{ title: 'Custom Map Style' }}
+          />
+          <Stack.Screen
+            name="IndoorLevelMap"
+            component={IndoorLevelMapScreen}
+            options={{ title: 'Indoor level map' }}
           />
           <Stack.Screen
             name="StressTest"

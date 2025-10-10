@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, useColorScheme, View } from 'react-native';
-import { GoogleMapsView } from 'react-native-google-maps-plus';
+import {
+  GoogleMapsView,
+  type RNIndoorBuilding,
+  type RNIndoorLevel,
+} from 'react-native-google-maps-plus';
 import type {
   GoogleMapsViewRef,
   RNGoogleMapsPlusViewProps,
@@ -141,6 +145,18 @@ export default function MapWrapper(props: Props) {
           props.onMarkerDragEnd ?? {
             f: (id: string | undefined, latLng: RNLatLng) =>
               console.log('Marker drag end', id, latLng),
+          }
+        )}
+        onIndoorBuildingFocused={callback(
+          props.onIndoorBuildingFocused ?? {
+            f: (building: RNIndoorBuilding) =>
+              console.log('Indoor building focused', building),
+          }
+        )}
+        onIndoorLevelActivated={callback(
+          props.onIndoorLevelActivated ?? {
+            f: (level: RNIndoorLevel) =>
+              console.log('Indoor level activated', level),
           }
         )}
         onCameraChangeStart={callback(
