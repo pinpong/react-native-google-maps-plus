@@ -38,7 +38,7 @@ export default function StressTestScreen() {
           if (coords.length)
             mapRef.current?.setCameraToCoordinates(
               coords,
-              { top: 0, left: 0, bottom: 0, right: 0 },
+              { top: 50, left: 50, bottom: 50, right: 50 },
               true,
               300
             );

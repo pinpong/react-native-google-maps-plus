@@ -11,6 +11,8 @@ export type RootStackParamList = {
   Location: undefined;
   CustomStyle: undefined;
   IndoorLevelMap: undefined;
+  Camera: undefined;
+  Snapshot: undefined;
   StressTest: undefined;
 };
 
