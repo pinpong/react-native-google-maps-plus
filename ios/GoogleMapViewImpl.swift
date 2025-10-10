@@ -297,10 +297,13 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
-  var onMarkerPress: ((String) -> Void)?
-  var onPolylinePress: ((String) -> Void)?
-  var onPolygonPress: ((String) -> Void)?
-  var onCirclePress: ((String) -> Void)?
+  var onMarkerPress: ((String?) -> Void)?
+  var onPolylinePress: ((String?) -> Void)?
+  var onPolygonPress: ((String?) -> Void)?
+  var onCirclePress: ((String?) -> Void)?
+  var onMarkerDragStart: ((String?, RNLatLng) -> Void)?
+  var onMarkerDrag: ((String?, RNLatLng) -> Void)?
+  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -723,27 +726,44 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
     mapView.selectedMarker = marker
-    let id = (marker.userData as? String) ?? "unknown"
-    onMarkerPress?(id)
+    onMarkerPress?(marker.userData as? String, )
     return true
   }
 
   func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
     switch overlay {
     case let circle as GMSCircle:
-      let id = (circle.userData as? String) ?? "unknown"
-      onCirclePress?(id)
+      onCirclePress?(circle.userData as? String, )
 
     case let polygon as GMSPolygon:
-      let id = (polygon.userData as? String) ?? "unknown"
-      onPolygonPress?(id)
+      onPolygonPress?(polygon.userData as? String, )
 
     case let polyline as GMSPolyline:
-      let id = (polyline.userData as? String) ?? "unknown"
-      onPolylinePress?(id)
+      onPolylinePress?(polyline.userData as? String, )
 
     default:
       break
     }
+  }
+
+  func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
+    onMarkerDragStart?(
+      marker.userData as? String,
+      RNLatLng(marker.position.latitude, marker.position.longitude)
+    )
+  }
+
+  func mapView(_ mapView: GMSMapView, didDrag marker: GMSMarker) {
+    onMarkerDrag?(
+      marker.userData as? String,
+      RNLatLng(marker.position.latitude, marker.position.longitude)
+    )
+  }
+
+  func mapView(_ mapView: GMSMapView, didEndDragging marker: GMSMarker) {
+    onMarkerDragEnd?(
+      marker.userData as? String,
+      RNLatLng(marker.position.latitude, marker.position.longitude)
+    )
   }
 }

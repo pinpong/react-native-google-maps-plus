@@ -15,6 +15,7 @@ import {
 } from 'react-native-google-maps-plus';
 import type { ViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { callback } from 'react-native-nitro-modules';
 
 type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
@@ -94,86 +95,82 @@ export default function MapWrapper(props: Props) {
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
         mapPadding={props.mapPadding ?? mapPadding}
         locationConfig={props.locationConfig ?? locationConfig}
-        onMapReady={
-          props.onMapReady
-            ? {
-                f: (ready: boolean) => console.log('Map is ready! ' + ready),
-              }
-            : undefined
-        }
-        onMapPress={
-          props.onMapPress
-            ? {
-                f: (c: RNLatLng) => console.log('Map press:', c),
-              }
-            : undefined
-        }
-        onMarkerPress={
-          props.onMarkerPress
-            ? {
-                f: (id: string) => console.log('Marker press:', id),
-              }
-            : undefined
-        }
-        onPolylinePress={
-          props.onPolylinePress
-            ? {
-                f: (id: string) => console.log('Polyline press:', id),
-              }
-            : undefined
-        }
-        onPolygonPress={
-          props.onPolygonPress
-            ? {
-                f: (id: string) => console.log('Polygon press:', id),
-              }
-            : undefined
-        }
-        onCirclePress={
-          props.onCirclePress
-            ? {
-                f: (id: string) => console.log('Circle press:', id),
-              }
-            : undefined
-        }
-        onCameraChangeStart={
-          props.onCameraChangeStart
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam start', r, cam, g),
-              }
-            : undefined
-        }
-        onCameraChange={
-          props.onCameraChange
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam', r, cam, g),
-              }
-            : undefined
-        }
-        onCameraChangeComplete={
-          props.onCameraChangeComplete
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam complete', r, cam, g),
-              }
-            : undefined
-        }
-        onLocationUpdate={
-          props.onLocationUpdate
-            ? {
-                f: (l: RNLocation) => console.log('Location', l),
-              }
-            : undefined
-        }
-        onLocationError={
-          props.onLocationError
-            ? {
-                f: (e: any) => console.log('Location error', e),
-              }
-            : undefined
-        }
+        onMapReady={callback(
+          props.onMapReady ?? {
+            f: (ready: boolean) => console.log('Map is ready! ' + ready),
+          }
+        )}
+        onMapPress={callback(
+          props.onMapPress ?? {
+            f: (c: RNLatLng) => console.log('Map press:', c),
+          }
+        )}
+        onMarkerPress={callback(
+          props.onMarkerPress ?? {
+            f: (id: string | undefined) => console.log('Marker press:', id),
+          }
+        )}
+        onPolylinePress={callback(
+          props.onPolylinePress ?? {
+            f: (id: string | undefined) => console.log('Polyline press:', id),
+          }
+        )}
+        onPolygonPress={callback(
+          props.onPolygonPress ?? {
+            f: (id: string | undefined) => console.log('Polygon press:', id),
+          }
+        )}
+        onCirclePress={callback(
+          props.onCirclePress ?? {
+            f: (id: string | undefined) => console.log('Circle press:', id),
+          }
+        )}
+        onMarkerDragStart={callback(
+          props.onMarkerDragStart ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag start', id, latLng),
+          }
+        )}
+        onMarkerDrag={callback(
+          props.onMarkerDrag ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag', id, latLng),
+          }
+        )}
+        onMarkerDragEnd={callback(
+          props.onMarkerDragEnd ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag end', id, latLng),
+          }
+        )}
+        onCameraChangeStart={callback(
+          props.onCameraChangeStart ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam start', r, cam, g),
+          }
+        )}
+        onCameraChange={callback(
+          props.onCameraChange ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam', r, cam, g),
+          }
+        )}
+        onCameraChangeComplete={callback(
+          props.onCameraChangeComplete ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam complete', r, cam, g),
+          }
+        )}
+        onLocationUpdate={callback(
+          props.onLocationUpdate ?? {
+            f: (l: RNLocation) => console.log('Location', l),
+          }
+        )}
+        onLocationError={callback(
+          props.onLocationError ?? {
+            f: (e: any) => console.log('Location error', e),
+          }
+        )}
       />
       {children}
     </View>

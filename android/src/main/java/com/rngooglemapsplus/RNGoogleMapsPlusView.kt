@@ -280,24 +280,39 @@ class RNGoogleMapsPlusView(
       view.onMapPress = cb
     }
 
-  override var onMarkerPress: ((String) -> Unit)? = null
+  override var onMarkerPress: ((String?) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
     }
 
-  override var onPolylinePress: ((String) -> Unit)? = null
+  override var onPolylinePress: ((String?) -> Unit)? = null
     set(cb) {
       view.onPolylinePress = cb
     }
 
-  override var onPolygonPress: ((String) -> Unit)? = null
+  override var onPolygonPress: ((String?) -> Unit)? = null
     set(cb) {
       view.onPolygonPress = cb
     }
 
-  override var onCirclePress: ((String) -> Unit)? = null
+  override var onCirclePress: ((String?) -> Unit)? = null
     set(cb) {
       view.onCirclePress = cb
+    }
+
+  override var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMarkerDragStart = cb
+    }
+
+  override var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMarkerDrag = cb
+    }
+
+  override var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMarkerDragEnd = cb
     }
 
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
