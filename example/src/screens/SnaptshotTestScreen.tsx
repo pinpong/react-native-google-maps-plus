@@ -4,10 +4,6 @@ import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
 import { useAppTheme } from '../theme';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
-import {
-  RNSnapshotFormat,
-  RNSnapshotResultType,
-} from 'react-native-google-maps-plus';
 
 export default function SnapshotTestScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -23,9 +19,9 @@ export default function SnapshotTestScreen() {
         onPress: async () => {
           try {
             const result = await mapRef.current?.snapshot({
-              format: RNSnapshotFormat.JPG,
+              format: 'jpg',
               quality: 0.9,
-              resultType: RNSnapshotResultType.BASE64,
+              resultType: 'base64',
             });
             if (result) {
               setSnapshotUri(result);
@@ -41,9 +37,9 @@ export default function SnapshotTestScreen() {
         onPress: async () => {
           try {
             const result = await mapRef.current?.snapshot({
-              format: RNSnapshotFormat.JPG,
+              format: 'jpg',
               quality: 0.9,
-              resultType: RNSnapshotResultType.FILE,
+              resultType: 'file',
             });
             if (result) {
               const uri = result.startsWith('file://')

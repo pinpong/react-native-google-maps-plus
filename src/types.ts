@@ -45,16 +45,9 @@ export type RNSize = {
   height: number;
 };
 
-export enum RNSnapshotFormat {
-  PNG = 0,
-  JPG = 1,
-  JPEG = 2,
-}
+export type RNSnapshotFormat = 'png' | 'jpg' | 'jpeg';
 
-export enum RNSnapshotResultType {
-  BASE64 = 0,
-  FILE = 1,
-}
+export type RNSnapshotResultType = 'base64' | 'file';
 
 export type RNMapPadding = {
   top: number;
