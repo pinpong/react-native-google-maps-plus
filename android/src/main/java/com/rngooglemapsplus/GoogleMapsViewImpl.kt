@@ -954,6 +954,7 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
+    marker.showInfoWindow()
     onMarkerPress?.invoke(marker.tag?.toString() ?: "unknown")
     return true
   }

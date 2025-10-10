@@ -41,8 +41,13 @@ class MapMarkerBuilder(
   ): MarkerOptions =
     MarkerOptions().apply {
       position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
-      anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
       icon(icon)
+      m.title?.let { title(it) }
+      m.snippet?.let { snippet(it) }
+      m.opacity?.let { alpha(it.toFloat()) }
+      m.flat?.let { flat(it) }
+      m.draggable?.let { draggable(it) }
+      anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
 
@@ -56,17 +61,22 @@ class MapMarkerBuilder(
         next.coordinate.latitude,
         next.coordinate.longitude,
       )
-    marker.zIndex = next.zIndex?.toFloat() ?: 0f
 
     if (!prev.markerStyleEquals(next)) {
       buildIconAsync(marker.id, next) { icon ->
         marker.setIcon(icon)
       }
     }
+    marker.title = next.title
+    marker.snippet = next.snippet
+    marker.alpha = next.opacity?.toFloat() ?: 0f
+    marker.isFlat = next.flat ?: false
+    marker.isDraggable = next.draggable ?: false
     marker.setAnchor(
       (next.anchor?.x ?: 0.5).toFloat(),
       (next.anchor?.y ?: 0.5).toFloat(),
     )
+    marker.zIndex = next.zIndex?.toFloat() ?: 0f
   }
 
   fun buildIconAsync(

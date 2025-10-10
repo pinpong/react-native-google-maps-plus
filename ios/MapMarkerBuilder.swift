@@ -21,6 +21,11 @@ final class MapMarkerBuilder {
     marker.userData = m.id
     marker.tracksViewChanges = true
     marker.icon = icon
+    m.title.map { marker.title = $0 }
+    m.snippet.map { marker.snippet = $0 }
+    m.opacity.map { marker.iconView?.alpha = CGFloat($0) }
+    m.flat.map { marker.isFlat = $0 }
+    m.draggable.map { marker.isDraggable = $0 }
     marker.groundAnchor = CGPoint(
       x: m.anchor?.x ?? 0.5,
       y: m.anchor?.y ?? 0.5
@@ -42,13 +47,16 @@ final class MapMarkerBuilder {
       longitude: next.coordinate.longitude
     )
 
+    m.title = next.title
+    m.snippet = next.snippet
+    m.iconView?.alpha = CGFloat(next.opacity ?? 0)
+    m.isFlat = next.flat ?? false
+    m.isDraggable = next.draggable ?? false
     m.zIndex = Int32(next.zIndex ?? 0)
-
     m.groundAnchor = CGPoint(
       x: next.anchor?.x ?? 0.5,
       y: next.anchor?.y ?? 0.5
     )
-
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next.id, next) { img in
         m.tracksViewChanges = true
