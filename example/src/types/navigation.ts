@@ -10,6 +10,7 @@ export type RootStackParamList = {
   KmlLayer: undefined;
   Location: undefined;
   CustomStyle: undefined;
+  IndoorLevelMap: undefined;
   StressTest: undefined;
 };
 

@@ -315,6 +315,16 @@ class RNGoogleMapsPlusView(
       view.onMarkerDragEnd = cb
     }
 
+  override var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
+    set(cb) {
+      view.onIndoorBuildingFocused = cb
+    }
+
+  override var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
+    set(cb) {
+      view.onIndoorLevelActivated = cb
+    }
+
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeStart = cb

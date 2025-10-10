@@ -3,7 +3,8 @@ import GoogleMaps
 import GoogleMapsUtils
 import UIKit
 
-final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
+final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
+GMSIndoorDisplayDelegate {
 
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
@@ -136,7 +137,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     myLocationEnabled.map { mapView?.isMyLocationEnabled = $0 }
     buildingEnabled.map { mapView?.isBuildingsEnabled = $0 }
     trafficEnabled.map { mapView?.isTrafficEnabled = $0 }
-    indoorEnabled.map { mapView?.isIndoorEnabled = $0 }
+    indoorEnabled.map {
+      mapView?.isIndoorEnabled = $0
+      mapView?.indoorDisplay.delegate = $0 == true ? self : nil
+    }
     customMapStyle.map { mapView?.mapStyle = $0 }
     mapType.map { mapView?.mapType = $0 }
     userInterfaceStyle.map { mapView?.overrideUserInterfaceStyle = $0 }
@@ -236,6 +240,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var indoorEnabled: Bool? {
     didSet {
       mapView?.isIndoorEnabled = indoorEnabled ?? false
+      mapView?.indoorDisplay.delegate = indoorEnabled == true ? self : nil
     }
   }
 
@@ -304,6 +309,8 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var onMarkerDragStart: ((String?, RNLatLng) -> Void)?
   var onMarkerDrag: ((String?, RNLatLng) -> Void)?
   var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
+  var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)?
+  var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -766,4 +773,23 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
       RNLatLng(marker.position.latitude, marker.position.longitude)
     )
   }
+
+  func didChangeActiveBuilding(_ building: GMSIndoorBuilding?) {
+    guard let display = mapView?.indoorDisplay, let building else { return }
+    onIndoorBuildingFocused?(building.toRNIndoorBuilding(from: display))
+  }
+
+  func didChangeActiveLevel(_ level: GMSIndoorLevel?) {
+    guard
+      let display = mapView?.indoorDisplay,
+      let building = display.activeBuilding,
+      let level,
+      let index = building.levels.firstIndex(where: {
+        $0.name == level.name && $0.shortName == level.shortName
+      })
+    else { return }
+
+    onIndoorLevelActivated?(level.toRNIndoorLevel(index: index, active: true))
+  }
+
 }

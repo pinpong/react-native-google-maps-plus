@@ -14,6 +14,7 @@ const screens = [
   { name: 'KmlLayer', title: 'KML Layer' },
   { name: 'Location', title: 'Location & Permissions' },
   { name: 'CustomStyle', title: 'Custom Map Style' },
+  { name: 'IndoorLevelMap', title: 'Indoor level map' },
   { name: 'StressTest', title: 'Stress Test' },
 ];
 

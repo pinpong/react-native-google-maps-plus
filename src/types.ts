@@ -210,6 +210,20 @@ export type RNKMLayer = {
   kmlString: string;
 };
 
+export type RNIndoorBuilding = {
+  activeLevelIndex?: number;
+  defaultLevelIndex?: number;
+  levels: RNIndoorLevel[];
+  underground?: boolean;
+};
+
+export type RNIndoorLevel = {
+  index: number;
+  name?: string;
+  shortName?: string;
+  active?: boolean;
+};
+
 export type RNLocationConfig = {
   android?: RNAndroidLocationConfig;
   ios?: RNIOSLocationConfig;

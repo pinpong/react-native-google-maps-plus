@@ -24,6 +24,8 @@ import type {
   RNMapZoomConfig,
   RNHeatmap,
   RNKMLayer,
+  RNIndoorBuilding,
+  RNIndoorLevel,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -57,6 +59,8 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMarkerDragStart?: (id: string | undefined, location: RNLatLng) => void;
   onMarkerDrag?: (id: string | undefined, location: RNLatLng) => void;
   onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
+  onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
+  onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,
