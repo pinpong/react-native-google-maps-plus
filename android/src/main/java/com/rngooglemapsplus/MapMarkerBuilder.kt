@@ -47,7 +47,7 @@ class MapMarkerBuilder(
       m.opacity?.let { alpha(it.toFloat()) }
       m.flat?.let { flat(it) }
       m.draggable?.let { draggable(it) }
-      anchor((m.anchor?.x ?: 0.5).toFloat(), (m.anchor?.y ?: 0.5).toFloat())
+      m.anchor?.let { anchor((m.anchor.x).toFloat(), (m.anchor.y).toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
 
@@ -74,7 +74,7 @@ class MapMarkerBuilder(
     marker.isDraggable = next.draggable ?: false
     marker.setAnchor(
       (next.anchor?.x ?: 0.5).toFloat(),
-      (next.anchor?.y ?: 0.5).toFloat(),
+      (next.anchor?.y ?: 1.0).toFloat(),
     )
     marker.zIndex = next.zIndex?.toFloat() ?: 0f
   }

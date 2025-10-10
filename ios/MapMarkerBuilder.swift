@@ -26,11 +26,12 @@ final class MapMarkerBuilder {
     m.opacity.map { marker.iconView?.alpha = CGFloat($0) }
     m.flat.map { marker.isFlat = $0 }
     m.draggable.map { marker.isDraggable = $0 }
-    marker.groundAnchor = CGPoint(
-      x: m.anchor?.x ?? 0.5,
-      y: m.anchor?.y ?? 0.5
-    )
-
+    m.anchor.map {
+      marker.groundAnchor = CGPoint(
+        x: $0.x,
+        y: $0.y
+      )
+    }
     m.zIndex.map { marker.zIndex = Int32($0) }
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak marker] in
@@ -55,7 +56,7 @@ final class MapMarkerBuilder {
     m.zIndex = Int32(next.zIndex ?? 0)
     m.groundAnchor = CGPoint(
       x: next.anchor?.x ?? 0.5,
-      y: next.anchor?.y ?? 0.5
+      y: next.anchor?.y ?? 1
     )
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next.id, next) { img in

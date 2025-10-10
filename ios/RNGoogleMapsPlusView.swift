@@ -298,17 +298,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onMapPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapPress = onMapPress }
   }
-  var onMarkerPress: ((String) -> Void)? {
+  var onMarkerPress: ((String?) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
-  var onPolylinePress: ((String) -> Void)? {
+  var onPolylinePress: ((String?) -> Void)? {
     didSet { impl.onPolylinePress = onPolylinePress }
   }
-  var onPolygonPress: ((String) -> Void)? {
+  var onPolygonPress: ((String?) -> Void)? {
     didSet { impl.onPolygonPress = onPolygonPress }
   }
-  var onCirclePress: ((String) -> Void)? {
+  var onCirclePress: ((String?) -> Void)? {
     didSet { impl.onCirclePress = onCirclePress }
+  }
+  var onMarkerDragStart: ((String?, RNLatLng) -> Void)? {
+    didSet { impl.onMarkerDragStart = onMarkerDragStart }
+  }
+  var onMarkerDrag: ((String?, RNLatLng) -> Void)? {
+    didSet { impl.onMarkerDrag = onMarkerDrag }
+  }
+  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)? {
+    didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }

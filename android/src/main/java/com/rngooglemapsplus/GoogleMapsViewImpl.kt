@@ -47,6 +47,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnPolylineClickListener,
   GoogleMap.OnPolygonClickListener,
   GoogleMap.OnCircleClickListener,
+  GoogleMap.OnMarkerDragListener,
   LifecycleEventListener {
   private var initialized = false
   private var mapReady = false
@@ -136,6 +137,7 @@ class GoogleMapsViewImpl(
         googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
       }
       initLocationCallbacks()
       applyPending()
@@ -481,10 +483,13 @@ class GoogleMapsViewImpl(
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
-  var onMarkerPress: ((String) -> Unit)? = null
-  var onPolylinePress: ((String) -> Unit)? = null
-  var onPolygonPress: ((String) -> Unit)? = null
-  var onCirclePress: ((String) -> Unit)? = null
+  var onMarkerPress: ((String?) -> Unit)? = null
+  var onPolylinePress: ((String?) -> Unit)? = null
+  var onPolygonPress: ((String?) -> Unit)? = null
+  var onCirclePress: ((String?) -> Unit)? = null
+  var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
+  var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
+  var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -900,6 +905,7 @@ class GoogleMapsViewImpl(
         setOnPolygonClickListener(null)
         setOnCircleClickListener(null)
         setOnMapClickListener(null)
+        setOnMarkerDragListener(null)
       }
       googleMap = null
       mapView?.apply {
@@ -955,25 +961,46 @@ class GoogleMapsViewImpl(
 
   override fun onMarkerClick(marker: Marker): Boolean {
     marker.showInfoWindow()
-    onMarkerPress?.invoke(marker.tag?.toString() ?: "unknown")
+    onMarkerPress?.invoke(marker.tag?.toString())
     return true
   }
 
   override fun onPolylineClick(polyline: Polyline) {
-    onPolylinePress?.invoke(polyline.tag?.toString() ?: "unknown")
+    onPolylinePress?.invoke(polyline.tag?.toString())
   }
 
   override fun onPolygonClick(polygon: Polygon) {
-    onPolygonPress?.invoke(polygon.tag?.toString() ?: "unknown")
+    onPolygonPress?.invoke(polygon.tag?.toString())
   }
 
   override fun onCircleClick(circle: Circle) {
-    onCirclePress?.invoke(circle.tag?.toString() ?: "unknown")
+    onCirclePress?.invoke(circle.tag?.toString())
   }
 
   override fun onMapClick(coordinates: LatLng) {
     onMapPress?.invoke(
       RNLatLng(coordinates.latitude, coordinates.longitude),
+    )
+  }
+
+  override fun onMarkerDragStart(marker: Marker) {
+    onMarkerDragStart?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onMarkerDrag(marker: Marker) {
+    onMarkerDrag?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onMarkerDragEnd(marker: Marker) {
+    onMarkerDragEnd?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
     )
   }
 }

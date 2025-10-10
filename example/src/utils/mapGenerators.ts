@@ -113,8 +113,8 @@ export function makeMarker(id: number): RNMarker {
     zIndex: id,
     coordinate: randomCoordinates(37.7749, -122.4194, 0.2),
     anchor: customIcon ? { x: 0.5, y: 1.0 } : undefined,
-    title: `Marker title ${id}`,
-    snippet: `Marker snippet ${id}`,
+    title: `Marker title id: ${id}`,
+    snippet: `Marker snippet id: ${id}`,
     draggable: customIcon,
     iconSvg: customIcon
       ? {
