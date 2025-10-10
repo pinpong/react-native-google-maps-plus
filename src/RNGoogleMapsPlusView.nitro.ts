@@ -26,6 +26,8 @@ import type {
   RNKMLayer,
   RNIndoorBuilding,
   RNIndoorLevel,
+  RNLatLngBounds,
+  RNSnapshotOptions,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -79,14 +81,25 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 }
 
 export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
-  setCamera(camera: RNCamera, animated?: boolean, durationMS?: number): void;
+  setCamera(camera: RNCamera, animated?: boolean, durationMs?: number): void;
 
   setCameraToCoordinates(
     coordinates: RNLatLng[],
     padding?: RNMapPadding,
     animated?: boolean,
-    durationMS?: number
+    durationMs?: number
   ): void;
+
+  setCameraBounds(bounds?: RNLatLngBounds): void;
+
+  animateToBounds(
+    bounds: RNLatLngBounds,
+    padding?: number,
+    durationMs?: number,
+    lockBounds?: boolean
+  ): void;
+
+  snapshot(options: RNSnapshotOptions): Promise<string | undefined>;
 
   showLocationDialog(): void;
 

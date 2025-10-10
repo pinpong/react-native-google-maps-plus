@@ -6,11 +6,16 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
+import com.rngooglemapsplus.extensions.isFileResult
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.polygonEquals
 import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
+import com.rngooglemapsplus.extensions.toCompressFormat
+import com.rngooglemapsplus.extensions.toFileExtension
+import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
+import com.rngooglemapsplus.extensions.toSize
 
 @DoNotStrip
 class RNGoogleMapsPlusView(
@@ -343,24 +348,53 @@ class RNGoogleMapsPlusView(
   override fun setCamera(
     camera: RNCamera,
     animated: Boolean?,
-    durationMS: Double?,
+    durationMs: Double?,
   ) {
-    view.setCamera(camera.toCameraPosition(), animated == true, durationMS?.toInt() ?: 3000)
+    view.setCamera(camera.toCameraPosition(), animated == true, durationMs?.toInt() ?: 3000)
   }
 
   override fun setCameraToCoordinates(
     coordinates: Array<RNLatLng>,
     padding: RNMapPadding?,
     animated: Boolean?,
-    durationMS: Double?,
+    durationMs: Double?,
   ) {
     view.setCameraToCoordinates(
       coordinates,
       padding = padding ?: RNMapPadding(0.0, 0.0, 0.0, 0.0),
       animated == true,
-      durationMS?.toInt() ?: 3000,
+      durationMs?.toInt() ?: 3000,
     )
   }
+
+  override fun setCameraBounds(bounds: RNLatLngBounds?) {
+    view.setCameraBounds(
+      bounds?.toLatLngBounds(),
+    )
+  }
+
+  override fun animateToBounds(
+    bounds: RNLatLngBounds,
+    padding: Double?,
+    durationMs: Double?,
+    lockBounds: Boolean?,
+  ) {
+    view.animateToBounds(
+      bounds.toLatLngBounds(),
+      padding = padding?.toInt() ?: 0,
+      durationMs?.toInt() ?: 3000,
+      lockBounds = false,
+    )
+  }
+
+  override fun snapshot(options: RNSnapshotOptions): Promise<String?> =
+    view.snapshot(
+      size = options.size.toSize(),
+      format = options.format.toFileExtension(),
+      compressFormat = options.format.toCompressFormat(),
+      quality = options.quality,
+      resultIsFile = options.resultType.isFileResult(),
+    )
 
   override fun showLocationDialog() {
     locationHandler.showLocationDialog()

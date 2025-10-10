@@ -1,8 +1,12 @@
 package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.location.Location
+import android.util.Base64
+import android.util.Size
 import android.widget.FrameLayout
+import androidx.core.graphics.scale
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -29,11 +33,15 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
+import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
@@ -188,6 +196,8 @@ class GoogleMapsViewImpl(
     if (cameraPosition == lastSubmittedCameraPosition) {
       return
     }
+    lastSubmittedCameraPosition = cameraPosition
+
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     val latDelta = bounds.northeast.latitude - bounds.southwest.latitude
@@ -207,7 +217,6 @@ class GoogleMapsViewImpl(
       ),
       isGesture,
     )
-    lastSubmittedCameraPosition = cameraPosition
   }
 
   override fun onCameraIdle() {
@@ -503,7 +512,7 @@ class GoogleMapsViewImpl(
   fun setCamera(
     cameraPosition: CameraPosition,
     animated: Boolean,
-    durationMS: Int,
+    durationMs: Int,
   ) {
     onUi {
       val current = googleMap?.cameraPosition
@@ -514,7 +523,7 @@ class GoogleMapsViewImpl(
       val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
 
       if (animated) {
-        googleMap?.animateCamera(update, durationMS, null)
+        googleMap?.animateCamera(update, durationMs, null)
       } else {
         googleMap?.moveCamera(update)
       }
@@ -525,7 +534,7 @@ class GoogleMapsViewImpl(
     coordinates: Array<RNLatLng>,
     padding: RNMapPadding,
     animated: Boolean,
-    durationMS: Int,
+    durationMs: Int,
   ) {
     if (coordinates.isEmpty()) {
       return
@@ -583,11 +592,83 @@ class GoogleMapsViewImpl(
           0,
         )
       if (animated) {
-        googleMap?.animateCamera(update, durationMS, null)
+        googleMap?.animateCamera(update, durationMs, null)
       } else {
         googleMap?.moveCamera(update)
       }
     }
+  }
+
+  fun setCameraBounds(bounds: LatLngBounds?) {
+    onUi {
+      googleMap?.setLatLngBoundsForCameraTarget(bounds)
+    }
+  }
+
+  fun animateToBounds(
+    bounds: LatLngBounds,
+    padding: Int,
+    durationMs: Int,
+    lockBounds: Boolean,
+  ) {
+    onUi {
+      if (lockBounds) {
+        googleMap?.setLatLngBoundsForCameraTarget(bounds)
+      }
+      val update =
+        CameraUpdateFactory.newLatLngBounds(
+          bounds,
+          padding,
+        )
+      googleMap?.animateCamera(update, durationMs, null)
+    }
+  }
+
+  fun snapshot(
+    size: Size?,
+    format: String,
+    compressFormat: Bitmap.CompressFormat,
+    quality: Double,
+    resultIsFile: Boolean,
+  ): Promise<String?> {
+    val promise = Promise<String?>()
+    onUi {
+      googleMap?.snapshot { bitmap ->
+        try {
+          if (bitmap == null) {
+            promise.resolve(null)
+            return@snapshot
+          }
+
+          val scaledBitmap =
+            size?.let {
+              bitmap.scale(it.width, it.height)
+            } ?: bitmap
+
+          val output = ByteArrayOutputStream()
+          scaledBitmap.compress(compressFormat, (quality * 100).toInt().coerceIn(0, 100), output)
+          val bytes = output.toByteArray()
+
+          if (resultIsFile) {
+            val file = File(context.cacheDir, "map_snapshot_${System.currentTimeMillis()}.$format")
+            FileOutputStream(file).use { it.write(bytes) }
+            promise.resolve(file.absolutePath)
+          } else {
+            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            promise.resolve("data:image/$format;base64,$base64")
+          }
+
+          if (scaledBitmap != bitmap) {
+            scaledBitmap.recycle()
+          }
+          bitmap.recycle()
+        } catch (e: Exception) {
+          promise.resolve(null)
+        }
+      }
+    }
+
+    return promise
   }
 
   fun addMarker(

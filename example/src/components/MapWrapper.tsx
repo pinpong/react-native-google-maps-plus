@@ -4,6 +4,8 @@ import {
   GoogleMapsView,
   type RNIndoorBuilding,
   type RNIndoorLevel,
+  RNLocationErrorCode,
+  RNMapErrorCode,
 } from 'react-native-google-maps-plus';
 import type {
   GoogleMapsViewRef,
@@ -58,10 +60,11 @@ export default function MapWrapper(props: Props) {
     []
   );
 
-  const mapPadding = useMemo(
-    () => ({ top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }),
-    [layout.bottom]
-  );
+  const mapPadding = useMemo(() => {
+    return props.children
+      ? { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }
+      : undefined;
+  }, [layout.bottom, props.children]);
 
   const mapZoomConfig = useMemo(() => ({ min: 0, max: 20 }), []);
 
@@ -93,7 +96,7 @@ export default function MapWrapper(props: Props) {
         uiSettings={props.uiSettings ?? uiSettings}
         style={[styles.map, props.style]}
         userInterfaceStyle={
-          (props.userInterfaceStyle ?? scheme === 'dark') ? 'dark' : 'light'
+          props.userInterfaceStyle ?? (scheme === 'dark' ? 'dark' : 'light')
         }
         mapType={props.mapType ?? 'normal'}
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
@@ -102,6 +105,11 @@ export default function MapWrapper(props: Props) {
         onMapReady={callback(
           props.onMapReady ?? {
             f: (ready: boolean) => console.log('Map is ready! ' + ready),
+          }
+        )}
+        onMapError={callback(
+          props.onMapError ?? {
+            f: (error: RNMapErrorCode) => console.log('Map error:', error),
           }
         )}
         onMapPress={callback(
@@ -184,7 +192,7 @@ export default function MapWrapper(props: Props) {
         )}
         onLocationError={callback(
           props.onLocationError ?? {
-            f: (e: any) => console.log('Location error', e),
+            f: (e: RNLocationErrorCode) => console.log('Location error', e),
           }
         )}
       />

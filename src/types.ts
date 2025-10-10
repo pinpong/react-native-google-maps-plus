@@ -23,9 +23,31 @@ export type RNMapUiSettings = {
   zoomGesturesEnabled?: boolean;
 };
 
-export type RNLatLng = { latitude: number; longitude: number };
+export type RNLatLng = {
+  latitude: number;
+  longitude: number;
+};
 
-export type RNBoundingBox = { northEast: RNLatLng; southWest: RNLatLng };
+export type RNLatLngBounds = {
+  northEast: RNLatLng;
+  southWest: RNLatLng;
+};
+
+export type RNSnapshotOptions = {
+  size?: RNSize;
+  format: RNSnapshotFormat;
+  quality: number;
+  resultType: RNSnapshotResultType;
+};
+
+export type RNSize = {
+  width: number;
+  height: number;
+};
+
+export type RNSnapshotFormat = 'png' | 'jpg' | 'jpeg';
+
+export type RNSnapshotResultType = 'base64' | 'file';
 
 export type RNMapPadding = {
   top: number;

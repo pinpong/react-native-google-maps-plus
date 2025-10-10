@@ -277,115 +277,160 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor var locationConfig: RNLocationConfig? {
+  @MainActor
+  var locationConfig: RNLocationConfig? {
     didSet {
       impl.locationConfig = locationConfig
     }
   }
 
+  @MainActor
   var onMapError: ((RNMapErrorCode) -> Void)? {
     didSet { impl.onMapError = onMapError }
   }
+  @MainActor
   var onMapReady: ((Bool) -> Void)? {
     didSet { impl.onMapReady = onMapReady }
   }
+  @MainActor
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
+  @MainActor
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
   }
+  @MainActor
   var onMapPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapPress = onMapPress }
   }
+  @MainActor
   var onMarkerPress: ((String?) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
+  @MainActor
   var onPolylinePress: ((String?) -> Void)? {
     didSet { impl.onPolylinePress = onPolylinePress }
   }
+  @MainActor
   var onPolygonPress: ((String?) -> Void)? {
     didSet { impl.onPolygonPress = onPolygonPress }
   }
+  @MainActor
   var onCirclePress: ((String?) -> Void)? {
     didSet { impl.onCirclePress = onCirclePress }
   }
+  @MainActor
   var onMarkerDragStart: ((String?, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragStart = onMarkerDragStart }
   }
+  @MainActor
   var onMarkerDrag: ((String?, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDrag = onMarkerDrag }
   }
+  @MainActor
   var onMarkerDragEnd: ((String?, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
+  @MainActor
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)? {
     didSet { impl.onIndoorBuildingFocused = onIndoorBuildingFocused }
   }
+  @MainActor
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)? {
     didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
   }
+  @MainActor
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
+  @MainActor
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChange = onCameraChange }
   }
+  @MainActor
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
-  func setCamera(camera: RNCamera, animated: Bool?, durationMS: Double?) {
+  @MainActor
+  func setCamera(camera: RNCamera, animated: Bool?, durationMs: Double?) {
     let cam = camera.toGMSCameraPosition(current: impl.currentCamera)
-    onMain {
-      self.impl.setCamera(
-        camera: cam,
-        animated: animated ?? true,
-        durationMS: durationMS ?? 3000
-      )
-    }
+    impl.setCamera(
+      camera: cam,
+      animated: animated ?? true,
+      durationMs: durationMs ?? 3000
+    )
   }
 
+  @MainActor
   func setCameraToCoordinates(
     coordinates: [RNLatLng],
     padding: RNMapPadding?,
     animated: Bool?,
-    durationMS: Double?
+    durationMs: Double?
   ) {
-    onMain {
-      self.impl.setCameraToCoordinates(
-        coordinates: coordinates,
-        padding: padding ?? RNMapPadding(0, 0, 0, 0),
-        animated: animated ?? true,
-        durationMS: durationMS ?? 3000
-      )
-    }
+    impl.setCameraToCoordinates(
+      coordinates: coordinates,
+      padding: padding ?? RNMapPadding(0, 0, 0, 0),
+      animated: animated ?? true,
+      durationMs: durationMs ?? 3000
+    )
   }
 
+  @MainActor
+  func setCameraBounds(bounds: RNLatLngBounds?) {
+    impl.setCameraBounds(bounds?.toCoordinateBounds())
+  }
+
+  @MainActor
+  func animateToBounds(
+    bounds: RNLatLngBounds,
+    padding: Double?,
+    durationMs: Double?,
+    lockBounds: Bool?
+  ) {
+    impl.animateToBounds(
+      bounds.toCoordinateBounds(),
+      padding: padding ?? 0,
+      durationMs: durationMs ?? 3000,
+      lockBounds: false
+    )
+  }
+
+  @MainActor
+  func snapshot(
+    options: RNSnapshotOptions,
+  ) -> NitroModules.Promise<String?> {
+    return impl.snapshot(
+      size: options.size?.toCGSize(),
+      format: options.format.toFileExtension(),
+      imageFormat: options.format.toImageFormat(),
+      quality: CGFloat(options.quality),
+      resultIsFile: options.resultType.isFileResult()
+    )
+
+  }
+
+  @MainActor
   func showLocationDialog() {
     locationHandler.showLocationDialog()
   }
 
+  @MainActor
   func openLocationSettings() {
     locationHandler.openLocationSettings()
   }
 
+  @MainActor
   func requestLocationPermission()
   -> NitroModules.Promise<RNLocationPermissionResult> {
     return permissionHandler.requestLocationPermission()
   }
 
+  @MainActor
   func isGooglePlayServicesAvailable() -> Bool {
     /// not supported
     return true
-  }
-}
-
-@inline(__always)
-func onMain(_ block: @escaping () -> Void) {
-  if Thread.isMainThread {
-    block()
-  } else {
-    DispatchQueue.main.async { block() }
   }
 }

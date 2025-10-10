@@ -21,7 +21,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from 'react-native';
 import BlankScreen from './screens/BlankScreen';
 import IndoorLevelMapScreen from './screens/IndoorLevelMapScreen';
+import CameraTestScreen from './screens/CameraTestScreen';
 import type { RootStackParamList } from './types/navigation';
+import SnapshotTestScreen from './screens/SnaptshotTestScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -101,9 +103,19 @@ export default function App() {
             options={{ title: 'Indoor level map' }}
           />
           <Stack.Screen
+            name="Camera"
+            component={CameraTestScreen}
+            options={{ title: 'Camera test' }}
+          />
+          <Stack.Screen
+            name="Snapshot"
+            component={SnapshotTestScreen}
+            options={{ title: 'Snapshot test' }}
+          />
+          <Stack.Screen
             name="StressTest"
             component={StressTestScreen}
-            options={{ title: 'Stress Test' }}
+            options={{ title: 'Stress test' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
