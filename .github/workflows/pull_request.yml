@@ -105,17 +105,7 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
 
-      - name: Cache Pods
-        id: pods-cache
-        uses: actions/cache@v4.2.4
-        with:
-          path: example/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile', 'example/ios/Podfile.lock', 'example/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
       - name: Install cocoapods
-        if: steps.pods-cache.outputs.cache-hit != 'true'
         working-directory: example
         run: yarn ios:pods
 
