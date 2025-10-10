@@ -722,6 +722,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+    mapView.selectedMarker = marker
     let id = (marker.userData as? String) ?? "unknown"
     onMarkerPress?(id)
     return true

@@ -136,6 +136,12 @@ export type RNMarker = {
   zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
+  showInfoWindow?: boolean;
+  title?: string;
+  snippet?: string;
+  opacity?: number;
+  flat?: boolean;
+  draggable?: boolean;
   iconSvg?: RNMarkerSvg;
 };
 
