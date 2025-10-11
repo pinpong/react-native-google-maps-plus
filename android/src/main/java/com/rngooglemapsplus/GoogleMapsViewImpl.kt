@@ -975,6 +975,7 @@ class GoogleMapsViewImpl(
 
   fun destroyInternal() {
     onUi {
+      locationHandler.stop()
       markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
@@ -982,7 +983,6 @@ class GoogleMapsViewImpl(
       clearCircles()
       clearHeatmaps()
       clearKmlLayer()
-      locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
@@ -1003,6 +1003,7 @@ class GoogleMapsViewImpl(
       }
       super.removeAllViews()
       reactContext.removeLifecycleEventListener(this)
+      initialized = false
     }
   }
 
