@@ -3,6 +3,7 @@ package com.rngooglemapsplus
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.ThemedReactContext
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
@@ -40,11 +41,13 @@ class RNGoogleMapsPlusView(
     super.afterUpdate()
     if (!propsInitialized) {
       propsInitialized = true
-      view.initMapView(
-        initialProps?.mapId,
-        initialProps?.liteMode,
-        initialProps?.camera?.toCameraPosition(),
-      )
+      val options =
+        GoogleMapOptions().apply {
+          initialProps?.mapId?.let { mapId(it) }
+          initialProps?.liteMode?.let { liteMode(it) }
+          initialProps?.camera?.let { camera(it.toCameraPosition()) }
+        }
+      view.initMapView(options)
     }
   }
 

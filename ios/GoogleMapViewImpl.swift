@@ -62,17 +62,12 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
-  func initMapView(mapId: String?, liteMode: Bool?, camera: GMSCameraPosition?) {
+  func initMapView(googleMapOptions: GMSMapViewOptions) {
     if initialized { return }
     initialized = true
-    let options = GMSMapViewOptions()
-    options.frame = bounds
+    googleMapOptions.frame = bounds
 
-    mapId.map { options.mapID = GMSMapID(identifier: $0) }
-    liteMode.map { _ in /* not supported */ }
-    camera.map { options.camera = $0 }
-
-    mapView = GMSMapView.init(options: options)
+    mapView = GMSMapView.init(options: googleMapOptions)
     mapView?.delegate = self
     mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     mapView?.paddingAdjustmentBehavior = .never
@@ -93,10 +88,7 @@ GMSIndoorDisplayDelegate {
         != loc.coordinate.longitude {
         self.onLocationUpdate?(
           RNLocation(
-            RNLatLng(
-              latitude: loc.coordinate.latitude,
-              longitude: loc.coordinate.longitude
-            ),
+            loc.coordinate.toRNLatLng(),
             loc.course
           )
         )
@@ -351,6 +343,7 @@ GMSIndoorDisplayDelegate {
     if coordinates.isEmpty {
       return
     }
+    /// TODO:
     var bounds = GMSCoordinateBounds(
       coordinate: CLLocationCoordinate2D(
         latitude: coordinates[0].latitude,
@@ -364,10 +357,8 @@ GMSIndoorDisplayDelegate {
 
     for coord in coordinates.dropFirst() {
       bounds = bounds.includingCoordinate(
-        CLLocationCoordinate2D(
-          latitude: coord.latitude,
-          longitude: coord.longitude
-        )
+        coord.toCLLocationCoordinate2D(),
+
       )
     }
 
@@ -736,15 +727,13 @@ GMSIndoorDisplayDelegate {
 
       let cp = mapView.camera
       let region = RNRegion(
-        center: RNLatLng(center.latitude, center.longitude),
+        center: center.toRNLatLng(),
         latitudeDelta: latDelta,
         longitudeDelta: lngDelta
       )
       let cam = RNCamera(
-        center: RNLatLng(
-          latitude: cp.target.latitude,
-          longitude: cp.target.longitude
-        ),
+        center:
+        cp.target.toRNLatLng(),
         zoom: Double(cp.zoom),
         bearing: cp.bearing,
         tilt: cp.viewingAngle
@@ -781,15 +770,12 @@ GMSIndoorDisplayDelegate {
 
       let cp = mapView.camera
       let region = RNRegion(
-        center: RNLatLng(center.latitude, center.longitude),
+        center: center.toRNLatLng(),
         latitudeDelta: latDelta,
         longitudeDelta: lngDelta
       )
       let cam = RNCamera(
-        center: RNLatLng(
-          latitude: cp.target.latitude,
-          longitude: cp.target.longitude
-        ),
+        center: cp.target.toRNLatLng(),
         zoom: Double(cp.zoom),
         bearing: cp.bearing,
         tilt: cp.viewingAngle
@@ -814,15 +800,13 @@ GMSIndoorDisplayDelegate {
 
       let cp = mapView.camera
       let region = RNRegion(
-        center: RNLatLng(center.latitude, center.longitude),
+        center: center.toRNLatLng(),
         latitudeDelta: latDelta,
         longitudeDelta: lngDelta
       )
       let cam = RNCamera(
-        center: RNLatLng(
-          latitude: cp.target.latitude,
-          longitude: cp.target.longitude
-        ),
+        center:
+        cp.target.toRNLatLng(),
         zoom: Double(cp.zoom),
         bearing: cp.bearing,
         tilt: cp.viewingAngle
@@ -837,10 +821,7 @@ GMSIndoorDisplayDelegate {
   ) {
     onMain {
       self.onMapPress?(
-        RNLatLng(
-          latitude: coordinate.latitude,
-          longitude: coordinate.longitude
-        )
+        coordinate.toRNLatLng(),
       )
     }
   }
@@ -875,7 +856,7 @@ GMSIndoorDisplayDelegate {
     onMain {
       self.onMarkerDragStart?(
         marker.userData as? String,
-        RNLatLng(marker.position.latitude, marker.position.longitude)
+        marker.position.toRNLatLng()
       )
     }
   }
@@ -884,7 +865,7 @@ GMSIndoorDisplayDelegate {
     onMain {
       self.onMarkerDrag?(
         marker.userData as? String,
-        RNLatLng(marker.position.latitude, marker.position.longitude)
+        marker.position.toRNLatLng()
       )
     }
   }
@@ -893,7 +874,7 @@ GMSIndoorDisplayDelegate {
     onMain {
       self.onMarkerDragEnd?(
         marker.userData as? String,
-        RNLatLng(marker.position.latitude, marker.position.longitude)
+        marker.position.toRNLatLng()
       )
     }
   }

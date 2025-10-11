@@ -8,11 +8,11 @@ import com.caverock.androidsvg.SVG
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
+import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,13 +40,15 @@ class MapMarkerBuilder(
     icon: BitmapDescriptor?,
   ): MarkerOptions =
     MarkerOptions().apply {
-      position(LatLng(m.coordinate.latitude, m.coordinate.longitude))
+      position(m.coordinate.toLatLng())
       icon(icon)
       m.title?.let { title(it) }
       m.snippet?.let { snippet(it) }
       m.opacity?.let { alpha(it.toFloat()) }
       m.flat?.let { flat(it) }
       m.draggable?.let { draggable(it) }
+      m.rotation?.let { rotation(it.toFloat()) }
+      m.infoWindowAnchor?.let { infoWindowAnchor(it.x.toFloat(), it.y.toFloat()) }
       m.anchor?.let { anchor((m.anchor.x).toFloat(), (m.anchor.y).toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
@@ -57,10 +59,7 @@ class MapMarkerBuilder(
     next: RNMarker,
   ) {
     marker.position =
-      LatLng(
-        next.coordinate.latitude,
-        next.coordinate.longitude,
-      )
+      next.coordinate.toLatLng()
 
     if (!prev.markerStyleEquals(next)) {
       buildIconAsync(marker.id, next) { icon ->
@@ -72,6 +71,11 @@ class MapMarkerBuilder(
     marker.alpha = next.opacity?.toFloat() ?: 0f
     marker.isFlat = next.flat ?: false
     marker.isDraggable = next.draggable ?: false
+    marker.rotation = next.rotation?.toFloat() ?: 0f
+    marker.setInfoWindowAnchor(
+      (next.infoWindowAnchor?.x ?: 0.5).toFloat(),
+      (next.infoWindowAnchor?.y ?: 0).toFloat(),
+    )
     marker.setAnchor(
       (next.anchor?.x ?: 0.5).toFloat(),
       (next.anchor?.y ?: 1.0).toFloat(),
