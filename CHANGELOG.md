@@ -1,3 +1,30 @@
+## [1.3.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.2.0...v1.3.0) (2025-10-11)
+
+### ✨ Features
+
+* add indoor building focus and level activation listener support ([64073d4](https://github.com/pinpong/react-native-google-maps-plus/commit/64073d432d48a8898282c246385b7a5ee7843080))
+* add marker drag support ([51044c8](https://github.com/pinpong/react-native-google-maps-plus/commit/51044c8c1e53434a4513d1907965d3bc9a5359ee))
+* add more supported marker props ([6b177a4](https://github.com/pinpong/react-native-google-maps-plus/commit/6b177a49c853197afa28302de3f047c46f778afc))
+* add snapshot function ([b6c1281](https://github.com/pinpong/react-native-google-maps-plus/commit/b6c1281a949edd423e09430ab1a80c4822d6bd97))
+* snapshot feature ([6525195](https://github.com/pinpong/react-native-google-maps-plus/commit/652519534a7c2a0d9dc16acce3d803f55575f96d))
+* snapshot feature ([7fe037a](https://github.com/pinpong/react-native-google-maps-plus/commit/7fe037ace3fc9f9413eeb69ab94595072e084c8c))
+
+### 🐛 Bug Fixes
+
+* disable ios view recycling ([46813b8](https://github.com/pinpong/react-native-google-maps-plus/commit/46813b8d7aec265264038f0dd45d4cc242f42d57))
+* map initialization ([0370ddf](https://github.com/pinpong/react-native-google-maps-plus/commit/0370ddfc113f4d414c212f28fcfc744fa38c9130))
+* mapview onDestroy ([f1110e7](https://github.com/pinpong/react-native-google-maps-plus/commit/f1110e728cbf89bd3fac74b0ab83409776925943))
+
+### 🔄 Code Refactors
+
+* map initialization ([150a526](https://github.com/pinpong/react-native-google-maps-plus/commit/150a52640f9ec79a108c9c4aa69bdecd5831dece))
+
+### 🛠️ Other changes
+
+* **example:** update example ([0320a78](https://github.com/pinpong/react-native-google-maps-plus/commit/0320a78967f21ec05835b5d3b7a18ac0c59d649d))
+* merge dev into main ([d9768d6](https://github.com/pinpong/react-native-google-maps-plus/commit/d9768d6b5f2e09a754dc606a1fa690fbdec30a94))
+* update CHANGELOG.md ([f2b897d](https://github.com/pinpong/react-native-google-maps-plus/commit/f2b897dbe2ac1b94262519cebe58f0b4e13a88b1))
+
 ## [1.2.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0...v1.2.0) (2025-10-09)
 
 ### ✨ Features
