@@ -340,26 +340,16 @@ GMSIndoorDisplayDelegate {
     animated: Bool,
     durationMs: Double
   ) {
-    if coordinates.isEmpty {
+    guard let firstCoordinates = coordinates.first else {
       return
     }
-    /// TODO:
     var bounds = GMSCoordinateBounds(
-      coordinate: CLLocationCoordinate2D(
-        latitude: coordinates[0].latitude,
-        longitude: coordinates[0].longitude
-      ),
-      coordinate: CLLocationCoordinate2D(
-        latitude: coordinates[0].latitude,
-        longitude: coordinates[0].longitude
-      )
+      coordinate: firstCoordinates.toCLLocationCoordinate2D(),
+      coordinate: firstCoordinates.toCLLocationCoordinate2D()
     )
 
     for coord in coordinates.dropFirst() {
-      bounds = bounds.includingCoordinate(
-        coord.toCLLocationCoordinate2D(),
-
-      )
+      bounds = bounds.includingCoordinate(coord.toCLLocationCoordinate2D())
     }
 
     let insets = UIEdgeInsets(
@@ -732,8 +722,7 @@ GMSIndoorDisplayDelegate {
         longitudeDelta: lngDelta
       )
       let cam = RNCamera(
-        center:
-        cp.target.toRNLatLng(),
+        center: cp.target.toRNLatLng(),
         zoom: Double(cp.zoom),
         bearing: cp.bearing,
         tilt: cp.viewingAngle
@@ -805,8 +794,7 @@ GMSIndoorDisplayDelegate {
         longitudeDelta: lngDelta
       )
       let cam = RNCamera(
-        center:
-        cp.target.toRNLatLng(),
+        center: cp.target.toRNLatLng(),
         zoom: Double(cp.zoom),
         bearing: cp.bearing,
         tilt: cp.viewingAngle
