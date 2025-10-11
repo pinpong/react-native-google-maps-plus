@@ -131,7 +131,6 @@ class LocationHandler(
 
   private fun restartLocationUpdates() {
     stop()
-    // 4) Google Play Services checken – früh zurückmelden
     val playServicesStatus =
       GoogleApiAvailability
         .getInstance()

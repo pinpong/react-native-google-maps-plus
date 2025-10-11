@@ -15,6 +15,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 import { useAppTheme } from '../theme';
+import { useNavigation } from '@react-navigation/native';
+import type { RootNavigationProp } from '../types/navigation';
 
 export type ButtonItem = { title: string; onPress: () => void };
 
@@ -25,7 +27,9 @@ type Props = {
 
 export default function ControlPanel({ mapRef, buttons }: Props) {
   const theme = useAppTheme();
+  const navigation = useNavigation<RootNavigationProp>();
   const progress = useSharedValue(0);
+  const styles = getThemedStyles(theme);
 
   const toggle = () => {
     progress.value = withTiming(progress.value === 1 ? 0 : 1, {
@@ -36,6 +40,10 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   const finalButtons = useMemo(
     () => [
       ...buttons,
+      {
+        title: `Navigate to blank screen`,
+        onPress: () => navigation.navigate('Blank'),
+      },
       {
         title: 'Request location permission',
         onPress: async () => {
@@ -57,7 +65,7 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
           console.log(mapRef.current?.isGooglePlayServicesAvailable()),
       },
     ],
-    [buttons, mapRef]
+    [buttons, mapRef, navigation]
   );
 
   const buttonHeight = 52;
@@ -83,22 +91,16 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.bgPrimary }]}
+      style={styles.scrollView}
       contentContainerStyle={styles.scrollContent}
     >
       <TouchableOpacity
-        style={[styles.header, { backgroundColor: theme.bgHeader }]}
+        style={styles.header}
         onPress={toggle}
         activeOpacity={0.8}
       >
-        <Text style={[styles.headerText, { color: theme.textPrimary }]}>
-          Controls
-        </Text>
-        <Animated.Text
-          style={[styles.arrow, arrowStyle, { color: theme.textPrimary }]}
-        >
-          ▼
-        </Animated.Text>
+        <Text style={styles.headerText}>Controls</Text>
+        <Animated.Text style={[styles.arrow, arrowStyle]}>▼</Animated.Text>
       </TouchableOpacity>
 
       <Animated.View style={[styles.animatedContainer, containerStyle]}>
@@ -106,16 +108,11 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
           {finalButtons.map((btn, i) => (
             <TouchableOpacity
               key={i}
-              style={[
-                styles.button,
-                { backgroundColor: theme.bgAccent, shadowColor: theme.shadow },
-              ]}
+              style={styles.button}
               onPress={btn.onPress}
               activeOpacity={0.85}
             >
-              <Text style={[styles.buttonText, { color: theme.textOnAccent }]}>
-                {btn.title}
-              </Text>
+              <Text style={styles.buttonText}>{btn.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -124,53 +121,61 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  scrollView: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 12,
-    paddingTop: 12,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  header: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  headerText: {
-    fontWeight: '600',
-    fontSize: 16,
-    marginRight: 6,
-  },
-  arrow: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  animatedContainer: {
-    overflow: 'hidden',
-  },
-  buttonList: {
-    gap: 8,
-  },
-  button: {
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  buttonText: {
-    fontWeight: '600',
-    fontSize: 15,
-  },
-});
+const getThemedStyles = (theme: any) =>
+  StyleSheet.create({
+    scrollView: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 12,
+      paddingTop: 12,
+      backgroundColor: theme.bgPrimary,
+    },
+    scrollContent: {
+      paddingBottom: 40,
+    },
+    header: {
+      borderRadius: 10,
+      paddingVertical: 12,
+      alignItems: 'center',
+      marginBottom: 10,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      backgroundColor: theme.bgHeader,
+    },
+    headerText: {
+      fontWeight: '600',
+      fontSize: 16,
+      marginRight: 6,
+      color: theme.textPrimary,
+    },
+    arrow: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.textPrimary,
+    },
+    animatedContainer: {
+      overflow: 'hidden',
+    },
+    buttonList: {
+      gap: 8,
+    },
+    button: {
+      backgroundColor: theme.bgAccent,
+      paddingVertical: 12,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: theme.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 1,
+    },
+    buttonText: {
+      fontWeight: '600',
+      fontSize: 15,
+      color: theme.textOnAccent,
+    },
+  });

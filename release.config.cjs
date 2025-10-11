@@ -7,6 +7,20 @@ const rules = [
   { type: 'chore', release: false, title: '🛠️ Other changes' },
 ];
 
+const isDev =
+  process.env.BRANCH_NAME === 'dev' || process.env.GITHUB_REF_NAME === 'dev';
+
+const gitPlugin = isDev
+  ? false
+  : [
+      '@semantic-release/git',
+      {
+        assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
+        message:
+          '🔖 release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+      },
+    ];
+
 const sortMap = Object.fromEntries(
   rules.map((rule, index) => [rule.title, index])
 );
@@ -67,13 +81,6 @@ module.exports = {
         ],
       },
     ],
-    [
-      '@semantic-release/git',
-      {
-        assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
-        message:
-          '🔖 release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
-      },
-    ],
+    ...(gitPlugin ? [gitPlugin] : []),
   ],
 };

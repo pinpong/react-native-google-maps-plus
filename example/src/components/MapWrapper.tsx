@@ -1,6 +1,12 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, useColorScheme, View } from 'react-native';
-import { GoogleMapsView } from 'react-native-google-maps-plus';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import {
+  GoogleMapsView,
+  type RNIndoorBuilding,
+  type RNIndoorLevel,
+  RNLocationErrorCode,
+  RNMapErrorCode,
+} from 'react-native-google-maps-plus';
 import type {
   GoogleMapsViewRef,
   RNGoogleMapsPlusViewProps,
@@ -15,6 +21,8 @@ import {
 } from 'react-native-google-maps-plus';
 import type { ViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { callback } from 'react-native-nitro-modules';
+import { useTheme } from '@react-navigation/native';
 
 type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
@@ -24,8 +32,11 @@ type Props = ViewProps &
 
 export default function MapWrapper(props: Props) {
   const { children, ...rest } = props;
-  const scheme = useColorScheme();
+  const theme = useTheme();
+  const styles = getThemedStyles(theme);
   const layout = useSafeAreaInsets();
+
+  const [mapReady, setMapReady] = React.useState(false);
   const initialProps = useMemo(
     () => ({
       camera: {
@@ -53,10 +64,11 @@ export default function MapWrapper(props: Props) {
     []
   );
 
-  const mapPadding = useMemo(
-    () => ({ top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }),
-    [layout.bottom]
-  );
+  const mapPadding = useMemo(() => {
+    return props.children
+      ? { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }
+      : undefined;
+  }, [layout.bottom, props.children]);
 
   const mapZoomConfig = useMemo(() => ({ min: 0, max: 20 }), []);
 
@@ -88,105 +100,137 @@ export default function MapWrapper(props: Props) {
         uiSettings={props.uiSettings ?? uiSettings}
         style={[styles.map, props.style]}
         userInterfaceStyle={
-          (props.userInterfaceStyle ?? scheme === 'dark') ? 'dark' : 'light'
+          props.userInterfaceStyle ?? (theme.dark ? 'dark' : 'light')
         }
         mapType={props.mapType ?? 'normal'}
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
         mapPadding={props.mapPadding ?? mapPadding}
         locationConfig={props.locationConfig ?? locationConfig}
-        onMapReady={
-          props.onMapReady
-            ? {
-                f: (ready: boolean) => console.log('Map is ready! ' + ready),
-              }
-            : undefined
-        }
-        onMapPress={
-          props.onMapPress
-            ? {
-                f: (c: RNLatLng) => console.log('Map press:', c),
-              }
-            : undefined
-        }
-        onMarkerPress={
-          props.onMarkerPress
-            ? {
-                f: (id: string) => console.log('Marker press:', id),
-              }
-            : undefined
-        }
-        onPolylinePress={
-          props.onPolylinePress
-            ? {
-                f: (id: string) => console.log('Polyline press:', id),
-              }
-            : undefined
-        }
-        onPolygonPress={
-          props.onPolygonPress
-            ? {
-                f: (id: string) => console.log('Polygon press:', id),
-              }
-            : undefined
-        }
-        onCirclePress={
-          props.onCirclePress
-            ? {
-                f: (id: string) => console.log('Circle press:', id),
-              }
-            : undefined
-        }
-        onCameraChangeStart={
-          props.onCameraChangeStart
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam start', r, cam, g),
-              }
-            : undefined
-        }
-        onCameraChange={
-          props.onCameraChange
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam', r, cam, g),
-              }
-            : undefined
-        }
-        onCameraChangeComplete={
-          props.onCameraChangeComplete
-            ? {
-                f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-                  console.log('Cam complete', r, cam, g),
-              }
-            : undefined
-        }
-        onLocationUpdate={
-          props.onLocationUpdate
-            ? {
-                f: (l: RNLocation) => console.log('Location', l),
-              }
-            : undefined
-        }
-        onLocationError={
-          props.onLocationError
-            ? {
-                f: (e: any) => console.log('Location error', e),
-              }
-            : undefined
-        }
+        onMapReady={callback(
+          props.onMapReady ?? {
+            f: (ready: boolean) => {
+              console.log('Map is ready! ' + ready);
+              setMapReady(true);
+            },
+          }
+        )}
+        onMapError={callback(
+          props.onMapError ?? {
+            f: (error: RNMapErrorCode) => console.log('Map error:', error),
+          }
+        )}
+        onMapPress={callback(
+          props.onMapPress ?? {
+            f: (c: RNLatLng) => console.log('Map press:', c),
+          }
+        )}
+        onMarkerPress={callback(
+          props.onMarkerPress ?? {
+            f: (id: string | undefined) => console.log('Marker press:', id),
+          }
+        )}
+        onPolylinePress={callback(
+          props.onPolylinePress ?? {
+            f: (id: string | undefined) => console.log('Polyline press:', id),
+          }
+        )}
+        onPolygonPress={callback(
+          props.onPolygonPress ?? {
+            f: (id: string | undefined) => console.log('Polygon press:', id),
+          }
+        )}
+        onCirclePress={callback(
+          props.onCirclePress ?? {
+            f: (id: string | undefined) => console.log('Circle press:', id),
+          }
+        )}
+        onMarkerDragStart={callback(
+          props.onMarkerDragStart ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag start', id, latLng),
+          }
+        )}
+        onMarkerDrag={callback(
+          props.onMarkerDrag ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag', id, latLng),
+          }
+        )}
+        onMarkerDragEnd={callback(
+          props.onMarkerDragEnd ?? {
+            f: (id: string | undefined, latLng: RNLatLng) =>
+              console.log('Marker drag end', id, latLng),
+          }
+        )}
+        onIndoorBuildingFocused={callback(
+          props.onIndoorBuildingFocused ?? {
+            f: (building: RNIndoorBuilding) =>
+              console.log('Indoor building focused', building),
+          }
+        )}
+        onIndoorLevelActivated={callback(
+          props.onIndoorLevelActivated ?? {
+            f: (level: RNIndoorLevel) =>
+              console.log('Indoor level activated', level),
+          }
+        )}
+        onCameraChangeStart={callback(
+          props.onCameraChangeStart ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam start', r, cam, g),
+          }
+        )}
+        onCameraChange={callback(
+          props.onCameraChange ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam', r, cam, g),
+          }
+        )}
+        onCameraChangeComplete={callback(
+          props.onCameraChangeComplete ?? {
+            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
+              console.log('Cam complete', r, cam, g),
+          }
+        )}
+        onLocationUpdate={callback(
+          props.onLocationUpdate ?? {
+            f: (l: RNLocation) => console.log('Location', l),
+          }
+        )}
+        onLocationError={callback(
+          props.onLocationError ?? {
+            f: (e: RNLocationErrorCode) => console.log('Location error', e),
+          }
+        )}
       />
       {children}
+      {!mapReady && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-});
+const getThemedStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    map: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    loadingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10,
+      backgroundColor: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)',
+    },
+  });

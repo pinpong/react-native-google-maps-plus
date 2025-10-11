@@ -19,8 +19,13 @@ import CustomStyleScreen from './screens/CustomStyleScreen';
 import StressTestScreen from './screens/StressTestScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from 'react-native';
+import BlankScreen from './screens/BlankScreen';
+import IndoorLevelMapScreen from './screens/IndoorLevelMapScreen';
+import CameraTestScreen from './screens/CameraTestScreen';
+import type { RootStackParamList } from './types/navigation';
+import SnapshotTestScreen from './screens/SnaptshotTestScreen';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   const scheme = useColorScheme();
@@ -42,7 +47,11 @@ export default function App() {
             component={HomeScreen}
             options={{ title: 'Google Maps Examples' }}
           />
-
+          <Stack.Screen
+            name="Blank"
+            component={BlankScreen}
+            options={{ title: 'Blank Screen' }}
+          />
           <Stack.Screen
             name="BasicMap"
             component={BasicMapScreen}
@@ -89,9 +98,24 @@ export default function App() {
             options={{ title: 'Custom Map Style' }}
           />
           <Stack.Screen
+            name="IndoorLevelMap"
+            component={IndoorLevelMapScreen}
+            options={{ title: 'Indoor level map' }}
+          />
+          <Stack.Screen
+            name="Camera"
+            component={CameraTestScreen}
+            options={{ title: 'Camera test' }}
+          />
+          <Stack.Screen
+            name="Snapshot"
+            component={SnapshotTestScreen}
+            options={{ title: 'Snapshot test' }}
+          />
+          <Stack.Screen
             name="StressTest"
             component={StressTestScreen}
-            options={{ title: 'Stress Test' }}
+            options={{ title: 'Stress test' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

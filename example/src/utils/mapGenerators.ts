@@ -106,17 +106,22 @@ export const makeHeatmap = (id: number): RNHeatmap => ({
   opacity: 1,
 });
 
-export const makeMarker = (id: number): RNMarker => ({
-  id: id.toString(),
-  zIndex: id,
-  coordinate: randomCoordinates(37.7749, -122.4194, 0.2),
-  anchor: { x: 0.5, y: 1.0 },
-  iconSvg:
-    id % 2 === 0
+export function makeMarker(id: number): RNMarker {
+  const customIcon = id % 2 === 0;
+  return {
+    id: id.toString(),
+    zIndex: id,
+    coordinate: randomCoordinates(37.7749, -122.4194, 0.2),
+    anchor: customIcon ? { x: 0.5, y: 1.0 } : undefined,
+    title: `Marker title id: ${id}`,
+    snippet: `Marker snippet id: ${id}`,
+    draggable: customIcon,
+    iconSvg: customIcon
       ? {
           width: (64 / 100) * 50,
           height: (88 / 100) * 50,
           svgString: makeSvgIcon(64, 88),
         }
       : undefined,
-});
+  };
+}

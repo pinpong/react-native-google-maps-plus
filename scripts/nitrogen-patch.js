@@ -1,22 +1,42 @@
 /**
- * Recursively patches all generated Android files:
+ * Recursively patches all generated Nitro files (Android & iOS):
+ *
+ * ANDROID
  *  - Replaces 'com.margelo.nitro.rngooglemapsplus' -> 'com.rngooglemapsplus'
  *  - Replaces 'com/margelo/nitro/rngooglemapsplus' -> 'com/rngooglemapsplus'
  *  - Removes 'margelo/nitro/' in RNGoogleMapsPlusOnLoad.cpp
- *  - Inserts `prepareToRecycleView()` under `onDropViewInstance()` if missing
+ *  - Inserts `prepareToRecycleView()`
+ *  nitrogen/generated/android/kotlin/com/margelo/nitro/rngooglemapsplus/views/HybridRNGoogleMapsPlusViewManager.kt
+ *
+ * iOS
+ *  - Inserts `+ (BOOL)shouldBeRecycled`
+ *  nitrogen/generated/ios/c++/views/HybridRNGoogleMapsPlusViewComponent.mm
  */
 import { fileURLToPath } from 'url';
 import { basename } from 'path';
 import path from 'node:path';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 
-const ROOT_DIR = path.join(process.cwd(), 'nitrogen', 'generated', 'android');
-console.log(ROOT_DIR);
-const ANDROID_ONLOAD_FILE = path.join(ROOT_DIR, 'RNGoogleMapsPlusOnLoad.cpp');
+const ROOT_ANDROID = path.join(
+  process.cwd(),
+  'nitrogen',
+  'generated',
+  'android'
+);
+const ROOT_IOS = path.join(process.cwd(), 'nitrogen', 'generated', 'ios');
+const ANDROID_ONLOAD_FILE = path.join(
+  ROOT_ANDROID,
+  'RNGoogleMapsPlusOnLoad.cpp'
+);
 
 const HYBRID_VIEW_MANAGER = path.join(
-  ROOT_DIR,
+  ROOT_ANDROID,
   'kotlin/com/margelo/nitro/rngooglemapsplus/views/HybridRNGoogleMapsPlusViewManager.kt'
+);
+
+const HYBRID_VIEW_COMPONENT_IOS = path.join(
+  ROOT_IOS,
+  'c++/views/HybridRNGoogleMapsPlusViewComponent.mm'
 );
 
 const REPLACEMENTS = [
@@ -33,14 +53,21 @@ const REPLACEMENTS = [
 const __filename = fileURLToPath(import.meta.url);
 const filename = basename(__filename);
 
-const RECYCLE_METHOD = `
+const RECYCLE_METHOD_ANDROID = `
   /// added by ${filename}
   override fun prepareToRecycleView(reactContext: ThemedReactContext, view: View): View? {
     return null
   }
 `;
 
-// Patch-Routine
+const RECYCLE_METHOD_IOS = `
+/// added by ${filename}
++ (BOOL)shouldBeRecycled
+{
+  return NO;
+}
+`;
+
 async function processFile(filePath) {
   let content = await readFile(filePath, 'utf8');
   let updated = content;
@@ -53,16 +80,30 @@ async function processFile(filePath) {
     updated = updated.replace(/margelo\/nitro\//g, '');
   }
 
-  console.log(filePath);
   if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_MANAGER)) {
     if (!/override fun prepareToRecycleView/.test(updated)) {
       const pattern =
         /(override fun onDropViewInstance\(view: View\)\s*\{[^}]+\}\s*)/m;
 
       if (pattern.test(updated)) {
-        updated = updated.replace(pattern, `$1${RECYCLE_METHOD}\n`);
+        updated = updated.replace(pattern, `$1${RECYCLE_METHOD_ANDROID}\n`);
       } else {
-        updated = updated.replace(/}\s*$/m, `${RECYCLE_METHOD}\n}\n`);
+        throw new Error(
+          `Pattern for "onDropViewInstance" not found in ${filePath}`
+        );
+      }
+    }
+  }
+
+  if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_COMPONENT_IOS)) {
+    if (!/\+\s*\(BOOL\)\s*shouldBeRecycled/.test(updated)) {
+      const pattern =
+        /(- \(instancetype\)\s*init\s*\{(?:[^{}]|\{[^{}]*\})*\})/m;
+
+      if (pattern.test(updated)) {
+        updated = updated.replace(pattern, `$1\n${RECYCLE_METHOD_IOS}`);
+      } else {
+        throw new Error(`Pattern for "init" not found in ${filePath}`);
       }
     }
   }
@@ -87,8 +128,9 @@ async function start(dir) {
 
 (async () => {
   try {
-    await start(ROOT_DIR);
-    console.log('All occurrences patched successfully.');
+    await start(ROOT_ANDROID);
+    await start(ROOT_IOS);
+    console.log('All Nitrogen files patched successfully.');
   } catch (err) {
     console.error('Error while processing files:', err);
     process.exit(1);

@@ -24,6 +24,10 @@ import type {
   RNMapZoomConfig,
   RNHeatmap,
   RNKMLayer,
+  RNIndoorBuilding,
+  RNIndoorLevel,
+  RNLatLngBounds,
+  RNSnapshotOptions,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -50,10 +54,15 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
-  onMarkerPress?: (id: string) => void;
-  onPolylinePress?: (id: string) => void;
-  onPolygonPress?: (id: string) => void;
-  onCirclePress?: (id: string) => void;
+  onMarkerPress?: (id?: string | undefined) => void;
+  onPolylinePress?: (id?: string | undefined) => void;
+  onPolygonPress?: (id?: string | undefined) => void;
+  onCirclePress?: (id?: string | undefined) => void;
+  onMarkerDragStart?: (id: string | undefined, location: RNLatLng) => void;
+  onMarkerDrag?: (id: string | undefined, location: RNLatLng) => void;
+  onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
+  onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
+  onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,
@@ -72,14 +81,25 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 }
 
 export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
-  setCamera(camera: RNCamera, animated?: boolean, durationMS?: number): void;
+  setCamera(camera: RNCamera, animated?: boolean, durationMs?: number): void;
 
   setCameraToCoordinates(
     coordinates: RNLatLng[],
     padding?: RNMapPadding,
     animated?: boolean,
-    durationMS?: number
+    durationMs?: number
   ): void;
+
+  setCameraBounds(bounds?: RNLatLngBounds): void;
+
+  animateToBounds(
+    bounds: RNLatLngBounds,
+    padding?: number,
+    durationMs?: number,
+    lockBounds?: boolean
+  ): void;
+
+  snapshot(options: RNSnapshotOptions): Promise<string | undefined>;
 
   showLocationDialog(): void;
 

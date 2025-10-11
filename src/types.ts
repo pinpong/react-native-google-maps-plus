@@ -23,9 +23,31 @@ export type RNMapUiSettings = {
   zoomGesturesEnabled?: boolean;
 };
 
-export type RNLatLng = { latitude: number; longitude: number };
+export type RNLatLng = {
+  latitude: number;
+  longitude: number;
+};
 
-export type RNBoundingBox = { northEast: RNLatLng; southWest: RNLatLng };
+export type RNLatLngBounds = {
+  northEast: RNLatLng;
+  southWest: RNLatLng;
+};
+
+export type RNSnapshotOptions = {
+  size?: RNSize;
+  format: RNSnapshotFormat;
+  quality: number;
+  resultType: RNSnapshotResultType;
+};
+
+export type RNSize = {
+  width: number;
+  height: number;
+};
+
+export type RNSnapshotFormat = 'png' | 'jpg' | 'jpeg';
+
+export type RNSnapshotResultType = 'base64' | 'file';
 
 export type RNMapPadding = {
   top: number;
@@ -136,6 +158,12 @@ export type RNMarker = {
   zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
+  showInfoWindow?: boolean;
+  title?: string;
+  snippet?: string;
+  opacity?: number;
+  flat?: boolean;
+  draggable?: boolean;
   iconSvg?: RNMarkerSvg;
 };
 
@@ -202,6 +230,20 @@ export type RNHeatmapGradient = {
 export type RNKMLayer = {
   id: string;
   kmlString: string;
+};
+
+export type RNIndoorBuilding = {
+  activeLevelIndex?: number;
+  defaultLevelIndex?: number;
+  levels: RNIndoorLevel[];
+  underground?: boolean;
+};
+
+export type RNIndoorLevel = {
+  index: number;
+  name?: string;
+  shortName?: string;
+  active?: boolean;
 };
 
 export type RNLocationConfig = {

@@ -1,8 +1,12 @@
 package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.location.Location
+import android.util.Base64
+import android.util.Size
 import android.widget.FrameLayout
+import androidx.core.graphics.scale
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -15,6 +19,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.IndoorBuilding
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
@@ -28,9 +33,15 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
+import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import com.rngooglemapsplus.extensions.toRNIndoorBuilding
+import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
@@ -47,6 +58,8 @@ class GoogleMapsViewImpl(
   GoogleMap.OnPolylineClickListener,
   GoogleMap.OnPolygonClickListener,
   GoogleMap.OnCircleClickListener,
+  GoogleMap.OnMarkerDragListener,
+  GoogleMap.OnIndoorStateChangeListener,
   LifecycleEventListener {
   private var initialized = false
   private var mapReady = false
@@ -136,12 +149,13 @@ class GoogleMapsViewImpl(
         googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
       }
       initLocationCallbacks()
       applyPending()
+      mapReady = true
+      onMapReady?.invoke(true)
     }
-    mapReady = true
-    onMapReady?.invoke(true)
   }
 
   override fun onCameraMoveStarted(reason: Int) {
@@ -182,6 +196,8 @@ class GoogleMapsViewImpl(
     if (cameraPosition == lastSubmittedCameraPosition) {
       return
     }
+    lastSubmittedCameraPosition = cameraPosition
+
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     val latDelta = bounds.northeast.latitude - bounds.southwest.latitude
@@ -201,7 +217,6 @@ class GoogleMapsViewImpl(
       ),
       isGesture,
     )
-    lastSubmittedCameraPosition = cameraPosition
   }
 
   override fun onCameraIdle() {
@@ -357,6 +372,8 @@ class GoogleMapsViewImpl(
     }
   }
 
+  var initialProps: RNInitialProps? = null
+
   var uiSettings: RNMapUiSettings? = null
     set(value) {
       field = value
@@ -481,10 +498,15 @@ class GoogleMapsViewImpl(
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
-  var onMarkerPress: ((String) -> Unit)? = null
-  var onPolylinePress: ((String) -> Unit)? = null
-  var onPolygonPress: ((String) -> Unit)? = null
-  var onCirclePress: ((String) -> Unit)? = null
+  var onMarkerPress: ((String?) -> Unit)? = null
+  var onPolylinePress: ((String?) -> Unit)? = null
+  var onPolygonPress: ((String?) -> Unit)? = null
+  var onCirclePress: ((String?) -> Unit)? = null
+  var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
+  var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
+  var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+  var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
+  var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -492,7 +514,7 @@ class GoogleMapsViewImpl(
   fun setCamera(
     cameraPosition: CameraPosition,
     animated: Boolean,
-    durationMS: Int,
+    durationMs: Int,
   ) {
     onUi {
       val current = googleMap?.cameraPosition
@@ -503,7 +525,7 @@ class GoogleMapsViewImpl(
       val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
 
       if (animated) {
-        googleMap?.animateCamera(update, durationMS, null)
+        googleMap?.animateCamera(update, durationMs, null)
       } else {
         googleMap?.moveCamera(update)
       }
@@ -514,7 +536,7 @@ class GoogleMapsViewImpl(
     coordinates: Array<RNLatLng>,
     padding: RNMapPadding,
     animated: Boolean,
-    durationMS: Int,
+    durationMs: Int,
   ) {
     if (coordinates.isEmpty()) {
       return
@@ -572,11 +594,83 @@ class GoogleMapsViewImpl(
           0,
         )
       if (animated) {
-        googleMap?.animateCamera(update, durationMS, null)
+        googleMap?.animateCamera(update, durationMs, null)
       } else {
         googleMap?.moveCamera(update)
       }
     }
+  }
+
+  fun setCameraBounds(bounds: LatLngBounds?) {
+    onUi {
+      googleMap?.setLatLngBoundsForCameraTarget(bounds)
+    }
+  }
+
+  fun animateToBounds(
+    bounds: LatLngBounds,
+    padding: Int,
+    durationMs: Int,
+    lockBounds: Boolean,
+  ) {
+    onUi {
+      if (lockBounds) {
+        googleMap?.setLatLngBoundsForCameraTarget(bounds)
+      }
+      val update =
+        CameraUpdateFactory.newLatLngBounds(
+          bounds,
+          padding,
+        )
+      googleMap?.animateCamera(update, durationMs, null)
+    }
+  }
+
+  fun snapshot(
+    size: Size?,
+    format: String,
+    compressFormat: Bitmap.CompressFormat,
+    quality: Double,
+    resultIsFile: Boolean,
+  ): Promise<String?> {
+    val promise = Promise<String?>()
+    onUi {
+      googleMap?.snapshot { bitmap ->
+        try {
+          if (bitmap == null) {
+            promise.resolve(null)
+            return@snapshot
+          }
+
+          val scaledBitmap =
+            size?.let {
+              bitmap.scale(it.width, it.height)
+            } ?: bitmap
+
+          val output = ByteArrayOutputStream()
+          scaledBitmap.compress(compressFormat, (quality * 100).toInt().coerceIn(0, 100), output)
+          val bytes = output.toByteArray()
+
+          if (resultIsFile) {
+            val file = File(context.cacheDir, "map_snapshot_${System.currentTimeMillis()}.$format")
+            FileOutputStream(file).use { it.write(bytes) }
+            promise.resolve(file.absolutePath)
+          } else {
+            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            promise.resolve("data:image/$format;base64,$base64")
+          }
+
+          if (scaledBitmap != bitmap) {
+            scaledBitmap.recycle()
+          }
+          bitmap.recycle()
+        } catch (e: Exception) {
+          promise.resolve(null)
+        }
+      }
+    }
+
+    return promise
   }
 
   fun addMarker(
@@ -883,6 +977,7 @@ class GoogleMapsViewImpl(
 
   fun destroyInternal() {
     onUi {
+      locationHandler.stop()
       markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
@@ -890,7 +985,6 @@ class GoogleMapsViewImpl(
       clearCircles()
       clearHeatmaps()
       clearKmlLayer()
-      locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
@@ -900,6 +994,7 @@ class GoogleMapsViewImpl(
         setOnPolygonClickListener(null)
         setOnCircleClickListener(null)
         setOnMapClickListener(null)
+        setOnMarkerDragListener(null)
       }
       googleMap = null
       mapView?.apply {
@@ -910,6 +1005,7 @@ class GoogleMapsViewImpl(
       }
       super.removeAllViews()
       reactContext.removeLifecycleEventListener(this)
+      initialized = false
     }
   }
 
@@ -954,25 +1050,62 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
-    onMarkerPress?.invoke(marker.tag?.toString() ?: "unknown")
+    marker.showInfoWindow()
+    onMarkerPress?.invoke(marker.tag?.toString())
     return true
   }
 
   override fun onPolylineClick(polyline: Polyline) {
-    onPolylinePress?.invoke(polyline.tag?.toString() ?: "unknown")
+    onPolylinePress?.invoke(polyline.tag?.toString())
   }
 
   override fun onPolygonClick(polygon: Polygon) {
-    onPolygonPress?.invoke(polygon.tag?.toString() ?: "unknown")
+    onPolygonPress?.invoke(polygon.tag?.toString())
   }
 
   override fun onCircleClick(circle: Circle) {
-    onCirclePress?.invoke(circle.tag?.toString() ?: "unknown")
+    onCirclePress?.invoke(circle.tag?.toString())
   }
 
   override fun onMapClick(coordinates: LatLng) {
     onMapPress?.invoke(
       RNLatLng(coordinates.latitude, coordinates.longitude),
+    )
+  }
+
+  override fun onMarkerDragStart(marker: Marker) {
+    onMarkerDragStart?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onMarkerDrag(marker: Marker) {
+    onMarkerDrag?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onMarkerDragEnd(marker: Marker) {
+    onMarkerDragEnd?.invoke(
+      marker.tag?.toString(),
+      RNLatLng(marker.position.latitude, marker.position.longitude),
+    )
+  }
+
+  override fun onIndoorBuildingFocused() {
+    val building = googleMap?.focusedBuilding ?: return
+    onIndoorBuildingFocused?.invoke(building.toRNIndoorBuilding())
+  }
+
+  override fun onIndoorLevelActivated(indoorBuilding: IndoorBuilding) {
+    val activeLevel = indoorBuilding.levels.getOrNull(indoorBuilding.activeLevelIndex) ?: return
+    onIndoorLevelActivated?.invoke(
+      activeLevel.toRNIndoorLevel(
+        indoorBuilding.activeLevelIndex,
+        true,
+      ),
     )
   }
 }

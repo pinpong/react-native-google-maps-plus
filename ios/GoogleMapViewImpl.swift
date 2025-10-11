@@ -3,7 +3,8 @@ import GoogleMaps
 import GoogleMapsUtils
 import UIKit
 
-final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
+final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
+GMSIndoorDisplayDelegate {
 
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
@@ -40,6 +41,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     setupAppLifecycleObservers()
   }
 
+  @MainActor
   private func setupAppLifecycleObservers() {
     NotificationCenter.default.addObserver(
       self,
@@ -81,6 +83,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     mapReady = true
   }
 
+  @MainActor
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
       guard let self = self else { return }
@@ -136,7 +139,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     myLocationEnabled.map { mapView?.isMyLocationEnabled = $0 }
     buildingEnabled.map { mapView?.isBuildingsEnabled = $0 }
     trafficEnabled.map { mapView?.isTrafficEnabled = $0 }
-    indoorEnabled.map { mapView?.isIndoorEnabled = $0 }
+    indoorEnabled.map {
+      mapView?.isIndoorEnabled = $0
+      mapView?.indoorDisplay.delegate = $0 == true ? self : nil
+    }
     customMapStyle.map { mapView?.mapStyle = $0 }
     mapType.map { mapView?.mapType = $0 }
     userInterfaceStyle.map { mapView?.overrideUserInterfaceStyle = $0 }
@@ -187,8 +193,14 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     }
   }
 
+  @MainActor
   var currentCamera: GMSCameraPosition? {
     mapView?.camera
+  }
+
+  @MainActor
+  var initialProps: RNInitialProps? {
+    didSet {}
   }
 
   @MainActor
@@ -236,6 +248,7 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var indoorEnabled: Bool? {
     didSet {
       mapView?.isIndoorEnabled = indoorEnabled ?? false
+      mapView?.indoorDisplay.delegate = indoorEnabled == true ? self : nil
     }
   }
 
@@ -263,7 +276,8 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     }
   }
 
-  @MainActor var mapPadding: RNMapPadding? {
+  @MainActor
+  var mapPadding: RNMapPadding? {
     didSet {
       mapView?.padding =
         mapPadding.map {
@@ -277,13 +291,15 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     }
   }
 
-  @MainActor var mapType: GMSMapViewType? {
+  @MainActor
+  var mapType: GMSMapViewType? {
     didSet {
       mapView?.mapType = mapType ?? .normal
     }
   }
 
-  @MainActor var locationConfig: RNLocationConfig? {
+  @MainActor
+  var locationConfig: RNLocationConfig? {
     didSet {
       locationHandler.desiredAccuracy =
         locationConfig?.ios?.desiredAccuracy?.toCLLocationAccuracy
@@ -297,19 +313,25 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
-  var onMarkerPress: ((String) -> Void)?
-  var onPolylinePress: ((String) -> Void)?
-  var onPolygonPress: ((String) -> Void)?
-  var onCirclePress: ((String) -> Void)?
+  var onMarkerPress: ((String?) -> Void)?
+  var onPolylinePress: ((String?) -> Void)?
+  var onPolygonPress: ((String?) -> Void)?
+  var onCirclePress: ((String?) -> Void)?
+  var onMarkerDragStart: ((String?, RNLatLng) -> Void)?
+  var onMarkerDrag: ((String?, RNLatLng) -> Void)?
+  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
+  var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)?
+  var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
 
-  func setCamera(camera: GMSCameraPosition, animated: Bool, durationMS: Double) {
+  @MainActor
+  func setCamera(camera: GMSCameraPosition, animated: Bool, durationMs: Double) {
     if animated {
       withCATransaction(
         disableActions: false,
-        duration: durationMS / 1000.0
+        duration: durationMs / 1000.0
       ) {
         mapView?.animate(to: camera)
       }
@@ -319,11 +341,12 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     }
   }
 
+  @MainActor
   func setCameraToCoordinates(
     coordinates: [RNLatLng],
     padding: RNMapPadding,
     animated: Bool,
-    durationMS: Double
+    durationMs: Double
   ) {
     if coordinates.isEmpty {
       return
@@ -359,13 +382,97 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
     if animated {
       withCATransaction(
         disableActions: false,
-        duration: durationMS / 1000.0
+        duration: durationMs / 1000.0
       ) {
         mapView?.animate(with: update)
       }
     } else {
       mapView?.moveCamera(update)
     }
+  }
+
+  @MainActor
+  func setCameraBounds(_ bounds: GMSCoordinateBounds?) {
+    mapView?.cameraTargetBounds = bounds
+  }
+
+  @MainActor
+  func animateToBounds(
+    _ bounds: GMSCoordinateBounds,
+    padding: Double,
+    durationMs: Double,
+    lockBounds: Bool
+  ) {
+    if lockBounds {
+      mapView?.cameraTargetBounds = bounds
+    }
+
+    let update = GMSCameraUpdate.fit(bounds, withPadding: CGFloat(padding))
+    mapView?.animate(with: update)
+  }
+
+  @MainActor
+  func snapshot(
+    size: CGSize?,
+    format: String,
+    imageFormat: ImageFormat,
+    quality: CGFloat,
+    resultIsFile: Bool
+  ) -> NitroModules.Promise<String?> {
+    let promise = Promise<String?>()
+
+    DispatchQueue.main.async {
+      guard let mapView = self.mapView else {
+        promise.resolve(withResult: nil)
+        return
+      }
+
+      let renderer = UIGraphicsImageRenderer(bounds: mapView.bounds)
+      let image = renderer.image { ctx in
+        mapView.layer.render(in: ctx.cgContext)
+      }
+
+      var finalImage = image
+
+      size.map {
+        UIGraphicsBeginImageContextWithOptions($0, false, 0.0)
+        image.draw(in: CGRect(origin: .zero, size: $0))
+        finalImage = UIGraphicsGetImageFromCurrentImageContext() ?? image
+        UIGraphicsEndImageContext()
+      }
+
+      let data: Data?
+      switch imageFormat {
+      case .jpeg:
+        data = finalImage.jpegData(compressionQuality: quality)
+      case .png:
+        data = finalImage.pngData()
+      }
+
+      guard let imageData = data else {
+        promise.resolve(withResult: nil)
+        return
+      }
+
+      // Rückgabe
+      if resultIsFile {
+        let filename =
+          "map_snapshot_\(Int(Date().timeIntervalSince1970)).\(format)"
+        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+          .appendingPathComponent(filename)
+        do {
+          try imageData.write(to: fileURL)
+          promise.resolve(withResult: fileURL.path)
+        } catch {
+          promise.resolve(withResult: nil)
+        }
+      } else {
+        let base64 = imageData.base64EncodedString()
+        promise.resolve(withResult: "data:image/\(format);base64,\(base64)")
+      }
+    }
+
+    return promise
   }
 
   @MainActor
@@ -527,7 +634,10 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
 
   @MainActor
   func clearHeatmaps() {
-    heatmapsById.values.forEach { $0.map = nil }
+    heatmapsById.values.forEach {
+      $0.clearTileCache()
+      $0.map = nil
+    }
     heatmapsById.removeAll()
     pendingHeatmaps.removeAll()
   }
@@ -569,16 +679,21 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   func deinitInternal() {
-    markerBuilder.cancelAllIconTasks()
-    clearMarkers()
-    clearPolylines()
-    clearPolygons()
-    clearCircles()
-    clearHeatmaps()
-    locationHandler.stop()
-    mapView?.clear()
-    mapView?.delegate = nil
-    mapView = nil
+    onMain {
+      self.locationHandler.stop()
+      self.markerBuilder.cancelAllIconTasks()
+      self.clearMarkers()
+      self.clearPolylines()
+      self.clearPolygons()
+      self.clearCircles()
+      self.clearHeatmaps()
+      self.clearKmlLayers()
+      self.mapView?.clear()
+      self.mapView?.indoorDisplay.delegate = nil
+      self.mapView?.delegate = nil
+      self.mapView = nil
+      self.initialized = false
+    }
   }
 
   @objc private func appDidBecomeActive() {
@@ -594,9 +709,6 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
-      if mapView != nil && mapReady {
-        onMapReady?(true)
-      }
       locationHandler.start()
     } else {
       locationHandler.stop()
@@ -609,140 +721,215 @@ final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
-    let visibleRegion = mapView.projection.visibleRegion()
-    let bounds = GMSCoordinateBounds(region: visibleRegion)
+    onMain {
+      let visibleRegion = mapView.projection.visibleRegion()
+      let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-    let center = CLLocationCoordinate2D(
-      latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-      longitude: (bounds.northEast.longitude + bounds.southWest.longitude) / 2.0
-    )
+      let center = CLLocationCoordinate2D(
+        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
+        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
+          / 2.0
+      )
 
-    let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-    let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
+      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
+      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
 
-    let cp = mapView.camera
-    let region = RNRegion(
-      center: RNLatLng(center.latitude, center.longitude),
-      latitudeDelta: latDelta,
-      longitudeDelta: lngDelta
-    )
-    let cam = RNCamera(
-      center: RNLatLng(
-        latitude: cp.target.latitude,
-        longitude: cp.target.longitude
-      ),
-      zoom: Double(cp.zoom),
-      bearing: cp.bearing,
-      tilt: cp.viewingAngle
-    )
-    cameraMoveReasonIsGesture = gesture
+      let cp = mapView.camera
+      let region = RNRegion(
+        center: RNLatLng(center.latitude, center.longitude),
+        latitudeDelta: latDelta,
+        longitudeDelta: lngDelta
+      )
+      let cam = RNCamera(
+        center: RNLatLng(
+          latitude: cp.target.latitude,
+          longitude: cp.target.longitude
+        ),
+        zoom: Double(cp.zoom),
+        bearing: cp.bearing,
+        tilt: cp.viewingAngle
+      )
+      self.cameraMoveReasonIsGesture = gesture
 
-    onCameraChangeStart?(region, cam, gesture)
+      self.onCameraChangeStart?(region, cam, gesture)
+    }
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-    if let last = lastSubmittedCameraPosition,
-       last.target.latitude == position.target.latitude,
-       last.target.longitude == position.target.longitude,
-       last.zoom == position.zoom,
-       last.bearing == position.bearing,
-       last.viewingAngle == position.viewingAngle {
-      return
+    onMain {
+      if let last = self.lastSubmittedCameraPosition,
+         last.target.latitude == position.target.latitude,
+         last.target.longitude == position.target.longitude,
+         last.zoom == position.zoom,
+         last.bearing == position.bearing,
+         last.viewingAngle == position.viewingAngle {
+        return
+      }
+
+      self.lastSubmittedCameraPosition = position
+      let visibleRegion = mapView.projection.visibleRegion()
+      let bounds = GMSCoordinateBounds(region: visibleRegion)
+
+      let center = CLLocationCoordinate2D(
+        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
+        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
+          / 2.0
+      )
+
+      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
+      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
+
+      let cp = mapView.camera
+      let region = RNRegion(
+        center: RNLatLng(center.latitude, center.longitude),
+        latitudeDelta: latDelta,
+        longitudeDelta: lngDelta
+      )
+      let cam = RNCamera(
+        center: RNLatLng(
+          latitude: cp.target.latitude,
+          longitude: cp.target.longitude
+        ),
+        zoom: Double(cp.zoom),
+        bearing: cp.bearing,
+        tilt: cp.viewingAngle
+      )
+      self.onCameraChange?(region, cam, self.cameraMoveReasonIsGesture)
     }
-    let visibleRegion = mapView.projection.visibleRegion()
-    let bounds = GMSCoordinateBounds(region: visibleRegion)
-
-    let center = CLLocationCoordinate2D(
-      latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-      longitude: (bounds.northEast.longitude + bounds.southWest.longitude) / 2.0
-    )
-
-    let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-    let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-    let cp = mapView.camera
-    let region = RNRegion(
-      center: RNLatLng(center.latitude, center.longitude),
-      latitudeDelta: latDelta,
-      longitudeDelta: lngDelta
-    )
-    let cam = RNCamera(
-      center: RNLatLng(
-        latitude: cp.target.latitude,
-        longitude: cp.target.longitude
-      ),
-      zoom: Double(cp.zoom),
-      bearing: cp.bearing,
-      tilt: cp.viewingAngle
-    )
-    onCameraChange?(region, cam, cameraMoveReasonIsGesture)
-    lastSubmittedCameraPosition = position
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-    let visibleRegion = mapView.projection.visibleRegion()
-    let bounds = GMSCoordinateBounds(region: visibleRegion)
+    onMain {
+      let visibleRegion = mapView.projection.visibleRegion()
+      let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-    let center = CLLocationCoordinate2D(
-      latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-      longitude: (bounds.northEast.longitude + bounds.southWest.longitude) / 2.0
-    )
+      let center = CLLocationCoordinate2D(
+        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
+        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
+          / 2.0
+      )
 
-    let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-    let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
+      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
+      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
 
-    let cp = mapView.camera
-    let region = RNRegion(
-      center: RNLatLng(center.latitude, center.longitude),
-      latitudeDelta: latDelta,
-      longitudeDelta: lngDelta
-    )
-    let cam = RNCamera(
-      center: RNLatLng(
-        latitude: cp.target.latitude,
-        longitude: cp.target.longitude
-      ),
-      zoom: Double(cp.zoom),
-      bearing: cp.bearing,
-      tilt: cp.viewingAngle
-    )
-    onCameraChangeComplete?(region, cam, cameraMoveReasonIsGesture)
+      let cp = mapView.camera
+      let region = RNRegion(
+        center: RNLatLng(center.latitude, center.longitude),
+        latitudeDelta: latDelta,
+        longitudeDelta: lngDelta
+      )
+      let cam = RNCamera(
+        center: RNLatLng(
+          latitude: cp.target.latitude,
+          longitude: cp.target.longitude
+        ),
+        zoom: Double(cp.zoom),
+        bearing: cp.bearing,
+        tilt: cp.viewingAngle
+      )
+      self.onCameraChangeComplete?(region, cam, self.cameraMoveReasonIsGesture)
+    }
   }
 
   func mapView(
     _ mapView: GMSMapView,
     didTapAt coordinate: CLLocationCoordinate2D
   ) {
-    onMapPress?(
-      RNLatLng(
-        latitude: coordinate.latitude,
-        longitude: coordinate.longitude
+    onMain {
+      self.onMapPress?(
+        RNLatLng(
+          latitude: coordinate.latitude,
+          longitude: coordinate.longitude
+        )
       )
-    )
+    }
   }
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
-    let id = (marker.userData as? String) ?? "unknown"
-    onMarkerPress?(id)
+    onMain {
+      mapView.selectedMarker = marker
+      self.onMarkerPress?(marker.userData as? String, )
+    }
     return true
   }
 
   func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
-    switch overlay {
-    case let circle as GMSCircle:
-      let id = (circle.userData as? String) ?? "unknown"
-      onCirclePress?(id)
+    onMain {
+      switch overlay {
+      case let circle as GMSCircle:
+        self.onCirclePress?(circle.userData as? String, )
 
-    case let polygon as GMSPolygon:
-      let id = (polygon.userData as? String) ?? "unknown"
-      onPolygonPress?(id)
+      case let polygon as GMSPolygon:
+        self.onPolygonPress?(polygon.userData as? String, )
 
-    case let polyline as GMSPolyline:
-      let id = (polyline.userData as? String) ?? "unknown"
-      onPolylinePress?(id)
+      case let polyline as GMSPolyline:
+        self.onPolylinePress?(polyline.userData as? String, )
 
-    default:
-      break
+      default:
+        break
+      }
     }
+  }
+
+  func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
+    onMain {
+      self.onMarkerDragStart?(
+        marker.userData as? String,
+        RNLatLng(marker.position.latitude, marker.position.longitude)
+      )
+    }
+  }
+
+  func mapView(_ mapView: GMSMapView, didDrag marker: GMSMarker) {
+    onMain {
+      self.onMarkerDrag?(
+        marker.userData as? String,
+        RNLatLng(marker.position.latitude, marker.position.longitude)
+      )
+    }
+  }
+
+  func mapView(_ mapView: GMSMapView, didEndDragging marker: GMSMarker) {
+    onMain {
+      self.onMarkerDragEnd?(
+        marker.userData as? String,
+        RNLatLng(marker.position.latitude, marker.position.longitude)
+      )
+    }
+  }
+
+  func didChangeActiveBuilding(_ building: GMSIndoorBuilding?) {
+    onMain {
+      guard let display = self.mapView?.indoorDisplay, let building else {
+        return
+      }
+      self.onIndoorBuildingFocused?(building.toRNIndoorBuilding(from: display))
+    }
+  }
+
+  func didChangeActiveLevel(_ level: GMSIndoorLevel?) {
+    onMain {
+      guard
+        let display = self.mapView?.indoorDisplay,
+        let building = display.activeBuilding,
+        let level,
+        let index = building.levels.firstIndex(where: {
+          $0.name == level.name && $0.shortName == level.shortName
+        })
+      else { return }
+
+      self.onIndoorLevelActivated?(
+        level.toRNIndoorLevel(index: index, active: true)
+      )
+    }
+  }
+}
+
+@inline(__always)
+func onMain(_ block: @escaping () -> Void) {
+  if Thread.isMainThread {
+    block()
+  } else {
+    DispatchQueue.main.async { block() }
   }
 }
