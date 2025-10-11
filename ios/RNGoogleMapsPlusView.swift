@@ -8,6 +8,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
 
+  private var propsInitialized = false
   private let markerBuilder = MapMarkerBuilder()
   private let polylineBuilder = MapPolylineBuilder()
   private let polygonBuilder = MapPolygonBuilder()
@@ -29,21 +30,23 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  /*
-   /// TODO: prepareForRecycle
-   override func prepareForRecycle() {
-   impl.clearAll()
-   }
-   */
+  func afterUpdate() {
+    if !propsInitialized {
+      propsInitialized = true
+      Task { @MainActor in
+        impl.initMapView(
+          mapId: self.initialProps?.mapId,
+          liteMode: self.initialProps?.liteMode,
+          camera: self.initialProps?.camera?.toGMSCameraPosition(current: nil)
+        )
+      }
+    }
+  }
 
   @MainActor
   var initialProps: RNInitialProps? {
     didSet {
-      impl.initMapView(
-        mapId: initialProps?.mapId,
-        liteMode: initialProps?.liteMode,
-        camera: initialProps?.camera?.toGMSCameraPosition(current: nil)
-      )
+      impl.initialProps = initialProps
     }
   }
 

@@ -153,9 +153,9 @@ class GoogleMapsViewImpl(
       }
       initLocationCallbacks()
       applyPending()
+      mapReady = true
+      onMapReady?.invoke(true)
     }
-    mapReady = true
-    onMapReady?.invoke(true)
   }
 
   override fun onCameraMoveStarted(reason: Int) {
@@ -371,6 +371,8 @@ class GoogleMapsViewImpl(
       pendingKmlLayers.clear()
     }
   }
+
+  var initialProps: RNInitialProps? = null
 
   var uiSettings: RNMapUiSettings? = null
     set(value) {
@@ -975,6 +977,7 @@ class GoogleMapsViewImpl(
 
   fun destroyInternal() {
     onUi {
+      locationHandler.stop()
       markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
@@ -982,7 +985,6 @@ class GoogleMapsViewImpl(
       clearCircles()
       clearHeatmaps()
       clearKmlLayer()
-      locationHandler.stop()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
@@ -1003,6 +1005,7 @@ class GoogleMapsViewImpl(
       }
       super.removeAllViews()
       reactContext.removeLifecycleEventListener(this)
+      initialized = false
     }
   }
 

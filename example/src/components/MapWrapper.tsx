@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import {
   GoogleMapsView,
   type RNIndoorBuilding,
@@ -22,6 +22,7 @@ import {
 import type { ViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { callback } from 'react-native-nitro-modules';
+import { useTheme } from '@react-navigation/native';
 
 type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
@@ -31,8 +32,11 @@ type Props = ViewProps &
 
 export default function MapWrapper(props: Props) {
   const { children, ...rest } = props;
-  const scheme = useColorScheme();
+  const theme = useTheme();
+  const styles = getThemedStyles(theme);
   const layout = useSafeAreaInsets();
+
+  const [mapReady, setMapReady] = React.useState(false);
   const initialProps = useMemo(
     () => ({
       camera: {
@@ -96,7 +100,7 @@ export default function MapWrapper(props: Props) {
         uiSettings={props.uiSettings ?? uiSettings}
         style={[styles.map, props.style]}
         userInterfaceStyle={
-          props.userInterfaceStyle ?? (scheme === 'dark' ? 'dark' : 'light')
+          props.userInterfaceStyle ?? (theme.dark ? 'dark' : 'light')
         }
         mapType={props.mapType ?? 'normal'}
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
@@ -104,7 +108,10 @@ export default function MapWrapper(props: Props) {
         locationConfig={props.locationConfig ?? locationConfig}
         onMapReady={callback(
           props.onMapReady ?? {
-            f: (ready: boolean) => console.log('Map is ready! ' + ready),
+            f: (ready: boolean) => {
+              console.log('Map is ready! ' + ready);
+              setMapReady(true);
+            },
           }
         )}
         onMapError={callback(
@@ -197,17 +204,33 @@ export default function MapWrapper(props: Props) {
         )}
       />
       {children}
+      {!mapReady && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-});
+const getThemedStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    map: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    loadingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10,
+      backgroundColor: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)',
+    },
+  });

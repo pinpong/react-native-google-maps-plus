@@ -199,6 +199,11 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
+  var initialProps: RNInitialProps? {
+    didSet {}
+  }
+
+  @MainActor
   var uiSettings: RNMapUiSettings? {
     didSet {
       mapView?.settings.setAllGesturesEnabled(
@@ -629,7 +634,10 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   func clearHeatmaps() {
-    heatmapsById.values.forEach { $0.map = nil }
+    heatmapsById.values.forEach {
+      $0.clearTileCache()
+      $0.map = nil
+    }
     heatmapsById.removeAll()
     pendingHeatmaps.removeAll()
   }
@@ -671,16 +679,21 @@ GMSIndoorDisplayDelegate {
   }
 
   func deinitInternal() {
-    markerBuilder.cancelAllIconTasks()
-    clearMarkers()
-    clearPolylines()
-    clearPolygons()
-    clearCircles()
-    clearHeatmaps()
-    locationHandler.stop()
-    mapView?.clear()
-    mapView?.delegate = nil
-    mapView = nil
+    onMain {
+      self.locationHandler.stop()
+      self.markerBuilder.cancelAllIconTasks()
+      self.clearMarkers()
+      self.clearPolylines()
+      self.clearPolygons()
+      self.clearCircles()
+      self.clearHeatmaps()
+      self.clearKmlLayers()
+      self.mapView?.clear()
+      self.mapView?.indoorDisplay.delegate = nil
+      self.mapView?.delegate = nil
+      self.mapView = nil
+      self.initialized = false
+    }
   }
 
   @objc private func appDidBecomeActive() {
@@ -696,9 +709,6 @@ GMSIndoorDisplayDelegate {
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
-      if mapView != nil && mapReady {
-        onMapReady?(true)
-      }
       locationHandler.start()
     } else {
       locationHandler.stop()
