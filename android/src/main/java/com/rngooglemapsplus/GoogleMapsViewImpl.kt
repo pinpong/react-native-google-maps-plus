@@ -372,6 +372,8 @@ class GoogleMapsViewImpl(
     }
   }
 
+  var initialProps: RNInitialProps? = null
+
   var uiSettings: RNMapUiSettings? = null
     set(value) {
       field = value

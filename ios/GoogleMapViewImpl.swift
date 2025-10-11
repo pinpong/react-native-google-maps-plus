@@ -199,6 +199,11 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
+  var initialProps: RNInitialProps? {
+    didSet {}
+  }
+
+  @MainActor
   var uiSettings: RNMapUiSettings? {
     didSet {
       mapView?.settings.setAllGesturesEnabled(
