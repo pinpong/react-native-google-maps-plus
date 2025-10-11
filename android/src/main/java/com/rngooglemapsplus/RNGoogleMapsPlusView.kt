@@ -16,6 +16,9 @@ import com.rngooglemapsplus.extensions.toFileExtension
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
 import com.rngooglemapsplus.extensions.toSize
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @DoNotStrip
 class RNGoogleMapsPlusView(
@@ -39,11 +42,14 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      view.initMapView(
-        value?.mapId,
-        value?.liteMode,
-        value?.camera?.toCameraPosition(),
-      )
+      MainScope().launch {
+        delay(500)
+        view.initMapView(
+          value?.mapId,
+          value?.liteMode,
+          value?.camera?.toCameraPosition(),
+        )
+      }
     }
 
   override var uiSettings: RNMapUiSettings? = null

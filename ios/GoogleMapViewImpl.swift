@@ -704,9 +704,6 @@ GMSIndoorDisplayDelegate {
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
-      if mapView != nil && mapReady {
-        onMapReady?(true)
-      }
       locationHandler.start()
     } else {
       locationHandler.stop()

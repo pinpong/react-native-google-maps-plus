@@ -153,9 +153,9 @@ class GoogleMapsViewImpl(
       }
       initLocationCallbacks()
       applyPending()
+      mapReady = true
+      onMapReady?.invoke(true)
     }
-    mapReady = true
-    onMapReady?.invoke(true)
   }
 
   override fun onCameraMoveStarted(reason: Int) {

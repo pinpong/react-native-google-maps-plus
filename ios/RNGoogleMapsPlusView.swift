@@ -29,21 +29,17 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  /*
-   /// TODO: prepareForRecycle
-   override func prepareForRecycle() {
-   impl.clearAll()
-   }
-   */
-
   @MainActor
   var initialProps: RNInitialProps? {
     didSet {
-      impl.initMapView(
-        mapId: initialProps?.mapId,
-        liteMode: initialProps?.liteMode,
-        camera: initialProps?.camera?.toGMSCameraPosition(current: nil)
-      )
+      Task { @MainActor in
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        impl.initMapView(
+          mapId: initialProps?.mapId,
+          liteMode: initialProps?.liteMode,
+          camera: initialProps?.camera?.toGMSCameraPosition(current: nil)
+        )
+      }
     }
   }
 
