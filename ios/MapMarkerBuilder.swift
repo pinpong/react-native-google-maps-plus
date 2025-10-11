@@ -13,10 +13,7 @@ final class MapMarkerBuilder {
 
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
-      position: CLLocationCoordinate2D(
-        latitude: m.coordinate.latitude,
-        longitude: m.coordinate.longitude
-      )
+      position: m.coordinate.toCLLocationCoordinate2D()
     )
     marker.userData = m.id
     marker.tracksViewChanges = true
@@ -26,6 +23,10 @@ final class MapMarkerBuilder {
     m.opacity.map { marker.iconView?.alpha = CGFloat($0) }
     m.flat.map { marker.isFlat = $0 }
     m.draggable.map { marker.isDraggable = $0 }
+    m.rotation.map { marker.rotation = $0 }
+    m.infoWindowAnchor.map {
+      marker.infoWindowAnchor = CGPoint(x: $0.x, y: $0.y)
+    }
     m.anchor.map {
       marker.groundAnchor = CGPoint(
         x: $0.x,
@@ -43,16 +44,17 @@ final class MapMarkerBuilder {
 
   @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    m.position = CLLocationCoordinate2D(
-      latitude: next.coordinate.latitude,
-      longitude: next.coordinate.longitude
-    )
-
+    m.position = next.coordinate.toCLLocationCoordinate2D()
     m.title = next.title
     m.snippet = next.snippet
     m.iconView?.alpha = CGFloat(next.opacity ?? 0)
     m.isFlat = next.flat ?? false
     m.isDraggable = next.draggable ?? false
+    m.rotation = next.rotation ?? 0
+    m.infoWindowAnchor = CGPoint(
+      x: next.infoWindowAnchor?.x ?? 0.5,
+      y: next.infoWindowAnchor?.y ?? 0
+    )
     m.zIndex = Int32(next.zIndex ?? 0)
     m.groundAnchor = CGPoint(
       x: next.anchor?.x ?? 0.5,

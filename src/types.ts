@@ -164,6 +164,8 @@ export type RNMarker = {
   opacity?: number;
   flat?: boolean;
   draggable?: boolean;
+  rotation?: number;
+  infoWindowAnchor?: RNPosition;
   iconSvg?: RNMarkerSvg;
 };
 
@@ -181,6 +183,12 @@ export type RNPolygon = {
   fillColor?: string;
   strokeColor?: string;
   strokeWidth?: number;
+  holes?: RNPolygonHole[];
+  geodesic?: boolean;
+};
+
+export type RNPolygonHole = {
+  coordinates: RNLatLng[];
 };
 
 export type RNPolyline = {
@@ -190,6 +198,7 @@ export type RNPolyline = {
   coordinates: RNLatLng[];
   lineCap?: RNLineCapType;
   lineJoin?: RNLineJoinType;
+  geodesic?: boolean;
   color?: string;
   width?: number;
 };

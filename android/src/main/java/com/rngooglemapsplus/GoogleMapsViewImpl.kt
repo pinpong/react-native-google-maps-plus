@@ -35,9 +35,11 @@ import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.toGooglePriority
+import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
+import com.rngooglemapsplus.extensions.toRnLatLng
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -88,11 +90,7 @@ class GoogleMapsViewImpl(
     reactContext.addLifecycleEventListener(this)
   }
 
-  fun initMapView(
-    mapId: String?,
-    liteMode: Boolean?,
-    cameraPosition: CameraPosition?,
-  ) {
+  fun initMapView(googleMapsOptions: GoogleMapOptions) {
     if (initialized) return
     initialized = true
     val result = playServiceHandler.playServicesAvailability()
@@ -126,13 +124,7 @@ class GoogleMapsViewImpl(
     mapView =
       MapView(
         reactContext,
-        GoogleMapOptions().apply {
-          mapId?.let { mapId(it) }
-          liteMode?.let { liteMode(it) }
-          cameraPosition?.let {
-            camera(it)
-          }
-        },
+        googleMapsOptions,
       )
 
     super.addView(mapView)
@@ -173,12 +165,12 @@ class GoogleMapsViewImpl(
 
     onCameraChangeStart?.invoke(
       RNRegion(
-        center = RNLatLng(bounds.center.latitude, bounds.center.longitude),
+        center = bounds.center.toRnLatLng(),
         latitudeDelta = latDelta,
         longitudeDelta = lngDelta,
       ),
       RNCamera(
-        center = RNLatLng(cameraPosition.target.latitude, cameraPosition.target.longitude),
+        center = cameraPosition.target.toRnLatLng(),
         zoom = cameraPosition.zoom.toDouble(),
         bearing = cameraPosition.bearing.toDouble(),
         tilt = cameraPosition.tilt.toDouble(),
@@ -205,12 +197,12 @@ class GoogleMapsViewImpl(
 
     onCameraChange?.invoke(
       RNRegion(
-        center = RNLatLng(bounds.center.latitude, bounds.center.longitude),
+        center = bounds.center.toRnLatLng(),
         latitudeDelta = latDelta,
         longitudeDelta = lngDelta,
       ),
       RNCamera(
-        center = RNLatLng(cameraPosition.target.latitude, cameraPosition.target.longitude),
+        center = cameraPosition.target.toRnLatLng(),
         zoom = cameraPosition.zoom.toDouble(),
         bearing = cameraPosition.bearing.toDouble(),
         tilt = cameraPosition.tilt.toDouble(),
@@ -233,12 +225,12 @@ class GoogleMapsViewImpl(
 
     onCameraChangeComplete?.invoke(
       RNRegion(
-        center = RNLatLng(bounds.center.latitude, bounds.center.longitude),
+        center = bounds.center.toRnLatLng(),
         latitudeDelta = latDelta,
         longitudeDelta = lngDelta,
       ),
       RNCamera(
-        center = RNLatLng(cameraPosition.target.latitude, cameraPosition.target.longitude),
+        center = cameraPosition.target.toRnLatLng(),
         zoom = cameraPosition.zoom.toDouble(),
         bearing = cameraPosition.bearing.toDouble(),
         tilt = cameraPosition.tilt.toDouble(),
@@ -544,7 +536,7 @@ class GoogleMapsViewImpl(
     onUi {
       val builder = LatLngBounds.Builder()
       coordinates.forEach { coord ->
-        builder.include(LatLng(coord.latitude, coord.longitude))
+        builder.include(coord.toLatLng())
       }
       val bounds = builder.build()
 
@@ -1069,28 +1061,28 @@ class GoogleMapsViewImpl(
 
   override fun onMapClick(coordinates: LatLng) {
     onMapPress?.invoke(
-      RNLatLng(coordinates.latitude, coordinates.longitude),
+      coordinates.toRnLatLng(),
     )
   }
 
   override fun onMarkerDragStart(marker: Marker) {
     onMarkerDragStart?.invoke(
       marker.tag?.toString(),
-      RNLatLng(marker.position.latitude, marker.position.longitude),
+      marker.position.toRnLatLng(),
     )
   }
 
   override fun onMarkerDrag(marker: Marker) {
     onMarkerDrag?.invoke(
       marker.tag?.toString(),
-      RNLatLng(marker.position.latitude, marker.position.longitude),
+      marker.position.toRnLatLng(),
     )
   }
 
   override fun onMarkerDragEnd(marker: Marker) {
     onMarkerDragEnd?.invoke(
       marker.tag?.toString(),
-      RNLatLng(marker.position.latitude, marker.position.longitude),
+      marker.position.toRnLatLng(),
     )
   }
 

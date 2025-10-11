@@ -3,11 +3,7 @@ import GoogleMaps
 final class MapCircleBuilder {
   func build(_ c: RNCircle) -> GMSCircle {
     let circle = GMSCircle()
-    circle.position = CLLocationCoordinate2D(
-      latitude: c.center.latitude,
-      longitude: c.center.longitude
-    )
-
+    circle.position = c.center.toCLLocationCoordinate2D()
     circle.radius = c.radius
     c.fillColor.map { circle.fillColor = $0.toUIColor() }
     c.strokeColor.map { circle.strokeColor = $0.toUIColor() }
@@ -19,11 +15,7 @@ final class MapCircleBuilder {
   }
 
   func update(_ next: RNCircle, _ c: GMSCircle) {
-    c.position = CLLocationCoordinate2D(
-      latitude: next.center.latitude,
-      longitude: next.center.longitude
-    )
-
+    c.position = next.center.toCLLocationCoordinate2D()
     c.radius = next.radius
     c.fillColor = next.fillColor?.toUIColor() ?? nil
     c.strokeColor = next.strokeColor?.toUIColor() ?? .black
