@@ -59,6 +59,31 @@ export const makePolygon = (id: number): RNPolygon => ({
   strokeWidth: 1 + (id % 5),
 });
 
+export const makePolygonWithHoles = (id: number): RNPolygon => ({
+  id: id.toString(),
+  zIndex: id,
+  pressable: true,
+  coordinates: [
+    { latitude: 37.7749, longitude: -122.4194 },
+    { latitude: 37.7799, longitude: -122.4194 },
+    { latitude: 37.7799, longitude: -122.4144 },
+    { latitude: 37.7749, longitude: -122.4144 },
+  ],
+  holes: [
+    {
+      coordinates: [
+        { latitude: 37.776, longitude: -122.418 },
+        { latitude: 37.778, longitude: -122.418 },
+        { latitude: 37.778, longitude: -122.416 },
+        { latitude: 37.776, longitude: -122.416 },
+      ],
+    },
+  ],
+  fillColor: '#0000ff',
+  strokeColor: '#ff0000',
+  strokeWidth: 1 + (id % 5),
+});
+
 export const makePolyline = (id: number): RNPolyline => ({
   id: id.toString(),
   zIndex: id,

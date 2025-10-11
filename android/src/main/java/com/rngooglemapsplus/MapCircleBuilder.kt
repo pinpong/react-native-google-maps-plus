@@ -4,13 +4,13 @@ import android.graphics.Color
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
 import com.rngooglemapsplus.extensions.toColor
+import com.rngooglemapsplus.extensions.toLatLng
 
 class MapCircleBuilder {
   fun build(circle: RNCircle): CircleOptions =
     CircleOptions().apply {
-      center(LatLng(circle.center.latitude, circle.center.longitude))
+      center(circle.center.toLatLng())
       radius(circle.radius)
       circle.strokeWidth?.let { strokeWidth(it.dpToPx()) }
       circle.strokeColor?.let { strokeColor(it.toColor()) }
@@ -23,11 +23,12 @@ class MapCircleBuilder {
     circle: Circle,
     next: RNCircle,
   ) {
-    circle.center = LatLng(next.center.latitude, next.center.longitude)
+    circle.center = next.center.toLatLng()
     circle.radius = next.radius
     circle.strokeWidth = next.strokeWidth?.dpToPx() ?: 1f
     circle.strokeColor = next.strokeColor?.toColor() ?: Color.BLACK
     circle.fillColor = next.fillColor?.toColor() ?: Color.TRANSPARENT
+    circle.isClickable = next.pressable ?: false
     circle.zIndex = next.zIndex?.toFloat() ?: 0f
   }
 }

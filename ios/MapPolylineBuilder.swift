@@ -5,7 +5,7 @@ final class MapPolylineBuilder {
     let path = GMSMutablePath()
     p.coordinates.forEach {
       path.add(
-        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+        $0.toCLLocationCoordinate2D()
       )
     }
 
@@ -16,6 +16,7 @@ final class MapPolylineBuilder {
     p.lineCap.map { _ in /* not supported */ }
     p.lineJoin.map { _ in /* not supported */ }
     p.pressable.map { pl.isTappable = $0 }
+    p.geodesic.map { pl.geodesic = $0 }
     p.zIndex.map { pl.zIndex = Int32($0) }
 
     return pl
@@ -25,7 +26,7 @@ final class MapPolylineBuilder {
     let path = GMSMutablePath()
     next.coordinates.forEach {
       path.add(
-        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+        $0.toCLLocationCoordinate2D()
       )
     }
     pl.path = path
@@ -35,6 +36,7 @@ final class MapPolylineBuilder {
     pl.strokeWidth = CGFloat(next.width ?? 1.0)
     pl.strokeColor = next.color?.toUIColor() ?? .black
     pl.isTappable = next.pressable ?? false
+    pl.geodesic = next.geodesic ?? false
     pl.zIndex = Int32(next.zIndex ?? 0)
   }
 }
