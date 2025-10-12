@@ -1,3 +1,20 @@
+## [1.4.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.3.0...v1.4.0) (2025-10-12)
+
+### ✨ Features
+
+* add polygon holes support ([36a1291](https://github.com/pinpong/react-native-google-maps-plus/commit/36a1291b054c86309e4cc8a35e08556dc7757d4c))
+* add polygon holes support ([ae53e17](https://github.com/pinpong/react-native-google-maps-plus/commit/ae53e17d3d65aedfeedb34d613ca6adc8887b34a))
+* add polygon holes support ([1b1d80d](https://github.com/pinpong/react-native-google-maps-plus/commit/1b1d80d15a86021a295cea5ddd3ce4fcbf09f9ff))
+
+### 🐛 Bug Fixes
+
+* marker, polyline, polygon and circle update ([767ecc7](https://github.com/pinpong/react-native-google-maps-plus/commit/767ecc762d5c1c6cda356b0fa3b5fede396dcbf7))
+
+### 🛠️ Other changes
+
+* merge dev into main ([2b076f1](https://github.com/pinpong/react-native-google-maps-plus/commit/2b076f160282581145ab1b8d55b1db769e0f7221))
+* update release.config.cjs ([efdabe0](https://github.com/pinpong/react-native-google-maps-plus/commit/efdabe06afebd6016195512c75586a8e5af3b5af))
+
 ## [1.3.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.2.0...v1.3.0) (2025-10-11)
 
 ### ✨ Features
