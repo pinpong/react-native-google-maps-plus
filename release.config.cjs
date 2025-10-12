@@ -17,7 +17,7 @@ const gitPlugin = isDev
       {
         assets: ['package.json', 'CHANGELOG.md', 'example/package.json'],
         message:
-          '🔖 release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+          'release: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
       },
     ];
 
