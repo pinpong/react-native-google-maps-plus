@@ -7,10 +7,9 @@ import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 
 export default function SnapshotTestScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
+  const theme = useAppTheme();
   const [snapshotUri, setSnapshotUri] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
-
-  const theme = useAppTheme();
 
   const buttons = useMemo(
     () => [
@@ -57,7 +56,7 @@ export default function SnapshotTestScreen() {
     []
   );
 
-  const styles = getThemedStyles(theme);
+  const styles = useMemo(() => getThemedStyles(theme), [theme]);
 
   return (
     <MapWrapper mapRef={mapRef}>

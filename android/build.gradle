@@ -28,7 +28,7 @@ apply from: "./fix-prefab.gradle"
 if (rootProject.name != "rngooglemapsplus.example") {
     apply plugin: "com.facebook.react"
 } else {
-    println("\u001B[33m⚠️  Skipping React Native Gradle plugin in library (example build detected)\u001B[0m")
+    println("\u001B[33mSkipping React Native Gradle plugin in library (example build detected)\u001B[0m")
 }
 
 def getExtOrIntegerDefault(name) {

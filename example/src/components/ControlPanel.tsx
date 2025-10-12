@@ -1,17 +1,17 @@
 import React, { useMemo } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolate,
   Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 import { useAppTheme } from '../theme';
@@ -29,7 +29,7 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   const theme = useAppTheme();
   const navigation = useNavigation<RootNavigationProp>();
   const progress = useSharedValue(0);
-  const styles = getThemedStyles(theme);
+  const styles = useMemo(() => getThemedStyles(theme), [theme]);
 
   const toggle = () => {
     progress.value = withTiming(progress.value === 1 ? 0 : 1, {
@@ -62,7 +62,10 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
       {
         title: 'Check Google Play Services',
         onPress: () =>
-          console.log(mapRef.current?.isGooglePlayServicesAvailable()),
+          console.log(
+            'Google Play Services result',
+            mapRef.current?.isGooglePlayServicesAvailable()
+          ),
       },
     ],
     [buttons, mapRef, navigation]

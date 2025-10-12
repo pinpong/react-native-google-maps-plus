@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useMemo } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../theme';
@@ -23,7 +23,7 @@ const screens = [
 export default function HomeScreen() {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const theme = useAppTheme();
-  const styles = getThemedStyles(theme);
+  const styles = useMemo(() => getThemedStyles(theme), [theme]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

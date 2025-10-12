@@ -1,25 +1,23 @@
 import React, { useMemo } from 'react';
+import type { ViewProps } from 'react-native';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import type {
+  GoogleMapsViewRef,
+  RNCamera,
+  RNGoogleMapsPlusViewProps,
+  RNLatLng,
+  RNLocation,
+  RNRegion,
+} from 'react-native-google-maps-plus';
 import {
   GoogleMapsView,
+  RNAndroidLocationPriority,
   type RNIndoorBuilding,
   type RNIndoorLevel,
+  RNIOSLocationAccuracy,
   RNLocationErrorCode,
   RNMapErrorCode,
 } from 'react-native-google-maps-plus';
-import type {
-  GoogleMapsViewRef,
-  RNGoogleMapsPlusViewProps,
-  RNCamera,
-  RNLocation,
-  RNRegion,
-  RNLatLng,
-} from 'react-native-google-maps-plus';
-import {
-  RNAndroidLocationPriority,
-  RNIOSLocationAccuracy,
-} from 'react-native-google-maps-plus';
-import type { ViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { callback } from 'react-native-nitro-modules';
 import { useTheme } from '@react-navigation/native';
@@ -33,7 +31,7 @@ type Props = ViewProps &
 export default function MapWrapper(props: Props) {
   const { children, ...rest } = props;
   const theme = useTheme();
-  const styles = getThemedStyles(theme);
+  const styles = useMemo(() => getThemedStyles(theme), [theme]);
   const layout = useSafeAreaInsets();
 
   const [mapReady, setMapReady] = React.useState(false);
@@ -67,7 +65,7 @@ export default function MapWrapper(props: Props) {
   const mapPadding = useMemo(() => {
     return props.children
       ? { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }
-      : undefined;
+      : { top: 20, left: 20, bottom: layout.bottom, right: 20 };
   }, [layout.bottom, props.children]);
 
   const mapZoomConfig = useMemo(() => ({ min: 0, max: 20 }), []);
@@ -217,7 +215,7 @@ const getThemedStyles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.background,
     },
     map: {
       position: 'absolute',
@@ -227,10 +225,10 @@ const getThemedStyles = (theme: any) =>
       bottom: 0,
     },
     loadingOverlay: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 10,
-      backgroundColor: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.7)',
+      backgroundColor: theme.overlay,
     },
   });

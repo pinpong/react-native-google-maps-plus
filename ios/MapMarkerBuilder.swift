@@ -47,7 +47,7 @@ final class MapMarkerBuilder {
     m.position = next.coordinate.toCLLocationCoordinate2D()
     m.title = next.title
     m.snippet = next.snippet
-    m.iconView?.alpha = CGFloat(next.opacity ?? 0)
+    m.iconView?.alpha = CGFloat(next.opacity ?? 1)
     m.isFlat = next.flat ?? false
     m.isDraggable = next.draggable ?? false
     m.rotation = next.rotation ?? 0

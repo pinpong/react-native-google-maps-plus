@@ -8,6 +8,8 @@ fun RNPolygon.polygonEquals(b: RNPolygon): Boolean {
   if (strokeWidth != b.strokeWidth) return false
   if (fillColor != b.fillColor) return false
   if (strokeColor != b.strokeColor) return false
+  if (geodesic != b.geodesic) return false
+  if (!holes.contentEquals(b.holes)) return false
   val ac = coordinates
   val bc = b.coordinates
   if (ac.size != bc.size) return false

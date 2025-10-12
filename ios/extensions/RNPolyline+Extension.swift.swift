@@ -7,6 +7,7 @@ extension RNPolyline {
           lineCap == b.lineCap,
           lineJoin == b.lineJoin,
           color == b.color,
+          geodesic == b.geodesic,
           coordinates.count == b.coordinates.count
     else { return false }
 

@@ -68,7 +68,7 @@ class MapMarkerBuilder(
     }
     marker.title = next.title
     marker.snippet = next.snippet
-    marker.alpha = next.opacity?.toFloat() ?: 0f
+    marker.alpha = next.opacity?.toFloat() ?: 1f
     marker.isFlat = next.flat ?: false
     marker.isDraggable = next.draggable ?: false
     marker.rotation = next.rotation?.toFloat() ?: 0f

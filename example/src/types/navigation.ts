@@ -13,7 +13,7 @@ export type RootStackParamList = {
   IndoorLevelMap: undefined;
   Camera: undefined;
   Snapshot: undefined;
-  StressTest: undefined;
+  Stress: undefined;
 };
 
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
