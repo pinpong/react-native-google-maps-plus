@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
-import { makeMarker } from '../utils/mapGenerators';
+import { makeRandomMarkerForStressTest } from '../utils/mapGenerators';
 import type {
   GoogleMapsViewRef,
   RNMarker,
@@ -18,7 +18,8 @@ export default function StressTestScreen() {
       setMarkers((m) => {
         const next = [...m];
         while (next.length > 100) next.shift();
-        for (let i = 0; i < 500; i++) next.push(makeMarker(next.length + 1));
+        for (let i = 0; i < 500; i++)
+          next.push(makeRandomMarkerForStressTest(next.length + 1));
         return next;
       });
     }, 100);
@@ -46,7 +47,11 @@ export default function StressTestScreen() {
       },
       {
         title: 'Marker +1',
-        onPress: () => setMarkers((m) => [...m, makeMarker(m.length + 1)]),
+        onPress: () =>
+          setMarkers((m) => [
+            ...m,
+            makeRandomMarkerForStressTest(m.length + 1),
+          ]),
       },
       {
         title: 'Marker -1',

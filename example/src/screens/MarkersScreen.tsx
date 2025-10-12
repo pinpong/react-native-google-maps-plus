@@ -1,47 +1,36 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
 import { makeMarker } from '../utils/mapGenerators';
 import type {
   GoogleMapsViewRef,
   RNMarker,
 } from 'react-native-google-maps-plus';
+import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
+import { useNavigation } from '@react-navigation/native';
+import { RNMarkerValidator } from '../components/maptConfigDialog/validator';
+import { useHeaderButton } from '../hooks/useHeaderButton';
 
 export default function MarkersScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
-  const [markers, setMarkers] = useState<RNMarker[]>(
-    Array.from({ length: 2 }, (_, i) => makeMarker(i + 1))
-  );
+  const navigation = useNavigation();
+  const [marker, setMarker] = useState<RNMarker | undefined>(undefined);
+  const [dialogVisible, setDialogVisible] = useState(true);
 
-  const buttons = useMemo(
-    () => [
-      {
-        title: 'Marker +1',
-        onPress: () => setMarkers((m) => [...m, makeMarker(m.length + 1)]),
-      },
-      {
-        title: 'Marker -1',
-        onPress: () => setMarkers((m) => m.slice(0, Math.max(0, m.length - 1))),
-      },
-      {
-        title: 'Fit to markers',
-        onPress: () => {
-          const coords = markers.map((m) => m.coordinate);
-          mapRef.current?.setCameraToCoordinates(
-            coords,
-            { top: 50, left: 50, bottom: 50, right: 50 },
-            true,
-            300
-          );
-        },
-      },
-    ],
-    [markers]
+  useHeaderButton(navigation, marker ? 'Edit' : 'Add', () =>
+    setDialogVisible(true)
   );
 
   return (
-    <MapWrapper mapRef={mapRef} markers={markers}>
-      <ControlPanel mapRef={mapRef} buttons={buttons} />
-    </MapWrapper>
+    <>
+      <MapWrapper mapRef={mapRef} markers={marker ? [marker] : []} />
+      <MapConfigDialog<RNMarker>
+        visible={dialogVisible}
+        title="Edit marker"
+        initialData={makeMarker(1)}
+        validator={RNMarkerValidator}
+        onClose={() => setDialogVisible(false)}
+        onSave={(c) => setMarker(c)}
+      />
+    </>
   );
 }

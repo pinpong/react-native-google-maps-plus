@@ -8,6 +8,7 @@ fun RNPolyline.polylineEquals(b: RNPolyline): Boolean {
   if ((width ?: 0.0) != (b.width ?: 0.0)) return false
   if (lineCap != b.lineCap) return false
   if (lineJoin != b.lineJoin) return false
+  if (geodesic != b.geodesic) return false
   if (color != b.color) return false
   val ac = coordinates
   val bc = b.coordinates

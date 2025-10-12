@@ -1,14 +1,13 @@
 package com.rngooglemapsplus.extensions
 
 import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.rngooglemapsplus.RNCamera
 
 fun RNCamera.toCameraPosition(): CameraPosition {
   val builder = CameraPosition.builder()
 
   center?.let {
-    builder.target(LatLng(it.latitude, it.longitude))
+    builder.target(it.toLatLng())
   }
 
   zoom?.let { builder.zoom(it.toFloat()) }

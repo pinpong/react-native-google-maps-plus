@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  NavigationContainer,
-  DefaultTheme,
   DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -113,7 +113,7 @@ export default function App() {
             options={{ title: 'Snapshot test' }}
           />
           <Stack.Screen
-            name="StressTest"
+            name="Stress"
             component={StressTestScreen}
             options={{ title: 'Stress test' }}
           />

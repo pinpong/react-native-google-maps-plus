@@ -3,9 +3,9 @@ import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
 import type {
   GoogleMapsViewRef,
-  RNLatLngBounds,
   RNCamera,
   RNLatLng,
+  RNLatLngBounds,
 } from 'react-native-google-maps-plus';
 
 export default function CameraTestScreen() {

@@ -5,7 +5,7 @@ final class MapPolygonBuilder {
     let path = GMSMutablePath()
     p.coordinates.forEach {
       path.add(
-        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+        $0.toCLLocationCoordinate2D()
       )
     }
 
@@ -15,6 +15,14 @@ final class MapPolygonBuilder {
     p.strokeColor.map { pg.strokeColor = $0.toUIColor() }
     p.strokeWidth.map { pg.strokeWidth = CGFloat($0) }
     p.pressable.map { pg.isTappable = $0 }
+    p.geodesic.map { pg.geodesic = $0 }
+    p.holes.map {
+      pg.holes = $0.map { hole in
+        let path = GMSMutablePath()
+        hole.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
+        return path
+      }
+    }
     p.zIndex.map { pg.zIndex = Int32($0) }
 
     return pg
@@ -24,7 +32,7 @@ final class MapPolygonBuilder {
     let path = GMSMutablePath()
     next.coordinates.forEach {
       path.add(
-        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+        $0.toCLLocationCoordinate2D()
       )
     }
     pg.path = path
@@ -33,6 +41,13 @@ final class MapPolygonBuilder {
     pg.strokeColor = next.strokeColor?.toUIColor() ?? .black
     pg.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
     pg.isTappable = next.pressable ?? false
+    pg.geodesic = next.geodesic ?? false
+    pg.holes =
+      next.holes?.map { hole in
+        let path = GMSMutablePath()
+        hole.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
+        return path
+      } ?? []
     pg.zIndex = Int32(next.zIndex ?? 0)
   }
 }
