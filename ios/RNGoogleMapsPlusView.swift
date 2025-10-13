@@ -169,7 +169,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.polylineEquals(next) {
             impl.updatePolyline(id: id) { pl in
-              self.polylineBuilder.update(next, pl)
+              self.polylineBuilder.update(prev, next, pl)
             }
           }
         } else {
@@ -201,7 +201,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.polygonEquals(next) {
             impl.updatePolygon(id: id) { pg in
-              self.polygonBuilder.update(next, pg)
+              self.polygonBuilder.update(prev, next, pg)
             }
           }
         } else {
@@ -230,7 +230,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.circleEquals(next) {
             impl.updateCircle(id: id) { circle in
-              self.circleBuilder.update(next, circle)
+              self.circleBuilder.update(prev, next, circle)
             }
           }
         } else {

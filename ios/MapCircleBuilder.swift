@@ -14,14 +14,34 @@ final class MapCircleBuilder {
     return circle
   }
 
-  func update(_ next: RNCircle, _ c: GMSCircle) {
-    c.position = next.center.toCLLocationCoordinate2D()
-    c.radius = next.radius
-    c.fillColor = next.fillColor?.toUIColor() ?? nil
-    c.strokeColor = next.strokeColor?.toUIColor() ?? .black
-    c.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
-    c.isTappable = next.pressable ?? false
-    c.zIndex = Int32(next.zIndex ?? 0)
-  }
+  func update(_ prev: RNCircle, _ next: RNCircle, _ c: GMSCircle) {
+    if prev.center.latitude != next.center.latitude
+      || prev.center.longitude != next.center.longitude {
+      c.position = next.center.toCLLocationCoordinate2D()
+    }
 
+    if prev.radius != next.radius {
+      c.radius = next.radius ?? 0
+    }
+
+    if prev.fillColor != next.fillColor {
+      c.fillColor = next.fillColor?.toUIColor() ?? .clear
+    }
+
+    if prev.strokeColor != next.strokeColor {
+      c.strokeColor = next.strokeColor?.toUIColor() ?? .black
+    }
+
+    if prev.strokeWidth != next.strokeWidth {
+      c.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
+    }
+
+    if prev.pressable != next.pressable {
+      c.isTappable = next.pressable ?? false
+    }
+
+    if prev.zIndex != next.zIndex {
+      c.zIndex = Int32(next.zIndex ?? 0)
+    }
+  }
 }

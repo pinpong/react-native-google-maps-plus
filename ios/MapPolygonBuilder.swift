@@ -28,26 +28,60 @@ final class MapPolygonBuilder {
     return pg
   }
 
-  func update(_ next: RNPolygon, _ pg: GMSPolygon) {
-    let path = GMSMutablePath()
-    next.coordinates.forEach {
-      path.add(
-        $0.toCLLocationCoordinate2D()
-      )
-    }
-    pg.path = path
+  func update(_ prev: RNPolygon, _ next: RNPolygon, _ pg: GMSPolygon) {
+    let coordsChanged =
+      prev.coordinates.count != next.coordinates.count
+        || !zip(prev.coordinates, next.coordinates).allSatisfy {
+          $0.latitude == $1.latitude && $0.longitude == $1.longitude
+        }
 
-    pg.fillColor = next.fillColor?.toUIColor() ?? .clear
-    pg.strokeColor = next.strokeColor?.toUIColor() ?? .black
-    pg.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
-    pg.isTappable = next.pressable ?? false
-    pg.geodesic = next.geodesic ?? false
-    pg.holes =
-      next.holes?.map { hole in
+    if coordsChanged {
+      let path = GMSMutablePath()
+      next.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
+      pg.path = path
+    }
+
+    let prevHoles = prev.holes ?? []
+    let nextHoles = next.holes ?? []
+    let holesChanged =
+      prevHoles.count != nextHoles.count
+        || !zip(prevHoles, nextHoles).allSatisfy { a, b in
+          a.coordinates.count == b.coordinates.count
+            && zip(a.coordinates, b.coordinates).allSatisfy {
+              $0.latitude == $1.latitude && $0.longitude == $1.longitude
+            }
+        }
+
+    if holesChanged {
+      pg.holes = nextHoles.map { hole in
         let path = GMSMutablePath()
         hole.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
         return path
-      } ?? []
-    pg.zIndex = Int32(next.zIndex ?? 0)
+      }
+    }
+
+    if prev.fillColor != next.fillColor {
+      pg.fillColor = next.fillColor?.toUIColor() ?? .clear
+    }
+
+    if prev.strokeColor != next.strokeColor {
+      pg.strokeColor = next.strokeColor?.toUIColor() ?? .black
+    }
+
+    if prev.strokeWidth != next.strokeWidth {
+      pg.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
+    }
+
+    if prev.pressable != next.pressable {
+      pg.isTappable = next.pressable ?? false
+    }
+
+    if prev.geodesic != next.geodesic {
+      pg.geodesic = next.geodesic ?? false
+    }
+
+    if prev.zIndex != next.zIndex {
+      pg.zIndex = Int32(next.zIndex ?? 0)
+    }
   }
 }
