@@ -1,3 +1,15 @@
+## [1.4.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.0...v1.4.1) (2025-10-13)
+
+### 🐛 Bug Fixes
+
+* handle feature type comparison correctly ([06528dd](https://github.com/pinpong/react-native-google-maps-plus/commit/06528dd5d3efad5b19df1dafb80bad7c96f32987))
+* **ios:** marker opacity ([25c1b52](https://github.com/pinpong/react-native-google-maps-plus/commit/25c1b5264a86288c74334377ada5bb6eb62e075d))
+
+### 🛠️ Other changes
+
+* **example:** add clustering example ([a435508](https://github.com/pinpong/react-native-google-maps-plus/commit/a4355083215a440a1863cd045c61cf771c47f761))
+* merge dev into main ([b65cabf](https://github.com/pinpong/react-native-google-maps-plus/commit/b65cabfcedd27f5add10039833e82eac3f1fc4c8))
+
 ## [1.4.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.3.0...v1.4.0) (2025-10-12)
 
 ### ✨ Features
