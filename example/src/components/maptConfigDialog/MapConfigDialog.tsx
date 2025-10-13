@@ -168,9 +168,11 @@ export default function MapConfigDialog<T>({
       ...(prev as any),
       [key]:
         type === 'number'
-          ? value === '' || isNaN(Number(value))
+          ? value === ''
             ? undefined
-            : Number(value)
+            : /^-?\d*\.?\d*$/.test(value)
+              ? value
+              : prev[key]
           : value,
     }));
   };
@@ -190,6 +192,22 @@ export default function MapConfigDialog<T>({
             Alert.alert('Invalid JSON', `${f.label ?? k}: ${e.message}`);
             return;
           }
+        }
+      }
+    }
+    for (const f of autoSchema) {
+      const k = String(f.key);
+      if (f.type === 'number') {
+        const val = updated[k];
+        if (val === '' || val == null) {
+          updated[k] = undefined;
+        } else if (typeof val === 'string') {
+          const parsed = Number(val.replace(',', '.'));
+          if (isNaN(parsed)) {
+            Alert.alert('Validation Error', `${f.label ?? k}: Invalid number`);
+            return;
+          }
+          updated[k] = parsed;
         }
       }
     }
@@ -348,7 +366,9 @@ export default function MapConfigDialog<T>({
                 <View key={k} style={styles.field}>
                   <Text style={styles.label}>{label}</Text>
                   <TextInput
-                    keyboardType={f.type === 'number' ? 'numeric' : 'default'}
+                    keyboardType={
+                      f.type === 'number' ? 'decimal-pad' : 'default'
+                    }
                     value={value?.toString() ?? ''}
                     onChangeText={(v) => updateField(key, v, f.type)}
                     placeholder={f.placeholder ?? label}
