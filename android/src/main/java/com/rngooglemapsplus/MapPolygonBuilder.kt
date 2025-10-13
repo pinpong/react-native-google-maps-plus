@@ -27,21 +27,60 @@ class MapPolygonBuilder {
     }
 
   fun update(
-    poly: Polygon,
+    prev: RNPolygon,
     next: RNPolygon,
+    poly: Polygon,
   ) {
-    poly.points =
-      next.coordinates.map {
-        it.toLatLng()
-      }
-    poly.fillColor = next.fillColor?.toColor() ?: Color.TRANSPARENT
-    poly.strokeColor = next.strokeColor?.toColor() ?: Color.BLACK
-    poly.strokeWidth = next.strokeWidth?.dpToPx() ?: 1f
-    poly.isClickable = next.pressable ?: false
-    poly.isGeodesic = next.geodesic ?: false
-    poly.holes = next.holes?.map { hole ->
-      hole.coordinates.map { it.toLatLng() }
-    } ?: emptyList()
-    poly.zIndex = next.zIndex?.toFloat() ?: 0f
+    val coordsChanged =
+      prev.coordinates.size != next.coordinates.size ||
+        !prev.coordinates.zip(next.coordinates).all { (a, b) ->
+          a.latitude == b.latitude && a.longitude == b.longitude
+        }
+
+    if (coordsChanged) {
+      poly.points = next.coordinates.map { it.toLatLng() }
+    }
+
+    val prevHoles = prev.holes?.toList() ?: emptyList()
+    val nextHoles = next.holes?.toList() ?: emptyList()
+    val holesChanged =
+      prevHoles.size != nextHoles.size ||
+        !prevHoles.zip(nextHoles).all { (ha, hb) ->
+          ha.coordinates.size == hb.coordinates.size &&
+            ha.coordinates.zip(hb.coordinates).all { (a, b) ->
+              a.latitude == b.latitude && a.longitude == b.longitude
+            }
+        }
+
+    if (holesChanged) {
+      poly.holes =
+        nextHoles.map { hole ->
+          hole.coordinates.map { it.toLatLng() }
+        }
+    }
+
+    if (prev.fillColor != next.fillColor) {
+      poly.fillColor = next.fillColor?.toColor() ?: Color.TRANSPARENT
+    }
+
+    if (prev.strokeColor != next.strokeColor) {
+      poly.strokeColor = next.strokeColor?.toColor() ?: Color.BLACK
+    }
+
+    if (prev.strokeWidth != next.strokeWidth) {
+      poly.strokeWidth = next.strokeWidth?.dpToPx() ?: 1f
+    }
+
+    if (prev.pressable != next.pressable) {
+      poly.isClickable = next.pressable ?: false
+    }
+
+    if (prev.geodesic != next.geodesic) {
+      poly.isGeodesic = next.geodesic ?: false
+    }
+
+    if (prev.zIndex != next.zIndex) {
+      poly.zIndex = next.zIndex?.toFloat() ?: 0f
+    }
   }
 }

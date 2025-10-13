@@ -20,15 +20,38 @@ class MapCircleBuilder {
     }
 
   fun update(
-    circle: Circle,
+    prev: RNCircle,
     next: RNCircle,
+    circle: Circle,
   ) {
-    circle.center = next.center.toLatLng()
-    circle.radius = next.radius
-    circle.strokeWidth = next.strokeWidth?.dpToPx() ?: 1f
-    circle.strokeColor = next.strokeColor?.toColor() ?: Color.BLACK
-    circle.fillColor = next.fillColor?.toColor() ?: Color.TRANSPARENT
-    circle.isClickable = next.pressable ?: false
-    circle.zIndex = next.zIndex?.toFloat() ?: 0f
+    if (prev.center.latitude != next.center.latitude ||
+      prev.center.longitude != next.center.longitude
+    ) {
+      circle.center = next.center.toLatLng()
+    }
+
+    if (prev.radius != next.radius) {
+      circle.radius = next.radius
+    }
+
+    if (prev.strokeWidth != next.strokeWidth) {
+      circle.strokeWidth = next.strokeWidth?.dpToPx() ?: 1f
+    }
+
+    if (prev.strokeColor != next.strokeColor) {
+      circle.strokeColor = next.strokeColor?.toColor() ?: Color.BLACK
+    }
+
+    if (prev.fillColor != next.fillColor) {
+      circle.fillColor = next.fillColor?.toColor() ?: Color.TRANSPARENT
+    }
+
+    if (prev.pressable != next.pressable) {
+      circle.isClickable = next.pressable ?: false
+    }
+
+    if (prev.zIndex != next.zIndex) {
+      circle.zIndex = next.zIndex?.toFloat() ?: 0f
+    }
   }
 }

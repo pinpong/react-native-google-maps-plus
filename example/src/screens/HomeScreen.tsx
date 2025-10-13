@@ -17,6 +17,7 @@ const screens = [
   { name: 'IndoorLevelMap', title: 'Indoor Level Map' },
   { name: 'Camera', title: 'Camera Test' },
   { name: 'Snapshot', title: 'Snapshot Test' },
+  { name: 'Clustering', title: 'Clustering' },
   { name: 'Stress', title: 'Stress Test' },
 ];
 

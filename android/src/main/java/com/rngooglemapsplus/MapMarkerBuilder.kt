@@ -54,33 +54,84 @@ class MapMarkerBuilder(
     }
 
   fun update(
-    marker: Marker,
     prev: RNMarker,
     next: RNMarker,
+    marker: Marker,
   ) {
-    marker.position =
-      next.coordinate.toLatLng()
+    if (prev.coordinate.latitude != next.coordinate.latitude ||
+      prev.coordinate.longitude != next.coordinate.longitude
+    ) {
+      marker.position = next.coordinate.toLatLng()
+    }
 
     if (!prev.markerStyleEquals(next)) {
       buildIconAsync(marker.id, next) { icon ->
         marker.setIcon(icon)
+        if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
+          prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
+        ) {
+          marker.setInfoWindowAnchor(
+            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+          )
+        }
+
+        if (prev.anchor?.x != next.anchor?.x ||
+          prev.anchor?.y != next.anchor?.y
+        ) {
+          marker.setAnchor(
+            (next.anchor?.x ?: 0.5f).toFloat(),
+            (next.anchor?.y ?: 1.0f).toFloat(),
+          )
+        }
+      }
+    } else {
+      if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
+        prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
+      ) {
+        marker.setInfoWindowAnchor(
+          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+        )
+      }
+
+      if (prev.anchor?.x != next.anchor?.x ||
+        prev.anchor?.y != next.anchor?.y
+      ) {
+        marker.setAnchor(
+          (next.anchor?.x ?: 0.5f).toFloat(),
+          (next.anchor?.y ?: 1.0f).toFloat(),
+        )
       }
     }
-    marker.title = next.title
-    marker.snippet = next.snippet
-    marker.alpha = next.opacity?.toFloat() ?: 1f
-    marker.isFlat = next.flat ?: false
-    marker.isDraggable = next.draggable ?: false
-    marker.rotation = next.rotation?.toFloat() ?: 0f
-    marker.setInfoWindowAnchor(
-      (next.infoWindowAnchor?.x ?: 0.5).toFloat(),
-      (next.infoWindowAnchor?.y ?: 0).toFloat(),
-    )
-    marker.setAnchor(
-      (next.anchor?.x ?: 0.5).toFloat(),
-      (next.anchor?.y ?: 1.0).toFloat(),
-    )
-    marker.zIndex = next.zIndex?.toFloat() ?: 0f
+
+    if (prev.title != next.title) {
+      marker.title = next.title
+    }
+
+    if (prev.snippet != next.snippet) {
+      marker.snippet = next.snippet
+    }
+
+    if (prev.opacity != next.opacity) {
+      marker.alpha = next.opacity?.toFloat() ?: 1f
+    }
+
+    if (prev.flat != next.flat) {
+      marker.isFlat = next.flat ?: false
+    }
+
+    if (prev.draggable != next.draggable) {
+      marker.isDraggable = next.draggable ?: false
+    }
+
+    if (prev.rotation != next.rotation) {
+      marker.rotation = next.rotation?.toFloat() ?: 0f
+    }
+
+    if (prev.zIndex != next.zIndex) {
+      marker.zIndex = next.zIndex?.toFloat() ?: 0f
+    }
   }
 
   fun buildIconAsync(

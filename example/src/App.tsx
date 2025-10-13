@@ -24,6 +24,7 @@ import IndoorLevelMapScreen from './screens/IndoorLevelMapScreen';
 import CameraTestScreen from './screens/CameraTestScreen';
 import type { RootStackParamList } from './types/navigation';
 import SnapshotTestScreen from './screens/SnaptshotTestScreen';
+import ClusteringScreen from './screens/ClsuteringScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -111,6 +112,11 @@ export default function App() {
             name="Snapshot"
             component={SnapshotTestScreen}
             options={{ title: 'Snapshot test' }}
+          />
+          <Stack.Screen
+            name="Clustering"
+            component={ClusteringScreen}
+            options={{ title: 'Clustering test' }}
           />
           <Stack.Screen
             name="Stress"

@@ -157,7 +157,7 @@ class RNGoogleMapsPlusView(
         } else if (!prev.markerEquals(next)) {
           view.updateMarker(id) { marker ->
             onUi {
-              markerBuilder.update(marker, next, prev)
+              markerBuilder.update(prev, next, marker)
             }
           }
         }
@@ -181,7 +181,7 @@ class RNGoogleMapsPlusView(
         } else if (!prev.polylineEquals(next)) {
           view.updatePolyline(id) { polyline ->
             onUi {
-              polylineBuilder.update(polyline, next)
+              polylineBuilder.update(prev, next, polyline)
             }
           }
         }
@@ -205,7 +205,7 @@ class RNGoogleMapsPlusView(
           view.addPolygon(id, polygonBuilder.build(next))
         } else if (!prev.polygonEquals(next)) {
           view.updatePolygon(id) { polygon ->
-            onUi { polygonBuilder.update(polygon, next) }
+            onUi { polygonBuilder.update(prev, next, polygon) }
           }
         }
       }
@@ -229,7 +229,7 @@ class RNGoogleMapsPlusView(
         } else if (!prev.circleEquals(next)) {
           view.updateCircle(id) { circle ->
             onUi {
-              circleBuilder.update(circle, next)
+              circleBuilder.update(prev, next, circle)
             }
           }
         }

@@ -44,37 +44,79 @@ final class MapMarkerBuilder {
 
   @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    m.position = next.coordinate.toCLLocationCoordinate2D()
-    m.title = next.title
-    m.snippet = next.snippet
-    m.iconView?.alpha = CGFloat(next.opacity ?? 1)
-    m.isFlat = next.flat ?? false
-    m.isDraggable = next.draggable ?? false
-    m.rotation = next.rotation ?? 0
-    m.infoWindowAnchor = CGPoint(
-      x: next.infoWindowAnchor?.x ?? 0.5,
-      y: next.infoWindowAnchor?.y ?? 0
-    )
-    m.zIndex = Int32(next.zIndex ?? 0)
-    m.groundAnchor = CGPoint(
-      x: next.anchor?.x ?? 0.5,
-      y: next.anchor?.y ?? 1
-    )
+    if prev.coordinate.latitude != next.coordinate.latitude
+      || prev.coordinate.longitude != next.coordinate.longitude {
+      m.position = next.coordinate.toCLLocationCoordinate2D()
+    }
+
+    if prev.title != next.title {
+      m.title = next.title
+    }
+
+    if prev.snippet != next.snippet {
+      m.snippet = next.snippet
+    }
+
+    if prev.opacity != next.opacity {
+      let opacity = Float(next.opacity ?? 1)
+      m.opacity = opacity
+      m.iconView?.alpha = CGFloat(opacity)
+    }
+
+    if prev.flat != next.flat {
+      m.isFlat = next.flat ?? false
+    }
+
+    if prev.draggable != next.draggable {
+      m.isDraggable = next.draggable ?? false
+    }
+
+    if prev.rotation != next.rotation {
+      m.rotation = next.rotation ?? 0
+    }
+
+    if prev.zIndex != next.zIndex {
+      m.zIndex = Int32(next.zIndex ?? 0)
+    }
+
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next.id, next) { img in
         m.tracksViewChanges = true
         m.icon = img
 
-        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
+        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
           m.groundAnchor = CGPoint(
             x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 0.5
+            y: next.anchor?.y ?? 1
+          )
+        }
+
+        if prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x
+          || prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y {
+          m.infoWindowAnchor = CGPoint(
+            x: next.infoWindowAnchor?.x ?? 0.5,
+            y: next.infoWindowAnchor?.y ?? 0
           )
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak m] in
           m?.tracksViewChanges = false
         }
+      }
+    } else {
+      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
+        m.groundAnchor = CGPoint(
+          x: next.anchor?.x ?? 0.5,
+          y: next.anchor?.y ?? 1
+        )
+      }
+
+      if prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x
+        || prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y {
+        m.infoWindowAnchor = CGPoint(
+          x: next.infoWindowAnchor?.x ?? 0.5,
+          y: next.infoWindowAnchor?.y ?? 0
+        )
       }
     }
   }

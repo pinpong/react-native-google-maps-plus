@@ -16,6 +16,7 @@
     "@react-navigation/stack": "7.4.9",
     "react": "19.1.1",
     "react-native": "0.82.0",
+    "react-native-clusterer": "4.0.0",
     "react-native-gesture-handler": "2.28.0",
     "react-native-google-maps-plus": "workspace:*",
     "react-native-nitro-modules": "0.30.0",
