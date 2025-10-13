@@ -919,7 +919,7 @@ class GoogleMapsViewImpl(
     onUi {
       heatmapsById.values.forEach { it.remove() }
     }
-    circlesById.clear()
+    heatmapsById.clear()
     pendingHeatmaps.clear()
   }
 
