@@ -1819,6 +1819,8 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-clusterer (4.0.0):
+    - React-Core
   - react-native-safe-area-context (5.6.1):
     - boost
     - DoubleConversion
@@ -2795,6 +2797,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-clusterer (from `../node_modules/react-native-clusterer`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2928,6 +2931,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-clusterer:
+    :path: "../node_modules/react-native-clusterer"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -3052,6 +3057,7 @@ SPEC CHECKSUMS:
   React-logger: 30adf849117e87cf86e88dca1824bb0f18f87e10
   React-Mapbuffer: 2a5edca6905cb1b3a40fb7ed3f4496df4f1bc60e
   React-microtasksnativemodule: 6d775fdf71445f58dbedbd66ed9cb08b48ae2797
+  react-native-clusterer: a9526b8fb1d6be10cd9a6d05d7d8b982da7c6abc
   react-native-safe-area-context: ee1e8e2a7abf737a8d4d9d1a5686a7f2e7466236
   React-NativeModulesApple: b2ee5b48020439fd81d1fd9cba40ebf0c3af5636
   React-oscompat: 80ca388c4831481cd03a6b45ecfc82739ca9a95e

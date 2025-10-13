@@ -2433,6 +2433,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mapbox/geo-viewport@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@mapbox/geo-viewport@npm:0.5.0"
+  dependencies:
+    "@mapbox/sphericalmercator": ^1.2.0
+  checksum: 9cb990e177226acbdf7658f3367ed3158d8a77350afb0e1de71fa432e682a8aed4afe2f80d36872eb79666b54432fe6219797d50f2ab4152c51811235b7520a0
+  languageName: node
+  linkType: hard
+
+"@mapbox/sphericalmercator@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@mapbox/sphericalmercator@npm:1.2.0"
+  bin:
+    bbox: bin/bbox.js
+    to4326: bin/to4326.js
+    to900913: bin/to900913.js
+    xyz: bin/xyz.js
+  checksum: 515cd9fcadc6626d6352001f6d9dba073fcd10433ceee37d13d4be7fc9a48930b4163b79f53151b71ff9a4410da77bd11c5ff62e3b9d6119bce9031c4d7dabc1
+  languageName: node
+  linkType: hard
+
 "@napi-rs/wasm-runtime@npm:^0.2.11":
   version: 0.2.12
   resolution: "@napi-rs/wasm-runtime@npm:0.2.12"
@@ -3750,6 +3771,13 @@ __metadata:
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
   checksum: bd93e2e415b6f182ec4da1074e1f36c480f1d26add3e696d54fb30c09bc470897e41361c8fd957bf0985024f8fbf1e6e2aff977d79352ef7eb93a5c6dcff6c11
+  languageName: node
+  linkType: hard
+
+"@types/geojson@npm:^7946.0.8":
+  version: 7946.0.16
+  resolution: "@types/geojson@npm:7946.0.16"
+  checksum: d66e5e023f43b3e7121448117af1930af7d06410a32a585a8bc9c6bb5d97e0d656cd93d99e31fa432976c32e98d4b780f82bf1fd1acd20ccf952eb6b8e39edf2
   languageName: node
   linkType: hard
 
@@ -11624,6 +11652,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-clusterer@npm:4.0.0":
+  version: 4.0.0
+  resolution: "react-native-clusterer@npm:4.0.0"
+  dependencies:
+    "@mapbox/geo-viewport": ^0.5.0
+    "@types/geojson": ^7946.0.8
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 4481c0e8aa92ce7fada43231137ea025de593169ab6fa943131666157ed72e64acce26a58334e9b7e67bdd8c9a07ff6ccd15728a474f4b0b574d7eddca5a6a10
+  languageName: node
+  linkType: hard
+
 "react-native-gesture-handler@npm:2.28.0":
   version: 2.28.0
   resolution: "react-native-gesture-handler@npm:2.28.0"
@@ -11658,6 +11699,7 @@ __metadata:
     react: 19.1.1
     react-native: 0.82.0
     react-native-builder-bob: 0.40.13
+    react-native-clusterer: 4.0.0
     react-native-gesture-handler: 2.28.0
     react-native-google-maps-plus: "workspace:*"
     react-native-monorepo-config: 0.2.2
