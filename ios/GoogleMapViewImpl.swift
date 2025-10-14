@@ -388,7 +388,6 @@ GMSIndoorDisplayDelegate {
         return
       }
 
-      // Rückgabe
       if resultIsFile {
         let filename =
           "map_snapshot_\(Int(Date().timeIntervalSince1970)).\(format)"
