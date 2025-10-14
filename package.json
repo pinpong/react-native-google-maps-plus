@@ -2,7 +2,7 @@
   "name": "react-native-google-maps-plus",
   "version": "1.2.0",
   "description": "React-native wrapper for android & IOS google maps sdk",
-  "main": "./lib/module/index.js",
+  "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "source": "src/index",
@@ -148,13 +148,14 @@
     "source": "src",
     "output": "lib",
     "targets": [
+      "commonjs",
+      "module",
       [
-        "module",
+        "typescript",
         {
-          "esm": true
+          "project": "tsconfig.json"
         }
-      ],
-      "typescript"
+      ]
     ]
   },
   "exports": {
