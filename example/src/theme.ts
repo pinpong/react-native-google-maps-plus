@@ -1,5 +1,3 @@
-import { useColorScheme } from 'react-native';
-
 export const lightTheme = {
   bgPrimary: '#FFFFFF',
   bgAccent: '#3B82F6',
@@ -33,8 +31,3 @@ export const darkTheme = {
 };
 
 export type AppTheme = typeof lightTheme;
-
-export function useAppTheme(): AppTheme {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? darkTheme : lightTheme;
-}

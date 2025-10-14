@@ -14,7 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
-import { useAppTheme } from '../theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import type { RootNavigationProp } from '../types/navigation';
 
