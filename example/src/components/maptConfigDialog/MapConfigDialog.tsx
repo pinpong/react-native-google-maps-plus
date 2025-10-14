@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -8,10 +7,15 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
 } from 'react-native';
-import { useForm, Controller, type FieldValues } from 'react-hook-form';
-import { validate } from 'superstruct';
+import { type Struct, validate } from 'superstruct';
 import { useAppTheme } from '../../hooks/useAppTheme';
+import {
+  formatSuperstructError,
+  parseWithUndefined,
+  stringifyWithUndefined,
+} from './utils';
 
 type Props<T> = {
   visible: boolean;
@@ -19,10 +23,10 @@ type Props<T> = {
   initialData: T;
   onClose: () => void;
   onSave: (updated: T) => void;
-  validator?: any;
+  validator?: Struct<T, any>;
 };
 
-export default function MapConfigDialog<T extends FieldValues>({
+export default function MapConfigDialog<T>({
   visible,
   title,
   initialData,
@@ -32,28 +36,67 @@ export default function MapConfigDialog<T extends FieldValues>({
 }: Props<T>) {
   const theme = useAppTheme();
   const styles = getThemedStyles(theme);
-  const { control, handleSubmit, reset } = useForm<T>();
 
-  const onSubmit = (data: T) => {
-    if (validator) {
-      const [err, value] = validate(data, validator);
-      if (err) {
-        Alert.alert(
-          'Input error',
-          `${err.path?.join('.') || '(root)'}: ${err.message}`
-        );
-        return;
+  const [text, setText] = useState(() => stringifyWithUndefined(initialData));
+  const [isValid, setIsValid] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setText(stringifyWithUndefined(initialData));
+    setIsValid(true);
+    setError(null);
+  }, [initialData]);
+
+  const handleChange = (value: string) => {
+    setText(value);
+    try {
+      const parsed = parseWithUndefined(value);
+
+      if (validator) {
+        const [err] = validate(parsed, validator);
+        if (err) {
+          setIsValid(false);
+          setError(formatSuperstructError(err, validator));
+          return;
+        }
       }
-      onSave(value as T);
-    } else {
-      onSave(data);
+
+      setIsValid(true);
+      setError(null);
+    } catch (e: any) {
+      setIsValid(false);
+      setError(e.message);
     }
-    onClose();
   };
 
-  React.useEffect(() => {
-    reset(initialData);
-  }, [initialData, reset]);
+  const handleSave = () => {
+    if (!isValid) {
+      Alert.alert('Invalid JSON', error ?? 'Please fix JSON before saving.');
+      return;
+    }
+
+    try {
+      const parsed = parseWithUndefined(text);
+
+      if (validator) {
+        const [err, value] = validate(parsed, validator);
+        if (err) {
+          Alert.alert(
+            'Validation Error',
+            formatSuperstructError(err, validator)
+          );
+          return;
+        }
+        onSave(value as T);
+      } else {
+        onSave(parsed as T);
+      }
+
+      onClose();
+    } catch (e: any) {
+      Alert.alert('Invalid JSON', e.message);
+    }
+  };
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -61,45 +104,26 @@ export default function MapConfigDialog<T extends FieldValues>({
         <View style={styles.dialog}>
           <Text style={styles.title}>{title}</Text>
           <ScrollView contentContainerStyle={styles.scroll}>
-            {Object.entries(initialData).map(([key, _]) => (
-              <View key={key} style={styles.field}>
-                <Text style={styles.label}>{key}</Text>
-                <Controller
-                  control={control}
-                  name={key as any}
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      spellCheck={false}
-                      autoCapitalize={'none'}
-                      autoCorrect={false}
-                      value={
-                        typeof value === 'object'
-                          ? JSON.stringify(value, null, 2)
-                          : String(value ?? '')
-                      }
-                      onChangeText={(v) => {
-                        try {
-                          onChange(JSON.parse(v));
-                        } catch {
-                          onChange(v);
-                        }
-                      }}
-                      multiline={typeof value === 'object'}
-                    />
-                  )}
-                />
-              </View>
-            ))}
+            <TextInput
+              value={text}
+              onChangeText={handleChange}
+              multiline
+              style={[styles.input, styles.multiline, !isValid && styles.error]}
+              autoCorrect={false}
+              autoCapitalize="none"
+              spellCheck={false}
+            />
+            {!isValid && (
+              <Text style={[styles.errorText]}>
+                {error ?? 'Invalid JSON or schema mismatch'}
+              </Text>
+            )}
           </ScrollView>
           <View style={styles.actions}>
             <Pressable onPress={onClose} style={styles.cancelButton}>
               <Text style={styles.buttonText}>Cancel</Text>
             </Pressable>
-            <Pressable
-              onPress={handleSubmit(onSubmit)}
-              style={styles.saveButton}
-            >
+            <Pressable onPress={handleSave} style={styles.saveButton}>
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
@@ -122,16 +146,15 @@ const getThemedStyles = (theme: any) =>
       maxHeight: '85%',
       backgroundColor: theme.bgPrimary,
       borderRadius: 12,
+      flexShrink: 1,
     },
+    scroll: { padding: 12 },
     title: {
       padding: 12,
       fontSize: 18,
       fontWeight: '600',
       color: theme.textPrimary,
     },
-    scroll: { padding: 12 },
-    field: { marginBottom: 12 },
-    label: { fontSize: 14, marginBottom: 4, color: theme.label },
     input: {
       borderWidth: 1,
       borderRadius: 8,
@@ -141,6 +164,16 @@ const getThemedStyles = (theme: any) =>
       color: theme.textPrimary,
       backgroundColor: theme.inputBg,
       fontFamily: 'monospace',
+    },
+    multiline: { minHeight: 250, textAlignVertical: 'top' },
+    errorText: {
+      marginTop: 6,
+      color: theme.errorBorder,
+      fontSize: 12,
+      fontFamily: 'monospace',
+    },
+    error: {
+      borderColor: theme.errorBorder,
     },
     actions: {
       flexDirection: 'row',
