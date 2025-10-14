@@ -84,7 +84,7 @@ final class MapMarkerBuilder {
         m.tracksViewChanges = true
         m.icon = img
 
-        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
+        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
           m.groundAnchor = CGPoint(
             x: next.anchor?.x ?? 0.5,
             y: next.anchor?.y ?? 1
@@ -104,7 +104,7 @@ final class MapMarkerBuilder {
         }
       }
     } else {
-      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
+      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
         m.groundAnchor = CGPoint(
           x: next.anchor?.x ?? 0.5,
           y: next.anchor?.y ?? 1
