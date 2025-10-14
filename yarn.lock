@@ -11599,6 +11599,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hook-form@npm:7.65.0":
+  version: 7.65.0
+  resolution: "react-hook-form@npm:7.65.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18 || ^19
+  checksum: ad7b6c6919e0f987587a94fe9bed0bd7d4c6817d7f9c4651f8d9d747261ad99b20d85f2ff2f329b86aadecc1ab48d4b0ef2eb13123e1a5d48022dbca259c4aef
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -11697,6 +11706,7 @@ __metadata:
     "@react-navigation/stack": 7.4.9
     "@types/react": 19.1.1
     react: 19.1.1
+    react-hook-form: 7.65.0
     react-native: 0.82.0
     react-native-builder-bob: 0.40.13
     react-native-clusterer: 4.0.0

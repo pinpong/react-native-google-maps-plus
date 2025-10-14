@@ -70,7 +70,19 @@ const REPLACEMENTS = [
 const __filename = fileURLToPath(import.meta.url);
 const filename = basename(__filename);
 
-const RECYCLE_METHOD_ANDROID = `
+const ANDROID_VIEW_MANAGER_METHODS =
+  /override fun onDropViewInstance\(view: View\)\s*\{\s*super\.onDropViewInstance\(view\)\s*views\.remove\(view\)\s*\}/m;
+
+const ANDROID_VIEW_MANAGER_METHODS_NEW = `
+  override fun onDropViewInstance(view: View) {
+    super.onDropViewInstance(view)
+    views.remove(view)
+  /// added by ${filename}
+    if (view is GoogleMapsViewImpl) {
+      view.destroyInternal()
+    }
+  }
+
   /// added by ${filename}
   override fun prepareToRecycleView(reactContext: ThemedReactContext, view: View): View? {
     return null
@@ -83,7 +95,15 @@ const RECYCLE_METHOD_IOS = `
 {
   return NO;
 }
-`;
+
+/// added by ${filename}
+- (void)dealloc {
+  if (_hybridView) {
+    RNGoogleMapsPlus::HybridRNGoogleMapsPlusViewSpec_cxx& swiftPart = _hybridView->getSwiftPart();
+    swiftPart.dispose();
+    _hybridView.reset();
+  }
+}`;
 
 async function processFile(filePath) {
   let content = await readFile(filePath, 'utf8');
@@ -98,17 +118,15 @@ async function processFile(filePath) {
   }
 
   if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_MANAGER)) {
-    if (!/override fun prepareToRecycleView/.test(updated)) {
-      const pattern =
-        /(override fun onDropViewInstance\(view: View\)\s*\{[^}]+\}\s*)/m;
-
-      if (pattern.test(updated)) {
-        updated = updated.replace(pattern, `$1${RECYCLE_METHOD_ANDROID}\n`);
-      } else {
-        throw new Error(
-          `Pattern for "onDropViewInstance" not found in ${filePath}`
-        );
-      }
+    if (ANDROID_VIEW_MANAGER_METHODS.test(updated)) {
+      updated = updated.replace(
+        ANDROID_VIEW_MANAGER_METHODS,
+        ANDROID_VIEW_MANAGER_METHODS_NEW
+      );
+    } else {
+      throw new Error(
+        `Pattern for HybridRNGoogleMapsPlusViewManager not found in ${filePath}`
+      );
     }
   }
 

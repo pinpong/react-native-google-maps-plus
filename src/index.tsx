@@ -1,11 +1,11 @@
-import { GoogleMapsView, GoogleMapsModule } from './GoogleMapsPlus.js';
+import { GoogleMapsView, GoogleMapsModule } from './GoogleMapsPlus';
 import type {
   RNGoogleMapsPlusViewMethods,
   RNGoogleMapsPlusViewProps,
 } from './RNGoogleMapsPlusView.nitro';
 import type { RNGoogleMapsPlusModule } from './RNGoogleMapsPlusModule.nitro';
 
-export * from './types.js';
+export * from './types';
 
 export type {
   RNGoogleMapsPlusViewMethods,

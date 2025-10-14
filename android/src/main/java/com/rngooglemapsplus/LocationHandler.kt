@@ -35,30 +35,28 @@ class LocationHandler(
   private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
-
-  var priority: Int? = PRIORITY_DEFAULT
-    set(value) {
-      field = value ?: PRIORITY_DEFAULT
-      start()
-    }
-
-  var interval: Long? = INTERVAL_DEFAULT
-    set(value) {
-      field = value ?: INTERVAL_DEFAULT
-      buildLocationRequest()
-    }
-
-  var minUpdateInterval: Long? = MIN_UPDATE_INTERVAL
-    set(value) {
-      field = value ?: MIN_UPDATE_INTERVAL
-      buildLocationRequest()
-    }
+  private var priority: Int = PRIORITY_DEFAULT
+  private var interval: Long = INTERVAL_DEFAULT
+  private var minUpdateInterval: Long = MIN_UPDATE_INTERVAL
+  private var lastSubmittedLocation: Location? = null
+  private var isActive = false
 
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
 
   init {
-    buildLocationRequest()
+    buildLocationRequest(priority, interval, minUpdateInterval)
+  }
+
+  fun updateConfig(
+    priority: Int? = null,
+    interval: Long? = null,
+    minUpdateInterval: Long? = null,
+  ) {
+    this.priority = priority ?: PRIORITY_DEFAULT
+    this.interval = interval ?: INTERVAL_DEFAULT
+    this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
+    buildLocationRequest(this.priority, this.interval, this.minUpdateInterval)
   }
 
   fun showLocationDialog() {
@@ -108,11 +106,11 @@ class LocationHandler(
   }
 
   @Suppress("deprecation")
-  private fun buildLocationRequest() {
-    val priority = priority ?: Priority.PRIORITY_BALANCED_POWER_ACCURACY
-    val interval = interval ?: INTERVAL_DEFAULT
-    val minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
-
+  private fun buildLocationRequest(
+    priority: Int,
+    interval: Long,
+    minUpdateInterval: Long,
+  ) {
     locationRequest =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         LocationRequest
@@ -126,11 +124,13 @@ class LocationHandler(
           .setInterval(interval)
           .setFastestInterval(minUpdateInterval)
       }
-    restartLocationUpdates()
   }
 
-  private fun restartLocationUpdates() {
-    stop()
+  @SuppressLint("MissingPermission")
+  fun start() {
+    if (isActive) return
+    isActive = true
+
     val playServicesStatus =
       GoogleApiAvailability
         .getInstance()
@@ -139,17 +139,13 @@ class LocationHandler(
       onError?.invoke(RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE)
       return
     }
-    start()
-  }
-
-  @SuppressLint("MissingPermission")
-  fun start() {
     try {
       fusedLocationClientProviderClient.lastLocation
         .addOnSuccessListener(
           OnSuccessListener { location ->
-            if (location != null) {
+            if (location != null && location != lastSubmittedLocation) {
               onUpdate?.invoke(location)
+              lastSubmittedLocation = location
             }
           },
         ).addOnFailureListener { e ->
@@ -161,8 +157,11 @@ class LocationHandler(
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
-              listener?.onLocationChanged(location)
-              onUpdate?.invoke(location)
+              if (location != lastSubmittedLocation) {
+                lastSubmittedLocation = location
+                listener?.onLocationChanged(location)
+                onUpdate?.invoke(location)
+              }
             } else {
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
             }
@@ -186,9 +185,11 @@ class LocationHandler(
   }
 
   fun stop() {
-    listener = null
+    if (!isActive) return
+    isActive = false
     if (locationCallback != null) {
       fusedLocationClientProviderClient.removeLocationUpdates(locationCallback!!)
+      fusedLocationClientProviderClient.flushLocations()
       locationCallback = null
     }
   }
@@ -199,6 +200,7 @@ class LocationHandler(
   }
 
   override fun deactivate() {
+    listener = null
     stop()
   }
 }

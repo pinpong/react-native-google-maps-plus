@@ -30,6 +30,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
+  @MainActor
   func afterUpdate() {
     if !propsInitialized {
       propsInitialized = true
@@ -43,6 +44,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         impl.initMapView(googleMapOptions: options)
       }
     }
+  }
+
+  @MainActor
+  func dispose() {
+    impl.deinitInternal()
   }
 
   @MainActor

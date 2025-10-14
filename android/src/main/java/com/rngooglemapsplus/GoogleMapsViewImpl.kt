@@ -2,7 +2,6 @@ package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.location.Location
 import android.util.Base64
 import android.util.Size
 import android.widget.FrameLayout
@@ -40,6 +39,7 @@ import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import com.rngooglemapsplus.extensions.toRnLatLng
+import com.rngooglemapsplus.extensions.toRnLocation
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -65,6 +65,7 @@ class GoogleMapsViewImpl(
   LifecycleEventListener {
   private var initialized = false
   private var mapReady = false
+  private var destroyed = false
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
 
@@ -83,7 +84,6 @@ class GoogleMapsViewImpl(
   private val kmlLayersById = mutableMapOf<String, KmlLayer>()
 
   private var cameraMoveReason = -1
-  private var lastSubmittedLocation: Location? = null
   private var lastSubmittedCameraPosition: CameraPosition? = null
 
   init {
@@ -143,8 +143,8 @@ class GoogleMapsViewImpl(
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
       }
+      applyProps()
       initLocationCallbacks()
-      applyPending()
       mapReady = true
       onMapReady?.invoke(true)
     }
@@ -241,18 +241,7 @@ class GoogleMapsViewImpl(
 
   fun initLocationCallbacks() {
     locationHandler.onUpdate = { location ->
-      // / only the coordinated are relevant right now
-      if (lastSubmittedLocation?.latitude != location.latitude || lastSubmittedLocation?.longitude != location.longitude ||
-        lastSubmittedLocation?.bearing != location.bearing
-      ) {
-        onLocationUpdate?.invoke(
-          RNLocation(
-            RNLatLng(location.latitude, location.longitude),
-            location.bearing.toDouble(),
-          ),
-        )
-      }
-      lastSubmittedLocation = location
+      onLocationUpdate?.invoke(location.toRnLocation())
     }
 
     locationHandler.onError = { error ->
@@ -261,65 +250,18 @@ class GoogleMapsViewImpl(
     locationHandler.start()
   }
 
-  fun applyPending() {
-    onUi {
-      mapPadding?.let {
-        googleMap?.setPadding(
-          it.left.dpToPx().toInt(),
-          it.top.dpToPx().toInt(),
-          it.right.dpToPx().toInt(),
-          it.bottom.dpToPx().toInt(),
-        )
-      }
-
-      uiSettings?.let { v ->
-        googleMap?.uiSettings?.apply {
-          v.allGesturesEnabled?.let { setAllGesturesEnabled(it) }
-          v.compassEnabled?.let { isCompassEnabled = it }
-          v.indoorLevelPickerEnabled?.let { isIndoorLevelPickerEnabled = it }
-          v.mapToolbarEnabled?.let { isMapToolbarEnabled = it }
-          v.myLocationButtonEnabled?.let {
-            googleMap?.setLocationSource(locationHandler)
-            isMyLocationButtonEnabled = it
-          }
-          v.rotateEnabled?.let { isRotateGesturesEnabled = it }
-          v.scrollEnabled?.let { isScrollGesturesEnabled = it }
-          v.scrollDuringRotateOrZoomEnabled?.let {
-            isScrollGesturesEnabledDuringRotateOrZoom = it
-          }
-          v.tiltEnabled?.let { isTiltGesturesEnabled = it }
-          v.zoomControlsEnabled?.let { isZoomControlsEnabled = it }
-          v.zoomGesturesEnabled?.let { isZoomGesturesEnabled = it }
-        }
-      }
-
-      buildingEnabled?.let {
-        googleMap?.isBuildingsEnabled = it
-      }
-      trafficEnabled?.let {
-        googleMap?.isTrafficEnabled = it
-      }
-      indoorEnabled?.let {
-        googleMap?.isIndoorEnabled = it
-      }
-      googleMap?.setMapStyle(customMapStyle)
-      mapType?.let {
-        googleMap?.mapType = it
-      }
-      userInterfaceStyle?.let {
-        googleMap?.mapColorScheme = it
-      }
-      mapZoomConfig?.let {
-        googleMap?.setMinZoomPreference(it.min?.toFloat() ?: 2.0f)
-        googleMap?.setMaxZoomPreference(it.max?.toFloat() ?: 21.0f)
-      }
-    }
-
-    locationConfig?.let {
-      locationHandler.priority = it.android?.priority?.toGooglePriority()
-      locationHandler.interval = it.android?.interval?.toLong()
-      locationHandler.minUpdateInterval = it.android?.minUpdateInterval?.toLong()
-    }
+  fun applyProps() {
+    mapPadding = mapPadding
+    uiSettings = uiSettings
+    myLocationEnabled = myLocationEnabled
+    buildingEnabled = buildingEnabled
+    trafficEnabled = trafficEnabled
+    indoorEnabled = indoorEnabled
+    customMapStyle = customMapStyle
+    mapType = mapType
+    userInterfaceStyle = userInterfaceStyle
+    mapZoomConfig = mapZoomConfig
+    locationConfig = locationConfig
 
     if (pendingMarkers.isNotEmpty()) {
       pendingMarkers.forEach { (id, opts) ->
@@ -480,9 +422,11 @@ class GoogleMapsViewImpl(
   var locationConfig: RNLocationConfig? = null
     set(value) {
       field = value
-      locationHandler.priority = value?.android?.priority?.toGooglePriority()
-      locationHandler.interval = value?.android?.interval?.toLong()
-      locationHandler.minUpdateInterval = value?.android?.minUpdateInterval?.toLong()
+      locationHandler.updateConfig(
+        value?.android?.priority?.toGooglePriority(),
+        value?.android?.interval?.toLong(),
+        value?.android?.minUpdateInterval?.toLong(),
+      )
     }
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
@@ -968,6 +912,8 @@ class GoogleMapsViewImpl(
   }
 
   fun destroyInternal() {
+    if (destroyed) return
+    destroyed = true
     onUi {
       locationHandler.stop()
       markerBuilder.cancelAllJobs()
