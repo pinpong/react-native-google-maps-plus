@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url';
 import { basename } from 'path';
 import path from 'node:path';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, copyFile } from 'node:fs/promises';
 
 const ROOT_ANDROID = path.join(
   process.cwd(),
@@ -24,6 +25,22 @@ const ROOT_ANDROID = path.join(
   'android'
 );
 const ROOT_IOS = path.join(process.cwd(), 'nitrogen', 'generated', 'ios');
+const SRC_JSON_DIR = path.join(
+  process.cwd(),
+  'nitrogen',
+  'generated',
+  'shared',
+  'json'
+);
+const DEST_JSON_DIR = path.join(
+  process.cwd(),
+  'lib',
+  'nitrogen',
+  'generated',
+  'shared',
+  'json'
+);
+
 const ANDROID_ONLOAD_FILE = path.join(
   ROOT_ANDROID,
   'RNGoogleMapsPlusOnLoad.cpp'
@@ -110,7 +127,7 @@ async function processFile(filePath) {
 
   if (updated !== content) {
     await writeFile(filePath, updated, 'utf8');
-    console.log(`✔ Updated: ${filePath}`);
+    console.log(`Updated: ${filePath}`);
   }
 }
 
@@ -126,8 +143,26 @@ async function start(dir) {
   }
 }
 
+async function copyJsonFiles() {
+  try {
+    await mkdir(DEST_JSON_DIR, { recursive: true });
+    const files = await readdir(SRC_JSON_DIR);
+    for (const file of files) {
+      if (file.endsWith('.json')) {
+        const src = path.join(SRC_JSON_DIR, file);
+        const dest = path.join(DEST_JSON_DIR, file);
+        await copyFile(src, dest);
+        console.log(`Copied JSON: ${file}`);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to copy JSON view configs:', err.message);
+  }
+}
+
 (async () => {
   try {
+    await copyJsonFiles();
     await start(ROOT_ANDROID);
     await start(ROOT_IOS);
     console.log('All Nitrogen files patched successfully.');
