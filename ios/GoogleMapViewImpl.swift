@@ -657,33 +657,14 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
     onMain {
+      self.cameraMoveReasonIsGesture = gesture
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.cameraMoveReasonIsGesture = gesture
-
-      self.onCameraChangeStart?(region, cam, gesture)
+      self.onCameraChange?(region, camera, gesture)
     }
   }
 
@@ -702,28 +683,10 @@ GMSIndoorDisplayDelegate {
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.onCameraChange?(region, cam, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
     }
   }
 
@@ -732,28 +695,10 @@ GMSIndoorDisplayDelegate {
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.onCameraChangeComplete?(region, cam, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
     }
   }
 

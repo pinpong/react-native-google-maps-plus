@@ -114,18 +114,10 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     didFailWithError error: Error
   ) {
     let code: RNLocationErrorCode
-
     if let clError = error as? CLError {
-      switch clError.code {
-      case .denied:
-        code = RNLocationErrorCode.permissionDenied
-      case .locationUnknown, .network:
-        code = RNLocationErrorCode.positionUnavailable
-      default:
-        code = RNLocationErrorCode.internalError
-      }
+      code = clError.code.toRNLocationErrorCode
     } else {
-      code = RNLocationErrorCode.internalError
+      code = .internalError
     }
     onError?(code)
   }
