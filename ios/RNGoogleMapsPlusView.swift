@@ -34,15 +34,13 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   func afterUpdate() {
     if !propsInitialized {
       propsInitialized = true
-      Task { @MainActor in
-        let options = GMSMapViewOptions()
-        initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
-        initialProps?.liteMode.map { _ in /* not supported */ }
-        initialProps?.camera.map {
-          options.camera = $0.toGMSCameraPosition(current: nil)
-        }
-        impl.initMapView(googleMapOptions: options)
+      let options = GMSMapViewOptions()
+      initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
+      initialProps?.liteMode.map { _ in /* not supported */ }
+      initialProps?.camera.map {
+        options.camera = $0.toGMSCameraPosition(current: nil)
       }
+      impl.initMapView(googleMapOptions: options)
     }
   }
 

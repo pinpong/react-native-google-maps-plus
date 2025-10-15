@@ -17,14 +17,13 @@ extension RNMarker {
   func markerStyleEquals(_ b: RNMarker) -> Bool {
     iconSvg?.width == b.iconSvg?.width && iconSvg?.height == b.iconSvg?.height
       && iconSvg?.svgString == b.iconSvg?.svgString
-
   }
 
-  func styleHash() -> NSString {
+  func styleHash() -> NSNumber {
     var hasher = Hasher()
     hasher.combine(iconSvg?.width)
     hasher.combine(iconSvg?.height)
     hasher.combine(iconSvg?.svgString)
-    return String(hasher.finalize()) as NSString
+    return NSNumber(value: hasher.finalize())
   }
 }

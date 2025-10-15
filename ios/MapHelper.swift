@@ -18,3 +18,23 @@ func withCATransaction(
   body()
   CATransaction.commit()
 }
+
+@MainActor @inline(__always)
+func onMain(_ block: @escaping @MainActor () -> Void) {
+  if Thread.isMainThread {
+    block()
+  } else {
+    Task { @MainActor in block() }
+  }
+}
+
+@inline(__always)
+func onMainAsync(
+  _ block: @MainActor @escaping () async -> Void
+) {
+  if Thread.isMainThread {
+    Task { @MainActor in await block() }
+  } else {
+    Task { @MainActor in await block() }
+  }
+}

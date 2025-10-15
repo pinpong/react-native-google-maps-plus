@@ -355,7 +355,7 @@ GMSIndoorDisplayDelegate {
   ) -> NitroModules.Promise<String?> {
     let promise = Promise<String?>()
 
-    DispatchQueue.main.async {
+    onMainAsync {
       guard let mapView = self.mapView else {
         promise.resolve(withResult: nil)
         return
@@ -845,14 +845,5 @@ GMSIndoorDisplayDelegate {
         level.toRNIndoorLevel(index: index, active: true)
       )
     }
-  }
-}
-
-@inline(__always)
-func onMain(_ block: @escaping () -> Void) {
-  if Thread.isMainThread {
-    block()
-  } else {
-    DispatchQueue.main.async { block() }
   }
 }
