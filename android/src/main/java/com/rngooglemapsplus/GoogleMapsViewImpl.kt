@@ -10,7 +10,6 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
@@ -38,8 +37,11 @@ import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
+import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
+import com.rngooglemapsplus.extensions.toRnCamera
 import com.rngooglemapsplus.extensions.toRnLatLng
 import com.rngooglemapsplus.extensions.toRnLocation
+import com.rngooglemapsplus.extensions.toRnRegion
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -94,31 +96,16 @@ class GoogleMapsViewImpl(
     if (initialized) return
     initialized = true
     val result = playServiceHandler.playServicesAvailability()
+    val errorCode = result.toRNMapErrorCodeOrNull()
 
-    when (result) {
-      ConnectionResult.SERVICE_MISSING -> {
-        onMapError?.invoke(RNMapErrorCode.PLAY_SERVICES_MISSING)
+    if (errorCode != null) {
+      onMapError?.invoke(errorCode)
+
+      if (errorCode == RNMapErrorCode.PLAY_SERVICES_MISSING ||
+        errorCode == RNMapErrorCode.PLAY_SERVICES_INVALID
+      ) {
         return
       }
-
-      ConnectionResult.SERVICE_INVALID -> {
-        onMapError?.invoke(RNMapErrorCode.PLAY_SERVICES_INVALID)
-        return
-      }
-
-      ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED ->
-        onMapError?.invoke(RNMapErrorCode.PLAY_SERVICES_OUTDATED)
-
-      ConnectionResult.SERVICE_UPDATING ->
-        onMapError?.invoke(RNMapErrorCode.PLAY_SERVICE_UPDATING)
-
-      ConnectionResult.SERVICE_DISABLED ->
-        onMapError?.invoke(RNMapErrorCode.PLAY_SERVICES_DISABLED)
-
-      ConnectionResult.SUCCESS -> {}
-
-      else ->
-        onMapError?.invoke(RNMapErrorCode.UNKNOWN)
     }
 
     mapView =
@@ -160,21 +147,9 @@ class GoogleMapsViewImpl(
     }
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason
 
-    val latDelta = bounds.northeast.latitude - bounds.southwest.latitude
-    val lngDelta = bounds.northeast.longitude - bounds.southwest.longitude
-
     onCameraChangeStart?.invoke(
-      RNRegion(
-        center = bounds.center.toRnLatLng(),
-        latitudeDelta = latDelta,
-        longitudeDelta = lngDelta,
-      ),
-      RNCamera(
-        center = cameraPosition.target.toRnLatLng(),
-        zoom = cameraPosition.zoom.toDouble(),
-        bearing = cameraPosition.bearing.toDouble(),
-        tilt = cameraPosition.tilt.toDouble(),
-      ),
+      bounds.toRnRegion(),
+      cameraPosition.toRnCamera(),
       isGesture,
     )
   }
@@ -192,21 +167,9 @@ class GoogleMapsViewImpl(
 
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
-    val latDelta = bounds.northeast.latitude - bounds.southwest.latitude
-    val lngDelta = bounds.northeast.longitude - bounds.southwest.longitude
-
-    onCameraChange?.invoke(
-      RNRegion(
-        center = bounds.center.toRnLatLng(),
-        latitudeDelta = latDelta,
-        longitudeDelta = lngDelta,
-      ),
-      RNCamera(
-        center = cameraPosition.target.toRnLatLng(),
-        zoom = cameraPosition.zoom.toDouble(),
-        bearing = cameraPosition.bearing.toDouble(),
-        tilt = cameraPosition.tilt.toDouble(),
-      ),
+    onCameraChangeStart?.invoke(
+      bounds.toRnRegion(),
+      cameraPosition.toRnCamera(),
       isGesture,
     )
   }
@@ -220,21 +183,9 @@ class GoogleMapsViewImpl(
     }
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
-    val latDelta = bounds.northeast.latitude - bounds.southwest.latitude
-    val lngDelta = bounds.northeast.longitude - bounds.southwest.longitude
-
-    onCameraChangeComplete?.invoke(
-      RNRegion(
-        center = bounds.center.toRnLatLng(),
-        latitudeDelta = latDelta,
-        longitudeDelta = lngDelta,
-      ),
-      RNCamera(
-        center = cameraPosition.target.toRnLatLng(),
-        zoom = cameraPosition.zoom.toDouble(),
-        bearing = cameraPosition.bearing.toDouble(),
-        tilt = cameraPosition.tilt.toDouble(),
-      ),
+    onCameraChangeStart?.invoke(
+      bounds.toRnRegion(),
+      cameraPosition.toRnCamera(),
       isGesture,
     )
   }
