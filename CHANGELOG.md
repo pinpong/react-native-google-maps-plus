@@ -1,3 +1,30 @@
+## [1.5.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.1...v1.5.0) (2025-10-15)
+
+### ✨ Features
+
+* extend location type ([27ff058](https://github.com/pinpong/react-native-google-maps-plus/commit/27ff05869166c2c2314732a00e133af5ba7f3d93))
+
+### 🐛 Bug Fixes
+
+* **android:** clearHeatmaps ([a7e113a](https://github.com/pinpong/react-native-google-maps-plus/commit/a7e113a657a115911aeebebd0950ebbe5c31328d))
+* **build:** copy ViewConfig.json into lib during patch step ([192e97b](https://github.com/pinpong/react-native-google-maps-plus/commit/192e97b6ab34e4a55ae46a5232cc1b61a73c1c7d))
+* **example:** number input ([0d99720](https://github.com/pinpong/react-native-google-maps-plus/commit/0d997200730951b30b48af499d682e5c2aebc8f6))
+
+### 🔄 Code Refactors
+
+* add more extensions ([6ce8c9d](https://github.com/pinpong/react-native-google-maps-plus/commit/6ce8c9d051ee15de3deb1198e8eb748fd40d4dea))
+* add more extensions ([db28521](https://github.com/pinpong/react-native-google-maps-plus/commit/db28521969ab54c033f1fafb335e1204253ac535))
+* **ios:** replace DispatchQueue with Swift concurrency and release SVGKit memory ([d9b2416](https://github.com/pinpong/react-native-google-maps-plus/commit/d9b24167cc1aafafef974194025205a66f3a2653))
+
+### 🛠️ Other changes
+
+* fmt ([1c67f3c](https://github.com/pinpong/react-native-google-maps-plus/commit/1c67f3ca150275d9090cdcafb045e8dc51aec3d4))
+* **ios:** fmt ([7974c09](https://github.com/pinpong/react-native-google-maps-plus/commit/7974c094df34ddfedbc943c22d2a856e571ad7bd))
+* merge dev into main ([daed74b](https://github.com/pinpong/react-native-google-maps-plus/commit/daed74ba5c5f391acd6b69f245f51ce93952e98f))
+* update example ([19559e3](https://github.com/pinpong/react-native-google-maps-plus/commit/19559e3d398e9c5722f69bb218bfa59e6efa4dfc))
+* update example ([1c54d21](https://github.com/pinpong/react-native-google-maps-plus/commit/1c54d21f08914db435775ad67f95342fe036aac1))
+* update release config ([eecb73e](https://github.com/pinpong/react-native-google-maps-plus/commit/eecb73e7cd8bdaa9b265e4e59ac342fcc974ecf6))
+
 ## [1.4.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.0...v1.4.1) (2025-10-13)
 
 ### 🐛 Bug Fixes
