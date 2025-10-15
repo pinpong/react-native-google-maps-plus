@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
-import { useAppTheme } from '../theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 
 export default function SnapshotTestScreen() {

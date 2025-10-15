@@ -6,6 +6,7 @@
   "module": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "source": "src/index",
+  "react-native": "src/index",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "yarn lint:js && yarn lint:android && yarn lint:ios",
@@ -148,22 +149,14 @@
     "source": "src",
     "output": "lib",
     "targets": [
+      "module",
       [
-        "module",
+        "typescript",
         {
-          "esm": true
+          "project": "tsconfig.json"
         }
-      ],
-      "typescript"
+      ]
     ]
-  },
-  "exports": {
-    ".": {
-      "source": "./src/index.tsx",
-      "types": "./lib/typescript/src/index.d.ts",
-      "default": "./lib/module/index.js"
-    },
-    "./package.json": "./package.json"
   },
   "packageManager": "yarn@3.6.1"
 }

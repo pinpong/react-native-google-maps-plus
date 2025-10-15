@@ -11,6 +11,7 @@ GMSIndoorDisplayDelegate {
   private var mapView: GMSMapView?
   private var initialized = false
   private var mapReady = false
+  private var deInitialized = false
 
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
@@ -28,7 +29,6 @@ GMSIndoorDisplayDelegate {
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
-  private var lastSubmittedLocation: CLLocation?
 
   init(
     frame: CGRect = .zero,
@@ -72,8 +72,8 @@ GMSIndoorDisplayDelegate {
     mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     mapView?.paddingAdjustmentBehavior = .never
     mapView.map { addSubview($0) }
+    applyProps()
     initLocationCallbacks()
-    applyPending()
     onMapReady?(true)
     mapReady = true
   }
@@ -82,18 +82,7 @@ GMSIndoorDisplayDelegate {
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
       guard let self = self else { return }
-      if self.lastSubmittedLocation?.coordinate.latitude
-        != loc.coordinate.latitude
-        || self.lastSubmittedLocation?.coordinate.longitude
-        != loc.coordinate.longitude {
-        self.onLocationUpdate?(
-          RNLocation(
-            loc.coordinate.toRNLatLng(),
-            loc.course
-          )
-        )
-      }
-      self.lastSubmittedLocation = loc
+      self.onLocationUpdate?(loc.toRnLocation())
     }
     locationHandler.onError = { [weak self] error in
       self?.onLocationError?(error)
@@ -102,55 +91,19 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
-  private func applyPending() {
-    mapPadding.map {
-      mapView?.padding = UIEdgeInsets(
-        top: $0.top,
-        left: $0.left,
-        bottom: $0.bottom,
-        right: $0.right
-      )
-    }
+  private func applyProps() {
+    ({ self.uiSettings = self.uiSettings })()
+    ({ self.mapPadding = self.mapPadding })()
+    ({ self.myLocationEnabled = self.myLocationEnabled })()
+    ({ self.buildingEnabled = self.buildingEnabled })()
+    ({ self.trafficEnabled = self.trafficEnabled })()
+    ({ self.indoorEnabled = self.indoorEnabled })()
+    ({ self.customMapStyle = self.customMapStyle })()
+    ({ self.mapType = self.mapType })()
+    ({ self.userInterfaceStyle = self.userInterfaceStyle })()
+    ({ self.mapZoomConfig = self.mapZoomConfig })()
+    ({ self.locationConfig = self.locationConfig })()
 
-    if let v = uiSettings {
-      v.allGesturesEnabled.map { mapView?.settings.setAllGesturesEnabled($0) }
-      v.compassEnabled.map { mapView?.settings.compassButton = $0 }
-      v.indoorLevelPickerEnabled.map { mapView?.settings.indoorPicker = $0 }
-      v.mapToolbarEnabled.map { _ in /* not supported */ }
-      v.myLocationButtonEnabled.map { mapView?.settings.myLocationButton = $0 }
-      v.rotateEnabled.map { mapView?.settings.rotateGestures = $0 }
-      v.scrollEnabled.map { mapView?.settings.scrollGestures = $0 }
-      v.scrollDuringRotateOrZoomEnabled.map {
-        mapView?.settings.allowScrollGesturesDuringRotateOrZoom = $0
-      }
-      v.tiltEnabled.map { mapView?.settings.tiltGestures = $0 }
-      v.zoomControlsEnabled.map { _ in /* not supported */ }
-      v.zoomGesturesEnabled.map { mapView?.settings.zoomGestures = $0 }
-    }
-
-    myLocationEnabled.map { mapView?.isMyLocationEnabled = $0 }
-    buildingEnabled.map { mapView?.isBuildingsEnabled = $0 }
-    trafficEnabled.map { mapView?.isTrafficEnabled = $0 }
-    indoorEnabled.map {
-      mapView?.isIndoorEnabled = $0
-      mapView?.indoorDisplay.delegate = $0 == true ? self : nil
-    }
-    customMapStyle.map { mapView?.mapStyle = $0 }
-    mapType.map { mapView?.mapType = $0 }
-    userInterfaceStyle.map { mapView?.overrideUserInterfaceStyle = $0 }
-
-    mapZoomConfig.map {
-      mapView?.setMinZoom(
-        Float($0.min ?? 2),
-        maxZoom: Float($0.max ?? 21)
-      )
-    }
-
-    locationConfig.map {
-      locationHandler.desiredAccuracy =
-        $0.ios?.desiredAccuracy?.toCLLocationAccuracy
-      locationHandler.distanceFilterMeters = $0.ios?.distanceFilterMeters
-    }
     if !pendingMarkers.isEmpty {
       pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
       pendingMarkers.removeAll()
@@ -402,7 +355,7 @@ GMSIndoorDisplayDelegate {
   ) -> NitroModules.Promise<String?> {
     let promise = Promise<String?>()
 
-    DispatchQueue.main.async {
+    onMainAsync {
       guard let mapView = self.mapView else {
         promise.resolve(withResult: nil)
         return
@@ -435,7 +388,6 @@ GMSIndoorDisplayDelegate {
         return
       }
 
-      // Rückgabe
       if resultIsFile {
         let filename =
           "map_snapshot_\(Int(Date().timeIntervalSince1970)).\(format)"
@@ -660,6 +612,8 @@ GMSIndoorDisplayDelegate {
   }
 
   func deinitInternal() {
+    guard !deInitialized else { return }
+    deInitialized = true
     onMain {
       self.locationHandler.stop()
       self.markerBuilder.cancelAllIconTasks()
@@ -703,33 +657,14 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
     onMain {
+      self.cameraMoveReasonIsGesture = gesture
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.cameraMoveReasonIsGesture = gesture
-
-      self.onCameraChangeStart?(region, cam, gesture)
+      self.onCameraChange?(region, camera, gesture)
     }
   }
 
@@ -748,28 +683,10 @@ GMSIndoorDisplayDelegate {
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.onCameraChange?(region, cam, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
     }
   }
 
@@ -778,28 +695,10 @@ GMSIndoorDisplayDelegate {
       let visibleRegion = mapView.projection.visibleRegion()
       let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let center = CLLocationCoordinate2D(
-        latitude: (bounds.northEast.latitude + bounds.southWest.latitude) / 2.0,
-        longitude: (bounds.northEast.longitude + bounds.southWest.longitude)
-          / 2.0
-      )
+      let region = bounds.toRNRegion()
+      let camera = mapView.camera.toRNCamera()
 
-      let latDelta = bounds.northEast.latitude - bounds.southWest.latitude
-      let lngDelta = bounds.northEast.longitude - bounds.southWest.longitude
-
-      let cp = mapView.camera
-      let region = RNRegion(
-        center: center.toRNLatLng(),
-        latitudeDelta: latDelta,
-        longitudeDelta: lngDelta
-      )
-      let cam = RNCamera(
-        center: cp.target.toRNLatLng(),
-        zoom: Double(cp.zoom),
-        bearing: cp.bearing,
-        tilt: cp.viewingAngle
-      )
-      self.onCameraChangeComplete?(region, cam, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
     }
   }
 
@@ -891,14 +790,5 @@ GMSIndoorDisplayDelegate {
         level.toRNIndoorLevel(index: index, active: true)
       )
     }
-  }
-}
-
-@inline(__always)
-func onMain(_ block: @escaping () -> Void) {
-  if Thread.isMainThread {
-    block()
-  } else {
-    DispatchQueue.main.async { block() }
   }
 }

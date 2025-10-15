@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url';
 import { basename } from 'path';
 import path from 'node:path';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, copyFile } from 'node:fs/promises';
 
 const ROOT_ANDROID = path.join(
   process.cwd(),
@@ -24,6 +25,22 @@ const ROOT_ANDROID = path.join(
   'android'
 );
 const ROOT_IOS = path.join(process.cwd(), 'nitrogen', 'generated', 'ios');
+const SRC_JSON_DIR = path.join(
+  process.cwd(),
+  'nitrogen',
+  'generated',
+  'shared',
+  'json'
+);
+const DEST_JSON_DIR = path.join(
+  process.cwd(),
+  'lib',
+  'nitrogen',
+  'generated',
+  'shared',
+  'json'
+);
+
 const ANDROID_ONLOAD_FILE = path.join(
   ROOT_ANDROID,
   'RNGoogleMapsPlusOnLoad.cpp'
@@ -53,7 +70,19 @@ const REPLACEMENTS = [
 const __filename = fileURLToPath(import.meta.url);
 const filename = basename(__filename);
 
-const RECYCLE_METHOD_ANDROID = `
+const ANDROID_VIEW_MANAGER_METHODS =
+  /override fun onDropViewInstance\(view: View\)\s*\{\s*super\.onDropViewInstance\(view\)\s*views\.remove\(view\)\s*\}/m;
+
+const ANDROID_VIEW_MANAGER_METHODS_NEW = `
+  override fun onDropViewInstance(view: View) {
+    super.onDropViewInstance(view)
+    views.remove(view)
+  /// added by ${filename}
+    if (view is GoogleMapsViewImpl) {
+      view.destroyInternal()
+    }
+  }
+
   /// added by ${filename}
   override fun prepareToRecycleView(reactContext: ThemedReactContext, view: View): View? {
     return null
@@ -66,7 +95,15 @@ const RECYCLE_METHOD_IOS = `
 {
   return NO;
 }
-`;
+
+/// added by ${filename}
+- (void)dealloc {
+  if (_hybridView) {
+    RNGoogleMapsPlus::HybridRNGoogleMapsPlusViewSpec_cxx& swiftPart = _hybridView->getSwiftPart();
+    swiftPart.dispose();
+    _hybridView.reset();
+  }
+}`;
 
 async function processFile(filePath) {
   let content = await readFile(filePath, 'utf8');
@@ -81,17 +118,15 @@ async function processFile(filePath) {
   }
 
   if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_MANAGER)) {
-    if (!/override fun prepareToRecycleView/.test(updated)) {
-      const pattern =
-        /(override fun onDropViewInstance\(view: View\)\s*\{[^}]+\}\s*)/m;
-
-      if (pattern.test(updated)) {
-        updated = updated.replace(pattern, `$1${RECYCLE_METHOD_ANDROID}\n`);
-      } else {
-        throw new Error(
-          `Pattern for "onDropViewInstance" not found in ${filePath}`
-        );
-      }
+    if (ANDROID_VIEW_MANAGER_METHODS.test(updated)) {
+      updated = updated.replace(
+        ANDROID_VIEW_MANAGER_METHODS,
+        ANDROID_VIEW_MANAGER_METHODS_NEW
+      );
+    } else {
+      throw new Error(
+        `Pattern for HybridRNGoogleMapsPlusViewManager not found in ${filePath}`
+      );
     }
   }
 
@@ -110,7 +145,7 @@ async function processFile(filePath) {
 
   if (updated !== content) {
     await writeFile(filePath, updated, 'utf8');
-    console.log(`✔ Updated: ${filePath}`);
+    console.log(`Updated: ${filePath}`);
   }
 }
 
@@ -126,8 +161,26 @@ async function start(dir) {
   }
 }
 
+async function copyJsonFiles() {
+  try {
+    await mkdir(DEST_JSON_DIR, { recursive: true });
+    const files = await readdir(SRC_JSON_DIR);
+    for (const file of files) {
+      if (file.endsWith('.json')) {
+        const src = path.join(SRC_JSON_DIR, file);
+        const dest = path.join(DEST_JSON_DIR, file);
+        await copyFile(src, dest);
+        console.log(`Copied JSON: ${file}`);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to copy JSON view configs:', err.message);
+  }
+}
+
 (async () => {
   try {
+    await copyJsonFiles();
     await start(ROOT_ANDROID);
     await start(ROOT_IOS);
     console.log('All Nitrogen files patched successfully.');

@@ -259,6 +259,7 @@ export type RNLocationConfig = {
   android?: RNAndroidLocationConfig;
   ios?: RNIOSLocationConfig;
 };
+
 export type RNAndroidLocationConfig = {
   priority?: RNAndroidLocationPriority;
   interval?: number;
@@ -302,7 +303,33 @@ export enum RNIOSPermissionResult {
 
 export type RNLocation = {
   center: RNLatLng;
+  altitude: number;
+  accuracy: number;
   bearing: number;
+  speed: number;
+  time: number;
+  android?: RNLocationAndroid;
+  ios?: RNLocationIOS;
+};
+
+export type RNLocationAndroid = {
+  provider?: string | null;
+  elapsedRealtimeNanos?: number;
+  bearingAccuracyDegrees?: number;
+  speedAccuracyMetersPerSecond?: number;
+  verticalAccuracyMeters?: number;
+  mslAltitudeMeters?: number;
+  mslAltitudeAccuracyMeters?: number;
+  isMock?: boolean;
+};
+export type RNLocationIOS = {
+  horizontalAccuracy?: number;
+  verticalAccuracy?: number;
+  speedAccuracy?: number;
+  courseAccuracy?: number;
+  floor?: number | null;
+  isFromMockProvider?: boolean;
+  timestamp?: number;
 };
 
 export enum RNLocationErrorCode {

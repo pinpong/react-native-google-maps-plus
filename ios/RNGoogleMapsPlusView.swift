@@ -30,19 +30,23 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
+  @MainActor
   func afterUpdate() {
     if !propsInitialized {
       propsInitialized = true
-      Task { @MainActor in
-        let options = GMSMapViewOptions()
-        initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
-        initialProps?.liteMode.map { _ in /* not supported */ }
-        initialProps?.camera.map {
-          options.camera = $0.toGMSCameraPosition(current: nil)
-        }
-        impl.initMapView(googleMapOptions: options)
+      let options = GMSMapViewOptions()
+      initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
+      initialProps?.liteMode.map { _ in /* not supported */ }
+      initialProps?.camera.map {
+        options.camera = $0.toGMSCameraPosition(current: nil)
       }
+      impl.initMapView(googleMapOptions: options)
     }
+  }
+
+  @MainActor
+  func dispose() {
+    impl.deinitInternal()
   }
 
   @MainActor

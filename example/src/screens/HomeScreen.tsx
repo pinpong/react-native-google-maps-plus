@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { useAppTheme } from '../theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },

@@ -3,13 +3,12 @@ import SVGKit
 import UIKit
 
 final class MapMarkerBuilder {
-  private let iconCache = NSCache<NSString, UIImage>()
+  private let iconCache: NSCache<NSNumber, UIImage> = {
+    let c = NSCache<NSNumber, UIImage>()
+    c.countLimit = 512
+    return c
+  }()
   private var tasks: [String: Task<Void, Never>] = [:]
-  private let queue = DispatchQueue(
-    label: "map.marker.render",
-    qos: .userInitiated,
-    attributes: .concurrent
-  )
 
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
@@ -35,7 +34,8 @@ final class MapMarkerBuilder {
     }
     m.zIndex.map { marker.zIndex = Int32($0) }
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak marker] in
+    onMainAsync { [weak marker] in
+      try? await Task.sleep(nanoseconds: 250_000_000)
       marker?.tracksViewChanges = false
     }
 
@@ -84,7 +84,7 @@ final class MapMarkerBuilder {
         m.tracksViewChanges = true
         m.icon = img
 
-        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
+        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
           m.groundAnchor = CGPoint(
             x: next.anchor?.x ?? 0.5,
             y: next.anchor?.y ?? 1
@@ -99,12 +99,13 @@ final class MapMarkerBuilder {
           )
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak m] in
+        onMainAsync { [weak m] in
+          try? await Task.sleep(nanoseconds: 250_000_000)
           m?.tracksViewChanges = false
         }
       }
     } else {
-      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y{
+      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
         m.groundAnchor = CGPoint(
           x: next.anchor?.x ?? 0.5,
           y: next.anchor?.y ?? 1
@@ -144,7 +145,8 @@ final class MapMarkerBuilder {
       guard let self else { return }
       defer { self.tasks.removeValue(forKey: id) }
 
-      let img = await self.renderUIImage(m)
+      let scale = UIScreen.main.scale
+      let img = await self.renderUIImage(m, scale)
       guard let img, !Task.isCancelled else { return }
 
       self.iconCache.setObject(img, forKey: key)
@@ -172,65 +174,38 @@ final class MapMarkerBuilder {
     iconCache.removeAllObjects()
   }
 
-  private func renderUIImage(_ m: RNMarker) async -> UIImage? {
-    guard let iconSvg = m.iconSvg else {
-      return nil
-    }
+  private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) async -> UIImage? {
+    guard let iconSvg = m.iconSvg,
+          let data = iconSvg.svgString.data(using: .utf8)
+    else { return nil }
 
-    return await withTaskCancellationHandler(
-      operation: {
-        await withCheckedContinuation {
-          (cont: CheckedContinuation<UIImage?, Never>) in
-          queue.async {
-            if Task.isCancelled {
-              cont.resume(returning: nil)
-              return
-            }
-
-            let targetW = max(1, Int(CGFloat(iconSvg.width)))
-            let targetH = max(1, Int(CGFloat(iconSvg.height)))
-            let size = CGSize(width: targetW, height: targetH)
-
-            guard
-              let data = iconSvg.svgString.data(using: .utf8),
-              let svgImg = SVGKImage(data: data)
-            else {
-              cont.resume(returning: nil)
-              return
-            }
-
-            svgImg.size = size
-
-            if Task.isCancelled {
-              cont.resume(returning: nil)
-              return
-            }
-
-            guard let base = svgImg.uiImage else {
-              cont.resume(returning: nil)
-              return
-            }
-
-            let scale = UIScreen.main.scale
-            let img: UIImage
-            if let cg = base.cgImage {
-              img = UIImage(cgImage: cg, scale: scale, orientation: .up)
-            } else {
-              let fmt = UIGraphicsImageRendererFormat.default()
-              fmt.opaque = false
-              fmt.scale = scale
-              let renderer = UIGraphicsImageRenderer(size: size, format: fmt)
-              img = renderer.image { _ in
-                base.draw(in: CGRect(origin: .zero, size: size))
-              }
-            }
-
-            cont.resume(returning: img)
-          }
-        }
-
-      },
-      onCancel: {}
+    let size = CGSize(
+      width: max(1, CGFloat(iconSvg.width)),
+      height: max(1, CGFloat(iconSvg.height))
     )
+
+    return await Task.detached(priority: .userInitiated) {
+      autoreleasepool {
+        guard let svgImg = SVGKImage(data: data) else { return nil }
+        svgImg.size = size
+
+        guard !Task.isCancelled else { return nil }
+        guard let base = svgImg.uiImage else { return nil }
+
+        if let cg = base.cgImage {
+          return UIImage(cgImage: cg, scale: scale, orientation: .up)
+        }
+        guard !Task.isCancelled else { return nil }
+        let fmt = UIGraphicsImageRendererFormat.default()
+        fmt.opaque = false
+        fmt.scale = scale
+        guard !Task.isCancelled else { return nil }
+        let renderer = UIGraphicsImageRenderer(size: size, format: fmt)
+        return renderer.image { _ in
+          base.draw(in: CGRect(origin: .zero, size: size))
+        }
+      }
+    }.value
   }
+
 }
