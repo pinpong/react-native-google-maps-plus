@@ -24,6 +24,12 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['node_modules/', 'lib/', '.yarn', 'eslint.config.mjs'],
+    ignores: [
+      'node_modules/',
+      'lib/',
+      'expoConfig/build',
+      '.yarn',
+      'eslint.config.mjs',
+    ],
   },
 ]);

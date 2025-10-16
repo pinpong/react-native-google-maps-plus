@@ -94,3 +94,4 @@ android/.kotlin/
 android/.kotlinc/
 
 tsconfig.tsbuildinfo
+expoConfig/build

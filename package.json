@@ -21,7 +21,8 @@
     "test": "jest",
     "git:clean": "git clean -dfX",
     "release": "semantic-release",
-    "build": "yarn nitrogen && bob build",
+    "build": "yarn nitrogen && bob build && yarn build:plugin",
+    "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
     "prepare": "bob build"
   },
@@ -33,11 +34,13 @@
     "google-maps-sdk",
     "android",
     "ios",
-    "maps"
+    "maps",
+    "expo"
   ],
   "files": [
     "src",
     "lib",
+    "expoConfig/build",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -77,6 +80,7 @@
     "@eslint/compat": "1.4.0",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.37.0",
+    "@expo/config-plugins": "54.0.2",
     "@jamesacarr/eslint-formatter-github-actions": "0.2.0",
     "@react-native/babel-preset": "0.82.0",
     "@react-native/eslint-config": "0.82.0",
@@ -94,12 +98,12 @@
     "eslint-plugin-prettier": "5.5.4",
     "jest": "30.2.0",
     "lefthook": "1.13.6",
-    "nitrogen": "0.30.0",
+    "nitrogen": "0.30.1",
     "prettier": "3.6.2",
     "react": "19.2.0",
     "react-native": "0.82.0",
     "react-native-builder-bob": "0.40.13",
-    "react-native-nitro-modules": "0.30.0",
+    "react-native-nitro-modules": "0.30.1",
     "semantic-release": "25.0.0-beta.6",
     "typescript": "5.9.3"
   },
@@ -108,9 +112,15 @@
     "semantic-release": "25.0.0-beta.6"
   },
   "peerDependencies": {
+    "expo": "*",
     "react": "*",
     "react-native": "*",
     "react-native-nitro-modules": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
   },
   "eslintConfig": {
     "root": true,
