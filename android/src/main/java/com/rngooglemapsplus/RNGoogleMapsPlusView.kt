@@ -147,19 +147,16 @@ class RNGoogleMapsPlusView(
 
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
-        if (prev == null) {
-          markerBuilder.buildIconAsync(id, next) { icon ->
-            view.addMarker(
-              id,
-              markerBuilder.build(next, icon),
-            )
-          }
-        } else if (!prev.markerEquals(next)) {
-          view.updateMarker(id) { marker ->
-            onUi {
-              markerBuilder.update(prev, next, marker)
+        when {
+          prev == null ->
+            markerBuilder.buildIconAsync(id, next) { icon ->
+              view.addMarker(id, markerBuilder.build(next, icon))
             }
-          }
+
+          !prev.markerEquals(next) ->
+            view.updateMarker(id) { marker ->
+              onUi { markerBuilder.update(prev, next, marker) }
+            }
         }
       }
     }
@@ -176,14 +173,14 @@ class RNGoogleMapsPlusView(
 
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
-        if (prev == null) {
-          view.addPolyline(id, polylineBuilder.build(next))
-        } else if (!prev.polylineEquals(next)) {
-          view.updatePolyline(id) { polyline ->
-            onUi {
-              polylineBuilder.update(prev, next, polyline)
+        when {
+          prev == null ->
+            view.addPolyline(id, polylineBuilder.build(next))
+
+          !prev.polylineEquals(next) ->
+            view.updatePolyline(id) { polyline ->
+              onUi { polylineBuilder.update(prev, next, polyline) }
             }
-          }
         }
       }
     }
@@ -201,12 +198,14 @@ class RNGoogleMapsPlusView(
 
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
-        if (prev == null) {
-          view.addPolygon(id, polygonBuilder.build(next))
-        } else if (!prev.polygonEquals(next)) {
-          view.updatePolygon(id) { polygon ->
-            onUi { polygonBuilder.update(prev, next, polygon) }
-          }
+        when {
+          prev == null ->
+            view.addPolygon(id, polygonBuilder.build(next))
+
+          !prev.polygonEquals(next) ->
+            view.updatePolygon(id) { polygon ->
+              onUi { polygonBuilder.update(prev, next, polygon) }
+            }
         }
       }
     }
@@ -224,14 +223,14 @@ class RNGoogleMapsPlusView(
 
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
-        if (prev == null) {
-          view.addCircle(id, circleBuilder.build(next))
-        } else if (!prev.circleEquals(next)) {
-          view.updateCircle(id) { circle ->
-            onUi {
-              circleBuilder.update(prev, next, circle)
+        when {
+          prev == null ->
+            view.addCircle(id, circleBuilder.build(next))
+
+          !prev.circleEquals(next) ->
+            view.updateCircle(id) { circle ->
+              onUi { circleBuilder.update(prev, next, circle) }
             }
-          }
         }
       }
     }

@@ -140,11 +140,9 @@ class GoogleMapsViewImpl(
   override fun onCameraMoveStarted(reason: Int) {
     lastSubmittedCameraPosition = null
     cameraMoveReason = reason
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds
-    val cameraPosition = googleMap?.cameraPosition
-    if (bounds == null || cameraPosition == null) {
-      return
-    }
+    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val cameraPosition = googleMap?.cameraPosition ?: return
+
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason
 
     onCameraChangeStart?.invoke(
@@ -155,11 +153,9 @@ class GoogleMapsViewImpl(
   }
 
   override fun onCameraMove() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds
-    val cameraPosition = googleMap?.cameraPosition
-    if (bounds == null || cameraPosition == null) {
-      return
-    }
+    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val cameraPosition = googleMap?.cameraPosition ?: return
+
     if (cameraPosition == lastSubmittedCameraPosition) {
       return
     }
@@ -175,12 +171,9 @@ class GoogleMapsViewImpl(
   }
 
   override fun onCameraIdle() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds
-    val cameraPosition = googleMap?.cameraPosition
+    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val cameraPosition = googleMap?.cameraPosition ?: return
 
-    if (bounds == null || cameraPosition == null) {
-      return
-    }
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     onCameraChangeStart?.invoke(
@@ -404,11 +397,6 @@ class GoogleMapsViewImpl(
     durationMs: Int,
   ) {
     onUi {
-      val current = googleMap?.cameraPosition
-      if (current == null) {
-        return@onUi
-      }
-
       val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
 
       if (animated) {
