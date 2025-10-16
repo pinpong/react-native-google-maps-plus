@@ -21,7 +21,8 @@
     "test": "jest",
     "git:clean": "git clean -dfX",
     "release": "semantic-release",
-    "build": "yarn nitrogen && bob build",
+    "build": "yarn nitrogen && bob build && yarn build:plugin",
+    "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
     "prepare": "bob build"
   },
@@ -33,11 +34,13 @@
     "google-maps-sdk",
     "android",
     "ios",
-    "maps"
+    "maps",
+    "expo"
   ],
   "files": [
     "src",
     "lib",
+    "expoConfig/build",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -108,9 +111,15 @@
     "semantic-release": "25.0.0-beta.6"
   },
   "peerDependencies": {
+    "expo": "*",
     "react": "*",
     "react-native": "*",
     "react-native-nitro-modules": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
   },
   "eslintConfig": {
     "root": true,

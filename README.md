@@ -22,6 +22,27 @@ React-native wrapper for android & IOS google maps sdk
 yarn add react-native-google-maps-plus react-native-nitro-modules
 ```
 
+### Expo Projects
+
+Add your keys to the `app.json`.
+The config plugin automatically injects them into your native Android and iOS builds during `expo prebuild`.
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "react-native-google-maps-plus",
+        {
+          "googleMapsAndroidApiKey": "YOUR_ANDROID_MAPS_API_KEY",
+          "googleMapsIosApiKey": "YOUR_IOS_MAPS_API_KEY"
+        }
+      ]
+    ]
+  }
+}
+```
+
 # Dependencies
 
 This package builds on native libraries for SVG rendering and Google Maps integration:
