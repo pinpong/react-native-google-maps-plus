@@ -1,3 +1,15 @@
+## [1.6.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.5.0...v1.6.0) (2025-10-16)
+
+### ✨ Features
+
+* add expo support ([3fbf01d](https://github.com/pinpong/react-native-google-maps-plus/commit/3fbf01d0ea505bfd8a8d2e657cfc6fa953ee8443))
+
+### 🛠️ Other changes
+
+* add @expo/config-plugins ([d66534f](https://github.com/pinpong/react-native-google-maps-plus/commit/d66534fa31262fc06c2a3cee07f964a23e43a1f2))
+* merge dev into main ([d3bbcfe](https://github.com/pinpong/react-native-google-maps-plus/commit/d3bbcfeaadfc71de1c4e898f802587faa4adea57))
+* updated deps ([743b18a](https://github.com/pinpong/react-native-google-maps-plus/commit/743b18a29234a9fc08b7b041991630e6bd1a76e5))
+
 ## [1.5.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.1...v1.5.0) (2025-10-15)
 
 ### ✨ Features
