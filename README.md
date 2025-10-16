@@ -12,7 +12,7 @@
 [![Platform: Android](https://img.shields.io/badge/platform-android-green.svg?logo=android&logoColor=white)](https://developer.android.com/)
 [![Platform: iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg?logo=apple&logoColor=black)](https://developer.apple.com/ios/)
 
-React-native wrapper for android & IOS google maps sdk
+React Native wrapper for Android & iOS Google Maps SDK.
 
 ## Installation
 
