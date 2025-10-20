@@ -5,7 +5,7 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@actions/core@npm:^1.10.0":
+"@actions/core@npm:^1.10.0, @actions/core@npm:^1.11.1":
   version: 1.11.1
   resolution: "@actions/core@npm:1.11.1"
   dependencies:
@@ -1856,23 +1856,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/config-array@npm:^0.21.0":
-  version: 0.21.0
-  resolution: "@eslint/config-array@npm:0.21.0"
+"@eslint/config-array@npm:^0.21.1":
+  version: 0.21.1
+  resolution: "@eslint/config-array@npm:0.21.1"
   dependencies:
-    "@eslint/object-schema": ^2.1.6
+    "@eslint/object-schema": ^2.1.7
     debug: ^4.3.1
     minimatch: ^3.1.2
-  checksum: 84d3ae7cb755af94dc158a74389f4c560757b13f2bb908f598f927b87b70a38e8152015ea2e9557c1b4afc5130ee1356f6cad682050d67aae0468bbef98bc3a8
+  checksum: fc5b57803b059f7c1f62950ef83baf045a01887fc00551f9e87ac119246fcc6d71c854a7f678accc79cbf829ed010e8135c755a154b0f54b129c538950cd7e6a
   languageName: node
   linkType: hard
 
-"@eslint/config-helpers@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@eslint/config-helpers@npm:0.4.0"
+"@eslint/config-helpers@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@eslint/config-helpers@npm:0.4.1"
   dependencies:
     "@eslint/core": ^0.16.0
-  checksum: f17af9d6de60e0d8be5131451ef489f32984f92aff00cb1c5c8f1790baf07ea7ad803e0f21f1519eded4ce247871ffe593b7e51ddc094b5337d22f29dd720ba5
+  checksum: 8c4c5040218459457fef363b71157b0bc8abb909ff78325c7be57459188b9f166d9eb43bf00a92ee59311b34964a585b540ca9961f49f79c8a201bb17ea3d159
   languageName: node
   linkType: hard
 
@@ -1902,17 +1902,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.37.0":
-  version: 9.37.0
-  resolution: "@eslint/js@npm:9.37.0"
-  checksum: 916f2ff7f70eadaa3a1c3f7d6d375fccfb676723484e1c54c5d63ff8a462746090097b73d21f4cb876ff2276d04af3f1c4c9e9a93729a9305213ca3aaa75008c
+"@eslint/js@npm:9.38.0":
+  version: 9.38.0
+  resolution: "@eslint/js@npm:9.38.0"
+  checksum: 24219b9547c9a7b584c68e8cdab1f3ec607f8e3ce5d9f5fbde51664db5cacc5606e436f3c2bea688f7e7e416cf155d0ea3b725c66055e0e0e8ce28d003b828e0
   languageName: node
   linkType: hard
 
-"@eslint/object-schema@npm:^2.1.6":
-  version: 2.1.6
-  resolution: "@eslint/object-schema@npm:2.1.6"
-  checksum: e32e565319f6544d36d3fa69a3e163120722d12d666d1a4525c9a6f02e9b54c29d9b1f03139e25d7e759e08dda8da433590bc23c09db8d511162157ef1b86a4c
+"@eslint/object-schema@npm:^2.1.7":
+  version: 2.1.7
+  resolution: "@eslint/object-schema@npm:2.1.7"
+  checksum: fc5708f192476956544def13455d60fd1bafbf8f062d1e05ec5c06dd470b02078eaf721e696a8b31c1c45d2056723a514b941ae5eea1398cc7e38eba6711a775
   languageName: node
   linkType: hard
 
@@ -3505,7 +3505,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/commit-analyzer@npm:^13.0.0-beta.1":
+"@semantic-release/commit-analyzer@npm:^13.0.1":
   version: 13.0.1
   resolution: "@semantic-release/commit-analyzer@npm:13.0.1"
   dependencies:
@@ -3555,7 +3555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/github@npm:^12.0.0-beta.2":
+"@semantic-release/github@npm:^12.0.0":
   version: 12.0.0
   resolution: "@semantic-release/github@npm:12.0.0"
   dependencies:
@@ -3581,35 +3581,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/npm@npm:13.0.0-beta.1":
-  version: 13.0.0-beta.1
-  resolution: "@semantic-release/npm@npm:13.0.0-beta.1"
+"@semantic-release/npm@npm:13.1.1, @semantic-release/npm@npm:^13.1.1":
+  version: 13.1.1
+  resolution: "@semantic-release/npm@npm:13.1.1"
   dependencies:
+    "@actions/core": ^1.11.1
     "@semantic-release/error": ^4.0.0
     aggregate-error: ^5.0.0
-    execa: ^9.0.0
-    fs-extra: ^11.0.0
-    lodash-es: ^4.17.21
-    nerf-dart: ^1.0.0
-    normalize-url: ^8.0.0
-    npm: ^11.4.2
-    rc: ^1.2.8
-    read-pkg: ^9.0.0
-    registry-auth-token: ^5.0.0
-    semver: ^7.1.2
-    tempy: ^3.0.0
-  peerDependencies:
-    semantic-release: ">=20.1.0"
-  checksum: e14d35c557bdc969f70b4e00def3f258a49bb44ccdea96b95cb04bbb4636ea4c2e5a06a5b80946cf0ffc57cf4fc21a182804691f39a19c7302a95e11b368113d
-  languageName: node
-  linkType: hard
-
-"@semantic-release/npm@npm:^13.0.0-beta.1":
-  version: 13.0.0
-  resolution: "@semantic-release/npm@npm:13.0.0"
-  dependencies:
-    "@semantic-release/error": ^4.0.0
-    aggregate-error: ^5.0.0
+    env-ci: ^11.2.0
     execa: ^9.0.0
     fs-extra: ^11.0.0
     lodash-es: ^4.17.21
@@ -3623,11 +3602,11 @@ __metadata:
     tempy: ^3.0.0
   peerDependencies:
     semantic-release: ">=20.1.0"
-  checksum: 05a3125d725b27d2ad36c24e27cb4a066f232c9ea808545bb8525fce396b95d8e06b70359b956feeb548a00c84a5c8e30677e3b72c7d1224d1fc5886d7044840
+  checksum: d9bb90c569d788b82cb2c065ff4e5765894af8953f86003b3832f012e4ebd8d6a90bffc1312870aa984ec146e779f0e389d932b78f34ff44c4176598976c1f53
   languageName: node
   linkType: hard
 
-"@semantic-release/release-notes-generator@npm:^14.0.0-beta.1":
+"@semantic-release/release-notes-generator@npm:^14.1.0":
   version: 14.1.0
   resolution: "@semantic-release/release-notes-generator@npm:14.1.0"
   dependencies:
@@ -3881,13 +3860,6 @@ __metadata:
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
   checksum: bd93e2e415b6f182ec4da1074e1f36c480f1d26add3e696d54fb30c09bc470897e41361c8fd957bf0985024f8fbf1e6e2aff977d79352ef7eb93a5c6dcff6c11
-  languageName: node
-  linkType: hard
-
-"@types/geojson@npm:^7946.0.8":
-  version: 7946.0.16
-  resolution: "@types/geojson@npm:7946.0.16"
-  checksum: d66e5e023f43b3e7121448117af1930af7d06410a32a585a8bc9c6bb5d97e0d656cd93d99e31fa432976c32e98d4b780f82bf1fd1acd20ccf952eb6b8e39edf2
   languageName: node
   linkType: hard
 
@@ -6168,7 +6140,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"env-ci@npm:^11.0.0":
+"env-ci@npm:^11.0.0, env-ci@npm:^11.2.0":
   version: 11.2.0
   resolution: "env-ci@npm:11.2.0"
   dependencies:
@@ -6613,23 +6585,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:9.37.0":
-  version: 9.37.0
-  resolution: "eslint@npm:9.37.0"
+"eslint@npm:9.38.0":
+  version: 9.38.0
+  resolution: "eslint@npm:9.38.0"
   dependencies:
     "@eslint-community/eslint-utils": ^4.8.0
     "@eslint-community/regexpp": ^4.12.1
-    "@eslint/config-array": ^0.21.0
-    "@eslint/config-helpers": ^0.4.0
+    "@eslint/config-array": ^0.21.1
+    "@eslint/config-helpers": ^0.4.1
     "@eslint/core": ^0.16.0
     "@eslint/eslintrc": ^3.3.1
-    "@eslint/js": 9.37.0
+    "@eslint/js": 9.38.0
     "@eslint/plugin-kit": ^0.4.0
     "@humanfs/node": ^0.16.6
     "@humanwhocodes/module-importer": ^1.0.1
     "@humanwhocodes/retry": ^0.4.2
     "@types/estree": ^1.0.6
-    "@types/json-schema": ^7.0.15
     ajv: ^6.12.4
     chalk: ^4.0.0
     cross-spawn: ^7.0.6
@@ -6659,7 +6630,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 78e813174acef58d361d557a4d083d2d03f20cd70dd96f59973414305acaedf72bad52271c789174a19ee0407f8bece017ce42a05c89014b93e457d033285aeb
+  checksum: 53b5551e2ecdbeba5f5dcd59615b803ca2d2fb3013e88f141402386afdff9bf3b08225518fb958296a916696f498a052dcf4c9efde1d3d14b942dcd1edc51753
   languageName: node
   linkType: hard
 
@@ -7673,10 +7644,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hook-std@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "hook-std@npm:3.0.0"
-  checksum: f1f0ca88bbbca2306b9c2c342f45fbecb318ad5496bcbde1fcfc2a64dab0feabd50278a613f683edf07225c4b8b75b3c64ad3f1fca090dd0cae426fdec374a56
+"hook-std@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "hook-std@npm:4.0.0"
+  checksum: 82a3becad2e7ec3a9da25eb26dbfa584015f5bfabaddc6c999f079e6c65166e6902f37783819b996be4621cec30945cc6468c539134184e7b265196964488467
   languageName: node
   linkType: hard
 
@@ -10535,18 +10506,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitrogen@npm:0.30.1":
-  version: 0.30.1
-  resolution: "nitrogen@npm:0.30.1"
+"nitrogen@npm:0.30.2":
+  version: 0.30.2
+  resolution: "nitrogen@npm:0.30.2"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.30.1
+    react-native-nitro-modules: ^0.30.2
     ts-morph: ^27.0.0
     yargs: ^18.0.0
     zod: ^4.0.5
   bin:
     nitrogen: lib/index.js
-  checksum: ad8645618028cac33d02fcd6837f39c2f8830df2ab988a42cade94d2c6344854811f3b592f4d2dc29ab996ef37c04d42888a9f2056a5e356e9a2e11b865fdcbe
+  checksum: b8692111891d70715b200d1c7adf129fe302cc8d85055ccb60144269970460b747d78caa110eadaee5c10f3cc077da46d53edbbc63ee9a5112a396e3256a2b32
   languageName: node
   linkType: hard
 
@@ -10773,7 +10744,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm@npm:^11.4.2, npm@npm:^11.6.2":
+"npm@npm:^11.6.2":
   version: 11.6.2
   resolution: "npm@npm:11.6.2"
   dependencies:
@@ -11822,16 +11793,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-clusterer@npm:4.0.0":
-  version: 4.0.0
-  resolution: "react-native-clusterer@npm:4.0.0"
+"react-native-clusterer@npm:5.0.1":
+  version: 5.0.1
+  resolution: "react-native-clusterer@npm:5.0.1"
   dependencies:
     "@mapbox/geo-viewport": ^0.5.0
-    "@types/geojson": ^7946.0.8
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 4481c0e8aa92ce7fada43231137ea025de593169ab6fa943131666157ed72e64acce26a58334e9b7e67bdd8c9a07ff6ccd15728a474f4b0b574d7eddca5a6a10
+    react-native-nitro-modules: ^0.30.2
+  checksum: b8701b1d8d7fa5ec66cf9e4a81e0a66977c0b49f6221ed0718ed6e30a071988913350d2490c5d624cdb02e48ba6eee61c85592d9d1da8dc57b9a2eb13da45430
   languageName: node
   linkType: hard
 
@@ -11870,11 +11841,11 @@ __metadata:
     react-hook-form: 7.65.0
     react-native: 0.82.0
     react-native-builder-bob: 0.40.13
-    react-native-clusterer: 4.0.0
+    react-native-clusterer: 5.0.1
     react-native-gesture-handler: 2.28.0
     react-native-google-maps-plus: "workspace:*"
     react-native-monorepo-config: 0.2.2
-    react-native-nitro-modules: 0.30.1
+    react-native-nitro-modules: 0.30.2
     react-native-reanimated: 4.1.3
     react-native-safe-area-context: 5.6.1
     react-native-screens: 4.17.1
@@ -11891,32 +11862,32 @@ __metadata:
     "@commitlint/config-conventional": 20.0.0
     "@eslint/compat": 1.4.0
     "@eslint/eslintrc": 3.3.1
-    "@eslint/js": 9.37.0
+    "@eslint/js": 9.38.0
     "@expo/config-plugins": 54.0.2
     "@jamesacarr/eslint-formatter-github-actions": 0.2.0
     "@react-native/babel-preset": 0.82.0
     "@react-native/eslint-config": 0.82.0
     "@semantic-release/changelog": 6.0.3
     "@semantic-release/git": 10.0.1
-    "@semantic-release/npm": 13.0.0-beta.1
+    "@semantic-release/npm": 13.1.1
     "@types/jest": 30.0.0
     "@types/react": 19.2.2
     clang-format-node: 2.0.2
     conventional-changelog-conventionalcommits: 9.1.0
     del-cli: 7.0.0
-    eslint: 9.37.0
+    eslint: 9.38.0
     eslint-config-prettier: 10.1.8
     eslint-plugin-ft-flow: 3.0.11
     eslint-plugin-prettier: 5.5.4
     jest: 30.2.0
     lefthook: 1.13.6
-    nitrogen: 0.30.1
+    nitrogen: 0.30.2
     prettier: 3.6.2
     react: 19.2.0
     react-native: 0.82.0
     react-native-builder-bob: 0.40.13
-    react-native-nitro-modules: 0.30.1
-    semantic-release: 25.0.0-beta.6
+    react-native-nitro-modules: 0.30.2
+    semantic-release: 25.0.1
     typescript: 5.9.3
   peerDependencies:
     expo: "*"
@@ -11959,13 +11930,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.30.1, react-native-nitro-modules@npm:^0.30.1":
-  version: 0.30.1
-  resolution: "react-native-nitro-modules@npm:0.30.1"
+"react-native-nitro-modules@npm:0.30.2, react-native-nitro-modules@npm:^0.30.2":
+  version: 0.30.2
+  resolution: "react-native-nitro-modules@npm:0.30.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 2536bec1e3f9dcf737a0ef372a28551a5f287823b6b0010c7ddad240a8aecd9a63ba53ca4974aecf319b4ec297c4b49ac7cd258c538babe97e907df78349b134
+  checksum: da06b99c7f2def27c43da39a9eef2535b36bef48ef4cd45f49c0180fa735a0407a6f2feb6a30d39c4645a849230827e391ebc23e74236bde98a6f6176c6b291a
   languageName: node
   linkType: hard
 
@@ -12471,15 +12442,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semantic-release@npm:25.0.0-beta.6":
-  version: 25.0.0-beta.6
-  resolution: "semantic-release@npm:25.0.0-beta.6"
+"semantic-release@npm:25.0.1":
+  version: 25.0.1
+  resolution: "semantic-release@npm:25.0.1"
   dependencies:
-    "@semantic-release/commit-analyzer": ^13.0.0-beta.1
+    "@semantic-release/commit-analyzer": ^13.0.1
     "@semantic-release/error": ^4.0.0
-    "@semantic-release/github": ^12.0.0-beta.2
-    "@semantic-release/npm": ^13.0.0-beta.1
-    "@semantic-release/release-notes-generator": ^14.0.0-beta.1
+    "@semantic-release/github": ^12.0.0
+    "@semantic-release/npm": ^13.1.1
+    "@semantic-release/release-notes-generator": ^14.1.0
     aggregate-error: ^5.0.0
     cosmiconfig: ^9.0.0
     debug: ^4.0.0
@@ -12489,7 +12460,7 @@ __metadata:
     find-versions: ^6.0.0
     get-stream: ^6.0.0
     git-log-parser: ^1.2.0
-    hook-std: ^3.0.0
+    hook-std: ^4.0.0
     hosted-git-info: ^9.0.0
     import-from-esm: ^2.0.0
     lodash-es: ^4.17.21
@@ -12501,21 +12472,21 @@ __metadata:
     read-package-up: ^11.0.0
     resolve-from: ^5.0.0
     semver: ^7.3.2
-    semver-diff: ^4.0.0
+    semver-diff: ^5.0.0
     signale: ^1.2.1
     yargs: ^18.0.0
   bin:
     semantic-release: bin/semantic-release.js
-  checksum: c9f24ca15f820736154b917defecb0297b65fd0174e2ebccd8302ec0d4eafa6de70aed770bcb8fb507fa69099f651b35eb57091880a6f7717b56ba33aca34ea7
+  checksum: 0f1df43c11dc36e9384ae98ad097ff40cf9d6cd640dd6519ee2835ca6bfa04e27e8b96ffcbc7005713b4f7a3001c58fd9fc2f3fef05c6090f57373c39cb5d018
   languageName: node
   linkType: hard
 
-"semver-diff@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "semver-diff@npm:4.0.0"
+"semver-diff@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "semver-diff@npm:5.0.0"
   dependencies:
     semver: ^7.3.5
-  checksum: 4a958d6f76c7e7858268e1e2cf936712542441c9e003e561b574167279eee0a9bd55cc7eae1bfb31d3e7ad06a9fc370e7dd412fcfefec8c0daf1ce5aea623559
+  checksum: 92ca28446796615b57ffd6701350e86a6264efce9b7a3abfb92d16311c0640adaca0a15940327f99464ab117a4d451024ad247264c78cdd456e8bf36a9964587
   languageName: node
   linkType: hard
 
