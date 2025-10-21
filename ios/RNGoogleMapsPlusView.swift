@@ -132,19 +132,19 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       withCATransaction(disableActions: true) {
 
         removed.forEach {
-          impl.removeMarker(id: $0)
-          markerBuilder.cancelIconTask($0)
+          self.impl.removeMarker(id: $0)
+          self.markerBuilder.cancelIconTask($0)
         }
 
         for (id, next) in nextById {
           if let prev = prevById[id] {
             if !prev.markerEquals(next) {
-              impl.updateMarker(id: id) { m in
+              self.impl.updateMarker(id: id) { m in
                 self.markerBuilder.update(prev, next, m)
               }
             }
           } else {
-            markerBuilder.buildIconAsync(next.id, next) { icon in
+            self.markerBuilder.buildIconAsync(next.id, next) { icon in
               let marker = self.markerBuilder.build(next, icon: icon)
               self.impl.addMarker(id: id, marker: marker)
             }

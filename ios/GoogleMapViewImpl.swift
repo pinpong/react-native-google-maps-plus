@@ -278,7 +278,7 @@ GMSIndoorDisplayDelegate {
         disableActions: false,
         duration: durationMs / 1000.0
       ) {
-        mapView?.animate(to: camera)
+        self.mapView?.animate(to: camera)
       }
     } else {
       let update = GMSCameraUpdate.setCamera(camera)
@@ -318,7 +318,7 @@ GMSIndoorDisplayDelegate {
         disableActions: false,
         duration: durationMs / 1000.0
       ) {
-        mapView?.animate(with: update)
+        self.mapView?.animate(with: update)
       }
     } else {
       mapView?.moveCamera(update)
