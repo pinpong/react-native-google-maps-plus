@@ -43,9 +43,9 @@ PODS:
   - GoogleMaps (10.4.0):
     - GoogleMaps/Maps (= 10.4.0)
   - GoogleMaps/Maps (10.4.0)
-  - hermes-engine (0.82.0):
-    - hermes-engine/Pre-built (= 0.82.0)
-  - hermes-engine/Pre-built (0.82.0)
+  - hermes-engine (0.82.1):
+    - hermes-engine/Pre-built (= 0.82.1)
+  - hermes-engine/Pre-built (0.82.1)
   - NitroModules (0.30.2):
     - boost
     - DoubleConversion
@@ -3051,7 +3051,7 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   Google-Maps-iOS-Utils: bed22fa703c919259b3901449434d60d994fae20
   GoogleMaps: a40d3b1f511f0fa2036e7b08c920c33279b1d5fd
-  hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
+  hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   NitroModules: 730eae5cd9d112f05252bbf36bfabe4ffd16e931
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
