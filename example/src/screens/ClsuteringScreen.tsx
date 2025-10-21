@@ -6,8 +6,8 @@ import type {
   RNMarker,
   RNMarkerSvg,
 } from 'react-native-google-maps-plus';
+import type { Supercluster } from 'react-native-clusterer';
 import { useClusterer } from 'react-native-clusterer';
-import type Supercluster from 'react-native-clusterer/lib/typescript/types';
 import { randomCoordinates } from '../utils/mapGenerators';
 
 export default function ClusteringScreen() {
