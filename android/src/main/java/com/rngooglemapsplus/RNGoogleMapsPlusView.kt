@@ -362,7 +362,7 @@ class RNGoogleMapsPlusView(
     durationMs: Double?,
   ) {
     onUi {
-      val current = view.currentCamera ?: return@onUi
+      val current = view.currentCamera
       view.setCamera(
         camera.toCameraPosition(current),
         animated == true,
