@@ -4,8 +4,8 @@ import GoogleMaps
 extension RNCamera {
   func toGMSCameraPosition(current: GMSCameraPosition?) -> GMSCameraPosition {
     let center = CLLocationCoordinate2D(
-      latitude: center?.latitude ?? current?.target.latitude ?? 0,
-      longitude: center?.longitude ?? current?.target.longitude ?? 0
+      latitude: center?.latitude ?? current?.target.latitude ?? 0.0,
+      longitude: center?.longitude ?? current?.target.longitude ?? 0.0
     )
 
     let zoom = Float(zoom ?? Double(current?.zoom ?? 0))
