@@ -107,10 +107,6 @@
     "semantic-release": "25.0.1",
     "typescript": "5.9.3"
   },
-  "overrides": {
-    "@semantic-release/npm": "13.0.0-beta.1",
-    "semantic-release": "25.0.0-beta.6"
-  },
   "peerDependencies": {
     "expo": "*",
     "react": "*",
