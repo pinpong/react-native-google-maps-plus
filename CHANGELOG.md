@@ -1,3 +1,23 @@
+## [1.6.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.1...v1.6.2) (2025-10-21)
+
+### 🐛 Bug Fixes
+
+* **android:** current camera getter ([6d1dbb1](https://github.com/pinpong/react-native-google-maps-plus/commit/6d1dbb1427a7153ef13716ec77b444ad52144a64))
+* **android:** location crash ([a403e49](https://github.com/pinpong/react-native-google-maps-plus/commit/a403e497f78506124c4f2e40f48c7b5554349e90))
+* **ios:** animation thread ([41f293e](https://github.com/pinpong/react-native-google-maps-plus/commit/41f293ebd500d269b5d3555ad09d7c6e02b6aa7f))
+* setCamera without center ([4036011](https://github.com/pinpong/react-native-google-maps-plus/commit/40360117d599659a2b3c9178122ce3e739740f06))
+* setCamera without center ([73c273e](https://github.com/pinpong/react-native-google-maps-plus/commit/73c273ef7887b4d3567a034ea1f6a6751e523767))
+* setCamera without props ([c82ac8d](https://github.com/pinpong/react-native-google-maps-plus/commit/c82ac8def40a26e21cd8a6cc1f6ac89316518b6d))
+
+### 🔄 Code Refactors
+
+* **example:** base map props ([c952dd4](https://github.com/pinpong/react-native-google-maps-plus/commit/c952dd414c89eef5af14ab28a09c43b31ff5de24))
+
+### 🛠️ Other changes
+
+* **android:** add proguard rules ([c49120b](https://github.com/pinpong/react-native-google-maps-plus/commit/c49120bfb49ab2224495a1091595a9f087dfe309))
+* merge dev into main ([63d2aa2](https://github.com/pinpong/react-native-google-maps-plus/commit/63d2aa28d818404636cba651f018cc9bd44d9991))
+
 ## [1.6.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.0...v1.6.1) (2025-10-21)
 
 ### 🐛 Bug Fixes
