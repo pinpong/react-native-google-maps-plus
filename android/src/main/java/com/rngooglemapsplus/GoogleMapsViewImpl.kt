@@ -163,7 +163,7 @@ class GoogleMapsViewImpl(
 
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
-    onCameraChangeStart?.invoke(
+    onCameraChange?.invoke(
       bounds.toRnRegion(),
       cameraPosition.toRnCamera(),
       isGesture,
@@ -176,7 +176,7 @@ class GoogleMapsViewImpl(
 
     val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
-    onCameraChangeStart?.invoke(
+    onCameraChangeComplete?.invoke(
       bounds.toRnRegion(),
       cameraPosition.toRnCamera(),
       isGesture,
