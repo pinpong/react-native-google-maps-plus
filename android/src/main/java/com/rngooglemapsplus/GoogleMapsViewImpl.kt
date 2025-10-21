@@ -250,7 +250,8 @@ class GoogleMapsViewImpl(
     }
   }
 
-  val currentCamera: CameraPosition? = googleMap?.cameraPosition
+  val currentCamera: CameraPosition?
+    get() = googleMap?.cameraPosition
 
   var initialProps: RNInitialProps? = null
 
