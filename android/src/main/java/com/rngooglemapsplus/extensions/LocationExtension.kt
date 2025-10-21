@@ -19,40 +19,44 @@ fun Location.toRnLocation(): RNLocation =
         provider = provider,
         elapsedRealtimeNanos = elapsedRealtimeNanos.toDouble(),
         bearingAccuracyDegrees =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            bearingAccuracyDegrees.toDouble()
-          } else {
-            null
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+              bearingAccuracyDegrees.toDouble()
+
+            else -> null
           },
         speedAccuracyMetersPerSecond =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            speedAccuracyMetersPerSecond.toDouble()
-          } else {
-            null
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+              speedAccuracyMetersPerSecond.toDouble()
+
+            else -> null
           },
         verticalAccuracyMeters =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            verticalAccuracyMeters.toDouble()
-          } else {
-            null
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+              verticalAccuracyMeters.toDouble()
+
+            else -> null
           },
         mslAltitudeMeters =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            mslAltitudeMeters
-          } else {
-            null
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
+              mslAltitudeMeters
+
+            else -> null
           },
         mslAltitudeAccuracyMeters =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            mslAltitudeAccuracyMeters.toDouble()
-          } else {
-            null
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
+              mslAltitudeAccuracyMeters.toDouble()
+
+            else -> null
           },
         isMock =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            isMock
-          } else {
-            isFromMockProvider
+          when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> isMock
+            else -> isFromMockProvider
           },
       ),
     ios = null,
