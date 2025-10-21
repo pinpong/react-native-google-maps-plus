@@ -164,7 +164,7 @@ GMSIndoorDisplayDelegate {
       mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
         uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
       mapView?.settings.tiltGestures = uiSettings?.tiltEnabled ?? true
-      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? false
+      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? true
     }
   }
 
@@ -664,7 +664,7 @@ GMSIndoorDisplayDelegate {
       let region = bounds.toRNRegion()
       let camera = mapView.camera.toRNCamera()
 
-      self.onCameraChange?(region, camera, gesture)
+      self.onCameraChangeStart?(region, camera, gesture)
     }
   }
 
@@ -698,7 +698,7 @@ GMSIndoorDisplayDelegate {
       let region = bounds.toRNRegion()
       let camera = mapView.camera.toRNCamera()
 
-      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
+      self.onCameraChangeComplete?(region, camera, self.cameraMoveReasonIsGesture)
     }
   }
 

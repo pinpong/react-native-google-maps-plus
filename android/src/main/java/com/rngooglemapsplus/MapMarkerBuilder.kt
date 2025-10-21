@@ -140,10 +140,9 @@ class MapMarkerBuilder(
     onReady: (BitmapDescriptor?) -> Unit,
   ) {
     jobsById[id]?.cancel()
-    if (m.iconSvg == null) {
-      onReady(null)
-      return
-    }
+
+    m.iconSvg ?: return onReady(null)
+
     val key = m.styleHash()
     iconCache.get(key)?.let { cached ->
       onReady(cached)
@@ -191,10 +190,9 @@ class MapMarkerBuilder(
   }
 
   private suspend fun renderBitmap(m: RNMarker): Bitmap? {
+    m.iconSvg ?: return null
+
     var bmp: Bitmap? = null
-    if (m.iconSvg == null) {
-      return null
-    }
     try {
       coroutineContext.ensureActive()
       val svg = SVG.getFromString(m.iconSvg.svgString)
