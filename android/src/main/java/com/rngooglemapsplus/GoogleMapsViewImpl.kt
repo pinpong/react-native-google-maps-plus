@@ -272,7 +272,7 @@ class GoogleMapsViewImpl(
             value?.scrollDuringRotateOrZoomEnabled ?: true
           isTiltGesturesEnabled = value?.tiltEnabled ?: true
           isZoomControlsEnabled = value?.zoomControlsEnabled ?: false
-          isZoomGesturesEnabled = value?.zoomGesturesEnabled ?: false
+          isZoomGesturesEnabled = value?.zoomGesturesEnabled ?: true
         }
       }
     }

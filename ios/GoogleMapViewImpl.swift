@@ -164,7 +164,7 @@ GMSIndoorDisplayDelegate {
       mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
         uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
       mapView?.settings.tiltGestures = uiSettings?.tiltEnabled ?? true
-      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? false
+      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? true
     }
   }
 
