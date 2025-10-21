@@ -1,3 +1,23 @@
+## [1.6.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.0...v1.6.1) (2025-10-21)
+
+### 🐛 Bug Fixes
+
+* **example:** clustering ([d714f43](https://github.com/pinpong/react-native-google-maps-plus/commit/d714f43512b147ffb14a91345919bf5831fc45c5))
+* map camera callbacks ([35446eb](https://github.com/pinpong/react-native-google-maps-plus/commit/35446eb4fd74ebab3860030000a7e2f6e39c5bb7))
+* zoomGesturesEnabled default ([df72799](https://github.com/pinpong/react-native-google-maps-plus/commit/df727990328d04994812f743763288af0921a7cd))
+
+### 🛠️ Other changes
+
+* **android:** simplify null checks and improve Kotlin idioms ([5f277ac](https://github.com/pinpong/react-native-google-maps-plus/commit/5f277acecc230637b3807454a1189f6836a68397))
+* description wording and formatting tweaks ([ebd0582](https://github.com/pinpong/react-native-google-maps-plus/commit/ebd05827b939c1000a6c45532ef4ba7ac5766fe1))
+* description wording and formatting tweaks ([1033c63](https://github.com/pinpong/react-native-google-maps-plus/commit/1033c63116c45ed196cff899fa2cc361d30aa429))
+* merge dev into main ([3998306](https://github.com/pinpong/react-native-google-maps-plus/commit/3998306e1aea392de2bb2b9e2f06270894eafe7e))
+* remove dependencies overrides ([fb6114f](https://github.com/pinpong/react-native-google-maps-plus/commit/fb6114fd187c2a884a14afaf7f2aa8cf35b2b8a7))
+* update Podfile.lock ([badd2c8](https://github.com/pinpong/react-native-google-maps-plus/commit/badd2c885a2a3df9f360274d4415970181dfaaa7))
+* update Podfile.lock ([04a1ada](https://github.com/pinpong/react-native-google-maps-plus/commit/04a1adaca7da2c9d6b2b8326ef85319faf2dc6fc))
+* updated deps ([0290e15](https://github.com/pinpong/react-native-google-maps-plus/commit/0290e151d7d1068a6cebe90a4fe9febda84d2f17))
+* updated deps ([b5a2643](https://github.com/pinpong/react-native-google-maps-plus/commit/b5a2643504931e9b55ce5dcf0a66696bc01ba842))
+
 ## [1.6.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.5.0...v1.6.0) (2025-10-16)
 
 ### ✨ Features
