@@ -73,7 +73,7 @@ export default function MapWrapper(props: Props) {
   const locationConfig = useMemo(
     () => ({
       android: {
-        priority: RNAndroidLocationPriority.PRIORITY_BALANCED_POWER_ACCURACY,
+        priority: RNAndroidLocationPriority.PRIORITY_HIGH_ACCURACY,
         interval: 5000,
         minUpdateInterval: 5000,
       },
