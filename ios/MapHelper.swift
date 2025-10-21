@@ -1,22 +1,24 @@
 import QuartzCore
 
-@inline(__always)
+@MainActor @inline(__always)
 func withCATransaction(
   disableActions: Bool = true,
   duration: CFTimeInterval? = nil,
   timingFunction: CAMediaTimingFunction? = nil,
   completion: (() -> Void)? = nil,
-  _ body: () -> Void
+  _ body: @escaping @MainActor () -> Void
 ) {
-  CATransaction.begin()
+  onMain {
+    CATransaction.begin()
 
-  CATransaction.setDisableActions(disableActions)
-  duration.map { CATransaction.setAnimationDuration($0) }
-  timingFunction.map { CATransaction.setAnimationTimingFunction($0) }
-  completion.map { CATransaction.setCompletionBlock($0) }
+    CATransaction.setDisableActions(disableActions)
+    duration.map { CATransaction.setAnimationDuration($0) }
+    timingFunction.map { CATransaction.setAnimationTimingFunction($0) }
+    completion.map { CATransaction.setCompletionBlock($0) }
 
-  body()
-  CATransaction.commit()
+    body()
+    CATransaction.commit()
+  }
 }
 
 @MainActor @inline(__always)

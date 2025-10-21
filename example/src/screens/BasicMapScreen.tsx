@@ -1,10 +1,6 @@
 import React, { useRef, useState } from 'react';
 import MapWrapper from '../components/MapWrapper';
-import {
-  type GoogleMapsViewRef,
-  RNAndroidLocationPriority,
-  RNIOSLocationAccuracy,
-} from 'react-native-google-maps-plus';
+import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 import ControlPanel from '../components/ControlPanel';
 import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
 import type { RNBasicMapConfig } from '../types/basicMapConfig';
@@ -49,17 +45,6 @@ export default function BasicMapScreen() {
     mapZoomConfig: { min: 0, max: 20 },
     mapPadding: { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 },
     mapType: 'normal',
-    locationConfig: {
-      android: {
-        priority: RNAndroidLocationPriority.PRIORITY_HIGH_ACCURACY,
-        interval: 5000,
-        minUpdateInterval: 5000,
-      },
-      ios: {
-        desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
-        distanceFilterMeters: 10,
-      },
-    },
   });
 
   const [dialogVisible, setDialogVisible] = useState(true);

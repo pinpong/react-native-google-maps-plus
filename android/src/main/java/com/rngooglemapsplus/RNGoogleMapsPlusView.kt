@@ -45,7 +45,7 @@ class RNGoogleMapsPlusView(
         GoogleMapOptions().apply {
           initialProps?.mapId?.let { mapId(it) }
           initialProps?.liteMode?.let { liteMode(it) }
-          initialProps?.camera?.let { camera(it.toCameraPosition()) }
+          initialProps?.camera?.let { camera(it.toCameraPosition(current = null)) }
         }
       view.initMapView(options)
     }
@@ -361,7 +361,14 @@ class RNGoogleMapsPlusView(
     animated: Boolean?,
     durationMs: Double?,
   ) {
-    view.setCamera(camera.toCameraPosition(), animated == true, durationMs?.toInt() ?: 3000)
+    onUi {
+      val current = view.currentCamera
+      view.setCamera(
+        camera.toCameraPosition(current),
+        animated == true,
+        durationMs?.toInt() ?: 3000,
+      )
+    }
   }
 
   override fun setCameraToCoordinates(
