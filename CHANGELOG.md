@@ -1,3 +1,98 @@
+## [1.6.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.5.0...v1.6.0) (2025-10-16)
+
+### ✨ Features
+
+* add expo support ([3fbf01d](https://github.com/pinpong/react-native-google-maps-plus/commit/3fbf01d0ea505bfd8a8d2e657cfc6fa953ee8443))
+
+### 🛠️ Other changes
+
+* add @expo/config-plugins ([d66534f](https://github.com/pinpong/react-native-google-maps-plus/commit/d66534fa31262fc06c2a3cee07f964a23e43a1f2))
+* merge dev into main ([d3bbcfe](https://github.com/pinpong/react-native-google-maps-plus/commit/d3bbcfeaadfc71de1c4e898f802587faa4adea57))
+* updated deps ([743b18a](https://github.com/pinpong/react-native-google-maps-plus/commit/743b18a29234a9fc08b7b041991630e6bd1a76e5))
+
+## [1.5.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.1...v1.5.0) (2025-10-15)
+
+### ✨ Features
+
+* extend location type ([27ff058](https://github.com/pinpong/react-native-google-maps-plus/commit/27ff05869166c2c2314732a00e133af5ba7f3d93))
+
+### 🐛 Bug Fixes
+
+* **android:** clearHeatmaps ([a7e113a](https://github.com/pinpong/react-native-google-maps-plus/commit/a7e113a657a115911aeebebd0950ebbe5c31328d))
+* **build:** copy ViewConfig.json into lib during patch step ([192e97b](https://github.com/pinpong/react-native-google-maps-plus/commit/192e97b6ab34e4a55ae46a5232cc1b61a73c1c7d))
+* **example:** number input ([0d99720](https://github.com/pinpong/react-native-google-maps-plus/commit/0d997200730951b30b48af499d682e5c2aebc8f6))
+
+### 🔄 Code Refactors
+
+* add more extensions ([6ce8c9d](https://github.com/pinpong/react-native-google-maps-plus/commit/6ce8c9d051ee15de3deb1198e8eb748fd40d4dea))
+* add more extensions ([db28521](https://github.com/pinpong/react-native-google-maps-plus/commit/db28521969ab54c033f1fafb335e1204253ac535))
+* **ios:** replace DispatchQueue with Swift concurrency and release SVGKit memory ([d9b2416](https://github.com/pinpong/react-native-google-maps-plus/commit/d9b24167cc1aafafef974194025205a66f3a2653))
+
+### 🛠️ Other changes
+
+* fmt ([1c67f3c](https://github.com/pinpong/react-native-google-maps-plus/commit/1c67f3ca150275d9090cdcafb045e8dc51aec3d4))
+* **ios:** fmt ([7974c09](https://github.com/pinpong/react-native-google-maps-plus/commit/7974c094df34ddfedbc943c22d2a856e571ad7bd))
+* merge dev into main ([daed74b](https://github.com/pinpong/react-native-google-maps-plus/commit/daed74ba5c5f391acd6b69f245f51ce93952e98f))
+* update example ([19559e3](https://github.com/pinpong/react-native-google-maps-plus/commit/19559e3d398e9c5722f69bb218bfa59e6efa4dfc))
+* update example ([1c54d21](https://github.com/pinpong/react-native-google-maps-plus/commit/1c54d21f08914db435775ad67f95342fe036aac1))
+* update release config ([eecb73e](https://github.com/pinpong/react-native-google-maps-plus/commit/eecb73e7cd8bdaa9b265e4e59ac342fcc974ecf6))
+
+## [1.4.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.4.0...v1.4.1) (2025-10-13)
+
+### 🐛 Bug Fixes
+
+* handle feature type comparison correctly ([06528dd](https://github.com/pinpong/react-native-google-maps-plus/commit/06528dd5d3efad5b19df1dafb80bad7c96f32987))
+* **ios:** marker opacity ([25c1b52](https://github.com/pinpong/react-native-google-maps-plus/commit/25c1b5264a86288c74334377ada5bb6eb62e075d))
+
+### 🛠️ Other changes
+
+* **example:** add clustering example ([a435508](https://github.com/pinpong/react-native-google-maps-plus/commit/a4355083215a440a1863cd045c61cf771c47f761))
+* merge dev into main ([b65cabf](https://github.com/pinpong/react-native-google-maps-plus/commit/b65cabfcedd27f5add10039833e82eac3f1fc4c8))
+
+## [1.4.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.3.0...v1.4.0) (2025-10-12)
+
+### ✨ Features
+
+* add polygon holes support ([36a1291](https://github.com/pinpong/react-native-google-maps-plus/commit/36a1291b054c86309e4cc8a35e08556dc7757d4c))
+* add polygon holes support ([ae53e17](https://github.com/pinpong/react-native-google-maps-plus/commit/ae53e17d3d65aedfeedb34d613ca6adc8887b34a))
+* add polygon holes support ([1b1d80d](https://github.com/pinpong/react-native-google-maps-plus/commit/1b1d80d15a86021a295cea5ddd3ce4fcbf09f9ff))
+
+### 🐛 Bug Fixes
+
+* marker, polyline, polygon and circle update ([767ecc7](https://github.com/pinpong/react-native-google-maps-plus/commit/767ecc762d5c1c6cda356b0fa3b5fede396dcbf7))
+
+### 🛠️ Other changes
+
+* merge dev into main ([2b076f1](https://github.com/pinpong/react-native-google-maps-plus/commit/2b076f160282581145ab1b8d55b1db769e0f7221))
+* update release.config.cjs ([efdabe0](https://github.com/pinpong/react-native-google-maps-plus/commit/efdabe06afebd6016195512c75586a8e5af3b5af))
+
+## [1.3.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.2.0...v1.3.0) (2025-10-11)
+
+### ✨ Features
+
+* add indoor building focus and level activation listener support ([64073d4](https://github.com/pinpong/react-native-google-maps-plus/commit/64073d432d48a8898282c246385b7a5ee7843080))
+* add marker drag support ([51044c8](https://github.com/pinpong/react-native-google-maps-plus/commit/51044c8c1e53434a4513d1907965d3bc9a5359ee))
+* add more supported marker props ([6b177a4](https://github.com/pinpong/react-native-google-maps-plus/commit/6b177a49c853197afa28302de3f047c46f778afc))
+* add snapshot function ([b6c1281](https://github.com/pinpong/react-native-google-maps-plus/commit/b6c1281a949edd423e09430ab1a80c4822d6bd97))
+* snapshot feature ([6525195](https://github.com/pinpong/react-native-google-maps-plus/commit/652519534a7c2a0d9dc16acce3d803f55575f96d))
+* snapshot feature ([7fe037a](https://github.com/pinpong/react-native-google-maps-plus/commit/7fe037ace3fc9f9413eeb69ab94595072e084c8c))
+
+### 🐛 Bug Fixes
+
+* disable ios view recycling ([46813b8](https://github.com/pinpong/react-native-google-maps-plus/commit/46813b8d7aec265264038f0dd45d4cc242f42d57))
+* map initialization ([0370ddf](https://github.com/pinpong/react-native-google-maps-plus/commit/0370ddfc113f4d414c212f28fcfc744fa38c9130))
+* mapview onDestroy ([f1110e7](https://github.com/pinpong/react-native-google-maps-plus/commit/f1110e728cbf89bd3fac74b0ab83409776925943))
+
+### 🔄 Code Refactors
+
+* map initialization ([150a526](https://github.com/pinpong/react-native-google-maps-plus/commit/150a52640f9ec79a108c9c4aa69bdecd5831dece))
+
+### 🛠️ Other changes
+
+* **example:** update example ([0320a78](https://github.com/pinpong/react-native-google-maps-plus/commit/0320a78967f21ec05835b5d3b7a18ac0c59d649d))
+* merge dev into main ([d9768d6](https://github.com/pinpong/react-native-google-maps-plus/commit/d9768d6b5f2e09a754dc606a1fa690fbdec30a94))
+* update CHANGELOG.md ([f2b897d](https://github.com/pinpong/react-native-google-maps-plus/commit/f2b897dbe2ac1b94262519cebe58f0b4e13a88b1))
+
 ## [1.2.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.1.0...v1.2.0) (2025-10-09)
 
 ### ✨ Features
