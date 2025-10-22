@@ -57,6 +57,8 @@ class LocationHandler(
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
     buildLocationRequest(this.priority, this.interval, this.minUpdateInterval)
+    stop()
+    start()
   }
 
   fun showLocationDialog() {
