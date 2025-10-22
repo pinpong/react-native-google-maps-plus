@@ -3,6 +3,7 @@ export type RootStackParamList = {
   Blank: undefined;
   BasicMap: undefined;
   Markers: undefined;
+  SvgMarkers: undefined;
   Polygons: undefined;
   Polylines: undefined;
   Circles: undefined;

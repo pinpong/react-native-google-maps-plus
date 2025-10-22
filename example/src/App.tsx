@@ -25,6 +25,7 @@ import CameraTestScreen from './screens/CameraTestScreen';
 import type { RootStackParamList } from './types/navigation';
 import SnapshotTestScreen from './screens/SnaptshotTestScreen';
 import ClusteringScreen from './screens/ClsuteringScreen';
+import SvgMarkersScreen from './screens/SvgMarkersScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -62,6 +63,11 @@ export default function App() {
             name="Markers"
             component={MarkersScreen}
             options={{ title: 'Markers' }}
+          />
+          <Stack.Screen
+            name="SvgMarkers"
+            component={SvgMarkersScreen}
+            options={{ title: 'SVG Markers' }}
           />
           <Stack.Screen
             name="Polygons"

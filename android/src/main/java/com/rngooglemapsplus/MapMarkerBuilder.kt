@@ -2,9 +2,11 @@ package com.rngooglemapsplus
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.util.Base64
 import android.util.LruCache
 import androidx.core.graphics.createBitmap
 import com.caverock.androidsvg.SVG
+import com.caverock.androidsvg.SVGExternalFileResolver
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -20,6 +22,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URLDecoder
 import kotlin.coroutines.coroutineContext
 
 class MapMarkerBuilder(
@@ -34,6 +37,42 @@ class MapMarkerBuilder(
     }
 
   private val jobsById = mutableMapOf<String, Job>()
+
+  init {
+    SVG.registerExternalFileResolver(
+      object : SVGExternalFileResolver() {
+        override fun resolveImage(filename: String?): Bitmap? {
+          if (filename.isNullOrBlank()) return null
+
+          return runCatching {
+            when {
+              filename.startsWith("data:image/svg+xml") -> {
+                val svgContent =
+                  if ("base64," in filename) {
+                    val base64 = filename.substringAfter("base64,")
+                    String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8)
+                  } else {
+                    URLDecoder.decode(filename.substringAfter(","), "UTF-8")
+                  }
+
+                val svg = SVG.getFromString(svgContent)
+                val width = (svg.documentWidth.takeIf { it > 0 } ?: 128f).toInt()
+                val height = (svg.documentHeight.takeIf { it > 0 } ?: 128f).toInt()
+
+                createBitmap(width, height).apply {
+                  Canvas(this).also(svg::renderToCanvas)
+                }
+              }
+
+              else -> null
+            }
+          }.getOrNull()
+        }
+
+        override fun isFormatSupported(mimeType: String?): Boolean = mimeType?.startsWith("image/") == true
+      },
+    )
+  }
 
   fun build(
     m: RNMarker,

@@ -7,6 +7,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
   { name: 'Markers', title: 'Markers' },
+  { name: 'SvgMarkers', title: 'SVG Markers' },
   { name: 'Polygons', title: 'Polygons' },
   { name: 'Polylines', title: 'Polylines' },
   { name: 'Circles', title: 'Circles' },
