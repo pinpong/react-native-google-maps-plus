@@ -66,7 +66,6 @@ class GoogleMapsViewImpl(
   GoogleMap.OnIndoorStateChangeListener,
   LifecycleEventListener {
   private var initialized = false
-  private var mapReady = false
   private var destroyed = false
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
@@ -129,10 +128,10 @@ class GoogleMapsViewImpl(
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
+        onMapLoaded?.invoke(true)
       }
       applyProps()
       initLocationCallbacks()
-      mapReady = true
       onMapReady?.invoke(true)
     }
   }
@@ -378,6 +377,7 @@ class GoogleMapsViewImpl(
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
+  var onMapLoaded: ((Boolean) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null

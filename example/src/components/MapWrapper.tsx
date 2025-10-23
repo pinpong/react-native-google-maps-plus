@@ -34,7 +34,7 @@ export default function MapWrapper(props: Props) {
   const styles = useMemo(() => getThemedStyles(theme), [theme]);
   const layout = useSafeAreaInsets();
 
-  const [mapReady, setMapReady] = React.useState(false);
+  const [mapLoaded, setMapLoaded] = React.useState(false);
   const initialProps = useMemo(
     () => ({
       camera: {
@@ -104,17 +104,24 @@ export default function MapWrapper(props: Props) {
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
         mapPadding={props.mapPadding ?? mapPadding}
         locationConfig={props.locationConfig ?? locationConfig}
-        onMapReady={callback(
-          props.onMapReady ?? {
-            f: (ready: boolean) => {
-              console.log('Map is ready! ' + ready);
-              setMapReady(true);
-            },
-          }
-        )}
         onMapError={callback(
           props.onMapError ?? {
             f: (error: RNMapErrorCode) => console.log('Map error:', error),
+          }
+        )}
+        onMapReady={callback(
+          props.onMapReady ?? {
+            f: (ready: boolean) => {
+              console.log('Map is ready ' + ready);
+            },
+          }
+        )}
+        onMapLoaded={callback(
+          props.onMapLoaded ?? {
+            f: (loaded: boolean) => {
+              console.log('Map is loaded ' + loaded);
+              setMapLoaded(loaded);
+            },
           }
         )}
         onMapPress={callback(
@@ -202,7 +209,7 @@ export default function MapWrapper(props: Props) {
         )}
       />
       {children}
-      {!mapReady && (
+      {!mapLoaded && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>

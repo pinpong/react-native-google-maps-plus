@@ -10,7 +10,7 @@ GMSIndoorDisplayDelegate {
   private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
   private var initialized = false
-  private var mapReady = false
+  private var loaded = false
   private var deInitialized = false
 
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
@@ -75,7 +75,6 @@ GMSIndoorDisplayDelegate {
     applyProps()
     initLocationCallbacks()
     onMapReady?(true)
-    mapReady = true
   }
 
   @MainActor
@@ -255,6 +254,7 @@ GMSIndoorDisplayDelegate {
 
   var onMapError: ((RNMapErrorCode) -> Void)?
   var onMapReady: ((Bool) -> Void)?
+  var onMapLoaded: ((Bool) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
@@ -653,6 +653,12 @@ GMSIndoorDisplayDelegate {
   deinit {
     NotificationCenter.default.removeObserver(self)
     deinitInternal()
+  }
+
+  func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
+    guard !loaded else { return }
+    loaded = true
+    onMapLoaded?(true)
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {

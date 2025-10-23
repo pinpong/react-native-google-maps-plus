@@ -51,6 +51,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
+  onMapLoaded?: (loaded: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;

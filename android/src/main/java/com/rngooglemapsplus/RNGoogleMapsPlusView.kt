@@ -281,6 +281,11 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
+  override var onMapLoaded: ((Boolean) -> Unit)? = null
+    set(cb) {
+      view.onMapLoaded = cb
+    }
+
   override var onLocationUpdate: ((RNLocation) -> Unit)? = null
     set(cb) {
       view.onLocationUpdate = cb

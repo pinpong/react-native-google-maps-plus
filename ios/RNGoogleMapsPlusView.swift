@@ -302,6 +302,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapReady = onMapReady }
   }
   @MainActor
+  var onMapLoaded: ((Bool) -> Void)? {
+    didSet { impl.onMapLoaded = onMapLoaded }
+  }
+  @MainActor
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
