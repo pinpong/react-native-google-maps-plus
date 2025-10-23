@@ -301,6 +301,11 @@ class RNGoogleMapsPlusView(
       view.onMapPress = cb
     }
 
+  override var onMapLongPress: ((RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMapLongPress = cb
+    }
+
   override var onMarkerPress: ((String?) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb

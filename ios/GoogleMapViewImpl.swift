@@ -258,6 +258,7 @@ GMSIndoorDisplayDelegate {
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
+  var onMapLongPress: ((RNLatLng) -> Void)?
   var onMarkerPress: ((String?) -> Void)?
   var onPolylinePress: ((String?) -> Void)?
   var onPolygonPress: ((String?) -> Void)?
@@ -714,6 +715,17 @@ GMSIndoorDisplayDelegate {
   ) {
     onMain {
       self.onMapPress?(
+        coordinate.toRNLatLng(),
+      )
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didLongPressAt coordinate: CLLocationCoordinate2D
+  ) {
+    onMain {
+      self.onMapLongPress?(
         coordinate.toRNLatLng(),
       )
     }

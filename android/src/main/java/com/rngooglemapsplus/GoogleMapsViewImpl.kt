@@ -58,6 +58,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnCameraMoveListener,
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
+  GoogleMap.OnMapLongClickListener,
   GoogleMap.OnMarkerClickListener,
   GoogleMap.OnPolylineClickListener,
   GoogleMap.OnPolygonClickListener,
@@ -127,6 +128,7 @@ class GoogleMapsViewImpl(
         googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
         onMapLoaded?.invoke(true)
       }
@@ -381,6 +383,7 @@ class GoogleMapsViewImpl(
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
+  var onMapLongPress: ((RNLatLng) -> Unit)? = null
   var onMarkerPress: ((String?) -> Unit)? = null
   var onPolylinePress: ((String?) -> Unit)? = null
   var onPolygonPress: ((String?) -> Unit)? = null
@@ -874,6 +877,7 @@ class GoogleMapsViewImpl(
         setOnPolygonClickListener(null)
         setOnCircleClickListener(null)
         setOnMapClickListener(null)
+        setOnMapLongClickListener(null)
         setOnMarkerDragListener(null)
       }
       googleMap = null
@@ -949,6 +953,12 @@ class GoogleMapsViewImpl(
 
   override fun onMapClick(coordinates: LatLng) {
     onMapPress?.invoke(
+      coordinates.toRnLatLng(),
+    )
+  }
+
+  override fun onMapLongClick(coordinates: LatLng) {
+    onMapLongPress?.invoke(
       coordinates.toRnLatLng(),
     )
   }

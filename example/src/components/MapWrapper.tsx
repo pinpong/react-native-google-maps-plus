@@ -129,6 +129,11 @@ export default function MapWrapper(props: Props) {
             f: (c: RNLatLng) => console.log('Map press:', c),
           }
         )}
+        onMapLongPress={callback(
+          props.onMapLongPress ?? {
+            f: (c: RNLatLng) => console.log('Map long press:', c),
+          }
+        )}
         onMarkerPress={callback(
           props.onMarkerPress ?? {
             f: (id: string | undefined) => console.log('Marker press:', id),

@@ -318,6 +318,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapPress = onMapPress }
   }
   @MainActor
+  var onMapLongPress: ((RNLatLng) -> Void)? {
+    didSet { impl.onMapLongPress = onMapLongPress }
+  }
+  @MainActor
   var onMarkerPress: ((String?) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
