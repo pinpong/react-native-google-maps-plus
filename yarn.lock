@@ -3939,12 +3939,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.2.0":
-  version: 19.2.0
-  resolution: "@types/react@npm:19.2.0"
+"@types/react@npm:19.1.1":
+  version: 19.1.1
+  resolution: "@types/react@npm:19.1.1"
   dependencies:
     csstype: ^3.0.2
-  checksum: 1bfef433bb4d237487835423eaf4789bad94bcf96d4106f5c53f3109dc8451edea6b04be3f6e9d374f1a76672bb66e58d68e64f45535f0b6c804930a731dd19e
+  checksum: 1daebda3dfe30944c3322da6ae352697e4a81dc6a64125110f1610fd5b2a98581c2fc7ef8a896d8f91d01d92642a72c941ee283d0a914a04e0a78597642f9242
   languageName: node
   linkType: hard
 
@@ -11829,8 +11829,8 @@ __metadata:
     "@react-navigation/native": 7.1.18
     "@react-navigation/native-stack": 7.5.1
     "@react-navigation/stack": 7.5.0
-    "@types/react": 19.2.0
-    react: 19.2.0
+    "@types/react": 19.1.1
+    react: 19.1.1
     react-hook-form: 7.65.0
     react-native: 0.82.1
     react-native-builder-bob: 0.40.13
@@ -11864,7 +11864,7 @@ __metadata:
     "@semantic-release/git": 10.0.1
     "@semantic-release/npm": 13.1.1
     "@types/jest": 30.0.0
-    "@types/react": 19.2.0
+    "@types/react": 19.1.1
     clang-format-node: 2.0.3
     conventional-changelog-conventionalcommits: 9.1.0
     del-cli: 7.0.0
@@ -11876,7 +11876,7 @@ __metadata:
     lefthook: 2.0.0
     nitrogen: 0.30.2
     prettier: 3.6.2
-    react: 19.2.0
+    react: 19.1.1
     react-native: 0.82.1
     react-native-builder-bob: 0.40.13
     react-native-nitro-modules: 0.30.2
@@ -12052,10 +12052,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:19.2.0":
-  version: 19.2.0
-  resolution: "react@npm:19.2.0"
-  checksum: 33dd01bf699e1c5040eb249e0f552519adf7ee90b98c49d702a50bf23af6852ea46023a5f7f93966ab10acd7a45428fa0f193c686ecdaa7a75a03886e53ec3fe
+"react@npm:19.1.1":
+  version: 19.1.1
+  resolution: "react@npm:19.1.1"
+  checksum: f2f18fea5deac87b1167365bd5160bcba64d383c26a37afa905b714ca424f423ef97d8daf53f041ab9ac25a06357fafcf0b5d3b6b84c9d1eace0e621bfeae629
   languageName: node
   linkType: hard
 
