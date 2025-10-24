@@ -26,6 +26,7 @@ import type { RootStackParamList } from './types/navigation';
 import SnapshotTestScreen from './screens/SnaptshotTestScreen';
 import ClusteringScreen from './screens/ClsuteringScreen';
 import SvgMarkersScreen from './screens/SvgMarkersScreen';
+import UrlTileOverlay from './screens/UrlTileOverlay';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -93,6 +94,11 @@ export default function App() {
             name="KmlLayer"
             component={KmlLayerScreen}
             options={{ title: 'KML Layer' }}
+          />
+          <Stack.Screen
+            name="UrlTileOverlay"
+            component={UrlTileOverlay}
+            options={{ title: 'Url Tile Overlay' }}
           />
           <Stack.Screen
             name="Location"

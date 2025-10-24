@@ -28,6 +28,7 @@ import type {
   RNIndoorLevel,
   RNLatLngBounds,
   RNSnapshotOptions,
+  RNUrlTileOverlay,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -48,6 +49,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   circles?: RNCircle[];
   heatmaps?: RNHeatmap[];
   kmlLayers?: RNKMLayer[];
+  urlTileOverlays?: RNUrlTileOverlay[];
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;

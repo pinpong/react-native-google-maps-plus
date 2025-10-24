@@ -14,6 +14,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let polygonBuilder = MapPolygonBuilder()
   private let circleBuilder = MapCircleBuilder()
   private let heatmapBuilder = MapHeatmapBuilder()
+  private let urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   private let impl: GoogleMapsViewImpl
 
@@ -110,9 +111,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var mapType: RNMapType? {
     didSet {
-      impl.mapType = mapType.map {
-        GMSMapViewType(rawValue: UInt($0.rawValue)) ?? .normal
-      }
+      impl.mapType = mapType?.toGMSMapViewType
     }
   }
 
@@ -282,6 +281,30 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
       for (id, next) in nextById {
         impl.addKmlLayer(id: id, kmlString: next.kmlString)
+      }
+    }
+  }
+
+  @MainActor
+  var urlTileOverlays: [RNUrlTileOverlay]? {
+    didSet {
+      let prevById = Dictionary(
+        (oldValue ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+      let nextById = Dictionary(
+        (urlTileOverlays ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+
+      let removed = Set(prevById.keys).subtracting(nextById.keys)
+      removed.forEach { impl.removeUrlTileOverlay(id: $0) }
+
+      for (id, next) in nextById {
+        impl.addUrlTileOverlay(
+          id: id,
+          urlTileOverlay: urlTileOverlayBuilder.build(next)
+        )
       }
     }
   }

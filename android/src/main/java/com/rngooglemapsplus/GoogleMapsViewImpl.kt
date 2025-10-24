@@ -77,6 +77,7 @@ class GoogleMapsViewImpl(
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
   private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
   private val pendingKmlLayers = mutableListOf<Pair<String, String>>()
+  private val pendingUrlTilesOverlays = mutableListOf<Pair<String, TileOverlayOptions>>()
 
   private val markersById = mutableMapOf<String, Marker>()
   private val polylinesById = mutableMapOf<String, Polyline>()
@@ -84,6 +85,7 @@ class GoogleMapsViewImpl(
   private val circlesById = mutableMapOf<String, Circle>()
   private val heatmapsById = mutableMapOf<String, TileOverlay>()
   private val kmlLayersById = mutableMapOf<String, KmlLayer>()
+  private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
 
   private var cameraMoveReason = -1
   private var lastSubmittedCameraPosition: CameraPosition? = null
@@ -248,6 +250,13 @@ class GoogleMapsViewImpl(
         internalAddKmlLayer(id, string)
       }
       pendingKmlLayers.clear()
+    }
+
+    if (pendingUrlTilesOverlays.isNotEmpty()) {
+      pendingUrlTilesOverlays.forEach { (id, string) ->
+        internalAddUrlTileOverlay(id, string)
+      }
+      pendingUrlTilesOverlays.clear()
     }
   }
 
@@ -856,6 +865,48 @@ class GoogleMapsViewImpl(
     pendingKmlLayers.clear()
   }
 
+  fun addUrlTileOverlay(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    if (googleMap == null) {
+      pendingUrlTilesOverlays.add(id to opts)
+      return
+    }
+
+    onUi {
+      urlTileOverlaysById.remove(id)?.remove()
+    }
+    internalAddUrlTileOverlay(id, opts)
+  }
+
+  private fun internalAddUrlTileOverlay(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    onUi {
+      val urlTile =
+        googleMap?.addTileOverlay(opts)
+      if (urlTile != null) {
+        urlTileOverlaysById[id] = urlTile
+      }
+    }
+  }
+
+  fun removeUrlTileOverlay(id: String) {
+    onUi {
+      urlTileOverlaysById.remove(id)?.remove()
+    }
+  }
+
+  fun clearUrlTileOverlays() {
+    onUi {
+      urlTileOverlaysById.values.forEach { it.remove() }
+    }
+    urlTileOverlaysById.clear()
+    pendingUrlTilesOverlays.clear()
+  }
+
   fun destroyInternal() {
     if (destroyed) return
     destroyed = true
@@ -868,6 +919,7 @@ class GoogleMapsViewImpl(
       clearCircles()
       clearHeatmaps()
       clearKmlLayer()
+      clearUrlTileOverlays()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)

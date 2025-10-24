@@ -13,6 +13,7 @@ const screens = [
   { name: 'Circles', title: 'Circles' },
   { name: 'Heatmap', title: 'Heatmap' },
   { name: 'KmlLayer', title: 'KML Layer' },
+  { name: 'UrlTileOverlay', title: 'Url Tile Overlay' },
   { name: 'Location', title: 'Location & Permissions' },
   { name: 'CustomStyle', title: 'Custom Map Style' },
   { name: 'IndoorLevelMap', title: 'Indoor Level Map' },

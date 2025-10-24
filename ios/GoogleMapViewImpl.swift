@@ -19,6 +19,7 @@ GMSIndoorDisplayDelegate {
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
   private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
   private var pendingKmlLayers: [(id: String, kmlString: String)] = []
+  private var pendingUrlTileOverlays: [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
 
   private var markersById: [String: GMSMarker] = [:]
   private var polylinesById: [String: GMSPolyline] = [:]
@@ -26,6 +27,7 @@ GMSIndoorDisplayDelegate {
   private var circlesById: [String: GMSCircle] = [:]
   private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
   private var kmlLayerById: [String: GMUGeometryRenderer] = [:]
+  private var urlTileOverlays: [String: GMSURLTileLayer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
   private var lastSubmittedCameraPosition: GMSCameraPosition?
@@ -134,6 +136,12 @@ GMSIndoorDisplayDelegate {
         addKmlLayerInternal(id: $0.id, kmlString: $0.kmlString)
       }
       pendingKmlLayers.removeAll()
+    }
+    if !pendingUrlTileOverlays.isEmpty {
+      pendingUrlTileOverlays.forEach {
+        addUrlTileOverlayInternal(id: $0.id, urlTileOverlay: $0.urlTileOverlay)
+      }
+      pendingUrlTileOverlays.removeAll()
     }
   }
 
@@ -612,6 +620,36 @@ GMSIndoorDisplayDelegate {
     pendingKmlLayers.removeAll()
   }
 
+  @MainActor
+  func addUrlTileOverlay(id: String, urlTileOverlay: GMSURLTileLayer) {
+    if mapView == nil {
+      pendingUrlTileOverlays.append((id, urlTileOverlay))
+      return
+    }
+    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+    addUrlTileOverlayInternal(id: id, urlTileOverlay: urlTileOverlay)
+  }
+
+  @MainActor
+  private func addUrlTileOverlayInternal(
+    id: String,
+    urlTileOverlay: GMSURLTileLayer
+  ) {
+    urlTileOverlay.map = mapView
+  }
+
+  @MainActor
+  func removeUrlTileOverlay(id: String) {
+    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+  }
+
+  @MainActor
+  func clearUrlTileOverlay() {
+    urlTileOverlays.values.forEach { $0.map = nil }
+    urlTileOverlays.removeAll()
+    pendingUrlTileOverlays.removeAll()
+  }
+
   func deinitInternal() {
     guard !deInitialized else { return }
     deInitialized = true
@@ -624,6 +662,7 @@ GMSIndoorDisplayDelegate {
       self.clearCircles()
       self.clearHeatmaps()
       self.clearKmlLayers()
+      self.clearUrlTileOverlay()
       self.mapView?.clear()
       self.mapView?.indoorDisplay.delegate = nil
       self.mapView?.delegate = nil

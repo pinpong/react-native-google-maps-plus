@@ -4,6 +4,7 @@ import type {
   RNMarker,
   RNPolygon,
   RNPolyline,
+  RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
 
 export function randomColor() {
@@ -169,6 +170,17 @@ export const makeHeatmap = (id: number): RNHeatmap => ({
   radius: 100,
   opacity: 1,
 });
+
+export function makeUrlTileOverlay(id: number): RNUrlTileOverlay {
+  return {
+    id: id.toString(),
+    zIndex: id,
+    fadeIn: false,
+    opacity: 1,
+    tileSize: 256,
+    url: '',
+  };
+}
 
 export function makeMarker(id: number): RNMarker {
   return {

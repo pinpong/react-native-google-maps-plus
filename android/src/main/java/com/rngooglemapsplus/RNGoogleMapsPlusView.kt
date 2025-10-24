@@ -14,6 +14,7 @@ import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
 import com.rngooglemapsplus.extensions.toCompressFormat
 import com.rngooglemapsplus.extensions.toFileExtension
+import com.rngooglemapsplus.extensions.toGoogleMapType
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
 import com.rngooglemapsplus.extensions.toSize
@@ -33,6 +34,7 @@ class RNGoogleMapsPlusView(
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
   private val heatmapBuilder = MapHeatmapBuilder()
+  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
@@ -128,9 +130,7 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      value?.let {
-        view.mapType = it.value
-      }
+      view.mapType = value?.toGoogleMapType()
     }
 
   override var markers: Array<RNMarker>? = null
@@ -261,6 +261,20 @@ class RNGoogleMapsPlusView(
       }
       nextById.forEach { (id, next) ->
         view.addKmlLayer(id, next.kmlString)
+      }
+    }
+  override var urlTileOverlays: Array<RNUrlTileOverlay>? = null
+    set(value) {
+      if (field.contentEquals(value)) return
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeUrlTileOverlay(id)
+      }
+
+      nextById.forEach { (id, next) ->
+        view.addUrlTileOverlay(id, urlTileOverlayBuilder.build(next))
       }
     }
 

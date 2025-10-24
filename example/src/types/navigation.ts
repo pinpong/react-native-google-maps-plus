@@ -9,6 +9,7 @@ export type RootStackParamList = {
   Circles: undefined;
   Heatmap: undefined;
   KmlLayer: undefined;
+  UrlTileOverlay: undefined;
   Location: undefined;
   CustomStyle: undefined;
   IndoorLevelMap: undefined;

@@ -235,6 +235,15 @@ export const RNKMLayerValidator = object({
   kmlString: string(),
 });
 
+export const RNUrlTileOverlayValidator = object({
+  id: string(),
+  zIndex: optional(number()),
+  url: string(),
+  tileSize: number(),
+  opacity: optional(number()),
+  fadeIn: optional(boolean()),
+});
+
 export const RNIndoorLevelValidator = object({
   index: number(),
   name: optional(string()),
@@ -342,6 +351,3 @@ if (
     { type: 'literal', schema: 'default' },
   ];
 }
-
-export type RNBasicMapConfigType =
-  typeof RNBasicMapConfigValidator extends Struct<infer O, any> ? O : never;

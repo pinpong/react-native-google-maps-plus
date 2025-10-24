@@ -241,6 +241,15 @@ export type RNKMLayer = {
   kmlString: string;
 };
 
+export type RNUrlTileOverlay = {
+  id: string;
+  zIndex?: number;
+  url: string;
+  tileSize: number;
+  opacity?: number;
+  fadeIn?: boolean;
+};
+
 export type RNIndoorBuilding = {
   activeLevelIndex?: number;
   defaultLevelIndex?: number;
