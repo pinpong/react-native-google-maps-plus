@@ -96,7 +96,6 @@ class GoogleMapsViewImpl(
   private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
 
   private var cameraMoveReason = -1
-  private var lastSubmittedCameraPosition: CameraPosition? = null
 
   init {
     reactContext.addLifecycleEventListener(this)
@@ -155,48 +154,38 @@ class GoogleMapsViewImpl(
   }
 
   override fun onCameraMoveStarted(reason: Int) {
-    lastSubmittedCameraPosition = null
     cameraMoveReason = reason
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
 
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason
-
     onCameraChangeStart?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason,
     )
   }
 
   override fun onCameraMove() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
-
-    if (cameraPosition == lastSubmittedCameraPosition) {
-      return
-    }
-    lastSubmittedCameraPosition = cameraPosition
-
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
+    val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     onCameraChange?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      gesture,
     )
   }
 
   override fun onCameraIdle() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
-
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
+    val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     onCameraChangeComplete?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      gesture,
     )
   }
 

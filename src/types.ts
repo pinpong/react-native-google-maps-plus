@@ -29,8 +29,8 @@ export type RNLatLng = {
 };
 
 export type RNLatLngBounds = {
-  northEast: RNLatLng;
-  southWest: RNLatLng;
+  southwest: RNLatLng;
+  northeast: RNLatLng;
 };
 
 export type RNSnapshotOptions = {
@@ -135,9 +135,11 @@ export type RNCamera = {
 };
 
 export type RNRegion = {
-  center: RNLatLng;
-  latitudeDelta: number;
-  longitudeDelta: number;
+  nearLeft: RNLatLng;
+  nearRight: RNLatLng;
+  farLeft: RNLatLng;
+  farRight: RNLatLng;
+  latLngBounds: RNLatLngBounds;
 };
 
 export type RNPosition = {

@@ -30,7 +30,6 @@ GMSIndoorDisplayDelegate {
   private var urlTileOverlays: [String: GMSURLTileLayer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
-  private var lastSubmittedCameraPosition: GMSCameraPosition?
 
   init(
     frame: CGRect = .zero,
@@ -710,47 +709,31 @@ GMSIndoorDisplayDelegate {
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
     onMain {
       self.cameraMoveReasonIsGesture = gesture
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
 
-      self.onCameraChangeStart?(region, camera, gesture)
+      self.onCameraChangeStart?(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
     onMain {
-      if let last = self.lastSubmittedCameraPosition,
-         last.target.latitude == position.target.latitude,
-         last.target.longitude == position.target.longitude,
-         last.zoom == position.zoom,
-         last.bearing == position.bearing,
-         last.viewingAngle == position.viewingAngle {
-        return
-      }
-
-      self.lastSubmittedCameraPosition = position
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
-
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
+      let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
     onMain {
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
-
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
+      let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChangeComplete?(region, camera, self.cameraMoveReasonIsGesture)
+      self.onCameraChangeComplete?(visibleRegion, camera, gesture)
     }
   }
 
@@ -776,7 +759,12 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  func mapView(_ mapView: GMSMapView, didTapPOIWithPlaceID placeID: String, name: String, location: CLLocationCoordinate2D) {
+  func mapView(
+    _ mapView: GMSMapView,
+    didTapPOIWithPlaceID placeID: String,
+    name: String,
+    location: CLLocationCoordinate2D
+  ) {
     onMain {
       self.onPoiPress?(placeID, name, location.toRNLatLng())
     }

@@ -4,12 +4,12 @@ extension RNLatLngBounds {
   func toCoordinateBounds() -> GMSCoordinateBounds {
     return GMSCoordinateBounds(
       coordinate: CLLocationCoordinate2D(
-        latitude: southWest.latitude,
-        longitude: southWest.longitude
+        latitude: southwest.latitude,
+        longitude: southwest.longitude
       ),
       coordinate: CLLocationCoordinate2D(
-        latitude: northEast.latitude,
-        longitude: northEast.longitude
+        latitude: northeast.latitude,
+        longitude: northeast.longitude
       )
     )
   }

@@ -38,7 +38,6 @@ class LocationHandler(
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
   private var minUpdateInterval: Long = MIN_UPDATE_INTERVAL
-  private var lastSubmittedLocation: Location? = null
   private var isActive = false
 
   var onUpdate: ((Location) -> Unit)? = null
@@ -145,9 +144,8 @@ class LocationHandler(
       fusedLocationClientProviderClient.lastLocation
         .addOnSuccessListener(
           OnSuccessListener { location ->
-            if (location != null && location != lastSubmittedLocation) {
+            if (location != null) {
               onUpdate?.invoke(location)
-              lastSubmittedLocation = location
             }
           },
         ).addOnFailureListener { e ->
@@ -159,11 +157,8 @@ class LocationHandler(
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
-              if (location != lastSubmittedLocation) {
-                lastSubmittedLocation = location
-                listener?.onLocationChanged(location)
-                onUpdate?.invoke(location)
-              }
+              listener?.onLocationChanged(location)
+              onUpdate?.invoke(location)
             } else {
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
             }
