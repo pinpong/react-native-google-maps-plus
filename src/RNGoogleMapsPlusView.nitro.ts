@@ -68,6 +68,11 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
   onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
   onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
+  onInfoWindowPress?: (id?: string) => void;
+  onInfoWindowClose?: (id?: string) => void;
+  onInfoWindowLongPress?: (id?: string) => void;
+  onMyLocationPress?: (location: RNLocation) => void;
+  onMyLocationButtonPress?: (pressed: boolean) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,

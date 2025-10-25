@@ -371,6 +371,31 @@ class RNGoogleMapsPlusView(
       view.onIndoorLevelActivated = cb
     }
 
+  override var onInfoWindowPress: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowPress = cb
+    }
+
+  override var onInfoWindowClose: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowClose = cb
+    }
+
+  override var onInfoWindowLongPress: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowLongPress = cb
+    }
+
+  override var onMyLocationPress: ((RNLocation) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationPress = cb
+    }
+
+  override var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationButtonPress = cb
+    }
+
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeStart = cb

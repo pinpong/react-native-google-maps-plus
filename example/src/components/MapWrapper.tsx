@@ -96,6 +96,9 @@ export default function MapWrapper(props: Props) {
         }}
         initialProps={props.initialProps ?? initialProps}
         uiSettings={props.uiSettings ?? uiSettings}
+        myLocationEnabled={props.myLocationEnabled ?? true}
+        trafficEnabled={props.trafficEnabled ?? false}
+        indoorEnabled={props.indoorEnabled ?? false}
         style={[styles.map, props.style]}
         userInterfaceStyle={
           props.userInterfaceStyle ?? (theme.dark ? 'dark' : 'light')
@@ -188,6 +191,33 @@ export default function MapWrapper(props: Props) {
           props.onIndoorLevelActivated ?? {
             f: (level: RNIndoorLevel) =>
               console.log('Indoor level activated', level),
+          }
+        )}
+        onInfoWindowPress={callback(
+          props.onInfoWindowPress ?? {
+            f: (id?: string) => console.log('InfoWindow press:', id),
+          }
+        )}
+        onInfoWindowClose={callback(
+          props.onInfoWindowClose ?? {
+            f: (id?: string) => console.log('InfoWindow close:', id),
+          }
+        )}
+        onInfoWindowLongPress={callback(
+          props.onInfoWindowLongPress ?? {
+            f: (id?: string) => console.log('InfoWindow long press:', id),
+          }
+        )}
+        onMyLocationPress={callback(
+          props.onMyLocationPress ?? {
+            f: (location: RNLocation) =>
+              console.log('MyLocation press:', location),
+          }
+        )}
+        onMyLocationButtonPress={callback(
+          props.onMyLocationButtonPress ?? {
+            f: (pressed: boolean) =>
+              console.log('MyLocation button press', pressed),
           }
         )}
         onCameraChangeStart={callback(

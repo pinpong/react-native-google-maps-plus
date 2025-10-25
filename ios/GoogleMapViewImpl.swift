@@ -277,6 +277,11 @@ GMSIndoorDisplayDelegate {
   var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)?
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)?
+  var onInfoWindowPress: ((String?) -> Void)?
+  var onInfoWindowClose: ((String?) -> Void)?
+  var onInfoWindowLongPress: ((String?) -> Void)?
+  var onMyLocationPress: ((RNLocation) -> Void)?
+  var onMyLocationButtonPress: ((Bool) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -782,7 +787,7 @@ GMSIndoorDisplayDelegate {
       mapView.selectedMarker = marker
       self.onMarkerPress?(marker.userData as? String, )
     }
-    return true
+    return false
   }
 
   func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
@@ -854,5 +859,44 @@ GMSIndoorDisplayDelegate {
         level.toRNIndoorLevel(index: index, active: true)
       )
     }
+  }
+
+  func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
+    onMain {
+      self.onInfoWindowPress?(marker.userData as? String)
+    }
+  }
+
+  func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
+    onMain {
+      self.onInfoWindowClose?(marker.userData as? String)
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didLongPressInfoWindowOf marker: GMSMarker
+  ) {
+    onMain {
+      self.onInfoWindowLongPress?(marker.userData as? String)
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didTapMyLocation location: CLLocationCoordinate2D
+  ) {
+    onMain {
+      self.mapView?.myLocation.map {
+        self.onMyLocationPress?($0.toRnLocation())
+      }
+    }
+  }
+
+  func didTapMyLocationButton(for mapView: GMSMapView) -> Bool {
+    onMain {
+      self.onMyLocationButtonPress?(true)
+    }
+    return false
   }
 }

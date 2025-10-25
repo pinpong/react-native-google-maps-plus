@@ -2,6 +2,7 @@ package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.location.Location
 import android.util.Base64
 import android.util.Size
 import android.widget.FrameLayout
@@ -67,6 +68,11 @@ class GoogleMapsViewImpl(
   GoogleMap.OnCircleClickListener,
   GoogleMap.OnMarkerDragListener,
   GoogleMap.OnIndoorStateChangeListener,
+  GoogleMap.OnInfoWindowClickListener,
+  GoogleMap.OnInfoWindowCloseListener,
+  GoogleMap.OnInfoWindowLongClickListener,
+  GoogleMap.OnMyLocationClickListener,
+  GoogleMap.OnMyLocationButtonClickListener,
   LifecycleEventListener {
   private var initialized = false
   private var destroyed = false
@@ -135,6 +141,11 @@ class GoogleMapsViewImpl(
         googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowCloseListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
         onMapLoaded?.invoke(true)
       }
       applyProps()
@@ -406,6 +417,11 @@ class GoogleMapsViewImpl(
   var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
+  var onInfoWindowPress: ((String?) -> Unit)? = null
+  var onInfoWindowClose: ((String?) -> Unit)? = null
+  var onInfoWindowLongPress: ((String?) -> Unit)? = null
+  var onMyLocationPress: ((RNLocation) -> Unit)? = null
+  var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -936,6 +952,11 @@ class GoogleMapsViewImpl(
         setOnMapLongClickListener(null)
         setOnPoiClickListener(null)
         setOnMarkerDragListener(null)
+        setOnInfoWindowClickListener(null)
+        setOnInfoWindowCloseListener(null)
+        setOnInfoWindowLongClickListener(null)
+        setOnMyLocationClickListener(null)
+        setOnMyLocationButtonClickListener(null)
       }
       googleMap = null
       mapView?.apply {
@@ -993,7 +1014,7 @@ class GoogleMapsViewImpl(
   override fun onMarkerClick(marker: Marker): Boolean {
     marker.showInfoWindow()
     onMarkerPress?.invoke(marker.tag?.toString())
-    return true
+    return false
   }
 
   override fun onPolylineClick(polyline: Polyline) {
@@ -1058,6 +1079,27 @@ class GoogleMapsViewImpl(
 
   override fun onPoiClick(poi: PointOfInterest) {
     onPoiPress?.invoke(poi.placeId, poi.name, poi.latLng.toRnLatLng())
+  }
+
+  override fun onInfoWindowClick(marker: Marker) {
+    onInfoWindowPress?.invoke(marker.tag?.toString())
+  }
+
+  override fun onInfoWindowClose(marker: Marker) {
+    onInfoWindowClose?.invoke(marker.tag?.toString())
+  }
+
+  override fun onInfoWindowLongClick(marker: Marker) {
+    onInfoWindowLongPress?.invoke(marker.tag?.toString())
+  }
+
+  override fun onMyLocationClick(location: Location) {
+    onMyLocationPress?.invoke(location.toRnLocation())
+  }
+
+  override fun onMyLocationButtonClick(): Boolean {
+    onMyLocationButtonPress?.invoke(true)
+    return false
   }
 }
 

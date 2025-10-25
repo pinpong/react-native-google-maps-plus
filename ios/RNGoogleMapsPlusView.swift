@@ -385,6 +385,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
   }
   @MainActor
+  var onInfoWindowPress: ((String?) -> Void)?{
+    didSet { impl.onInfoWindowPress = onInfoWindowPress }
+  }
+  @MainActor
+  var onInfoWindowClose: ((String?) -> Void)?{
+    didSet { impl.onInfoWindowClose = onInfoWindowClose }
+  }
+  @MainActor
+  var onInfoWindowLongPress: ((String?) -> Void)?{
+    didSet { impl.onInfoWindowLongPress = onInfoWindowLongPress }
+  }
+  @MainActor
+  var onMyLocationPress: ((RNLocation) -> Void)?{
+    didSet { impl.onMyLocationPress = onMyLocationPress }
+  }
+  @MainActor
+  var onMyLocationButtonPress: ((Bool) -> Void)? {
+    didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
+  }
+  @MainActor
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
