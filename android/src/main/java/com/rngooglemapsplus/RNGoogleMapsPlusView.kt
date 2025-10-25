@@ -29,7 +29,7 @@ class RNGoogleMapsPlusView(
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MapMarkerBuilder()
+  private val markerBuilder = MapMarkerBuilder(context)
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()

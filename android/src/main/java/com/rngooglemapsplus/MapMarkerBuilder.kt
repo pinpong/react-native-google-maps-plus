@@ -1,13 +1,16 @@
 package com.rngooglemapsplus
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Typeface
 import android.util.Base64
 import android.util.LruCache
 import androidx.core.graphics.createBitmap
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGExternalFileResolver
 import com.facebook.react.uimanager.PixelUtil.dpToPx
+import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
@@ -22,10 +25,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
 import java.net.URLDecoder
 import kotlin.coroutines.coroutineContext
 
 class MapMarkerBuilder(
+  val context: ThemedReactContext,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
@@ -39,6 +45,7 @@ class MapMarkerBuilder(
   private val jobsById = mutableMapOf<String, Job>()
 
   init {
+    // / TODO: refactor with androidsvg 1.5 release
     SVG.registerExternalFileResolver(
       object : SVGExternalFileResolver() {
         override fun resolveImage(filename: String?): Bitmap? {
@@ -64,9 +71,68 @@ class MapMarkerBuilder(
                 }
               }
 
+              filename.startsWith("http://") || filename.startsWith("https://") -> {
+                val conn =
+                  (URL(filename).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    requestMethod = "GET"
+                    instanceFollowRedirects = true
+                  }
+                conn.connect()
+
+                val contentType = conn.contentType ?: ""
+                val result =
+                  if (contentType.contains("svg") || filename.endsWith(".svg")) {
+                    val svgText = conn.inputStream.bufferedReader().use { it.readText() }
+                    val innerSvg = SVG.getFromString(svgText)
+                    val w = innerSvg.documentWidth.takeIf { it > 0 } ?: 128f
+                    val h = innerSvg.documentHeight.takeIf { it > 0 } ?: 128f
+                    val bmp = createBitmap(w.toInt(), h.toInt())
+                    val canvas = Canvas(bmp)
+                    innerSvg.renderToCanvas(canvas)
+                    bmp
+                  } else {
+                    conn.inputStream.use { BitmapFactory.decodeStream(it) }
+                  }
+
+                conn.disconnect()
+                result
+              }
+
               else -> null
             }
           }.getOrNull()
+        }
+
+        override fun resolveFont(
+          fontFamily: String?,
+          fontWeight: Int,
+          fontStyle: String?,
+        ): Typeface? {
+          if (fontFamily.isNullOrBlank()) return null
+
+          return runCatching {
+            val assetManager = context.assets
+
+            val candidates =
+              listOf(
+                "fonts/$fontFamily.ttf",
+                "fonts/$fontFamily.otf",
+              )
+
+            for (path in candidates) {
+              try {
+                return Typeface.createFromAsset(assetManager, path)
+              } catch (_: Throwable) {
+                // / ignore
+              }
+            }
+
+            Typeface.create(fontFamily, Typeface.NORMAL)
+          }.getOrElse {
+            Typeface.create(fontFamily, fontWeight)
+          }
         }
 
         override fun isFormatSupported(mimeType: String?): Boolean = mimeType?.startsWith("image/") == true

@@ -72,11 +72,46 @@ const MARKER_P_IMAGE_INLINE_SVG = `
 </svg>
 `;
 
+const MARKER_P_IMAGE_REMOTE_SVG = `
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <image
+    width="64"
+    height="64"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.svg"
+  />
+   ${buildText('F')}
+</svg>
+`;
+
+const MARKER_P_IMAGE_REMOTE_PNG = `
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <image
+    width="64"
+    height="64"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.png"
+  />
+ ${buildText('G')}
+
+</svg>
+`;
+
+const MARKER_P_IMAGE_REMOTE_JPG = `
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <image
+    width="64"
+    height="64"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.jpg"
+  />
+ ${buildText('H')}
+
+</svg>
+`;
+
 const MARKER_P_IMAGE_USE_SYMBOL = `
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <g id="dot">
     <circle cx="32" cy="32" r="16" fill="#FF0000" stroke="#FFF" stroke-width="4" />
-     ${buildText('F')}
+     ${buildText('I')}
   </g>
   <use href="#dot" />
 
@@ -92,7 +127,7 @@ const MARKER_P_IMAGE_GRADIENT = `
     </linearGradient>
   </defs>
   <circle cx="32" cy="32" r="16" fill="url(#grad)" stroke="#FFF" stroke-width="4" />
-   ${buildText('G')}
+   ${buildText('J')}
 
 </svg>
 `;
@@ -109,7 +144,7 @@ const MARKER_P_IMAGE_TRANSPARENT = `
     stroke="#FFFFFF"
     stroke-width="4"
   />
-   ${buildText('H')}
+   ${buildText('K')}
 </svg>
 `;
 
@@ -153,6 +188,9 @@ const MARKERS = [
   MARKER_P_IMAGE_SVG_BASE64,
   MARKER_P_IMAGE_BASE64_PNG,
   MARKER_P_IMAGE_INLINE_SVG,
+  MARKER_P_IMAGE_REMOTE_SVG,
+  MARKER_P_IMAGE_REMOTE_PNG,
+  MARKER_P_IMAGE_REMOTE_JPG,
   MARKER_P_IMAGE_USE_SYMBOL,
   MARKER_P_IMAGE_GRADIENT,
   MARKER_P_IMAGE_TRANSPARENT,
