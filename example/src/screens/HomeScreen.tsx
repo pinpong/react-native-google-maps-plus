@@ -7,11 +7,13 @@ import { useAppTheme } from '../hooks/useAppTheme';
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
   { name: 'Markers', title: 'Markers' },
+  { name: 'SvgMarkers', title: 'SVG Markers' },
   { name: 'Polygons', title: 'Polygons' },
   { name: 'Polylines', title: 'Polylines' },
   { name: 'Circles', title: 'Circles' },
   { name: 'Heatmap', title: 'Heatmap' },
   { name: 'KmlLayer', title: 'KML Layer' },
+  { name: 'UrlTileOverlay', title: 'Url Tile Overlay' },
   { name: 'Location', title: 'Location & Permissions' },
   { name: 'CustomStyle', title: 'Custom Map Style' },
   { name: 'IndoorLevelMap', title: 'Indoor Level Map' },

@@ -25,6 +25,8 @@ import CameraTestScreen from './screens/CameraTestScreen';
 import type { RootStackParamList } from './types/navigation';
 import SnapshotTestScreen from './screens/SnaptshotTestScreen';
 import ClusteringScreen from './screens/ClsuteringScreen';
+import SvgMarkersScreen from './screens/SvgMarkersScreen';
+import UrlTileOverlay from './screens/UrlTileOverlay';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -64,6 +66,11 @@ export default function App() {
             options={{ title: 'Markers' }}
           />
           <Stack.Screen
+            name="SvgMarkers"
+            component={SvgMarkersScreen}
+            options={{ title: 'SVG Markers' }}
+          />
+          <Stack.Screen
             name="Polygons"
             component={PolygonsScreen}
             options={{ title: 'Polygons' }}
@@ -87,6 +94,11 @@ export default function App() {
             name="KmlLayer"
             component={KmlLayerScreen}
             options={{ title: 'KML Layer' }}
+          />
+          <Stack.Screen
+            name="UrlTileOverlay"
+            component={UrlTileOverlay}
+            options={{ title: 'Url Tile Overlay' }}
           />
           <Stack.Screen
             name="Location"

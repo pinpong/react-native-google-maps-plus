@@ -6,12 +6,6 @@ import com.rngooglemapsplus.RNLatLngBounds
 
 fun RNLatLngBounds.toLatLngBounds(): LatLngBounds =
   LatLngBounds(
-    LatLng(
-      southWest.latitude,
-      southWest.longitude,
-    ),
-    LatLng(
-      northEast.latitude,
-      northEast.longitude,
-    ),
+    southwest.toLatLng(),
+    northeast.toLatLng(),
   )

@@ -10,7 +10,7 @@ GMSIndoorDisplayDelegate {
   private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
   private var initialized = false
-  private var mapReady = false
+  private var loaded = false
   private var deInitialized = false
 
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
@@ -19,6 +19,7 @@ GMSIndoorDisplayDelegate {
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
   private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
   private var pendingKmlLayers: [(id: String, kmlString: String)] = []
+  private var pendingUrlTileOverlays: [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
 
   private var markersById: [String: GMSMarker] = [:]
   private var polylinesById: [String: GMSPolyline] = [:]
@@ -26,9 +27,9 @@ GMSIndoorDisplayDelegate {
   private var circlesById: [String: GMSCircle] = [:]
   private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
   private var kmlLayerById: [String: GMUGeometryRenderer] = [:]
+  private var urlTileOverlays: [String: GMSURLTileLayer] = [:]
 
   private var cameraMoveReasonIsGesture: Bool = false
-  private var lastSubmittedCameraPosition: GMSCameraPosition?
 
   init(
     frame: CGRect = .zero,
@@ -75,7 +76,6 @@ GMSIndoorDisplayDelegate {
     applyProps()
     initLocationCallbacks()
     onMapReady?(true)
-    mapReady = true
   }
 
   @MainActor
@@ -135,6 +135,12 @@ GMSIndoorDisplayDelegate {
         addKmlLayerInternal(id: $0.id, kmlString: $0.kmlString)
       }
       pendingKmlLayers.removeAll()
+    }
+    if !pendingUrlTileOverlays.isEmpty {
+      pendingUrlTileOverlays.forEach {
+        addUrlTileOverlayInternal(id: $0.id, urlTileOverlay: $0.urlTileOverlay)
+      }
+      pendingUrlTileOverlays.removeAll()
     }
   }
 
@@ -255,9 +261,12 @@ GMSIndoorDisplayDelegate {
 
   var onMapError: ((RNMapErrorCode) -> Void)?
   var onMapReady: ((Bool) -> Void)?
+  var onMapLoaded: ((Bool) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
+  var onMapLongPress: ((RNLatLng) -> Void)?
+  var onPoiPress: ((String, String, RNLatLng) -> Void)?
   var onMarkerPress: ((String?) -> Void)?
   var onPolylinePress: ((String?) -> Void)?
   var onPolygonPress: ((String?) -> Void)?
@@ -267,6 +276,11 @@ GMSIndoorDisplayDelegate {
   var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)?
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)?
+  var onInfoWindowPress: ((String?) -> Void)?
+  var onInfoWindowClose: ((String?) -> Void)?
+  var onInfoWindowLongPress: ((String?) -> Void)?
+  var onMyLocationPress: ((RNLocation) -> Void)?
+  var onMyLocationButtonPress: ((Bool) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -611,6 +625,36 @@ GMSIndoorDisplayDelegate {
     pendingKmlLayers.removeAll()
   }
 
+  @MainActor
+  func addUrlTileOverlay(id: String, urlTileOverlay: GMSURLTileLayer) {
+    if mapView == nil {
+      pendingUrlTileOverlays.append((id, urlTileOverlay))
+      return
+    }
+    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+    addUrlTileOverlayInternal(id: id, urlTileOverlay: urlTileOverlay)
+  }
+
+  @MainActor
+  private func addUrlTileOverlayInternal(
+    id: String,
+    urlTileOverlay: GMSURLTileLayer
+  ) {
+    urlTileOverlay.map = mapView
+  }
+
+  @MainActor
+  func removeUrlTileOverlay(id: String) {
+    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+  }
+
+  @MainActor
+  func clearUrlTileOverlay() {
+    urlTileOverlays.values.forEach { $0.map = nil }
+    urlTileOverlays.removeAll()
+    pendingUrlTileOverlays.removeAll()
+  }
+
   func deinitInternal() {
     guard !deInitialized else { return }
     deInitialized = true
@@ -623,6 +667,7 @@ GMSIndoorDisplayDelegate {
       self.clearCircles()
       self.clearHeatmaps()
       self.clearKmlLayers()
+      self.clearUrlTileOverlay()
       self.mapView?.clear()
       self.mapView?.indoorDisplay.delegate = nil
       self.mapView?.delegate = nil
@@ -655,50 +700,40 @@ GMSIndoorDisplayDelegate {
     deinitInternal()
   }
 
+  func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
+    guard !loaded else { return }
+    loaded = true
+    onMapLoaded?(true)
+  }
+
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
     onMain {
       self.cameraMoveReasonIsGesture = gesture
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
 
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
 
-      self.onCameraChangeStart?(region, camera, gesture)
+      self.onCameraChangeStart?(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
     onMain {
-      if let last = self.lastSubmittedCameraPosition,
-         last.target.latitude == position.target.latitude,
-         last.target.longitude == position.target.longitude,
-         last.zoom == position.zoom,
-         last.bearing == position.bearing,
-         last.viewingAngle == position.viewingAngle {
-        return
-      }
-
-      self.lastSubmittedCameraPosition = position
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
-
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
+      let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChange?(region, camera, self.cameraMoveReasonIsGesture)
+      self.onCameraChange?(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
     onMain {
-      let visibleRegion = mapView.projection.visibleRegion()
-      let bounds = GMSCoordinateBounds(region: visibleRegion)
-
-      let region = bounds.toRNRegion()
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
+      let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChangeComplete?(region, camera, self.cameraMoveReasonIsGesture)
+      self.onCameraChangeComplete?(visibleRegion, camera, gesture)
     }
   }
 
@@ -713,12 +748,34 @@ GMSIndoorDisplayDelegate {
     }
   }
 
+  func mapView(
+    _ mapView: GMSMapView,
+    didLongPressAt coordinate: CLLocationCoordinate2D
+  ) {
+    onMain {
+      self.onMapLongPress?(
+        coordinate.toRNLatLng(),
+      )
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didTapPOIWithPlaceID placeID: String,
+    name: String,
+    location: CLLocationCoordinate2D
+  ) {
+    onMain {
+      self.onPoiPress?(placeID, name, location.toRNLatLng())
+    }
+  }
+
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
     onMain {
       mapView.selectedMarker = marker
       self.onMarkerPress?(marker.userData as? String, )
     }
-    return true
+    return false
   }
 
   func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
@@ -790,5 +847,44 @@ GMSIndoorDisplayDelegate {
         level.toRNIndoorLevel(index: index, active: true)
       )
     }
+  }
+
+  func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
+    onMain {
+      self.onInfoWindowPress?(marker.userData as? String)
+    }
+  }
+
+  func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
+    onMain {
+      self.onInfoWindowClose?(marker.userData as? String)
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didLongPressInfoWindowOf marker: GMSMarker
+  ) {
+    onMain {
+      self.onInfoWindowLongPress?(marker.userData as? String)
+    }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didTapMyLocation location: CLLocationCoordinate2D
+  ) {
+    onMain {
+      self.mapView?.myLocation.map {
+        self.onMyLocationPress?($0.toRnLocation())
+      }
+    }
+  }
+
+  func didTapMyLocationButton(for mapView: GMSMapView) -> Bool {
+    onMain {
+      self.onMyLocationButtonPress?(true)
+    }
+    return false
   }
 }

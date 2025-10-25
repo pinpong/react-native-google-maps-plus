@@ -2475,7 +2475,7 @@ PODS:
     - React-perflogger (= 0.82.1)
     - React-utils (= 0.82.1)
     - SocketRocket
-  - RNGestureHandler (2.28.0):
+  - RNGestureHandler (2.29.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2629,7 +2629,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.17.1):
+  - RNScreens (4.18.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2656,10 +2656,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.17.1)
+    - RNScreens/common (= 4.18.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.17.1):
+  - RNScreens/common (4.18.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3119,10 +3119,10 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: a45ef34bb22dc1c9b2ac1f74167d9a28af961176
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
-  RNGestureHandler: e1cc4de7646eb557ad62d1271d8eac73c304a896
+  RNGestureHandler: 332c71177cd5c856673c7e7875fa3f92ba5a5cc2
   RNGoogleMapsPlus: b08637cb23bb9592c6e12d1497148e9fd98c35f2
   RNReanimated: 8f0185df21f0dea34ee8c9611ba88c17a290ed9a
-  RNScreens: ccfcc2f7d9c0d458b7fc41b3f4f0bea054602b3a
+  RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea

@@ -28,6 +28,7 @@ import type {
   RNIndoorLevel,
   RNLatLngBounds,
   RNSnapshotOptions,
+  RNUrlTileOverlay,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -48,12 +49,16 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   circles?: RNCircle[];
   heatmaps?: RNHeatmap[];
   kmlLayers?: RNKMLayer[];
+  urlTileOverlays?: RNUrlTileOverlay[];
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
+  onMapLoaded?: (loaded: boolean) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
+  onMapLongPress?: (coordinate: RNLatLng) => void;
+  onPoiPress?: (placeId: string, name: string, coordinate: RNLatLng) => void;
   onMarkerPress?: (id?: string | undefined) => void;
   onPolylinePress?: (id?: string | undefined) => void;
   onPolygonPress?: (id?: string | undefined) => void;
@@ -63,6 +68,11 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
   onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
   onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
+  onInfoWindowPress?: (id?: string) => void;
+  onInfoWindowClose?: (id?: string) => void;
+  onInfoWindowLongPress?: (id?: string) => void;
+  onMyLocationPress?: (location: RNLocation) => void;
+  onMyLocationButtonPress?: (pressed: boolean) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,

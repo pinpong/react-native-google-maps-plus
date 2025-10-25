@@ -2,6 +2,7 @@ package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.location.Location
 import android.util.Base64
 import android.util.Size
 import android.widget.FrameLayout
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
@@ -58,15 +60,21 @@ class GoogleMapsViewImpl(
   GoogleMap.OnCameraMoveListener,
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
+  GoogleMap.OnMapLongClickListener,
+  GoogleMap.OnPoiClickListener,
   GoogleMap.OnMarkerClickListener,
   GoogleMap.OnPolylineClickListener,
   GoogleMap.OnPolygonClickListener,
   GoogleMap.OnCircleClickListener,
   GoogleMap.OnMarkerDragListener,
   GoogleMap.OnIndoorStateChangeListener,
+  GoogleMap.OnInfoWindowClickListener,
+  GoogleMap.OnInfoWindowCloseListener,
+  GoogleMap.OnInfoWindowLongClickListener,
+  GoogleMap.OnMyLocationClickListener,
+  GoogleMap.OnMyLocationButtonClickListener,
   LifecycleEventListener {
   private var initialized = false
-  private var mapReady = false
   private var destroyed = false
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
@@ -77,6 +85,7 @@ class GoogleMapsViewImpl(
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
   private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
   private val pendingKmlLayers = mutableListOf<Pair<String, String>>()
+  private val pendingUrlTilesOverlays = mutableListOf<Pair<String, TileOverlayOptions>>()
 
   private val markersById = mutableMapOf<String, Marker>()
   private val polylinesById = mutableMapOf<String, Polyline>()
@@ -84,9 +93,9 @@ class GoogleMapsViewImpl(
   private val circlesById = mutableMapOf<String, Circle>()
   private val heatmapsById = mutableMapOf<String, TileOverlay>()
   private val kmlLayersById = mutableMapOf<String, KmlLayer>()
+  private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
 
   private var cameraMoveReason = -1
-  private var lastSubmittedCameraPosition: CameraPosition? = null
 
   init {
     reactContext.addLifecycleEventListener(this)
@@ -128,58 +137,55 @@ class GoogleMapsViewImpl(
         googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowCloseListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
+        onMapLoaded?.invoke(true)
       }
       applyProps()
       initLocationCallbacks()
-      mapReady = true
       onMapReady?.invoke(true)
     }
   }
 
   override fun onCameraMoveStarted(reason: Int) {
-    lastSubmittedCameraPosition = null
     cameraMoveReason = reason
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
 
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason
-
     onCameraChangeStart?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason,
     )
   }
 
   override fun onCameraMove() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
-
-    if (cameraPosition == lastSubmittedCameraPosition) {
-      return
-    }
-    lastSubmittedCameraPosition = cameraPosition
-
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
+    val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     onCameraChange?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      gesture,
     )
   }
 
   override fun onCameraIdle() {
-    val bounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+    val visibleRegion = googleMap?.projection?.visibleRegion ?: return
     val cameraPosition = googleMap?.cameraPosition ?: return
-
-    val isGesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
+    val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
 
     onCameraChangeComplete?.invoke(
-      bounds.toRnRegion(),
+      visibleRegion.toRnRegion(),
       cameraPosition.toRnCamera(),
-      isGesture,
+      gesture,
     )
   }
 
@@ -247,6 +253,13 @@ class GoogleMapsViewImpl(
         internalAddKmlLayer(id, string)
       }
       pendingKmlLayers.clear()
+    }
+
+    if (pendingUrlTilesOverlays.isNotEmpty()) {
+      pendingUrlTilesOverlays.forEach { (id, string) ->
+        internalAddUrlTileOverlay(id, string)
+      }
+      pendingUrlTilesOverlays.clear()
     }
   }
 
@@ -378,9 +391,12 @@ class GoogleMapsViewImpl(
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
+  var onMapLoaded: ((Boolean) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
+  var onMapLongPress: ((RNLatLng) -> Unit)? = null
+  var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
   var onMarkerPress: ((String?) -> Unit)? = null
   var onPolylinePress: ((String?) -> Unit)? = null
   var onPolygonPress: ((String?) -> Unit)? = null
@@ -390,6 +406,11 @@ class GoogleMapsViewImpl(
   var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
+  var onInfoWindowPress: ((String?) -> Unit)? = null
+  var onInfoWindowClose: ((String?) -> Unit)? = null
+  var onInfoWindowLongPress: ((String?) -> Unit)? = null
+  var onMyLocationPress: ((RNLocation) -> Unit)? = null
+  var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -853,6 +874,48 @@ class GoogleMapsViewImpl(
     pendingKmlLayers.clear()
   }
 
+  fun addUrlTileOverlay(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    if (googleMap == null) {
+      pendingUrlTilesOverlays.add(id to opts)
+      return
+    }
+
+    onUi {
+      urlTileOverlaysById.remove(id)?.remove()
+    }
+    internalAddUrlTileOverlay(id, opts)
+  }
+
+  private fun internalAddUrlTileOverlay(
+    id: String,
+    opts: TileOverlayOptions,
+  ) {
+    onUi {
+      val urlTile =
+        googleMap?.addTileOverlay(opts)
+      if (urlTile != null) {
+        urlTileOverlaysById[id] = urlTile
+      }
+    }
+  }
+
+  fun removeUrlTileOverlay(id: String) {
+    onUi {
+      urlTileOverlaysById.remove(id)?.remove()
+    }
+  }
+
+  fun clearUrlTileOverlays() {
+    onUi {
+      urlTileOverlaysById.values.forEach { it.remove() }
+    }
+    urlTileOverlaysById.clear()
+    pendingUrlTilesOverlays.clear()
+  }
+
   fun destroyInternal() {
     if (destroyed) return
     destroyed = true
@@ -865,6 +928,7 @@ class GoogleMapsViewImpl(
       clearCircles()
       clearHeatmaps()
       clearKmlLayer()
+      clearUrlTileOverlays()
       googleMap?.apply {
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
@@ -874,7 +938,14 @@ class GoogleMapsViewImpl(
         setOnPolygonClickListener(null)
         setOnCircleClickListener(null)
         setOnMapClickListener(null)
+        setOnMapLongClickListener(null)
+        setOnPoiClickListener(null)
         setOnMarkerDragListener(null)
+        setOnInfoWindowClickListener(null)
+        setOnInfoWindowCloseListener(null)
+        setOnInfoWindowLongClickListener(null)
+        setOnMyLocationClickListener(null)
+        setOnMyLocationButtonClickListener(null)
       }
       googleMap = null
       mapView?.apply {
@@ -932,7 +1003,7 @@ class GoogleMapsViewImpl(
   override fun onMarkerClick(marker: Marker): Boolean {
     marker.showInfoWindow()
     onMarkerPress?.invoke(marker.tag?.toString())
-    return true
+    return false
   }
 
   override fun onPolylineClick(polyline: Polyline) {
@@ -949,6 +1020,12 @@ class GoogleMapsViewImpl(
 
   override fun onMapClick(coordinates: LatLng) {
     onMapPress?.invoke(
+      coordinates.toRnLatLng(),
+    )
+  }
+
+  override fun onMapLongClick(coordinates: LatLng) {
+    onMapLongPress?.invoke(
       coordinates.toRnLatLng(),
     )
   }
@@ -987,6 +1064,31 @@ class GoogleMapsViewImpl(
         true,
       ),
     )
+  }
+
+  override fun onPoiClick(poi: PointOfInterest) {
+    onPoiPress?.invoke(poi.placeId, poi.name, poi.latLng.toRnLatLng())
+  }
+
+  override fun onInfoWindowClick(marker: Marker) {
+    onInfoWindowPress?.invoke(marker.tag?.toString())
+  }
+
+  override fun onInfoWindowClose(marker: Marker) {
+    onInfoWindowClose?.invoke(marker.tag?.toString())
+  }
+
+  override fun onInfoWindowLongClick(marker: Marker) {
+    onInfoWindowLongPress?.invoke(marker.tag?.toString())
+  }
+
+  override fun onMyLocationClick(location: Location) {
+    onMyLocationPress?.invoke(location.toRnLocation())
+  }
+
+  override fun onMyLocationButtonClick(): Boolean {
+    onMyLocationButtonPress?.invoke(true)
+    return false
   }
 }
 

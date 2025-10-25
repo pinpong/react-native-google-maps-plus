@@ -34,7 +34,7 @@ export default function MapWrapper(props: Props) {
   const styles = useMemo(() => getThemedStyles(theme), [theme]);
   const layout = useSafeAreaInsets();
 
-  const [mapReady, setMapReady] = React.useState(false);
+  const [mapLoaded, setMapLoaded] = React.useState(false);
   const initialProps = useMemo(
     () => ({
       camera: {
@@ -96,6 +96,9 @@ export default function MapWrapper(props: Props) {
         }}
         initialProps={props.initialProps ?? initialProps}
         uiSettings={props.uiSettings ?? uiSettings}
+        myLocationEnabled={props.myLocationEnabled ?? true}
+        trafficEnabled={props.trafficEnabled ?? false}
+        indoorEnabled={props.indoorEnabled ?? false}
         style={[styles.map, props.style]}
         userInterfaceStyle={
           props.userInterfaceStyle ?? (theme.dark ? 'dark' : 'light')
@@ -104,22 +107,40 @@ export default function MapWrapper(props: Props) {
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
         mapPadding={props.mapPadding ?? mapPadding}
         locationConfig={props.locationConfig ?? locationConfig}
-        onMapReady={callback(
-          props.onMapReady ?? {
-            f: (ready: boolean) => {
-              console.log('Map is ready! ' + ready);
-              setMapReady(true);
-            },
-          }
-        )}
         onMapError={callback(
           props.onMapError ?? {
             f: (error: RNMapErrorCode) => console.log('Map error:', error),
           }
         )}
+        onMapReady={callback(
+          props.onMapReady ?? {
+            f: (ready: boolean) => {
+              console.log('Map is ready ' + ready);
+            },
+          }
+        )}
+        onMapLoaded={callback(
+          props.onMapLoaded ?? {
+            f: (loaded: boolean) => {
+              console.log('Map is loaded ' + loaded);
+              setMapLoaded(loaded);
+            },
+          }
+        )}
         onMapPress={callback(
           props.onMapPress ?? {
             f: (c: RNLatLng) => console.log('Map press:', c),
+          }
+        )}
+        onMapLongPress={callback(
+          props.onMapLongPress ?? {
+            f: (c: RNLatLng) => console.log('Map long press:', c),
+          }
+        )}
+        onPoiPress={callback(
+          props.onPoiPress ?? {
+            f: (placeId: string, name: String, coordinate: RNLatLng) =>
+              console.log('Poi press:', placeId, name, coordinate),
           }
         )}
         onMarkerPress={callback(
@@ -172,6 +193,33 @@ export default function MapWrapper(props: Props) {
               console.log('Indoor level activated', level),
           }
         )}
+        onInfoWindowPress={callback(
+          props.onInfoWindowPress ?? {
+            f: (id?: string) => console.log('InfoWindow press:', id),
+          }
+        )}
+        onInfoWindowClose={callback(
+          props.onInfoWindowClose ?? {
+            f: (id?: string) => console.log('InfoWindow close:', id),
+          }
+        )}
+        onInfoWindowLongPress={callback(
+          props.onInfoWindowLongPress ?? {
+            f: (id?: string) => console.log('InfoWindow long press:', id),
+          }
+        )}
+        onMyLocationPress={callback(
+          props.onMyLocationPress ?? {
+            f: (location: RNLocation) =>
+              console.log('MyLocation press:', location),
+          }
+        )}
+        onMyLocationButtonPress={callback(
+          props.onMyLocationButtonPress ?? {
+            f: (pressed: boolean) =>
+              console.log('MyLocation button press', pressed),
+          }
+        )}
         onCameraChangeStart={callback(
           props.onCameraChangeStart ?? {
             f: (r: RNRegion, cam: RNCamera, g: boolean) =>
@@ -202,7 +250,7 @@ export default function MapWrapper(props: Props) {
         )}
       />
       {children}
-      {!mapReady && (
+      {!mapLoaded && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>

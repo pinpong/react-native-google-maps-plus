@@ -14,6 +14,7 @@ import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
 import com.rngooglemapsplus.extensions.toCompressFormat
 import com.rngooglemapsplus.extensions.toFileExtension
+import com.rngooglemapsplus.extensions.toGoogleMapType
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
 import com.rngooglemapsplus.extensions.toSize
@@ -28,11 +29,12 @@ class RNGoogleMapsPlusView(
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MapMarkerBuilder()
+  private val markerBuilder = MapMarkerBuilder(context)
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
   private val heatmapBuilder = MapHeatmapBuilder()
+  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
@@ -128,9 +130,7 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      value?.let {
-        view.mapType = it.value
-      }
+      view.mapType = value?.toGoogleMapType()
     }
 
   override var markers: Array<RNMarker>? = null
@@ -264,6 +264,21 @@ class RNGoogleMapsPlusView(
       }
     }
 
+  override var urlTileOverlays: Array<RNUrlTileOverlay>? = null
+    set(value) {
+      if (field.contentEquals(value)) return
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeUrlTileOverlay(id)
+      }
+
+      nextById.forEach { (id, next) ->
+        view.addUrlTileOverlay(id, urlTileOverlayBuilder.build(next))
+      }
+    }
+
   override var locationConfig: RNLocationConfig? = null
     set(value) {
       if (field == value) return
@@ -281,6 +296,11 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
+  override var onMapLoaded: ((Boolean) -> Unit)? = null
+    set(cb) {
+      view.onMapLoaded = cb
+    }
+
   override var onLocationUpdate: ((RNLocation) -> Unit)? = null
     set(cb) {
       view.onLocationUpdate = cb
@@ -296,9 +316,19 @@ class RNGoogleMapsPlusView(
       view.onMapPress = cb
     }
 
+  override var onMapLongPress: ((RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMapLongPress = cb
+    }
+
   override var onMarkerPress: ((String?) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
+    }
+
+  override var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onPoiPress = cb
     }
 
   override var onPolylinePress: ((String?) -> Unit)? = null
@@ -339,6 +369,31 @@ class RNGoogleMapsPlusView(
   override var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
     set(cb) {
       view.onIndoorLevelActivated = cb
+    }
+
+  override var onInfoWindowPress: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowPress = cb
+    }
+
+  override var onInfoWindowClose: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowClose = cb
+    }
+
+  override var onInfoWindowLongPress: ((String?) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowLongPress = cb
+    }
+
+  override var onMyLocationPress: ((RNLocation) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationPress = cb
+    }
+
+  override var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationButtonPress = cb
     }
 
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
