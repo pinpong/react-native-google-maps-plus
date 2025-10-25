@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
@@ -59,6 +60,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnCameraIdleListener,
   GoogleMap.OnMapClickListener,
   GoogleMap.OnMapLongClickListener,
+  GoogleMap.OnPoiClickListener,
   GoogleMap.OnMarkerClickListener,
   GoogleMap.OnPolylineClickListener,
   GoogleMap.OnPolygonClickListener,
@@ -131,6 +133,7 @@ class GoogleMapsViewImpl(
         googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
+        googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
         googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
         onMapLoaded?.invoke(true)
       }
@@ -393,6 +396,7 @@ class GoogleMapsViewImpl(
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMapLongPress: ((RNLatLng) -> Unit)? = null
+  var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
   var onMarkerPress: ((String?) -> Unit)? = null
   var onPolylinePress: ((String?) -> Unit)? = null
   var onPolygonPress: ((String?) -> Unit)? = null
@@ -930,6 +934,7 @@ class GoogleMapsViewImpl(
         setOnCircleClickListener(null)
         setOnMapClickListener(null)
         setOnMapLongClickListener(null)
+        setOnPoiClickListener(null)
         setOnMarkerDragListener(null)
       }
       googleMap = null
@@ -1049,6 +1054,10 @@ class GoogleMapsViewImpl(
         true,
       ),
     )
+  }
+
+  override fun onPoiClick(poi: PointOfInterest) {
+    onPoiPress?.invoke(poi.placeId, poi.name, poi.latLng.toRnLatLng())
   }
 }
 

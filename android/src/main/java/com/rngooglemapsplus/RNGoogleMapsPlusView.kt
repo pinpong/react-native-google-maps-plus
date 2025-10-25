@@ -263,6 +263,7 @@ class RNGoogleMapsPlusView(
         view.addKmlLayer(id, next.kmlString)
       }
     }
+
   override var urlTileOverlays: Array<RNUrlTileOverlay>? = null
     set(value) {
       if (field.contentEquals(value)) return
@@ -323,6 +324,11 @@ class RNGoogleMapsPlusView(
   override var onMarkerPress: ((String?) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
+    }
+
+  override var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onPoiPress = cb
     }
 
   override var onPolylinePress: ((String?) -> Unit)? = null

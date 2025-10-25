@@ -58,6 +58,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
   onMapLongPress?: (coordinate: RNLatLng) => void;
+  onPoiPress?: (placeId: string, name: string, coordinate: RNLatLng) => void;
   onMarkerPress?: (id?: string | undefined) => void;
   onPolylinePress?: (id?: string | undefined) => void;
   onPolygonPress?: (id?: string | undefined) => void;

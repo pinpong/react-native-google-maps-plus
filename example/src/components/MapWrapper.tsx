@@ -134,6 +134,12 @@ export default function MapWrapper(props: Props) {
             f: (c: RNLatLng) => console.log('Map long press:', c),
           }
         )}
+        onPoiPress={callback(
+          props.onPoiPress ?? {
+            f: (placeId: string, name: String, coordinate: RNLatLng) =>
+              console.log('Poi press:', placeId, name, coordinate),
+          }
+        )}
         onMarkerPress={callback(
           props.onMarkerPress ?? {
             f: (id: string | undefined) => console.log('Marker press:', id),
