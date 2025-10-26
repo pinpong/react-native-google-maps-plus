@@ -6,6 +6,7 @@ import type {
   RNPolyline,
   RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
+import { weightData } from './heatMapWeightData';
 
 export function randomColor() {
   return (
@@ -125,49 +126,13 @@ export const makeCircle = (id: number): RNCircle => ({
 export const makeHeatmap = (id: number): RNHeatmap => ({
   id: id.toString(),
   zIndex: id,
-  weightedData: [
-    {
-      latitude: 37.777714074525925,
-      longitude: -122.42099587858186,
-      weight: 1,
-    },
-    {
-      latitude: 37.785184052875735,
-      longitude: -122.42914114591328,
-      weight: 1,
-    },
-    {
-      latitude: 37.769334961755526,
-      longitude: -122.41418426583697,
-      weight: 5,
-    },
-    {
-      latitude: 37.7717263096532,
-      longitude: -122.41931954914673,
-      weight: 4,
-    },
-    {
-      latitude: 37.78589459403588,
-      longitude: -122.40573314204349,
-      weight: 3,
-    },
-    {
-      latitude: 37.78664297332888,
-      longitude: -122.42602082474453,
-      weight: 2,
-    },
-    {
-      latitude: 37.74874321698208,
-      longitude: -122.44390470794693,
-      weight: 1,
-    },
-  ],
+  weightedData: weightData,
   gradient: {
     colors: ['#00f', '#0ff', '#0f0', '#ff0', '#f00'],
-    startPoints: [0.0, 0.25, 0.5, 0.75, 1.0],
-    colorMapSize: 1024,
+    startPoints: [0.1, 0.2, 0.45, 0.7, 1.0],
+    colorMapSize: 256,
   },
-  radius: 100,
+  radius: 50,
   opacity: 1,
 });
 

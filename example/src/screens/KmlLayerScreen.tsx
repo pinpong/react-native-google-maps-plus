@@ -13,23 +13,25 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function KmlLayerScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [kmlLayer, setKmlLayer] = useState<RNKMLayer | undefined>(undefined);
+  const [kmlLayers, setKmlLayers] = useState<RNKMLayer[] | undefined>(
+    undefined
+  );
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, kmlLayer ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, kmlLayers ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} kmlLayers={kmlLayer ? [kmlLayer] : []} />
+      <MapWrapper mapRef={mapRef} kmlLayers={kmlLayers ? kmlLayers : []} />
       <MapConfigDialog<RNKMLayer>
         visible={dialogVisible}
         title="Edit KML layer"
         initialData={{ id: '1', kmlString: kmlString }}
         validator={RNKMLayerValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setKmlLayer(c)}
+        onSave={(c) => setKmlLayers([c])}
       />
     </>
   );

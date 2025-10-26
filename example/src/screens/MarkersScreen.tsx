@@ -13,23 +13,23 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function MarkersScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [marker, setMarker] = useState<RNMarker | undefined>(undefined);
+  const [markers, setMarkers] = useState<RNMarker[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, marker ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, markers ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} markers={marker ? [marker] : []} />
+      <MapWrapper mapRef={mapRef} markers={markers ? markers : []} />
       <MapConfigDialog<RNMarker>
         visible={dialogVisible}
         title="Edit marker"
         initialData={makeMarker(1)}
         validator={RNMarkerValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setMarker(c)}
+        onSave={(c) => setMarkers([c])}
       />
     </>
   );

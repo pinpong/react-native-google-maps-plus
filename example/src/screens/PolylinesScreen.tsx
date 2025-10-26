@@ -13,23 +13,25 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function PolylinesScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [polyline, setPolyline] = useState<RNPolyline | undefined>(undefined);
+  const [polylines, setPolylines] = useState<RNPolyline[] | undefined>(
+    undefined
+  );
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, polyline ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, polylines ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} polylines={polyline ? [polyline] : []} />
+      <MapWrapper mapRef={mapRef} polylines={polylines ? polylines : []} />
       <MapConfigDialog<RNPolyline>
         visible={dialogVisible}
         title="Edit polyline"
         initialData={makePolyline(1)}
         validator={RNPolylineValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setPolyline(c)}
+        onSave={(c) => setPolylines([c])}
       />
     </>
   );

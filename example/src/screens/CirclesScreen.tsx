@@ -13,23 +13,23 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function CirclesScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [circle, setCircle] = useState<RNCircle | undefined>(undefined);
+  const [circles, setCircles] = useState<RNCircle[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, circle ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, circles ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} circles={circle ? [circle] : []} />
+      <MapWrapper mapRef={mapRef} circles={circles ? circles : []} />
       <MapConfigDialog<RNCircle>
         visible={dialogVisible}
         title="Edit circle"
         initialData={makeCircle(1)}
         validator={RNCircleValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setCircle(c)}
+        onSave={(c) => setCircles([c])}
       />
     </>
   );

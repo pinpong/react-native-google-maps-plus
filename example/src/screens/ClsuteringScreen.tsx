@@ -5,10 +5,12 @@ import type {
   GoogleMapsViewRef,
   RNMarker,
   RNMarkerSvg,
+  RNRegion,
 } from 'react-native-google-maps-plus';
 import type { Supercluster } from 'react-native-clusterer';
 import { useClusterer } from 'react-native-clusterer';
 import { randomCoordinates } from '../utils/mapGenerators';
+import { rnRegionToRegion } from '../utils/mapUtils';
 
 export default function ClusteringScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -17,13 +19,34 @@ export default function ClusteringScreen() {
       randomCoordinates(37.7749, -122.4194, 0.2)
     )
   );
-  const [region, setRegion] = useState({
-    center: {
-      latitude: 37.7749,
-      longitude: -122.4194,
+
+  const [region, setRegion] = useState<RNRegion>({
+    nearLeft: {
+      latitude: 37.694064782393845,
+      longitude: -122.48315982520582,
     },
-    latitudeDelta: 0.4,
-    longitudeDelta: 0.4,
+    nearRight: {
+      latitude: 37.694064782393845,
+      longitude: -122.35563989728689,
+    },
+    farLeft: {
+      latitude: 37.87190908762174,
+      longitude: -122.48315982520582,
+    },
+    farRight: {
+      latitude: 37.87190908762174,
+      longitude: -122.35563989728689,
+    },
+    latLngBounds: {
+      southwest: {
+        latitude: 37.694064782393845,
+        longitude: -122.48315982520582,
+      },
+      northeast: {
+        latitude: 37.87190908762174,
+        longitude: -122.35563989728689,
+      },
+    },
   });
 
   const mapDimensions = useMemo(() => ({ width: 400, height: 800 }), []);
@@ -66,15 +89,7 @@ export default function ClusteringScreen() {
     [coordinates]
   );
 
-  const clusterRegion = useMemo(
-    () => ({
-      latitude: region.center.latitude,
-      longitude: region.center.longitude,
-      latitudeDelta: region.latitudeDelta,
-      longitudeDelta: region.longitudeDelta,
-    }),
-    [region]
-  );
+  const clusterRegion = useMemo(() => rnRegionToRegion(region), [region]);
 
   const clusterOptions = useMemo(
     () => ({ radius: 60, maxZoom: 16, minZoom: 0 }),
@@ -107,8 +122,6 @@ export default function ClusteringScreen() {
           }
         : feature.properties.svgIcon;
 
-      console.log(feature);
-
       return {
         id: feature.id?.toString() ?? i.toString(),
         coordinate: { latitude: lat, longitude: lng },
@@ -118,7 +131,12 @@ export default function ClusteringScreen() {
   }, [points]);
 
   return (
-    <MapWrapper mapRef={mapRef} markers={markers} onCameraChange={setRegion}>
+    <MapWrapper
+      mapRef={mapRef}
+      markers={markers}
+      onCameraChange={setRegion}
+      onCameraChangeStart={() => console.log('OKK')}
+    >
       <ControlPanel mapRef={mapRef} buttons={[]} />
     </MapWrapper>
   );

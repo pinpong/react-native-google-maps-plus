@@ -13,12 +13,12 @@ import { makeUrlTileOverlay } from '../utils/mapGenerators';
 export default function UrlTileOverlay() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [urlTileOverlay, setUrlTileOverlay] = useState<
-    RNUrlTileOverlay | undefined
+  const [urlTileOverlays, setUrlTileOverlays] = useState<
+    RNUrlTileOverlay[] | undefined
   >(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, urlTileOverlay ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, urlTileOverlays ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
@@ -27,7 +27,7 @@ export default function UrlTileOverlay() {
       <MapWrapper
         mapType={'none'}
         mapRef={mapRef}
-        urlTileOverlays={urlTileOverlay ? [urlTileOverlay] : []}
+        urlTileOverlays={urlTileOverlays ? urlTileOverlays : []}
       />
       <MapConfigDialog<RNUrlTileOverlay>
         visible={dialogVisible}
@@ -35,7 +35,7 @@ export default function UrlTileOverlay() {
         initialData={makeUrlTileOverlay(1)}
         validator={RNUrlTileOverlayValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setUrlTileOverlay(c)}
+        onSave={(c) => setUrlTileOverlays([c])}
       />
     </>
   );

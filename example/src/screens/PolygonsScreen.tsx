@@ -13,23 +13,23 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function PolygonsScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [polygon, setPolygon] = useState<RNPolygon | undefined>(undefined);
+  const [polygons, setPolygons] = useState<RNPolygon[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, polygon ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, polygons ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} polygons={polygon ? [polygon] : []} />
+      <MapWrapper mapRef={mapRef} polygons={polygons ? polygons : []} />
       <MapConfigDialog<RNPolygon>
         visible={dialogVisible}
         title="Edit polygon"
         initialData={makePolygon(1)}
         validator={RNPolygonValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setPolygon(c)}
+        onSave={(c) => setPolygons([c])}
       />
     </>
   );
