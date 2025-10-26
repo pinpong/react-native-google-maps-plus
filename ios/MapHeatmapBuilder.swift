@@ -19,7 +19,7 @@ final class MapHeatmapBuilder {
       heatmap.gradient = GMUGradient(
         colors: colors,
         startPoints: startPoints,
-        colorMapSize: g.colorMapSize
+        colorMapSize: UInt(g.colorMapSize)
       )
     }
 

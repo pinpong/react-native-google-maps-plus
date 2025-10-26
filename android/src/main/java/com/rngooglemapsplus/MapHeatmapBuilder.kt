@@ -19,7 +19,7 @@ class MapHeatmapBuilder {
           heatmap.gradient?.let {
             val colors = it.colors.map { c -> c.toColor() }.toIntArray()
             val startPoints = it.startPoints.map { p -> p.toFloat() }.toFloatArray()
-            gradient(Gradient(colors, startPoints))
+            gradient(Gradient(colors, startPoints, it.colorMapSize.toInt()))
           }
         }.build()
 
