@@ -8,7 +8,9 @@
   "source": "src/index",
   "react-native": "src/index",
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck:lib": "tsc --noEmit -p tsconfig.json",
+    "typecheck:example": "tsc --noEmit -p example/tsconfig.json",
+    "typecheck": "yarn typecheck:lib && yarn typecheck:example",
     "lint": "yarn lint:js && yarn lint:android && yarn lint:ios",
     "lint:js": "eslint . --max-warnings 0 && yarn prettier --check .",
     "lint:android": "cd android && ktlint -F ./**/*.kt*",
