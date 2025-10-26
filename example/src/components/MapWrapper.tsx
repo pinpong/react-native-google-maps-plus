@@ -28,6 +28,18 @@ type Props = ViewProps &
     children?: React.ReactNode;
   };
 
+function wrapCallback<T extends (...args: any[]) => void>(
+  propCallback: T | undefined,
+  fallback?: (...args: Parameters<T>) => void
+) {
+  return callback({
+    f: ((...args: Parameters<T>) => {
+      propCallback?.(...args);
+      fallback?.(...args);
+    }) as T,
+  });
+}
+
 export default function MapWrapper(props: Props) {
   const { children, ...rest } = props;
   const theme = useTheme();
@@ -107,146 +119,109 @@ export default function MapWrapper(props: Props) {
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
         mapPadding={props.mapPadding ?? mapPadding}
         locationConfig={props.locationConfig ?? locationConfig}
-        onMapError={callback(
-          props.onMapError ?? {
-            f: (error: RNMapErrorCode) => console.log('Map error:', error),
+        onMapError={wrapCallback(props.onMapError, (e: RNMapErrorCode) =>
+          console.log('Map error:', e)
+        )}
+        onMapReady={wrapCallback(props.onMapReady, (ready: boolean) =>
+          console.log('Map is ready:', ready)
+        )}
+        onMapLoaded={wrapCallback(
+          props.onMapLoaded,
+          (region: RNRegion, camera: RNCamera) => {
+            console.log('Map is loaded:', region, camera);
+            setMapLoaded(true);
           }
         )}
-        onMapReady={callback(
-          props.onMapReady ?? {
-            f: (ready: boolean) => {
-              console.log('Map is ready ' + ready);
-            },
-          }
+        onMapPress={wrapCallback(props.onMapPress, (c: RNLatLng) =>
+          console.log('Map press:', c)
         )}
-        onMapLoaded={callback(
-          props.onMapLoaded ?? {
-            f: (loaded: boolean) => {
-              console.log('Map is loaded ' + loaded);
-              setMapLoaded(loaded);
-            },
-          }
+        onMapLongPress={wrapCallback(props.onMapLongPress, (c: RNLatLng) =>
+          console.log('Map long press:', c)
         )}
-        onMapPress={callback(
-          props.onMapPress ?? {
-            f: (c: RNLatLng) => console.log('Map press:', c),
-          }
+        onPoiPress={wrapCallback(
+          props.onPoiPress,
+          (placeId: string, name: string, coordinate: RNLatLng) =>
+            console.log('Poi press:', placeId, name, coordinate)
         )}
-        onMapLongPress={callback(
-          props.onMapLongPress ?? {
-            f: (c: RNLatLng) => console.log('Map long press:', c),
-          }
+        onMarkerPress={wrapCallback(props.onMarkerPress, (id?: string) =>
+          console.log('Marker press:', id)
         )}
-        onPoiPress={callback(
-          props.onPoiPress ?? {
-            f: (placeId: string, name: String, coordinate: RNLatLng) =>
-              console.log('Poi press:', placeId, name, coordinate),
-          }
+        onPolylinePress={wrapCallback(props.onPolylinePress, (id?: string) =>
+          console.log('Polyline press:', id)
         )}
-        onMarkerPress={callback(
-          props.onMarkerPress ?? {
-            f: (id: string | undefined) => console.log('Marker press:', id),
-          }
+        onPolygonPress={wrapCallback(props.onPolygonPress, (id?: string) =>
+          console.log('Polygon press:', id)
         )}
-        onPolylinePress={callback(
-          props.onPolylinePress ?? {
-            f: (id: string | undefined) => console.log('Polyline press:', id),
-          }
+        onCirclePress={wrapCallback(props.onCirclePress, (id?: string) =>
+          console.log('Circle press:', id)
         )}
-        onPolygonPress={callback(
-          props.onPolygonPress ?? {
-            f: (id: string | undefined) => console.log('Polygon press:', id),
-          }
+        onMarkerDragStart={wrapCallback(
+          props.onMarkerDragStart,
+          (id: string | undefined, latLng: RNLatLng) =>
+            console.log('Marker drag start:', id, latLng)
         )}
-        onCirclePress={callback(
-          props.onCirclePress ?? {
-            f: (id: string | undefined) => console.log('Circle press:', id),
-          }
+        onMarkerDrag={wrapCallback(
+          props.onMarkerDrag,
+          (id: string | undefined, latLng: RNLatLng) =>
+            console.log('Marker drag:', id, latLng)
         )}
-        onMarkerDragStart={callback(
-          props.onMarkerDragStart ?? {
-            f: (id: string | undefined, latLng: RNLatLng) =>
-              console.log('Marker drag start', id, latLng),
-          }
+        onMarkerDragEnd={wrapCallback(
+          props.onMarkerDragEnd,
+          (id: string | undefined, latLng: RNLatLng) =>
+            console.log('Marker drag end:', id, latLng)
         )}
-        onMarkerDrag={callback(
-          props.onMarkerDrag ?? {
-            f: (id: string | undefined, latLng: RNLatLng) =>
-              console.log('Marker drag', id, latLng),
-          }
+        onIndoorBuildingFocused={wrapCallback(
+          props.onIndoorBuildingFocused,
+          (building: RNIndoorBuilding) =>
+            console.log('Indoor building focused:', building)
         )}
-        onMarkerDragEnd={callback(
-          props.onMarkerDragEnd ?? {
-            f: (id: string | undefined, latLng: RNLatLng) =>
-              console.log('Marker drag end', id, latLng),
-          }
+        onIndoorLevelActivated={wrapCallback(
+          props.onIndoorLevelActivated,
+          (level: RNIndoorLevel) =>
+            console.log('Indoor level activated:', level)
         )}
-        onIndoorBuildingFocused={callback(
-          props.onIndoorBuildingFocused ?? {
-            f: (building: RNIndoorBuilding) =>
-              console.log('Indoor building focused', building),
-          }
+        onInfoWindowPress={wrapCallback(
+          props.onInfoWindowPress,
+          (id?: string) => console.log('InfoWindow press:', id)
         )}
-        onIndoorLevelActivated={callback(
-          props.onIndoorLevelActivated ?? {
-            f: (level: RNIndoorLevel) =>
-              console.log('Indoor level activated', level),
-          }
+        onInfoWindowClose={wrapCallback(
+          props.onInfoWindowClose,
+          (id?: string) => console.log('InfoWindow close:', id)
         )}
-        onInfoWindowPress={callback(
-          props.onInfoWindowPress ?? {
-            f: (id?: string) => console.log('InfoWindow press:', id),
-          }
+        onInfoWindowLongPress={wrapCallback(
+          props.onInfoWindowLongPress,
+          (id?: string) => console.log('InfoWindow long press:', id)
         )}
-        onInfoWindowClose={callback(
-          props.onInfoWindowClose ?? {
-            f: (id?: string) => console.log('InfoWindow close:', id),
-          }
+        onMyLocationPress={wrapCallback(
+          props.onMyLocationPress,
+          (location: RNLocation) => console.log('MyLocation press:', location)
         )}
-        onInfoWindowLongPress={callback(
-          props.onInfoWindowLongPress ?? {
-            f: (id?: string) => console.log('InfoWindow long press:', id),
-          }
+        onMyLocationButtonPress={wrapCallback(
+          props.onMyLocationButtonPress,
+          (pressed: boolean) => console.log('MyLocation button press:', pressed)
         )}
-        onMyLocationPress={callback(
-          props.onMyLocationPress ?? {
-            f: (location: RNLocation) =>
-              console.log('MyLocation press:', location),
-          }
+        onCameraChangeStart={wrapCallback(
+          props.onCameraChangeStart,
+          (r: RNRegion, cam: RNCamera, g: boolean) =>
+            console.log('Camera start:', r, cam, g)
         )}
-        onMyLocationButtonPress={callback(
-          props.onMyLocationButtonPress ?? {
-            f: (pressed: boolean) =>
-              console.log('MyLocation button press', pressed),
-          }
+        onCameraChange={wrapCallback(
+          props.onCameraChange,
+          (r: RNRegion, cam: RNCamera, g: boolean) =>
+            console.log('Camera changed:', r, cam, g)
         )}
-        onCameraChangeStart={callback(
-          props.onCameraChangeStart ?? {
-            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-              console.log('Cam start', r, cam, g),
-          }
+        onCameraChangeComplete={wrapCallback(
+          props.onCameraChangeComplete,
+          (r: RNRegion, cam: RNCamera, g: boolean) =>
+            console.log('Camera complete:', r, cam, g)
         )}
-        onCameraChange={callback(
-          props.onCameraChange ?? {
-            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-              console.log('Cam', r, cam, g),
-          }
+        onLocationUpdate={wrapCallback(
+          props.onLocationUpdate,
+          (l: RNLocation) => console.log('Location:', l)
         )}
-        onCameraChangeComplete={callback(
-          props.onCameraChangeComplete ?? {
-            f: (r: RNRegion, cam: RNCamera, g: boolean) =>
-              console.log('Cam complete', r, cam, g),
-          }
-        )}
-        onLocationUpdate={callback(
-          props.onLocationUpdate ?? {
-            f: (l: RNLocation) => console.log('Location', l),
-          }
-        )}
-        onLocationError={callback(
-          props.onLocationError ?? {
-            f: (e: RNLocationErrorCode) => console.log('Location error', e),
-          }
+        onLocationError={wrapCallback(
+          props.onLocationError,
+          (e: RNLocationErrorCode) => console.log('Location error:', e)
         )}
       />
       {children}

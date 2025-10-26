@@ -261,7 +261,7 @@ GMSIndoorDisplayDelegate {
 
   var onMapError: ((RNMapErrorCode) -> Void)?
   var onMapReady: ((Bool) -> Void)?
-  var onMapLoaded: ((Bool) -> Void)?
+  var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
@@ -703,10 +703,14 @@ GMSIndoorDisplayDelegate {
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
     guard !loaded else { return }
     loaded = true
-    onMapLoaded?(true)
+    let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
+    let camera = mapView.camera.toRNCamera()
+
+    self.onMapLoaded?(visibleRegion, camera)
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
+    if !loaded { return }
     onMain {
       self.cameraMoveReasonIsGesture = gesture
 
@@ -718,6 +722,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+    if !loaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
@@ -728,6 +733,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
+    if !loaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()

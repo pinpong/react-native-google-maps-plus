@@ -76,6 +76,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnMyLocationButtonClickListener,
   LifecycleEventListener {
   private var initialized = false
+  private var loaded = false
   private var destroyed = false
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
@@ -141,7 +142,11 @@ class GoogleMapsViewImpl(
           googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
           googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
           googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
-          onMapLoaded?.invoke(true)
+          loaded = true
+          onMapLoaded?.invoke(
+            map.projection.visibleRegion.toRnRegion(),
+            map.cameraPosition.toRnCamera(),
+          )
         }
         applyProps()
         initLocationCallbacks()
@@ -151,6 +156,7 @@ class GoogleMapsViewImpl(
 
   override fun onCameraMoveStarted(reason: Int) =
     onUi {
+      if (!loaded) return@onUi
       cameraMoveReason = reason
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
@@ -163,6 +169,7 @@ class GoogleMapsViewImpl(
 
   override fun onCameraMove() =
     onUi {
+      if (!loaded) return@onUi
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
@@ -175,6 +182,7 @@ class GoogleMapsViewImpl(
 
   override fun onCameraIdle() =
     onUi {
+      if (!loaded) return@onUi
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
@@ -354,7 +362,7 @@ class GoogleMapsViewImpl(
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
-  var onMapLoaded: ((Boolean) -> Unit)? = null
+  var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null

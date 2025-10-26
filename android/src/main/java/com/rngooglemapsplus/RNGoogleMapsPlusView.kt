@@ -295,7 +295,7 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
-  override var onMapLoaded: ((Boolean) -> Unit)? = null
+  override var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
     set(cb) {
       view.onMapLoaded = cb
     }
