@@ -694,7 +694,10 @@ class GoogleMapsViewImpl(
 
   fun removeHeatmap(id: String) =
     onUi {
-      heatmapsById.remove(id)?.remove()
+      heatmapsById.remove(id)?.let { heatMap ->
+        heatMap.clearTileCache()
+        heatMap.remove()
+      }
     }
 
   fun clearHeatmaps() =
@@ -764,7 +767,10 @@ class GoogleMapsViewImpl(
 
   fun removeUrlTileOverlay(id: String) =
     onUi {
-      urlTileOverlaysById.remove(id)?.remove()
+      urlTileOverlaysById.remove(id)?.let { urlTileOverlay ->
+        urlTileOverlay.clearTileCache()
+        urlTileOverlay.remove()
+      }
     }
 
   fun clearUrlTileOverlays() =
