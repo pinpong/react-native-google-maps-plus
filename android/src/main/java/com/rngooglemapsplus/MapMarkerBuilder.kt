@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rngooglemapsplus.extensions.markerStyleEquals
+import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,7 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.coroutineContext
 
 class MapMarkerBuilder(
@@ -42,7 +44,7 @@ class MapMarkerBuilder(
       ): Int = 1
     }
 
-  private val jobsById = mutableMapOf<String, Job>()
+  private val jobsById = ConcurrentHashMap<String, Job>()
 
   init {
     // / TODO: refactor with androidsvg 1.5 release
@@ -162,7 +164,7 @@ class MapMarkerBuilder(
     prev: RNMarker,
     next: RNMarker,
     marker: Marker,
-  ) {
+  ) = onUi {
     if (prev.coordinate.latitude != next.coordinate.latitude ||
       prev.coordinate.longitude != next.coordinate.longitude
     ) {

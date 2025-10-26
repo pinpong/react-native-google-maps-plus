@@ -1,7 +1,6 @@
 package com.rngooglemapsplus
 
 import com.facebook.proguard.annotations.DoNotStrip
-import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -155,7 +154,7 @@ class RNGoogleMapsPlusView(
 
           !prev.markerEquals(next) ->
             view.updateMarker(id) { marker ->
-              onUi { markerBuilder.update(prev, next, marker) }
+              markerBuilder.update(prev, next, marker)
             }
         }
       }
@@ -179,7 +178,7 @@ class RNGoogleMapsPlusView(
 
           !prev.polylineEquals(next) ->
             view.updatePolyline(id) { polyline ->
-              onUi { polylineBuilder.update(prev, next, polyline) }
+              polylineBuilder.update(prev, next, polyline)
             }
         }
       }
@@ -204,7 +203,7 @@ class RNGoogleMapsPlusView(
 
           !prev.polygonEquals(next) ->
             view.updatePolygon(id) { polygon ->
-              onUi { polygonBuilder.update(prev, next, polygon) }
+              polygonBuilder.update(prev, next, polygon)
             }
         }
       }
@@ -229,7 +228,7 @@ class RNGoogleMapsPlusView(
 
           !prev.circleEquals(next) ->
             view.updateCircle(id) { circle ->
-              onUi { circleBuilder.update(prev, next, circle) }
+              circleBuilder.update(prev, next, circle)
             }
         }
       }
@@ -416,14 +415,12 @@ class RNGoogleMapsPlusView(
     animated: Boolean?,
     durationMs: Double?,
   ) {
-    onUi {
-      val current = view.currentCamera
-      view.setCamera(
-        camera.toCameraPosition(current),
-        animated == true,
-        durationMs?.toInt() ?: 3000,
-      )
-    }
+    val current = view.currentCamera
+    view.setCamera(
+      camera.toCameraPosition(current),
+      animated == true,
+      durationMs?.toInt() ?: 3000,
+    )
   }
 
   override fun setCameraToCoordinates(
@@ -480,12 +477,4 @@ class RNGoogleMapsPlusView(
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 
   override fun isGooglePlayServicesAvailable(): Boolean = playServiceHandler.isPlayServicesAvailable()
-}
-
-private inline fun onUi(crossinline block: () -> Unit) {
-  if (UiThreadUtil.isOnUiThread()) {
-    block()
-  } else {
-    UiThreadUtil.runOnUiThread { block() }
-  }
 }

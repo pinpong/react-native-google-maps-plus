@@ -4,6 +4,7 @@ import android.graphics.Color
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
+import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
 
@@ -30,7 +31,7 @@ class MapPolygonBuilder {
     prev: RNPolygon,
     next: RNPolygon,
     poly: Polygon,
-  ) {
+  ) = onUi {
     val coordsChanged =
       prev.coordinates.size != next.coordinates.size ||
         !prev.coordinates.zip(next.coordinates).all { (a, b) ->

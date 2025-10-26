@@ -4,6 +4,7 @@ import GoogleMapsUtils
 import UIKit
 
 final class MapHeatmapBuilder {
+  @MainActor
   func build(_ h: RNHeatmap) -> GMUHeatmapTileLayer {
     let heatmap = GMUHeatmapTileLayer()
     heatmap.weightedData = h.weightedData.toWeightedLatLngs()

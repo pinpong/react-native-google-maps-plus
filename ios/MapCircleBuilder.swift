@@ -1,6 +1,7 @@
 import GoogleMaps
 
 final class MapCircleBuilder {
+  @MainActor
   func build(_ c: RNCircle) -> GMSCircle {
     let circle = GMSCircle()
     circle.position = c.center.toCLLocationCoordinate2D()
@@ -14,6 +15,7 @@ final class MapCircleBuilder {
     return circle
   }
 
+  @MainActor
   func update(_ prev: RNCircle, _ next: RNCircle, _ c: GMSCircle) {
     if prev.center.latitude != next.center.latitude
       || prev.center.longitude != next.center.longitude {

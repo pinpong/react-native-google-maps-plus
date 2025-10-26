@@ -1,6 +1,7 @@
 import GoogleMaps
 
 class MapUrlTileOverlayBuilder {
+  @MainActor
   func build(_ t: RNUrlTileOverlay) -> GMSURLTileLayer {
 
     let constructor: GMSTileURLConstructor = { (x: UInt, y: UInt, zoom: UInt) in

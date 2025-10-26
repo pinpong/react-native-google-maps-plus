@@ -1,6 +1,7 @@
 import GoogleMaps
 
 final class MapPolygonBuilder {
+  @MainActor
   func build(_ p: RNPolygon) -> GMSPolygon {
     let path = GMSMutablePath()
     p.coordinates.forEach {
@@ -28,6 +29,7 @@ final class MapPolygonBuilder {
     return pg
   }
 
+  @MainActor
   func update(_ prev: RNPolygon, _ next: RNPolygon, _ pg: GMSPolygon) {
     let coordsChanged =
       prev.coordinates.count != next.coordinates.count

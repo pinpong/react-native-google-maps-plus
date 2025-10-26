@@ -10,6 +10,7 @@ final class MapMarkerBuilder {
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
 
+  @MainActor
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
       position: m.coordinate.toCLLocationCoordinate2D()
@@ -160,11 +161,13 @@ final class MapMarkerBuilder {
     tasks[id] = task
   }
 
+  @MainActor
   func cancelIconTask(_ id: String) {
     tasks[id]?.cancel()
     tasks.removeValue(forKey: id)
   }
 
+  @MainActor
   func cancelAllIconTasks() {
     let ids = Array(tasks.keys)
     for id in ids {
@@ -174,6 +177,7 @@ final class MapMarkerBuilder {
     iconCache.removeAllObjects()
   }
 
+  @MainActor
   private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) async -> UIImage? {
     guard let iconSvg = m.iconSvg,
           let data = iconSvg.svgString.data(using: .utf8)
