@@ -20,34 +20,7 @@ export default function ClusteringScreen() {
     )
   );
 
-  const [region, setRegion] = useState<RNRegion>({
-    nearLeft: {
-      latitude: 37.694064782393845,
-      longitude: -122.48315982520582,
-    },
-    nearRight: {
-      latitude: 37.694064782393845,
-      longitude: -122.35563989728689,
-    },
-    farLeft: {
-      latitude: 37.87190908762174,
-      longitude: -122.48315982520582,
-    },
-    farRight: {
-      latitude: 37.87190908762174,
-      longitude: -122.35563989728689,
-    },
-    latLngBounds: {
-      southwest: {
-        latitude: 37.694064782393845,
-        longitude: -122.48315982520582,
-      },
-      northeast: {
-        latitude: 37.87190908762174,
-        longitude: -122.35563989728689,
-      },
-    },
-  });
+  const [region, setRegion] = useState<RNRegion | null>(null);
 
   const mapDimensions = useMemo(() => ({ width: 400, height: 800 }), []);
 
@@ -104,11 +77,14 @@ export default function ClusteringScreen() {
   );
 
   const markers: RNMarker[] = useMemo(() => {
-    return points.map((feature, i) => {
+    return points.map((feature) => {
       const [lng, lat] = feature.geometry.coordinates as [number, number];
       const isCluster = 'cluster' in feature.properties;
-      // @ts-ignore
+      const id = isCluster
+        ? `cluster-${feature.properties.cluster_id}`
+        : feature.properties.id;
       const count = feature.properties?.point_count ?? 0;
+
       const icon = isCluster
         ? {
             width: 36,
@@ -123,7 +99,7 @@ export default function ClusteringScreen() {
         : feature.properties.svgIcon;
 
       return {
-        id: feature.id?.toString() ?? i.toString(),
+        id,
         coordinate: { latitude: lat, longitude: lng },
         iconSvg: icon,
       } as RNMarker;
@@ -134,8 +110,8 @@ export default function ClusteringScreen() {
     <MapWrapper
       mapRef={mapRef}
       markers={markers}
-      onCameraChange={setRegion}
-      onCameraChangeStart={() => console.log('OKK')}
+      onMapLoaded={(r: RNRegion) => setRegion(r)}
+      onCameraChange={(r: RNRegion) => setRegion(r)}
     >
       <ControlPanel mapRef={mapRef} buttons={[]} />
     </MapWrapper>
