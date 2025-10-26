@@ -128,6 +128,8 @@ export const RNMapUiSettingsValidator = object({
   tiltEnabled: optional(boolean()),
   zoomControlsEnabled: optional(boolean()),
   zoomGesturesEnabled: optional(boolean()),
+  consumeOnMarkerPress: optional(boolean()),
+  consumeOnMyLocationButtonPress: optional(boolean()),
 });
 
 export const RNMapZoomConfigValidator = object({

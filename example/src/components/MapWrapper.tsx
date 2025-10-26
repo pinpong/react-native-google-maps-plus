@@ -5,8 +5,13 @@ import type {
   GoogleMapsViewRef,
   RNCamera,
   RNGoogleMapsPlusViewProps,
+  RNInitialProps,
   RNLatLng,
   RNLocation,
+  RNLocationConfig,
+  RNMapPadding,
+  RNMapUiSettings,
+  RNMapZoomConfig,
   RNRegion,
 } from 'react-native-google-maps-plus';
 import {
@@ -47,7 +52,7 @@ export default function MapWrapper(props: Props) {
   const layout = useSafeAreaInsets();
 
   const [mapLoaded, setMapLoaded] = React.useState(false);
-  const initialProps = useMemo(
+  const initialProps: RNInitialProps = useMemo(
     () => ({
       camera: {
         center: { latitude: 37.7749, longitude: -122.4194 },
@@ -57,7 +62,7 @@ export default function MapWrapper(props: Props) {
     []
   );
 
-  const uiSettings = useMemo(
+  const uiSettings: RNMapUiSettings = useMemo(
     () => ({
       allGesturesEnabled: true,
       compassEnabled: true,
@@ -70,19 +75,24 @@ export default function MapWrapper(props: Props) {
       tiltEnabled: true,
       zoomControlsEnabled: true,
       zoomGesturesEnabled: true,
+      consumeOnMarkerPress: false,
+      consumeOnMyLocationButtonPress: false,
     }),
     []
   );
 
-  const mapPadding = useMemo(() => {
+  const mapPadding: RNMapPadding = useMemo(() => {
     return props.children
       ? { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }
       : { top: 20, left: 20, bottom: layout.bottom, right: 20 };
   }, [layout.bottom, props.children]);
 
-  const mapZoomConfig = useMemo(() => ({ min: 0, max: 20 }), []);
+  const mapZoomConfig: RNMapZoomConfig = useMemo(
+    () => ({ min: 0, max: 20 }),
+    []
+  );
 
-  const locationConfig = useMemo(
+  const locationConfig: RNLocationConfig = useMemo(
     () => ({
       android: {
         priority: RNAndroidLocationPriority.PRIORITY_HIGH_ACCURACY,

@@ -21,6 +21,8 @@ export type RNMapUiSettings = {
   tiltEnabled?: boolean;
   zoomControlsEnabled?: boolean;
   zoomGesturesEnabled?: boolean;
+  consumeOnMarkerPress?: boolean;
+  consumeOnMyLocationButtonPress?: boolean;
 };
 
 export type RNLatLng = {

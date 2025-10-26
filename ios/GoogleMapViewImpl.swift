@@ -781,7 +781,7 @@ GMSIndoorDisplayDelegate {
       mapView.selectedMarker = marker
       self.onMarkerPress?(marker.userData as? String, )
     }
-    return false
+    return uiSettings?.consumeOnMarkerPress ?? false
   }
 
   func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
@@ -891,6 +891,6 @@ GMSIndoorDisplayDelegate {
     onMain {
       self.onMyLocationButtonPress?(true)
     }
-    return false
+    return uiSettings?.consumeOnMyLocationButtonPress ?? false
   }
 }

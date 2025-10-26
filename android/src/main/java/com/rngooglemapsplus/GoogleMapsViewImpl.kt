@@ -876,7 +876,7 @@ class GoogleMapsViewImpl(
       marker.showInfoWindow()
       onMarkerPress?.invoke(marker.tag?.toString())
     }
-    return false
+    return uiSettings?.consumeOnMarkerPress ?: false
   }
 
   override fun onPolylineClick(polyline: Polyline) =
@@ -963,6 +963,6 @@ class GoogleMapsViewImpl(
     onUi {
       onMyLocationButtonPress?.invoke(true)
     }
-    return false
+    return uiSettings?.consumeOnMyLocationButtonPress ?: false
   }
 }
