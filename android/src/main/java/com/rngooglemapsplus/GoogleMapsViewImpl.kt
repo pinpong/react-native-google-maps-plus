@@ -7,7 +7,6 @@ import PolylineTag
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.location.Location
-import android.util.Base64
 import android.util.Size
 import android.view.View
 import android.widget.FrameLayout
@@ -38,6 +37,7 @@ import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
 import com.margelo.nitro.core.Promise
+import com.rngooglemapsplus.extensions.encode
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.onUiSync
 import com.rngooglemapsplus.extensions.toGooglePriority
@@ -50,12 +50,10 @@ import com.rngooglemapsplus.extensions.toRnCamera
 import com.rngooglemapsplus.extensions.toRnLatLng
 import com.rngooglemapsplus.extensions.toRnLocation
 import com.rngooglemapsplus.extensions.toRnRegion
+import com.rngooglemapsplus.extensions.withPaddingPixels
 import idTag
 import tagData
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
@@ -427,56 +425,23 @@ class GoogleMapsViewImpl(
     durationMs: Int,
   ) = onUi {
     if (coordinates.isEmpty()) return@onUi
-    val builder = LatLngBounds.Builder()
+
+    val w = mapView?.width ?: 0
+    val h = mapView?.height ?: 0
+
+    val builder = LatLngBounds.builder()
     coordinates.forEach { coord -> builder.include(coord.toLatLng()) }
-    val bounds = builder.build()
 
-    val latSpan = bounds.northeast.latitude - bounds.southwest.latitude
-    val lngSpan = bounds.northeast.longitude - bounds.southwest.longitude
+    val baseBounds = builder.build()
+    val paddedBounds = baseBounds.withPaddingPixels(w, h, padding)
 
-    val h = (mapView?.height ?: 0)
-    val w = (mapView?.width ?: 0)
-    val latPerPixel = if (h != 0) latSpan / h else 0.0
-    val lngPerPixel = if (w != 0) lngSpan / w else 0.0
-
-    builder.include(
-      LatLng(
-        bounds.northeast.latitude + (padding.top.dpToPx() * latPerPixel),
-        bounds.northeast.longitude,
-      ),
-    )
-    builder.include(
-      LatLng(
-        bounds.southwest.latitude - (padding.bottom.dpToPx() * latPerPixel),
-        bounds.southwest.longitude,
-      ),
-    )
-    builder.include(
-      LatLng(
-        bounds.northeast.latitude,
-        bounds.northeast.longitude + (padding.right.dpToPx() * lngPerPixel),
-      ),
-    )
-    builder.include(
-      LatLng(
-        bounds.southwest.latitude,
-        bounds.southwest.longitude - (padding.left.dpToPx() * lngPerPixel),
-      ),
-    )
-
-    val paddedBounds = builder.build()
     val adjustedWidth =
       (w - padding.left.dpToPx() - padding.right.dpToPx()).toInt().coerceAtLeast(0)
     val adjustedHeight =
       (h - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt().coerceAtLeast(0)
 
-    val update =
-      CameraUpdateFactory.newLatLngBounds(
-        paddedBounds,
-        adjustedWidth,
-        adjustedHeight,
-        0,
-      )
+    val update = CameraUpdateFactory.newLatLngBounds(paddedBounds, adjustedWidth, adjustedHeight, 0)
+
     if (animated) {
       googleMap?.animateCamera(update, durationMs, null)
     } else {
@@ -512,30 +477,9 @@ class GoogleMapsViewImpl(
     val promise = Promise<String?>()
     onUi {
       googleMap?.snapshot { bitmap ->
-        try {
-          if (bitmap == null) {
-            promise.resolve(null)
-            return@snapshot
-          }
-          val scaledBitmap = size?.let { bitmap.scale(it.width, it.height) } ?: bitmap
-          val output = ByteArrayOutputStream()
-          scaledBitmap.compress(compressFormat, (quality * 100).toInt().coerceIn(0, 100), output)
-          val bytes = output.toByteArray()
-
-          if (resultIsFile) {
-            val file = File(context.cacheDir, "map_snapshot_${System.currentTimeMillis()}.$format")
-            FileOutputStream(file).use { it.write(bytes) }
-            promise.resolve(file.absolutePath)
-          } else {
-            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
-            promise.resolve("data:image/$format;base64,$base64")
-          }
-
-          if (scaledBitmap !== bitmap) scaledBitmap.recycle()
-          bitmap.recycle()
-        } catch (_: Exception) {
-          promise.resolve(null)
-        }
+        bitmap
+          ?.encode(context, size, format, compressFormat, quality, resultIsFile)
+          ?.let(promise::resolve) ?: promise.resolve(null)
       }
     }
     return promise

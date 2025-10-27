@@ -288,7 +288,7 @@ GMSIndoorDisplayDelegate {
   @MainActor
   func showMarkerInfoWindow(id: String) {
     onMain {
-      guard let marker =  self.markersById[id] else { return }
+      guard let marker = self.markersById[id] else { return }
       self.mapView?.selectedMarker = nil
       self.mapView?.selectedMarker = marker
     }
@@ -399,42 +399,16 @@ GMSIndoorDisplayDelegate {
         mapView.layer.render(in: ctx.cgContext)
       }
 
-      var finalImage = image
-
-      size.map {
-        UIGraphicsBeginImageContextWithOptions($0, false, 0.0)
-        image.draw(in: CGRect(origin: .zero, size: $0))
-        finalImage = UIGraphicsGetImageFromCurrentImageContext() ?? image
-        UIGraphicsEndImageContext()
-      }
-
-      let data: Data?
-      switch imageFormat {
-      case .jpeg:
-        data = finalImage.jpegData(compressionQuality: quality)
-      case .png:
-        data = finalImage.pngData()
-      }
-
-      guard let imageData = data else {
-        promise.resolve(withResult: nil)
-        return
-      }
-
-      if resultIsFile {
-        let filename =
-          "map_snapshot_\(Int(Date().timeIntervalSince1970)).\(format)"
-        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
-          .appendingPathComponent(filename)
-        do {
-          try imageData.write(to: fileURL)
-          promise.resolve(withResult: fileURL.path)
-        } catch {
-          promise.resolve(withResult: nil)
-        }
+      if let result = image.encode(
+        targetSize: size,
+        format: format,
+        imageFormat: imageFormat,
+        quality: quality,
+        resultIsFile: resultIsFile
+      ) {
+        promise.resolve(withResult: result)
       } else {
-        let base64 = imageData.base64EncodedString()
-        promise.resolve(withResult: "data:image/\(format);base64,\(base64)")
+        promise.resolve(withResult: nil)
       }
     }
 
