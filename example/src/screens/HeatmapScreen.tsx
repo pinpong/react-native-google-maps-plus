@@ -13,23 +13,23 @@ import { useHeaderButton } from '../hooks/useHeaderButton';
 export default function HeatmapScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
-  const [heatmap, setHeatmap] = useState<RNHeatmap | undefined>(undefined);
+  const [heatmaps, setHeatmaps] = useState<RNHeatmap[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
-  useHeaderButton(navigation, heatmap ? 'Edit' : 'Add', () =>
+  useHeaderButton(navigation, heatmaps ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} heatmaps={heatmap ? [heatmap] : []} />
+      <MapWrapper mapRef={mapRef} heatmaps={heatmaps ? heatmaps : []} />
       <MapConfigDialog<RNHeatmap>
         visible={dialogVisible}
         title="Edit heatmap"
         initialData={makeHeatmap(1)}
         validator={RNHeatmapValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setHeatmap(c)}
+        onSave={(c) => setHeatmaps([c])}
       />
     </>
   );

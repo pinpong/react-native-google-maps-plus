@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.model.RoundCap
 import com.google.android.gms.maps.model.SquareCap
+import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
 
@@ -34,7 +35,7 @@ class MapPolylineBuilder {
     prev: RNPolyline,
     next: RNPolyline,
     polyline: Polyline,
-  ) {
+  ) = onUi {
     val coordsChanged =
       prev.coordinates.size != next.coordinates.size ||
         !prev.coordinates.zip(next.coordinates).all { (a, b) ->

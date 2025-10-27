@@ -23,8 +23,8 @@ export default function CameraTestScreen() {
 
   const bounds = useMemo<RNLatLngBounds>(
     () => ({
-      southWest: { latitude: 37.703, longitude: -122.527 },
-      northEast: { latitude: 37.833, longitude: -122.356 },
+      southwest: { latitude: 37.703, longitude: -122.527 },
+      northeast: { latitude: 37.833, longitude: -122.356 },
     }),
     []
   );

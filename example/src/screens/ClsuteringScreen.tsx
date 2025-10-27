@@ -5,10 +5,12 @@ import type {
   GoogleMapsViewRef,
   RNMarker,
   RNMarkerSvg,
+  RNRegion,
 } from 'react-native-google-maps-plus';
 import type { Supercluster } from 'react-native-clusterer';
 import { useClusterer } from 'react-native-clusterer';
 import { randomCoordinates } from '../utils/mapGenerators';
+import { rnRegionToRegion } from '../utils/mapUtils';
 
 export default function ClusteringScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -17,14 +19,8 @@ export default function ClusteringScreen() {
       randomCoordinates(37.7749, -122.4194, 0.2)
     )
   );
-  const [region, setRegion] = useState({
-    center: {
-      latitude: 37.7749,
-      longitude: -122.4194,
-    },
-    latitudeDelta: 0.4,
-    longitudeDelta: 0.4,
-  });
+
+  const [region, setRegion] = useState<RNRegion | null>(null);
 
   const mapDimensions = useMemo(() => ({ width: 400, height: 800 }), []);
 
@@ -66,15 +62,7 @@ export default function ClusteringScreen() {
     [coordinates]
   );
 
-  const clusterRegion = useMemo(
-    () => ({
-      latitude: region.center.latitude,
-      longitude: region.center.longitude,
-      latitudeDelta: region.latitudeDelta,
-      longitudeDelta: region.longitudeDelta,
-    }),
-    [region]
-  );
+  const clusterRegion = useMemo(() => rnRegionToRegion(region), [region]);
 
   const clusterOptions = useMemo(
     () => ({ radius: 60, maxZoom: 16, minZoom: 0 }),
@@ -89,11 +77,14 @@ export default function ClusteringScreen() {
   );
 
   const markers: RNMarker[] = useMemo(() => {
-    return points.map((feature, i) => {
+    return points.map((feature) => {
       const [lng, lat] = feature.geometry.coordinates as [number, number];
       const isCluster = 'cluster' in feature.properties;
-      // @ts-ignore
+      const id = isCluster
+        ? `cluster-${feature.properties.cluster_id}`
+        : feature.properties.id;
       const count = feature.properties?.point_count ?? 0;
+
       const icon = isCluster
         ? {
             width: 36,
@@ -107,10 +98,8 @@ export default function ClusteringScreen() {
           }
         : feature.properties.svgIcon;
 
-      console.log(feature);
-
       return {
-        id: feature.id?.toString() ?? i.toString(),
+        id,
         coordinate: { latitude: lat, longitude: lng },
         iconSvg: icon,
       } as RNMarker;
@@ -118,7 +107,12 @@ export default function ClusteringScreen() {
   }, [points]);
 
   return (
-    <MapWrapper mapRef={mapRef} markers={markers} onCameraChange={setRegion}>
+    <MapWrapper
+      mapRef={mapRef}
+      markers={markers}
+      onMapLoaded={(r: RNRegion) => setRegion(r)}
+      onCameraChange={(r: RNRegion) => setRegion(r)}
+    >
       <ControlPanel mapRef={mapRef} buttons={[]} />
     </MapWrapper>
   );

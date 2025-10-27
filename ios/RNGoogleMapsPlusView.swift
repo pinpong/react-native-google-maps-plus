@@ -14,6 +14,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let polygonBuilder = MapPolygonBuilder()
   private let circleBuilder = MapCircleBuilder()
   private let heatmapBuilder = MapHeatmapBuilder()
+  private let urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   private let impl: GoogleMapsViewImpl
 
@@ -110,9 +111,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var mapType: RNMapType? {
     didSet {
-      impl.mapType = mapType.map {
-        GMSMapViewType(rawValue: UInt($0.rawValue)) ?? .normal
-      }
+      impl.mapType = mapType?.toGMSMapViewType
     }
   }
 
@@ -287,6 +286,30 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
+  var urlTileOverlays: [RNUrlTileOverlay]? {
+    didSet {
+      let prevById = Dictionary(
+        (oldValue ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+      let nextById = Dictionary(
+        (urlTileOverlays ?? []).map { ($0.id, $0) },
+        uniquingKeysWith: { _, new in new }
+      )
+
+      let removed = Set(prevById.keys).subtracting(nextById.keys)
+      removed.forEach { impl.removeUrlTileOverlay(id: $0) }
+
+      for (id, next) in nextById {
+        impl.addUrlTileOverlay(
+          id: id,
+          urlTileOverlay: urlTileOverlayBuilder.build(next)
+        )
+      }
+    }
+  }
+
+  @MainActor
   var locationConfig: RNLocationConfig? {
     didSet {
       impl.locationConfig = locationConfig
@@ -302,6 +325,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapReady = onMapReady }
   }
   @MainActor
+  var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
+    didSet { impl.onMapLoaded = onMapLoaded }
+  }
+  @MainActor
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
@@ -314,31 +341,39 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapPress = onMapPress }
   }
   @MainActor
-  var onMarkerPress: ((String?) -> Void)? {
+  var onMapLongPress: ((RNLatLng) -> Void)? {
+    didSet { impl.onMapLongPress = onMapLongPress }
+  }
+  @MainActor
+  var onPoiPress: ((String, String, RNLatLng) -> Void)? {
+    didSet { impl.onPoiPress = onPoiPress }
+  }
+  @MainActor
+  var onMarkerPress: ((String) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
   @MainActor
-  var onPolylinePress: ((String?) -> Void)? {
+  var onPolylinePress: ((String) -> Void)? {
     didSet { impl.onPolylinePress = onPolylinePress }
   }
   @MainActor
-  var onPolygonPress: ((String?) -> Void)? {
+  var onPolygonPress: ((String) -> Void)? {
     didSet { impl.onPolygonPress = onPolygonPress }
   }
   @MainActor
-  var onCirclePress: ((String?) -> Void)? {
+  var onCirclePress: ((String) -> Void)? {
     didSet { impl.onCirclePress = onCirclePress }
   }
   @MainActor
-  var onMarkerDragStart: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDragStart: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragStart = onMarkerDragStart }
   }
   @MainActor
-  var onMarkerDrag: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDrag: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDrag = onMarkerDrag }
   }
   @MainActor
-  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDragEnd: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
   @MainActor
@@ -348,6 +383,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)? {
     didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
+  }
+  @MainActor
+  var onInfoWindowPress: ((String) -> Void)? {
+    didSet { impl.onInfoWindowPress = onInfoWindowPress }
+  }
+  @MainActor
+  var onInfoWindowClose: ((String) -> Void)? {
+    didSet { impl.onInfoWindowClose = onInfoWindowClose }
+  }
+  @MainActor
+  var onInfoWindowLongPress: ((String) -> Void)? {
+    didSet { impl.onInfoWindowLongPress = onInfoWindowLongPress }
+  }
+  @MainActor
+  var onMyLocationPress: ((RNLocation) -> Void)? {
+    didSet { impl.onMyLocationPress = onMyLocationPress }
+  }
+  @MainActor
+  var onMyLocationButtonPress: ((Bool) -> Void)? {
+    didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
   @MainActor
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
@@ -360,6 +415,16 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
+  }
+
+  @MainActor
+  func showMarkerInfoWindow(id: String) {
+    impl.showMarkerInfoWindow(id: id);
+  }
+
+  @MainActor
+  func hideMarkerInfoWindow(id: String) {
+    impl.hideMarkerInfoWindow(id: id);
   }
 
   @MainActor

@@ -4,6 +4,7 @@ import GoogleMapsUtils
 import UIKit
 
 final class MapHeatmapBuilder {
+  @MainActor
   func build(_ h: RNHeatmap) -> GMUHeatmapTileLayer {
     let heatmap = GMUHeatmapTileLayer()
     heatmap.weightedData = h.weightedData.toWeightedLatLngs()
@@ -18,7 +19,7 @@ final class MapHeatmapBuilder {
       heatmap.gradient = GMUGradient(
         colors: colors,
         startPoints: startPoints,
-        colorMapSize: 256
+        colorMapSize: UInt(g.colorMapSize)
       )
     }
 

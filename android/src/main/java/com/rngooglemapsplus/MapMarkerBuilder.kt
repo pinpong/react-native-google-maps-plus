@@ -1,16 +1,26 @@
 package com.rngooglemapsplus
 
+import MarkerTag
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Typeface
+import android.graphics.drawable.PictureDrawable
+import android.util.Base64
 import android.util.LruCache
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.graphics.createBitmap
 import com.caverock.androidsvg.SVG
+import com.caverock.androidsvg.SVGExternalFileResolver
 import com.facebook.react.uimanager.PixelUtil.dpToPx
+import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rngooglemapsplus.extensions.markerStyleEquals
+import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +30,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLDecoder
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.coroutineContext
 
 class MapMarkerBuilder(
+  val context: ThemedReactContext,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
@@ -33,7 +48,103 @@ class MapMarkerBuilder(
       ): Int = 1
     }
 
-  private val jobsById = mutableMapOf<String, Job>()
+  private val jobsById = ConcurrentHashMap<String, Job>()
+
+  init {
+    // / TODO: refactor with androidsvg 1.5 release
+    SVG.registerExternalFileResolver(
+      object : SVGExternalFileResolver() {
+        override fun resolveImage(filename: String?): Bitmap? {
+          if (filename.isNullOrBlank()) return null
+
+          return runCatching {
+            when {
+              filename.startsWith("data:image/svg+xml") -> {
+                val svgContent =
+                  if ("base64," in filename) {
+                    val base64 = filename.substringAfter("base64,")
+                    String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8)
+                  } else {
+                    URLDecoder.decode(filename.substringAfter(","), "UTF-8")
+                  }
+
+                val svg = SVG.getFromString(svgContent)
+                val width = (svg.documentWidth.takeIf { it > 0 } ?: 128f).toInt()
+                val height = (svg.documentHeight.takeIf { it > 0 } ?: 128f).toInt()
+
+                createBitmap(width, height).apply {
+                  Canvas(this).also(svg::renderToCanvas)
+                }
+              }
+
+              filename.startsWith("http://") || filename.startsWith("https://") -> {
+                val conn =
+                  (URL(filename).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    requestMethod = "GET"
+                    instanceFollowRedirects = true
+                  }
+                conn.connect()
+
+                val contentType = conn.contentType ?: ""
+                val result =
+                  if (contentType.contains("svg") || filename.endsWith(".svg")) {
+                    val svgText = conn.inputStream.bufferedReader().use { it.readText() }
+                    val innerSvg = SVG.getFromString(svgText)
+                    val w = innerSvg.documentWidth.takeIf { it > 0 } ?: 128f
+                    val h = innerSvg.documentHeight.takeIf { it > 0 } ?: 128f
+                    val bmp = createBitmap(w.toInt(), h.toInt())
+                    val canvas = Canvas(bmp)
+                    innerSvg.renderToCanvas(canvas)
+                    bmp
+                  } else {
+                    conn.inputStream.use { BitmapFactory.decodeStream(it) }
+                  }
+
+                conn.disconnect()
+                result
+              }
+
+              else -> null
+            }
+          }.getOrNull()
+        }
+
+        override fun resolveFont(
+          fontFamily: String?,
+          fontWeight: Int,
+          fontStyle: String?,
+        ): Typeface? {
+          if (fontFamily.isNullOrBlank()) return null
+
+          return runCatching {
+            val assetManager = context.assets
+
+            val candidates =
+              listOf(
+                "fonts/$fontFamily.ttf",
+                "fonts/$fontFamily.otf",
+              )
+
+            for (path in candidates) {
+              try {
+                return Typeface.createFromAsset(assetManager, path)
+              } catch (_: Throwable) {
+                // / ignore
+              }
+            }
+
+            Typeface.create(fontFamily, Typeface.NORMAL)
+          }.getOrElse {
+            Typeface.create(fontFamily, fontWeight)
+          }
+        }
+
+        override fun isFormatSupported(mimeType: String?): Boolean = mimeType?.startsWith("image/") == true
+      },
+    )
+  }
 
   fun build(
     m: RNMarker,
@@ -57,7 +168,7 @@ class MapMarkerBuilder(
     prev: RNMarker,
     next: RNMarker,
     marker: Marker,
-  ) {
+  ) = onUi {
     if (prev.coordinate.latitude != next.coordinate.latitude ||
       prev.coordinate.longitude != next.coordinate.longitude
     ) {
@@ -132,6 +243,10 @@ class MapMarkerBuilder(
     if (prev.zIndex != next.zIndex) {
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
+
+    if (prev.infoWindowIconSvg != next.infoWindowIconSvg) {
+      marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
+    }
   }
 
   fun buildIconAsync(
@@ -187,6 +302,31 @@ class MapMarkerBuilder(
     }
     jobsById.clear()
     iconCache.evictAll()
+  }
+
+  fun buildInfoWindow(iconSvg: RNMarkerSvg?): ImageView? {
+    val iconSvg = iconSvg ?: return null
+
+    val svgView =
+      ImageView(context).apply {
+        layoutParams =
+          LinearLayout.LayoutParams(
+            iconSvg.width.dpToPx().toInt(),
+            iconSvg.height.dpToPx().toInt(),
+          )
+      }
+
+    try {
+      val svg = SVG.getFromString(iconSvg.svgString)
+      svg.setDocumentWidth(iconSvg.width.dpToPx())
+      svg.setDocumentHeight(iconSvg.height.dpToPx())
+      val drawable = PictureDrawable(svg.renderToPicture())
+      svgView.setImageDrawable(drawable)
+    } catch (e: Exception) {
+      return null
+    }
+
+    return svgView
   }
 
   private suspend fun renderBitmap(m: RNMarker): Bitmap? {

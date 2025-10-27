@@ -28,6 +28,7 @@ import type {
   RNIndoorLevel,
   RNLatLngBounds,
   RNSnapshotOptions,
+  RNUrlTileOverlay,
 } from './types';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
@@ -48,21 +49,30 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   circles?: RNCircle[];
   heatmaps?: RNHeatmap[];
   kmlLayers?: RNKMLayer[];
+  urlTileOverlays?: RNUrlTileOverlay[];
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
+  onMapLoaded?: (region: RNRegion, camera: RNCamera) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
-  onMarkerPress?: (id?: string | undefined) => void;
-  onPolylinePress?: (id?: string | undefined) => void;
-  onPolygonPress?: (id?: string | undefined) => void;
-  onCirclePress?: (id?: string | undefined) => void;
-  onMarkerDragStart?: (id: string | undefined, location: RNLatLng) => void;
-  onMarkerDrag?: (id: string | undefined, location: RNLatLng) => void;
-  onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
+  onMapLongPress?: (coordinate: RNLatLng) => void;
+  onPoiPress?: (placeId: string, name: string, coordinate: RNLatLng) => void;
+  onMarkerPress?: (id: string) => void;
+  onPolylinePress?: (id: string) => void;
+  onPolygonPress?: (id: string) => void;
+  onCirclePress?: (id: string) => void;
+  onMarkerDragStart?: (id: string, location: RNLatLng) => void;
+  onMarkerDrag?: (id: string, location: RNLatLng) => void;
+  onMarkerDragEnd?: (id: string, location: RNLatLng) => void;
   onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
   onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
+  onInfoWindowPress?: (id: string) => void;
+  onInfoWindowClose?: (id: string) => void;
+  onInfoWindowLongPress?: (id: string) => void;
+  onMyLocationPress?: (location: RNLocation) => void;
+  onMyLocationButtonPress?: (pressed: boolean) => void;
   onCameraChangeStart?: (
     region: RNRegion,
     camera: RNCamera,
@@ -81,6 +91,10 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 }
 
 export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
+  showMarkerInfoWindow(id: string): void;
+
+  hideMarkerInfoWindow(id: string): void;
+
   setCamera(camera: RNCamera, animated?: boolean, durationMs?: number): void;
 
   setCameraToCoordinates(

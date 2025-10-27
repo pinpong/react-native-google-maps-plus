@@ -21,6 +21,17 @@ export default defineConfig([
     rules: {
       'react/react-in-jsx-scope': 'off',
       'prettier/prettier': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/lib/**'],
+              message: 'Import only from: "react-native-google-maps-plus".',
+            },
+          ],
+        },
+      ],
     },
   },
   {

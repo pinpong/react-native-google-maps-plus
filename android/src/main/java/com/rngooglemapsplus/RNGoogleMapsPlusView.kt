@@ -1,7 +1,7 @@
 package com.rngooglemapsplus
 
+import MarkerTag
 import com.facebook.proguard.annotations.DoNotStrip
-import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -14,6 +14,7 @@ import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
 import com.rngooglemapsplus.extensions.toCompressFormat
 import com.rngooglemapsplus.extensions.toFileExtension
+import com.rngooglemapsplus.extensions.toGoogleMapType
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
 import com.rngooglemapsplus.extensions.toSize
@@ -28,11 +29,12 @@ class RNGoogleMapsPlusView(
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MapMarkerBuilder()
+  private val markerBuilder = MapMarkerBuilder(context)
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
   private val heatmapBuilder = MapHeatmapBuilder()
+  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
@@ -128,9 +130,7 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      value?.let {
-        view.mapType = it.value
-      }
+      view.mapType = value?.toGoogleMapType()
     }
 
   override var markers: Array<RNMarker>? = null
@@ -150,12 +150,19 @@ class RNGoogleMapsPlusView(
         when {
           prev == null ->
             markerBuilder.buildIconAsync(id, next) { icon ->
-              view.addMarker(id, markerBuilder.build(next, icon))
+              view.addMarker(
+                id,
+                markerBuilder.build(next, icon),
+                MarkerTag(
+                  id = id,
+                  iconSvg = next.infoWindowIconSvg,
+                ),
+              )
             }
 
           !prev.markerEquals(next) ->
             view.updateMarker(id) { marker ->
-              onUi { markerBuilder.update(prev, next, marker) }
+              markerBuilder.update(prev, next, marker)
             }
         }
       }
@@ -179,7 +186,7 @@ class RNGoogleMapsPlusView(
 
           !prev.polylineEquals(next) ->
             view.updatePolyline(id) { polyline ->
-              onUi { polylineBuilder.update(prev, next, polyline) }
+              polylineBuilder.update(prev, next, polyline)
             }
         }
       }
@@ -204,7 +211,7 @@ class RNGoogleMapsPlusView(
 
           !prev.polygonEquals(next) ->
             view.updatePolygon(id) { polygon ->
-              onUi { polygonBuilder.update(prev, next, polygon) }
+              polygonBuilder.update(prev, next, polygon)
             }
         }
       }
@@ -229,7 +236,7 @@ class RNGoogleMapsPlusView(
 
           !prev.circleEquals(next) ->
             view.updateCircle(id) { circle ->
-              onUi { circleBuilder.update(prev, next, circle) }
+              circleBuilder.update(prev, next, circle)
             }
         }
       }
@@ -264,6 +271,21 @@ class RNGoogleMapsPlusView(
       }
     }
 
+  override var urlTileOverlays: Array<RNUrlTileOverlay>? = null
+    set(value) {
+      if (field.contentEquals(value)) return
+      val prevById = field?.associateBy { it.id } ?: emptyMap()
+      val nextById = value?.associateBy { it.id } ?: emptyMap()
+      field = value
+      (prevById.keys - nextById.keys).forEach { id ->
+        view.removeUrlTileOverlay(id)
+      }
+
+      nextById.forEach { (id, next) ->
+        view.addUrlTileOverlay(id, urlTileOverlayBuilder.build(next))
+      }
+    }
+
   override var locationConfig: RNLocationConfig? = null
     set(value) {
       if (field == value) return
@@ -281,6 +303,11 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
+  override var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
+    set(cb) {
+      view.onMapLoaded = cb
+    }
+
   override var onLocationUpdate: ((RNLocation) -> Unit)? = null
     set(cb) {
       view.onLocationUpdate = cb
@@ -296,37 +323,47 @@ class RNGoogleMapsPlusView(
       view.onMapPress = cb
     }
 
-  override var onMarkerPress: ((String?) -> Unit)? = null
+  override var onMapLongPress: ((RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onMapLongPress = cb
+    }
+
+  override var onMarkerPress: ((String) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
     }
 
-  override var onPolylinePress: ((String?) -> Unit)? = null
+  override var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
+    set(cb) {
+      view.onPoiPress = cb
+    }
+
+  override var onPolylinePress: ((String) -> Unit)? = null
     set(cb) {
       view.onPolylinePress = cb
     }
 
-  override var onPolygonPress: ((String?) -> Unit)? = null
+  override var onPolygonPress: ((String) -> Unit)? = null
     set(cb) {
       view.onPolygonPress = cb
     }
 
-  override var onCirclePress: ((String?) -> Unit)? = null
+  override var onCirclePress: ((String) -> Unit)? = null
     set(cb) {
       view.onCirclePress = cb
     }
 
-  override var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDragStart: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDragStart = cb
     }
 
-  override var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDrag: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDrag = cb
     }
 
-  override var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDragEnd: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDragEnd = cb
     }
@@ -339,6 +376,31 @@ class RNGoogleMapsPlusView(
   override var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
     set(cb) {
       view.onIndoorLevelActivated = cb
+    }
+
+  override var onInfoWindowPress: ((String) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowPress = cb
+    }
+
+  override var onInfoWindowClose: ((String) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowClose = cb
+    }
+
+  override var onInfoWindowLongPress: ((String) -> Unit)? = null
+    set(cb) {
+      view.onInfoWindowLongPress = cb
+    }
+
+  override var onMyLocationPress: ((RNLocation) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationPress = cb
+    }
+
+  override var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
+    set(cb) {
+      view.onMyLocationButtonPress = cb
     }
 
   override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -356,19 +418,25 @@ class RNGoogleMapsPlusView(
       view.onCameraChangeComplete = cb
     }
 
+  override fun showMarkerInfoWindow(id: String) {
+    view.showMarkerInfoWindow(id)
+  }
+
+  override fun hideMarkerInfoWindow(id: String) {
+    view.hideMarkerInfoWindow(id)
+  }
+
   override fun setCamera(
     camera: RNCamera,
     animated: Boolean?,
     durationMs: Double?,
   ) {
-    onUi {
-      val current = view.currentCamera
-      view.setCamera(
-        camera.toCameraPosition(current),
-        animated == true,
-        durationMs?.toInt() ?: 3000,
-      )
-    }
+    val current = view.currentCamera
+    view.setCamera(
+      camera.toCameraPosition(current),
+      animated == true,
+      durationMs?.toInt() ?: 3000,
+    )
   }
 
   override fun setCameraToCoordinates(
@@ -425,12 +493,4 @@ class RNGoogleMapsPlusView(
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 
   override fun isGooglePlayServicesAvailable(): Boolean = playServiceHandler.isPlayServicesAvailable()
-}
-
-private inline fun onUi(crossinline block: () -> Unit) {
-  if (UiThreadUtil.isOnUiThread()) {
-    block()
-  } else {
-    UiThreadUtil.runOnUiThread { block() }
-  }
 }

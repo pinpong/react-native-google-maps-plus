@@ -128,6 +128,8 @@ export const RNMapUiSettingsValidator = object({
   tiltEnabled: optional(boolean()),
   zoomControlsEnabled: optional(boolean()),
   zoomGesturesEnabled: optional(boolean()),
+  consumeOnMarkerPress: optional(boolean()),
+  consumeOnMyLocationButtonPress: optional(boolean()),
 });
 
 export const RNMapZoomConfigValidator = object({
@@ -167,6 +169,7 @@ export const RNMarkerValidator = object({
   rotation: optional(number()),
   infoWindowAnchor: optional(RNPositionValidator),
   iconSvg: optional(RNMarkerSvgValidator),
+  infoWindowIconSvg: optional(RNMarkerSvgValidator),
 });
 
 export const RNPolygonHoleValidator = object({
@@ -233,6 +236,15 @@ export const RNHeatmapValidator = object({
 export const RNKMLayerValidator = object({
   id: string(),
   kmlString: string(),
+});
+
+export const RNUrlTileOverlayValidator = object({
+  id: string(),
+  zIndex: optional(number()),
+  url: string(),
+  tileSize: number(),
+  opacity: optional(number()),
+  fadeIn: optional(boolean()),
 });
 
 export const RNIndoorLevelValidator = object({
@@ -342,6 +354,3 @@ if (
     { type: 'literal', schema: 'default' },
   ];
 }
-
-export type RNBasicMapConfigType =
-  typeof RNBasicMapConfigValidator extends Struct<infer O, any> ? O : never;

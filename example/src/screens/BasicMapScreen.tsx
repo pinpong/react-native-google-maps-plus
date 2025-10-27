@@ -35,6 +35,8 @@ export default function BasicMapScreen() {
       tiltEnabled: true,
       zoomControlsEnabled: true,
       zoomGesturesEnabled: true,
+      consumeOnMarkerPress: false,
+      consumeOnMyLocationButtonPress: false,
     },
     myLocationEnabled: true,
     buildingEnabled: undefined,

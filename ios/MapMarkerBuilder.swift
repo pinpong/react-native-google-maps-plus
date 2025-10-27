@@ -10,16 +10,19 @@ final class MapMarkerBuilder {
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
 
+  @MainActor
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
       position: m.coordinate.toCLLocationCoordinate2D()
     )
-    marker.userData = m.id
     marker.tracksViewChanges = true
     marker.icon = icon
     m.title.map { marker.title = $0 }
     m.snippet.map { marker.snippet = $0 }
-    m.opacity.map { marker.iconView?.alpha = CGFloat($0) }
+    m.opacity.map {
+      marker.opacity = Float($0)
+      marker.iconView?.alpha = CGFloat($0)
+    }
     m.flat.map { marker.isFlat = $0 }
     m.draggable.map { marker.isDraggable = $0 }
     m.rotation.map { marker.rotation = $0 }
@@ -33,6 +36,11 @@ final class MapMarkerBuilder {
       )
     }
     m.zIndex.map { marker.zIndex = Int32($0) }
+
+    marker.tagData = MarkerTag(
+      id: m.id,
+      iconSvg: m.infoWindowIconSvg
+    )
 
     onMainAsync { [weak marker] in
       try? await Task.sleep(nanoseconds: 250_000_000)
@@ -119,6 +127,12 @@ final class MapMarkerBuilder {
           y: next.infoWindowAnchor?.y ?? 0
         )
       }
+
+      m.tagData = MarkerTag(
+        id: next.id,
+        iconSvg: next.infoWindowIconSvg
+      )
+
     }
   }
 
@@ -160,11 +174,13 @@ final class MapMarkerBuilder {
     tasks[id] = task
   }
 
+  @MainActor
   func cancelIconTask(_ id: String) {
     tasks[id]?.cancel()
     tasks.removeValue(forKey: id)
   }
 
+  @MainActor
   func cancelAllIconTasks() {
     let ids = Array(tasks.keys)
     for id in ids {
@@ -174,6 +190,47 @@ final class MapMarkerBuilder {
     iconCache.removeAllObjects()
   }
 
+  @MainActor
+  func buildInfoWindow(iconSvg: RNMarkerSvg?) -> UIImageView? {
+    guard let iconSvg = iconSvg else {
+      return nil
+    }
+
+    guard let data = iconSvg.svgString.data(using: .utf8),
+          let svgImg = SVGKImage(data: data)
+    else {
+      return nil
+    }
+
+    let size = CGSize(
+      width: max(1, CGFloat(iconSvg.width)),
+      height: max(1, CGFloat(iconSvg.height))
+    )
+
+    svgImg.size = size
+
+    guard let base = svgImg.uiImage else {
+      return nil
+    }
+
+    let fmt = UIGraphicsImageRendererFormat.default()
+    fmt.opaque = false
+    fmt.scale = UIScreen.main.scale
+    let renderer = UIGraphicsImageRenderer(size: size, format: fmt)
+
+    let finalImage = renderer.image { _ in
+      base.draw(in: CGRect(origin: .zero, size: size))
+    }
+
+    let imageView = UIImageView(image: finalImage)
+    imageView.frame = CGRect(origin: .zero, size: size)
+    imageView.contentMode = .scaleAspectFit
+    imageView.backgroundColor = .clear
+
+    return imageView
+  }
+
+  @MainActor
   private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) async -> UIImage? {
     guard let iconSvg = m.iconSvg,
           let data = iconSvg.svgString.data(using: .utf8)

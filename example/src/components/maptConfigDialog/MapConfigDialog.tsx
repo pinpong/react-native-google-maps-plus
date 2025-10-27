@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
+  View,
   Text,
   TextInput,
-  View,
+  StyleSheet,
   Alert,
+  Pressable,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { type Struct, validate } from 'superstruct';
 import { useAppTheme } from '../../hooks/useAppTheme';
@@ -47,29 +48,32 @@ export default function MapConfigDialog<T>({
     setError(null);
   }, [initialData]);
 
-  const handleChange = (value: string) => {
-    setText(value);
-    try {
-      const parsed = parseWithUndefined(value);
+  const handleChange = useCallback(
+    (value: string) => {
+      setText(value);
+      try {
+        const parsed = parseWithUndefined(value);
 
-      if (validator) {
-        const [err] = validate(parsed, validator);
-        if (err) {
-          setIsValid(false);
-          setError(formatSuperstructError(err, validator));
-          return;
+        if (validator) {
+          const [err] = validate(parsed, validator);
+          if (err) {
+            setIsValid(false);
+            setError(formatSuperstructError(err, validator));
+            return;
+          }
         }
+
+        setIsValid(true);
+        setError(null);
+      } catch (e: any) {
+        setIsValid(false);
+        setError(e.message);
       }
+    },
+    [validator]
+  );
 
-      setIsValid(true);
-      setError(null);
-    } catch (e: any) {
-      setIsValid(false);
-      setError(e.message);
-    }
-  };
-
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!isValid) {
       Alert.alert('Invalid JSON', error ?? 'Please fix JSON before saving.');
       return;
@@ -96,39 +100,54 @@ export default function MapConfigDialog<T>({
     } catch (e: any) {
       Alert.alert('Invalid JSON', e.message);
     }
-  };
+  }, [isValid, error, text, validator, onSave, onClose]);
+
+  const handleCancel = useCallback(() => {
+    setText(stringifyWithUndefined(initialData));
+    setIsValid(true);
+    setError(null);
+    onClose();
+  }, [initialData, onClose]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
+    <Modal visible={visible} animationType="fade" transparent>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.overlay}
+      >
         <View style={styles.dialog}>
-          <Text style={styles.title}>{title}</Text>
-          <ScrollView contentContainerStyle={styles.scroll}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.headerActions}>
+              <Pressable onPress={handleCancel} style={styles.cancelButton}>
+                <Text style={styles.headerButtonText}>Cancel</Text>
+              </Pressable>
+              <Pressable onPress={handleSave} style={styles.saveButton}>
+                <Text style={styles.headerButtonText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          <View style={isValid ? styles.body : styles.bodyWithError}>
             <TextInput
+              scrollEnabled
               value={text}
               onChangeText={handleChange}
               multiline
-              style={[styles.input, styles.multiline, !isValid && styles.error]}
+              style={[styles.input, !isValid && styles.error]}
               autoCorrect={false}
               autoCapitalize="none"
               spellCheck={false}
+              textAlignVertical="top"
             />
             {!isValid && (
-              <Text style={[styles.errorText]}>
+              <Text style={styles.errorText}>
                 {error ?? 'Invalid JSON or schema mismatch'}
               </Text>
             )}
-          </ScrollView>
-          <View style={styles.actions}>
-            <Pressable onPress={onClose} style={styles.cancelButton}>
-              <Text style={styles.buttonText}>Cancel</Text>
-            </Pressable>
-            <Pressable onPress={handleSave} style={styles.saveButton}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -137,48 +156,35 @@ const getThemedStyles = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: theme.overlay,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: theme.overlay,
+      paddingHorizontal: 16,
     },
     dialog: {
-      width: '85%',
-      maxHeight: '85%',
+      width: '100%',
+      maxWidth: 700,
       backgroundColor: theme.bgPrimary,
-      borderRadius: 12,
+      borderRadius: 16,
+      maxHeight: '85%',
       flexShrink: 1,
+      overflow: 'visible',
     },
-    scroll: { padding: 12 },
-    title: {
-      padding: 12,
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.textPrimary,
-    },
-    input: {
-      borderWidth: 1,
-      borderRadius: 8,
-      padding: 10,
-      fontSize: 13,
-      borderColor: theme.border,
-      color: theme.textPrimary,
-      backgroundColor: theme.inputBg,
-      fontFamily: 'monospace',
-    },
-    multiline: { minHeight: 250, textAlignVertical: 'top' },
-    errorText: {
-      marginTop: 6,
-      color: theme.errorBorder,
-      fontSize: 12,
-      fontFamily: 'monospace',
-    },
-    error: {
-      borderColor: theme.errorBorder,
-    },
-    actions: {
+    header: {
       flexDirection: 'row',
-      justifyContent: 'flex-end',
-      padding: 12,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.border,
+      backgroundColor: theme.bgSecondary,
+    },
+    headerActions: { flexDirection: 'row', gap: 8 },
+    headerButtonText: {
+      color: theme.textPrimary,
+      fontWeight: '600',
+      fontSize: 14,
     },
     cancelButton: {
       paddingVertical: 8,
@@ -194,4 +200,36 @@ const getThemedStyles = (theme: any) =>
       backgroundColor: theme.bgAccent,
     },
     buttonText: { color: theme.textOnAccent, fontWeight: '500' },
+    title: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: theme.textPrimary,
+    },
+    body: {
+      flexShrink: 1,
+      padding: 16,
+    },
+    bodyWithError: {
+      flexShrink: 1,
+      padding: 16,
+      paddingBottom: 50,
+    },
+    input: {
+      borderWidth: 1,
+      borderRadius: 8,
+      padding: 10,
+      fontSize: 13,
+      borderColor: theme.border,
+      color: theme.textPrimary,
+      backgroundColor: theme.inputBg,
+      fontFamily: 'monospace',
+      minHeight: 100,
+    },
+    errorText: {
+      marginTop: 6,
+      color: theme.errorBorder,
+      fontSize: 12,
+      fontFamily: 'monospace',
+    },
+    error: { borderColor: theme.errorBorder },
   });

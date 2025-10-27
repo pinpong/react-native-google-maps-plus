@@ -4,7 +4,9 @@ import type {
   RNMarker,
   RNPolygon,
   RNPolyline,
+  RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
+import { weightData } from './heatMapWeightData';
 
 export function randomColor() {
   return (
@@ -27,6 +29,59 @@ export function makeSvgIcon(
   <circle cx="32" cy="28" r="10" fill="#FFFFFF" />
   <ellipse cx="32" cy="82" rx="14" ry="4" fill="#000000" opacity="0.15" />
 </svg>`;
+}
+
+export function makeInfoWindowIconSvg(
+  width: number,
+  height: number,
+  color?: string,
+  text?: string
+): string {
+  color = color ?? randomColor();
+  const label = text ?? 'Google Maps Plus';
+  const corner = 12;
+  const pointerHeight = 12;
+
+  const rectHeight = height - pointerHeight;
+  const textY = rectHeight / 2 + 5;
+
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.25"/>
+  </filter>
+
+  <path
+    d="
+      M${corner},0
+      h${width - corner * 2}
+      a${corner},${corner} 0 0 1 ${corner},${corner}
+      v${rectHeight - corner - pointerHeight}
+      a${corner},${corner} 0 0 1 -${corner},${corner}
+      h-${(width - corner * 2) / 2 - pointerHeight}
+      l-${pointerHeight},${pointerHeight}
+      l-${pointerHeight},-${pointerHeight}
+      h-${(width - corner * 2) / 2 - pointerHeight}
+      a${corner},${corner} 0 0 1 -${corner},-${corner}
+      v-${rectHeight - corner - pointerHeight}
+      a${corner},${corner} 0 0 1 ${corner},-${corner}
+      z
+    "
+    fill="${color}"
+    filter="url(#shadow)"
+  />
+
+  <text
+    x="50%"
+    y="${textY}"
+    font-size="14"
+    font-family="sans-serif"
+    fill="white"
+    text-anchor="middle"
+    dominant-baseline="middle"
+  >${label}</text>
+</svg>
+`.trim();
 }
 
 export const randomCoordinates = (
@@ -124,51 +179,26 @@ export const makeCircle = (id: number): RNCircle => ({
 export const makeHeatmap = (id: number): RNHeatmap => ({
   id: id.toString(),
   zIndex: id,
-  weightedData: [
-    {
-      latitude: 37.777714074525925,
-      longitude: -122.42099587858186,
-      weight: 1,
-    },
-    {
-      latitude: 37.785184052875735,
-      longitude: -122.42914114591328,
-      weight: 1,
-    },
-    {
-      latitude: 37.769334961755526,
-      longitude: -122.41418426583697,
-      weight: 5,
-    },
-    {
-      latitude: 37.7717263096532,
-      longitude: -122.41931954914673,
-      weight: 4,
-    },
-    {
-      latitude: 37.78589459403588,
-      longitude: -122.40573314204349,
-      weight: 3,
-    },
-    {
-      latitude: 37.78664297332888,
-      longitude: -122.42602082474453,
-      weight: 2,
-    },
-    {
-      latitude: 37.74874321698208,
-      longitude: -122.44390470794693,
-      weight: 1,
-    },
-  ],
+  weightedData: weightData,
   gradient: {
     colors: ['#00f', '#0ff', '#0f0', '#ff0', '#f00'],
-    startPoints: [0.0, 0.25, 0.5, 0.75, 1.0],
-    colorMapSize: 1024,
+    startPoints: [0.1, 0.2, 0.45, 0.7, 1.0],
+    colorMapSize: 256,
   },
-  radius: 100,
+  radius: 50,
   opacity: 1,
 });
+
+export function makeUrlTileOverlay(id: number): RNUrlTileOverlay {
+  return {
+    id: id.toString(),
+    zIndex: id,
+    fadeIn: false,
+    opacity: 1,
+    tileSize: 256,
+    url: '',
+  };
+}
 
 export function makeMarker(id: number): RNMarker {
   return {
@@ -193,6 +223,11 @@ export function makeMarker(id: number): RNMarker {
       width: 32,
       height: 44,
       svgString: makeSvgIcon(32, 44, '#2D6BE9'),
+    },
+    infoWindowIconSvg: {
+      width: 150,
+      height: 50,
+      svgString: makeInfoWindowIconSvg(150, 50, '#2D6BE9'),
     },
   };
 }

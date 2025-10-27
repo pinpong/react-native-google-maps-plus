@@ -21,6 +21,8 @@ export type RNMapUiSettings = {
   tiltEnabled?: boolean;
   zoomControlsEnabled?: boolean;
   zoomGesturesEnabled?: boolean;
+  consumeOnMarkerPress?: boolean;
+  consumeOnMyLocationButtonPress?: boolean;
 };
 
 export type RNLatLng = {
@@ -29,8 +31,8 @@ export type RNLatLng = {
 };
 
 export type RNLatLngBounds = {
-  northEast: RNLatLng;
-  southWest: RNLatLng;
+  southwest: RNLatLng;
+  northeast: RNLatLng;
 };
 
 export type RNSnapshotOptions = {
@@ -135,9 +137,11 @@ export type RNCamera = {
 };
 
 export type RNRegion = {
-  center: RNLatLng;
-  latitudeDelta: number;
-  longitudeDelta: number;
+  nearLeft: RNLatLng;
+  nearRight: RNLatLng;
+  farLeft: RNLatLng;
+  farRight: RNLatLng;
+  latLngBounds: RNLatLngBounds;
 };
 
 export type RNPosition = {
@@ -167,6 +171,7 @@ export type RNMarker = {
   rotation?: number;
   infoWindowAnchor?: RNPosition;
   iconSvg?: RNMarkerSvg;
+  infoWindowIconSvg?: RNMarkerSvg;
 };
 
 export type RNMarkerSvg = {
@@ -239,6 +244,15 @@ export type RNHeatmapGradient = {
 export type RNKMLayer = {
   id: string;
   kmlString: string;
+};
+
+export type RNUrlTileOverlay = {
+  id: string;
+  zIndex?: number;
+  url: string;
+  tileSize: number;
+  opacity?: number;
+  fadeIn?: boolean;
 };
 
 export type RNIndoorBuilding = {
