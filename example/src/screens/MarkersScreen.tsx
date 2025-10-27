@@ -9,7 +9,7 @@ import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
 import { useNavigation } from '@react-navigation/native';
 import { RNMarkerValidator } from '../components/maptConfigDialog/validator';
 import { useHeaderButton } from '../hooks/useHeaderButton';
-import type { RNMapUiSettings } from '../../../lib/typescript/src';
+import type { RNMapUiSettings } from 'react-native-google-maps-plus';
 
 export default function MarkersScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
