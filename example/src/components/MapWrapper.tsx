@@ -111,11 +111,7 @@ export default function MapWrapper(props: Props) {
     <View style={styles.container}>
       <GoogleMapsView
         {...rest}
-        hybridRef={{
-          f: (ref) => {
-            props.mapRef.current = ref;
-          },
-        }}
+        hybridRef={wrapCallback((ref) => (props.mapRef.current = ref))}
         initialProps={props.initialProps ?? initialProps}
         uiSettings={props.uiSettings ?? uiSettings}
         myLocationEnabled={props.myLocationEnabled ?? true}
