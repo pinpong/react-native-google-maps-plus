@@ -1,3 +1,44 @@
+## [1.7.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.2...v1.7.0) (2025-10-27)
+
+### ✨ Features
+
+* add consumeOnMarkerPress and consumeOnMyLocationButtonPress to RNMapUiSettings ([3c274a1](https://github.com/pinpong/react-native-google-maps-plus/commit/3c274a116eb7c1b57cbe1f407e68eda27781789b))
+* add custom info window support ([66fb740](https://github.com/pinpong/react-native-google-maps-plus/commit/66fb7400d75c9b0bb290555aa794382aebf1c2b9))
+* add onInfoWindowPress ([d2e0909](https://github.com/pinpong/react-native-google-maps-plus/commit/d2e0909fa81092550e14e854ece4b0e5c5149b05))
+* add onMapLoaded callback ([4bd8e47](https://github.com/pinpong/react-native-google-maps-plus/commit/4bd8e4731ec3d2d8c31d73a9487ab9f1fdcaa509))
+* add onMapLongPress ([b9aaa20](https://github.com/pinpong/react-native-google-maps-plus/commit/b9aaa205fa6ae055b823ff07c1f1fc8b9aaab54a))
+* add onPoiPress ([875e50c](https://github.com/pinpong/react-native-google-maps-plus/commit/875e50c6cb9aaadfc2949ff266e1d478dd9a4dbc))
+* add url tile overlay ([f4badbc](https://github.com/pinpong/react-native-google-maps-plus/commit/f4badbcaba99c31ce337fa12dd9caa436d0fad8c))
+* **android:** add marker icon remote image support ([35544ff](https://github.com/pinpong/react-native-google-maps-plus/commit/35544ff34359c7e77e8db8362fa2c3db5a4b0b57))
+* emit region and camera from onMapLoaded event ([7e0a4f1](https://github.com/pinpong/react-native-google-maps-plus/commit/7e0a4f1478622827f7a318bfdd3f64cdec442394))
+
+### 🐛 Bug Fixes
+
+* **android:** clear tile cache ([b7c259a](https://github.com/pinpong/react-native-google-maps-plus/commit/b7c259ac18d2ebbbb63d8ff71f4525fd2466736f))
+* **android:** proguard-rules.pro ([e5240d6](https://github.com/pinpong/react-native-google-maps-plus/commit/e5240d646382dd02998c9d46cfb1db8517549fa6))
+* **android:** update location config ([25517f1](https://github.com/pinpong/react-native-google-maps-plus/commit/25517f1ab4d3c9009af2d92f4ba9d61786b696c4))
+* **example:** config dialog ([962ac52](https://github.com/pinpong/react-native-google-maps-plus/commit/962ac52fc7b0bb09323cd9c629a225953fba068b))
+* **example:** import ([0e1ef8b](https://github.com/pinpong/react-native-google-maps-plus/commit/0e1ef8b644d88c483052778804f7bfe6fcafdab9))
+* **example:** types ([fdd27c2](https://github.com/pinpong/react-native-google-maps-plus/commit/fdd27c2abd37b9e5861ee094db384ed4c5612aa5))
+* **heatmap:** colorMapSize ([bcc81c7](https://github.com/pinpong/react-native-google-maps-plus/commit/bcc81c7f2698bb1b4a1f20f15ec7b49cd095e886))
+* **ios:** heatmap gradient colorMapSize ([584dcea](https://github.com/pinpong/react-native-google-maps-plus/commit/584dcea17f360032d52c6a210409d0484ad31f45))
+* threading issues ([7019a86](https://github.com/pinpong/react-native-google-maps-plus/commit/7019a862c074ea6f2255091e531f25cf9c82de99))
+
+### 🔄 Code Refactors
+
+* align RNRegion with native SDK behavior ([092993f](https://github.com/pinpong/react-native-google-maps-plus/commit/092993f483e3c4f0993b3505bb812c300afdc580))
+* cleanup ([541a4e5](https://github.com/pinpong/react-native-google-maps-plus/commit/541a4e5d115e3a0ddf1fd321baf8b83816a3dd9b))
+
+### 🛠️ Other changes
+
+* downgrade react version ([e43bb64](https://github.com/pinpong/react-native-google-maps-plus/commit/e43bb644dd765482d6682beb8aa568c7f78f30f4))
+* **example:** add svg marker examples ([cc31a7b](https://github.com/pinpong/react-native-google-maps-plus/commit/cc31a7b8e91d855dd90faf202708cdd3cbd2f841))
+* **example:** enable hardwareAccelerated ([bdbed0a](https://github.com/pinpong/react-native-google-maps-plus/commit/bdbed0a2d0ff3dec3575ffc2580406718e465007))
+* merge dev into main ([cb265a7](https://github.com/pinpong/react-native-google-maps-plus/commit/cb265a7651fd5e2eb792979813e4abd8de788f4d))
+* sync code parity between Android and iOS ([302d359](https://github.com/pinpong/react-native-google-maps-plus/commit/302d35920800dc6201083a0c3223f2640ed16b75))
+* updated dependencies ([844c652](https://github.com/pinpong/react-native-google-maps-plus/commit/844c652024c44c25867cbe1520d5a05db86c340e))
+* updated package.json ([538c2c8](https://github.com/pinpong/react-native-google-maps-plus/commit/538c2c8c1d964a07d6d25515a3cdb1330b61a7a1))
+
 ## [1.6.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.1...v1.6.2) (2025-10-21)
 
 ### 🐛 Bug Fixes
