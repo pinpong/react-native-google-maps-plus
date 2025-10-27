@@ -574,7 +574,10 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   func removeHeatmap(id: String) {
-    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+    heatmapsById.removeValue(forKey: id).map {
+      $0.clearTileCache()
+      $0.map = nil
+    }
   }
 
   @MainActor
@@ -608,6 +611,7 @@ GMSIndoorDisplayDelegate {
         geometries: parser.placemarks
       )
       renderer.render()
+      kmlLayerById[id] = renderer
     }
   }
 
@@ -639,16 +643,23 @@ GMSIndoorDisplayDelegate {
     urlTileOverlay: GMSURLTileLayer
   ) {
     urlTileOverlay.map = mapView
+    urlTileOverlays[id] = urlTileOverlay
   }
 
   @MainActor
   func removeUrlTileOverlay(id: String) {
-    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+    urlTileOverlays.removeValue(forKey: id).map {
+      $0.clearTileCache()
+      $0.map = nil
+    }
   }
 
   @MainActor
   func clearUrlTileOverlay() {
-    urlTileOverlays.values.forEach { $0.map = nil }
+    urlTileOverlays.values.forEach {
+      $0.clearTileCache()
+      $0.map = nil
+    }
     urlTileOverlays.removeAll()
     pendingUrlTileOverlays.removeAll()
   }

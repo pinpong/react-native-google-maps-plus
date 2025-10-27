@@ -19,7 +19,10 @@ final class MapMarkerBuilder {
     marker.icon = icon
     m.title.map { marker.title = $0 }
     m.snippet.map { marker.snippet = $0 }
-    m.opacity.map { marker.iconView?.alpha = CGFloat($0) }
+    m.opacity.map {
+      marker.opacity = Float($0)
+      marker.iconView?.alpha = CGFloat($0)
+    }
     m.flat.map { marker.isFlat = $0 }
     m.draggable.map { marker.isDraggable = $0 }
     m.rotation.map { marker.rotation = $0 }
@@ -187,6 +190,7 @@ final class MapMarkerBuilder {
     iconCache.removeAllObjects()
   }
 
+  @MainActor
   func buildInfoWindow(iconSvg: RNMarkerSvg?) -> UIImageView? {
     guard let iconSvg = iconSvg else {
       return nil

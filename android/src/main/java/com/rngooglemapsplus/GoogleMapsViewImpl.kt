@@ -10,7 +10,6 @@ import android.location.Location
 import android.util.Size
 import android.view.View
 import android.widget.FrameLayout
-import androidx.core.graphics.scale
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
@@ -224,31 +223,31 @@ class GoogleMapsViewImpl(
     locationConfig = locationConfig
 
     if (pendingMarkers.isNotEmpty()) {
-      pendingMarkers.forEach { (id, opts, markerTag) -> internalAddMarker(id, opts, markerTag) }
+      pendingMarkers.forEach { (id, opts, markerTag) -> addMarkerInternal(id, opts, markerTag) }
       pendingMarkers.clear()
     }
     if (pendingPolylines.isNotEmpty()) {
-      pendingPolylines.forEach { (id, opts) -> internalAddPolyline(id, opts) }
+      pendingPolylines.forEach { (id, opts) -> addPolylineInternal(id, opts) }
       pendingPolylines.clear()
     }
     if (pendingPolygons.isNotEmpty()) {
-      pendingPolygons.forEach { (id, opts) -> internalAddPolygon(id, opts) }
+      pendingPolygons.forEach { (id, opts) -> addPolygonInternal(id, opts) }
       pendingPolygons.clear()
     }
     if (pendingCircles.isNotEmpty()) {
-      pendingCircles.forEach { (id, opts) -> internalAddCircle(id, opts) }
+      pendingCircles.forEach { (id, opts) -> addCircleInternal(id, opts) }
       pendingCircles.clear()
     }
     if (pendingHeatmaps.isNotEmpty()) {
-      pendingHeatmaps.forEach { (id, opts) -> internalAddHeatmap(id, opts) }
+      pendingHeatmaps.forEach { (id, opts) -> addHeatmapInternal(id, opts) }
       pendingHeatmaps.clear()
     }
     if (pendingKmlLayers.isNotEmpty()) {
-      pendingKmlLayers.forEach { (id, str) -> internalAddKmlLayer(id, str) }
+      pendingKmlLayers.forEach { (id, str) -> addKmlLayerInternal(id, str) }
       pendingKmlLayers.clear()
     }
     if (pendingUrlTilesOverlays.isNotEmpty()) {
-      pendingUrlTilesOverlays.forEach { (id, opts) -> internalAddUrlTileOverlay(id, opts) }
+      pendingUrlTilesOverlays.forEach { (id, opts) -> addUrlTileOverlayInternal(id, opts) }
       pendingUrlTilesOverlays.clear()
     }
   }
@@ -496,10 +495,10 @@ class GoogleMapsViewImpl(
     }
 
     markersById.remove(id)?.remove()
-    internalAddMarker(id, opts, markerTag)
+    addMarkerInternal(id, opts, markerTag)
   }
 
-  private fun internalAddMarker(
+  private fun addMarkerInternal(
     id: String,
     opts: MarkerOptions,
     markerTag: MarkerTag,
@@ -547,10 +546,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     polylinesById.remove(id)?.remove()
-    internalAddPolyline(id, opts)
+    addPolylineInternal(id, opts)
   }
 
-  private fun internalAddPolyline(
+  private fun addPolylineInternal(
     id: String,
     opts: PolylineOptions,
   ) = onUi {
@@ -590,10 +589,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     polygonsById.remove(id)?.remove()
-    internalAddPolygon(id, opts)
+    addPolygonInternal(id, opts)
   }
 
-  private fun internalAddPolygon(
+  private fun addPolygonInternal(
     id: String,
     opts: PolygonOptions,
   ) = onUi {
@@ -633,10 +632,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     circlesById.remove(id)?.remove()
-    internalAddCircle(id, opts)
+    addCircleInternal(id, opts)
   }
 
-  private fun internalAddCircle(
+  private fun addCircleInternal(
     id: String,
     opts: CircleOptions,
   ) = onUi {
@@ -676,10 +675,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     heatmapsById.remove(id)?.remove()
-    internalAddHeatmap(id, opts)
+    addHeatmapInternal(id, opts)
   }
 
-  private fun internalAddHeatmap(
+  private fun addHeatmapInternal(
     id: String,
     opts: TileOverlayOptions,
   ) = onUi {
@@ -697,7 +696,10 @@ class GoogleMapsViewImpl(
 
   fun clearHeatmaps() =
     onUi {
-      heatmapsById.values.forEach { it.remove() }
+      heatmapsById.values.forEach {
+        it.clearTileCache()
+        it.remove()
+      }
       heatmapsById.clear()
       pendingHeatmaps.clear()
     }
@@ -711,10 +713,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     kmlLayersById.remove(id)?.removeLayerFromMap()
-    internalAddKmlLayer(id, kmlString)
+    addKmlLayerInternal(id, kmlString)
   }
 
-  private fun internalAddKmlLayer(
+  private fun addKmlLayerInternal(
     id: String,
     kmlString: String,
   ) = onUi {
@@ -749,10 +751,10 @@ class GoogleMapsViewImpl(
       return@onUi
     }
     urlTileOverlaysById.remove(id)?.remove()
-    internalAddUrlTileOverlay(id, opts)
+    addUrlTileOverlayInternal(id, opts)
   }
 
-  private fun internalAddUrlTileOverlay(
+  private fun addUrlTileOverlayInternal(
     id: String,
     opts: TileOverlayOptions,
   ) = onUi {
@@ -770,7 +772,10 @@ class GoogleMapsViewImpl(
 
   fun clearUrlTileOverlays() =
     onUi {
-      urlTileOverlaysById.values.forEach { it.remove() }
+      urlTileOverlaysById.values.forEach {
+        it.clearTileCache()
+        it.remove()
+      }
       urlTileOverlaysById.clear()
       pendingUrlTilesOverlays.clear()
     }
