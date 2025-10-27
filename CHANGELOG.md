@@ -1,3 +1,43 @@
+## [1.6.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.1...v1.6.2) (2025-10-21)
+
+### 🐛 Bug Fixes
+
+* **android:** current camera getter ([6d1dbb1](https://github.com/pinpong/react-native-google-maps-plus/commit/6d1dbb1427a7153ef13716ec77b444ad52144a64))
+* **android:** location crash ([a403e49](https://github.com/pinpong/react-native-google-maps-plus/commit/a403e497f78506124c4f2e40f48c7b5554349e90))
+* **ios:** animation thread ([41f293e](https://github.com/pinpong/react-native-google-maps-plus/commit/41f293ebd500d269b5d3555ad09d7c6e02b6aa7f))
+* setCamera without center ([4036011](https://github.com/pinpong/react-native-google-maps-plus/commit/40360117d599659a2b3c9178122ce3e739740f06))
+* setCamera without center ([73c273e](https://github.com/pinpong/react-native-google-maps-plus/commit/73c273ef7887b4d3567a034ea1f6a6751e523767))
+* setCamera without props ([c82ac8d](https://github.com/pinpong/react-native-google-maps-plus/commit/c82ac8def40a26e21cd8a6cc1f6ac89316518b6d))
+
+### 🔄 Code Refactors
+
+* **example:** base map props ([c952dd4](https://github.com/pinpong/react-native-google-maps-plus/commit/c952dd414c89eef5af14ab28a09c43b31ff5de24))
+
+### 🛠️ Other changes
+
+* **android:** add proguard rules ([c49120b](https://github.com/pinpong/react-native-google-maps-plus/commit/c49120bfb49ab2224495a1091595a9f087dfe309))
+* merge dev into main ([63d2aa2](https://github.com/pinpong/react-native-google-maps-plus/commit/63d2aa28d818404636cba651f018cc9bd44d9991))
+
+## [1.6.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.0...v1.6.1) (2025-10-21)
+
+### 🐛 Bug Fixes
+
+* **example:** clustering ([d714f43](https://github.com/pinpong/react-native-google-maps-plus/commit/d714f43512b147ffb14a91345919bf5831fc45c5))
+* map camera callbacks ([35446eb](https://github.com/pinpong/react-native-google-maps-plus/commit/35446eb4fd74ebab3860030000a7e2f6e39c5bb7))
+* zoomGesturesEnabled default ([df72799](https://github.com/pinpong/react-native-google-maps-plus/commit/df727990328d04994812f743763288af0921a7cd))
+
+### 🛠️ Other changes
+
+* **android:** simplify null checks and improve Kotlin idioms ([5f277ac](https://github.com/pinpong/react-native-google-maps-plus/commit/5f277acecc230637b3807454a1189f6836a68397))
+* description wording and formatting tweaks ([ebd0582](https://github.com/pinpong/react-native-google-maps-plus/commit/ebd05827b939c1000a6c45532ef4ba7ac5766fe1))
+* description wording and formatting tweaks ([1033c63](https://github.com/pinpong/react-native-google-maps-plus/commit/1033c63116c45ed196cff899fa2cc361d30aa429))
+* merge dev into main ([3998306](https://github.com/pinpong/react-native-google-maps-plus/commit/3998306e1aea392de2bb2b9e2f06270894eafe7e))
+* remove dependencies overrides ([fb6114f](https://github.com/pinpong/react-native-google-maps-plus/commit/fb6114fd187c2a884a14afaf7f2aa8cf35b2b8a7))
+* update Podfile.lock ([badd2c8](https://github.com/pinpong/react-native-google-maps-plus/commit/badd2c885a2a3df9f360274d4415970181dfaaa7))
+* update Podfile.lock ([04a1ada](https://github.com/pinpong/react-native-google-maps-plus/commit/04a1adaca7da2c9d6b2b8326ef85319faf2dc6fc))
+* updated deps ([0290e15](https://github.com/pinpong/react-native-google-maps-plus/commit/0290e151d7d1068a6cebe90a4fe9febda84d2f17))
+* updated deps ([b5a2643](https://github.com/pinpong/react-native-google-maps-plus/commit/b5a2643504931e9b55ce5dcf0a66696bc01ba842))
+
 ## [1.6.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.5.0...v1.6.0) (2025-10-16)
 
 ### ✨ Features
