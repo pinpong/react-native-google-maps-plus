@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import MapWrapper from '../components/MapWrapper';
 import { makeMarker } from '../utils/mapGenerators';
 import type {
@@ -9,6 +9,7 @@ import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
 import { useNavigation } from '@react-navigation/native';
 import { RNMarkerValidator } from '../components/maptConfigDialog/validator';
 import { useHeaderButton } from '../hooks/useHeaderButton';
+import type { RNMapUiSettings } from '../../../lib/typescript/src';
 
 export default function MarkersScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -16,13 +17,37 @@ export default function MarkersScreen() {
   const [markers, setMarkers] = useState<RNMarker[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
 
+  const uiSettings: RNMapUiSettings = useMemo(
+    () => ({
+      allGesturesEnabled: true,
+      compassEnabled: true,
+      indoorLevelPickerEnabled: true,
+      mapToolbarEnabled: true,
+      myLocationButtonEnabled: true,
+      rotateEnabled: true,
+      scrollEnabled: true,
+      scrollDuringRotateOrZoomEnabled: true,
+      tiltEnabled: true,
+      zoomControlsEnabled: true,
+      zoomGesturesEnabled: true,
+      consumeOnMarkerPress: true,
+      consumeOnMyLocationButtonPress: false,
+    }),
+    []
+  );
+
   useHeaderButton(navigation, markers ? 'Edit' : 'Add', () =>
     setDialogVisible(true)
   );
 
   return (
     <>
-      <MapWrapper mapRef={mapRef} markers={markers ? markers : []} />
+      <MapWrapper
+        mapRef={mapRef}
+        uiSettings={uiSettings}
+        markers={markers ? markers : []}
+        onMarkerPress={(id: string) => mapRef.current?.showMarkerInfoWindow(id)}
+      />
       <MapConfigDialog<RNMarker>
         visible={dialogVisible}
         title="Edit marker"

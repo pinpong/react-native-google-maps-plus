@@ -1,11 +1,15 @@
 package com.rngooglemapsplus
 
+import MarkerTag
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Typeface
+import android.graphics.drawable.PictureDrawable
 import android.util.Base64
 import android.util.LruCache
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.graphics.createBitmap
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGExternalFileResolver
@@ -239,6 +243,10 @@ class MapMarkerBuilder(
     if (prev.zIndex != next.zIndex) {
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
+
+    if (prev.infoWindowIconSvg != next.infoWindowIconSvg) {
+      marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
+    }
   }
 
   fun buildIconAsync(
@@ -294,6 +302,31 @@ class MapMarkerBuilder(
     }
     jobsById.clear()
     iconCache.evictAll()
+  }
+
+  fun buildInfoWindow(iconSvg: RNMarkerSvg?): ImageView? {
+    val iconSvg = iconSvg ?: return null
+
+    val svgView =
+      ImageView(context).apply {
+        layoutParams =
+          LinearLayout.LayoutParams(
+            iconSvg.width.dpToPx().toInt(),
+            iconSvg.height.dpToPx().toInt(),
+          )
+      }
+
+    try {
+      val svg = SVG.getFromString(iconSvg.svgString)
+      svg.setDocumentWidth(iconSvg.width.dpToPx())
+      svg.setDocumentHeight(iconSvg.height.dpToPx())
+      val drawable = PictureDrawable(svg.renderToPicture())
+      svgView.setImageDrawable(drawable)
+    } catch (e: Exception) {
+      return null
+    }
+
+    return svgView
   }
 
   private suspend fun renderBitmap(m: RNMarker): Bitmap? {

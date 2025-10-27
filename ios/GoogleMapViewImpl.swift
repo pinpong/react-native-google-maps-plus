@@ -267,23 +267,42 @@ GMSIndoorDisplayDelegate {
   var onMapPress: ((RNLatLng) -> Void)?
   var onMapLongPress: ((RNLatLng) -> Void)?
   var onPoiPress: ((String, String, RNLatLng) -> Void)?
-  var onMarkerPress: ((String?) -> Void)?
-  var onPolylinePress: ((String?) -> Void)?
-  var onPolygonPress: ((String?) -> Void)?
-  var onCirclePress: ((String?) -> Void)?
-  var onMarkerDragStart: ((String?, RNLatLng) -> Void)?
-  var onMarkerDrag: ((String?, RNLatLng) -> Void)?
-  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)?
+  var onMarkerPress: ((String) -> Void)?
+  var onPolylinePress: ((String) -> Void)?
+  var onPolygonPress: ((String) -> Void)?
+  var onCirclePress: ((String) -> Void)?
+  var onMarkerDragStart: ((String, RNLatLng) -> Void)?
+  var onMarkerDrag: ((String, RNLatLng) -> Void)?
+  var onMarkerDragEnd: ((String, RNLatLng) -> Void)?
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)?
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)?
-  var onInfoWindowPress: ((String?) -> Void)?
-  var onInfoWindowClose: ((String?) -> Void)?
-  var onInfoWindowLongPress: ((String?) -> Void)?
+  var onInfoWindowPress: ((String) -> Void)?
+  var onInfoWindowClose: ((String) -> Void)?
+  var onInfoWindowLongPress: ((String) -> Void)?
   var onMyLocationPress: ((RNLocation) -> Void)?
   var onMyLocationButtonPress: ((Bool) -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
+
+  @MainActor
+  func showMarkerInfoWindow(id: String) {
+    onMain {
+      guard let marker =  self.markersById[id] else { return }
+      self.mapView?.selectedMarker = nil
+      self.mapView?.selectedMarker = marker
+    }
+  }
+
+  @MainActor
+  func hideMarkerInfoWindow(id: String) {
+    onMain {
+      guard let marker = self.markersById[id] else { return }
+      if self.mapView?.selectedMarker == marker {
+        self.mapView?.selectedMarker = nil
+      }
+    }
+  }
 
   @MainActor
   func setCamera(camera: GMSCameraPosition, animated: Bool, durationMs: Double) {
@@ -434,14 +453,19 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   private func addMarkerInternal(id: String, marker: GMSMarker) {
-    marker.userData = id
     marker.map = mapView
     markersById[id] = marker
   }
 
   @MainActor
   func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
-    markersById[id].map { block($0) }
+    markersById[id].map {
+      block($0)
+      if let mapView, mapView.selectedMarker == $0 {
+        mapView.selectedMarker = nil
+        mapView.selectedMarker = $0
+      }
+    }
   }
 
   @MainActor
@@ -468,8 +492,8 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   private func addPolylineInternal(id: String, polyline: GMSPolyline) {
+    polyline.tagData = PolylineTag(id: id)
     polyline.map = mapView
-    polyline.userData = id
     polylinesById[id] = polyline
   }
 
@@ -502,8 +526,8 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   private func addPolygonInternal(id: String, polygon: GMSPolygon) {
+    polygon.tagData = PolygonTag(id: id)
     polygon.map = mapView
-    polygon.userData = id
     polygonsById[id] = polygon
   }
 
@@ -536,8 +560,8 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   private func addCircleInternal(id: String, circle: GMSCircle) {
+    circle.tagData = CircleTag(id: id)
     circle.map = mapView
-    circle.userData = id
     circlesById[id] = circle
   }
 
@@ -778,8 +802,7 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
     onMain {
-      mapView.selectedMarker = marker
-      self.onMarkerPress?(marker.userData as? String, )
+      self.onMarkerPress?(marker.idTag)
     }
     return uiSettings?.consumeOnMarkerPress ?? false
   }
@@ -788,13 +811,13 @@ GMSIndoorDisplayDelegate {
     onMain {
       switch overlay {
       case let circle as GMSCircle:
-        self.onCirclePress?(circle.userData as? String, )
+        self.onCirclePress?(circle.idTag)
 
       case let polygon as GMSPolygon:
-        self.onPolygonPress?(polygon.userData as? String, )
+        self.onPolygonPress?(polygon.idTag)
 
       case let polyline as GMSPolyline:
-        self.onPolylinePress?(polyline.userData as? String, )
+        self.onPolylinePress?(polyline.idTag)
 
       default:
         break
@@ -805,7 +828,7 @@ GMSIndoorDisplayDelegate {
   func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
     onMain {
       self.onMarkerDragStart?(
-        marker.userData as? String,
+        marker.idTag,
         marker.position.toRNLatLng()
       )
     }
@@ -814,7 +837,7 @@ GMSIndoorDisplayDelegate {
   func mapView(_ mapView: GMSMapView, didDrag marker: GMSMarker) {
     onMain {
       self.onMarkerDrag?(
-        marker.userData as? String,
+        marker.idTag,
         marker.position.toRNLatLng()
       )
     }
@@ -823,7 +846,7 @@ GMSIndoorDisplayDelegate {
   func mapView(_ mapView: GMSMapView, didEndDragging marker: GMSMarker) {
     onMain {
       self.onMarkerDragEnd?(
-        marker.userData as? String,
+        marker.idTag,
         marker.position.toRNLatLng()
       )
     }
@@ -857,13 +880,13 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
     onMain {
-      self.onInfoWindowPress?(marker.userData as? String)
+      self.onInfoWindowPress?(marker.idTag)
     }
   }
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
     onMain {
-      self.onInfoWindowClose?(marker.userData as? String)
+      self.onInfoWindowClose?(marker.idTag)
     }
   }
 
@@ -872,7 +895,7 @@ GMSIndoorDisplayDelegate {
     didLongPressInfoWindowOf marker: GMSMarker
   ) {
     onMain {
-      self.onInfoWindowLongPress?(marker.userData as? String)
+      self.onInfoWindowLongPress?(marker.idTag)
     }
   }
 
@@ -892,5 +915,14 @@ GMSIndoorDisplayDelegate {
       self.onMyLocationButtonPress?(true)
     }
     return uiSettings?.consumeOnMyLocationButtonPress ?? false
+  }
+
+  func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+    return markerBuilder.buildInfoWindow(iconSvg: marker.tagData.iconSvg)
+  }
+
+  func mapView(_ mapView: GMSMapView, markerInfoContents marker: GMSMarker)
+  -> UIView? {
+    return nil
   }
 }

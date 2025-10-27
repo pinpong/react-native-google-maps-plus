@@ -1,10 +1,15 @@
 package com.rngooglemapsplus
 
+import CircleTag
+import MarkerTag
+import PolygonTag
+import PolylineTag
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Base64
 import android.util.Size
+import android.view.View
 import android.widget.FrameLayout
 import androidx.core.graphics.scale
 import com.facebook.react.bridge.LifecycleEventListener
@@ -45,6 +50,8 @@ import com.rngooglemapsplus.extensions.toRnCamera
 import com.rngooglemapsplus.extensions.toRnLatLng
 import com.rngooglemapsplus.extensions.toRnLocation
 import com.rngooglemapsplus.extensions.toRnRegion
+import idTag
+import tagData
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -74,6 +81,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnInfoWindowLongClickListener,
   GoogleMap.OnMyLocationClickListener,
   GoogleMap.OnMyLocationButtonClickListener,
+  GoogleMap.InfoWindowAdapter,
   LifecycleEventListener {
   private var initialized = false
   private var loaded = false
@@ -81,7 +89,7 @@ class GoogleMapsViewImpl(
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
 
-  private val pendingMarkers = mutableListOf<Pair<String, MarkerOptions>>()
+  private val pendingMarkers = mutableListOf<Triple<String, MarkerOptions, MarkerTag>>()
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
@@ -142,6 +150,7 @@ class GoogleMapsViewImpl(
           googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
           googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
           googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
+          googleMap?.setInfoWindowAdapter(this@GoogleMapsViewImpl)
           loaded = true
           onMapLoaded?.invoke(
             map.projection.visibleRegion.toRnRegion(),
@@ -217,7 +226,7 @@ class GoogleMapsViewImpl(
     locationConfig = locationConfig
 
     if (pendingMarkers.isNotEmpty()) {
-      pendingMarkers.forEach { (id, opts) -> internalAddMarker(id, opts) }
+      pendingMarkers.forEach { (id, opts, markerTag) -> internalAddMarker(id, opts, markerTag) }
       pendingMarkers.clear()
     }
     if (pendingPolylines.isNotEmpty()) {
@@ -368,23 +377,35 @@ class GoogleMapsViewImpl(
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMapLongPress: ((RNLatLng) -> Unit)? = null
   var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null
-  var onMarkerPress: ((String?) -> Unit)? = null
-  var onPolylinePress: ((String?) -> Unit)? = null
-  var onPolygonPress: ((String?) -> Unit)? = null
-  var onCirclePress: ((String?) -> Unit)? = null
-  var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
-  var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
-  var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+  var onMarkerPress: ((String) -> Unit)? = null
+  var onPolylinePress: ((String) -> Unit)? = null
+  var onPolygonPress: ((String) -> Unit)? = null
+  var onCirclePress: ((String) -> Unit)? = null
+  var onMarkerDragStart: ((String, RNLatLng) -> Unit)? = null
+  var onMarkerDrag: ((String, RNLatLng) -> Unit)? = null
+  var onMarkerDragEnd: ((String, RNLatLng) -> Unit)? = null
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Unit)? = null
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Unit)? = null
-  var onInfoWindowPress: ((String?) -> Unit)? = null
-  var onInfoWindowClose: ((String?) -> Unit)? = null
-  var onInfoWindowLongPress: ((String?) -> Unit)? = null
+  var onInfoWindowPress: ((String) -> Unit)? = null
+  var onInfoWindowClose: ((String) -> Unit)? = null
+  var onInfoWindowLongPress: ((String) -> Unit)? = null
   var onMyLocationPress: ((RNLocation) -> Unit)? = null
   var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+
+  fun showMarkerInfoWindow(id: String) =
+    onUi {
+      val marker = markersById[id] ?: return@onUi
+      marker.showInfoWindow()
+    }
+
+  fun hideMarkerInfoWindow(id: String) =
+    onUi {
+      val marker = markersById[id] ?: return@onUi
+      marker.hideInfoWindow()
+    }
 
   fun setCamera(
     cameraPosition: CameraPosition,
@@ -523,21 +544,30 @@ class GoogleMapsViewImpl(
   fun addMarker(
     id: String,
     opts: MarkerOptions,
+    markerTag: MarkerTag,
   ) = onUi {
     if (googleMap == null) {
-      pendingMarkers.add(id to opts)
+      pendingMarkers.add(Triple(id, opts, markerTag))
       return@onUi
     }
+
     markersById.remove(id)?.remove()
-    internalAddMarker(id, opts)
+    internalAddMarker(id, opts, markerTag)
   }
 
   private fun internalAddMarker(
     id: String,
     opts: MarkerOptions,
+    markerTag: MarkerTag,
   ) = onUi {
-    val marker = googleMap?.addMarker(opts).also { it?.tag = id }
-    if (marker != null) markersById[id] = marker
+    val marker =
+      googleMap?.addMarker(opts)?.apply {
+        tag = markerTag
+      }
+
+    if (marker != null) {
+      markersById[id] = marker
+    }
   }
 
   fun updateMarker(
@@ -546,6 +576,10 @@ class GoogleMapsViewImpl(
   ) = onUi {
     val marker = markersById[id] ?: return@onUi
     block(marker)
+    if (marker.isInfoWindowShown) {
+      marker.hideInfoWindow()
+      marker.showInfoWindow()
+    }
   }
 
   fun removeMarker(id: String) =
@@ -576,7 +610,10 @@ class GoogleMapsViewImpl(
     id: String,
     opts: PolylineOptions,
   ) = onUi {
-    val pl = googleMap?.addPolyline(opts).also { it?.tag = id }
+    val pl =
+      googleMap?.addPolyline(opts).also {
+        it?.tag = PolylineTag(id = id)
+      }
     if (pl != null) polylinesById[id] = pl
   }
 
@@ -616,7 +653,10 @@ class GoogleMapsViewImpl(
     id: String,
     opts: PolygonOptions,
   ) = onUi {
-    val polygon = googleMap?.addPolygon(opts).also { it?.tag = id }
+    val polygon =
+      googleMap?.addPolygon(opts).also {
+        it?.tag = PolygonTag(id = id)
+      }
     if (polygon != null) polygonsById[id] = polygon
   }
 
@@ -656,7 +696,10 @@ class GoogleMapsViewImpl(
     id: String,
     opts: CircleOptions,
   ) = onUi {
-    val circle = googleMap?.addCircle(opts).also { it?.tag = id }
+    val circle =
+      googleMap?.addCircle(opts).also {
+        it?.tag = CircleTag(id = id)
+      }
     if (circle != null) circlesById[id] = circle
   }
 
@@ -818,6 +861,7 @@ class GoogleMapsViewImpl(
         setOnInfoWindowLongClickListener(null)
         setOnMyLocationClickListener(null)
         setOnMyLocationButtonClickListener(null)
+        setInfoWindowAdapter(null)
       }
       googleMap = null
       mapView?.apply {
@@ -873,25 +917,24 @@ class GoogleMapsViewImpl(
 
   override fun onMarkerClick(marker: Marker): Boolean {
     onUi {
-      marker.showInfoWindow()
-      onMarkerPress?.invoke(marker.tag?.toString())
+      onMarkerPress?.invoke(marker.idTag)
     }
     return uiSettings?.consumeOnMarkerPress ?: false
   }
 
   override fun onPolylineClick(polyline: Polyline) =
     onUi {
-      onPolylinePress?.invoke(polyline.tag?.toString())
+      onPolylinePress?.invoke(polyline.idTag)
     }
 
   override fun onPolygonClick(polygon: Polygon) =
     onUi {
-      onPolygonPress?.invoke(polygon.tag?.toString())
+      onPolygonPress?.invoke(polygon.idTag)
     }
 
   override fun onCircleClick(circle: Circle) =
     onUi {
-      onCirclePress?.invoke(circle.tag?.toString())
+      onCirclePress?.invoke(circle.idTag)
     }
 
   override fun onMapClick(coordinates: LatLng) =
@@ -906,17 +949,17 @@ class GoogleMapsViewImpl(
 
   override fun onMarkerDragStart(marker: Marker) =
     onUi {
-      onMarkerDragStart?.invoke(marker.tag?.toString(), marker.position.toRnLatLng())
+      onMarkerDragStart?.invoke(marker.idTag, marker.position.toRnLatLng())
     }
 
   override fun onMarkerDrag(marker: Marker) =
     onUi {
-      onMarkerDrag?.invoke(marker.tag?.toString(), marker.position.toRnLatLng())
+      onMarkerDrag?.invoke(marker.idTag, marker.position.toRnLatLng())
     }
 
   override fun onMarkerDragEnd(marker: Marker) =
     onUi {
-      onMarkerDragEnd?.invoke(marker.tag?.toString(), marker.position.toRnLatLng())
+      onMarkerDragEnd?.invoke(marker.idTag, marker.position.toRnLatLng())
     }
 
   override fun onIndoorBuildingFocused() =
@@ -941,17 +984,17 @@ class GoogleMapsViewImpl(
 
   override fun onInfoWindowClick(marker: Marker) =
     onUi {
-      onInfoWindowPress?.invoke(marker.tag?.toString())
+      onInfoWindowPress?.invoke(marker.idTag)
     }
 
   override fun onInfoWindowClose(marker: Marker) =
     onUi {
-      onInfoWindowClose?.invoke(marker.tag?.toString())
+      onInfoWindowClose?.invoke(marker.idTag)
     }
 
   override fun onInfoWindowLongClick(marker: Marker) =
     onUi {
-      onInfoWindowLongPress?.invoke(marker.tag?.toString())
+      onInfoWindowLongPress?.invoke(marker.idTag)
     }
 
   override fun onMyLocationClick(location: Location) =
@@ -965,4 +1008,8 @@ class GoogleMapsViewImpl(
     }
     return uiSettings?.consumeOnMyLocationButtonPress ?: false
   }
+
+  override fun getInfoContents(marker: Marker): View? = null
+
+  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData.iconSvg)
 }

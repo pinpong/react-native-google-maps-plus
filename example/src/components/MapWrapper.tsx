@@ -153,31 +153,31 @@ export default function MapWrapper(props: Props) {
           (placeId: string, name: string, coordinate: RNLatLng) =>
             console.log('Poi press:', placeId, name, coordinate)
         )}
-        onMarkerPress={wrapCallback(props.onMarkerPress, (id?: string) =>
+        onMarkerPress={wrapCallback(props.onMarkerPress, (id: string) =>
           console.log('Marker press:', id)
         )}
-        onPolylinePress={wrapCallback(props.onPolylinePress, (id?: string) =>
+        onPolylinePress={wrapCallback(props.onPolylinePress, (id: string) =>
           console.log('Polyline press:', id)
         )}
-        onPolygonPress={wrapCallback(props.onPolygonPress, (id?: string) =>
+        onPolygonPress={wrapCallback(props.onPolygonPress, (id: string) =>
           console.log('Polygon press:', id)
         )}
-        onCirclePress={wrapCallback(props.onCirclePress, (id?: string) =>
+        onCirclePress={wrapCallback(props.onCirclePress, (id: string) =>
           console.log('Circle press:', id)
         )}
         onMarkerDragStart={wrapCallback(
           props.onMarkerDragStart,
-          (id: string | undefined, latLng: RNLatLng) =>
+          (id: string, latLng: RNLatLng) =>
             console.log('Marker drag start:', id, latLng)
         )}
         onMarkerDrag={wrapCallback(
           props.onMarkerDrag,
-          (id: string | undefined, latLng: RNLatLng) =>
+          (id: string, latLng: RNLatLng) =>
             console.log('Marker drag:', id, latLng)
         )}
         onMarkerDragEnd={wrapCallback(
           props.onMarkerDragEnd,
-          (id: string | undefined, latLng: RNLatLng) =>
+          (id: string, latLng: RNLatLng) =>
             console.log('Marker drag end:', id, latLng)
         )}
         onIndoorBuildingFocused={wrapCallback(
@@ -190,17 +190,15 @@ export default function MapWrapper(props: Props) {
           (level: RNIndoorLevel) =>
             console.log('Indoor level activated:', level)
         )}
-        onInfoWindowPress={wrapCallback(
-          props.onInfoWindowPress,
-          (id?: string) => console.log('InfoWindow press:', id)
+        onInfoWindowPress={wrapCallback(props.onInfoWindowPress, (id: string) =>
+          console.log('InfoWindow press:', id)
         )}
-        onInfoWindowClose={wrapCallback(
-          props.onInfoWindowClose,
-          (id?: string) => console.log('InfoWindow close:', id)
+        onInfoWindowClose={wrapCallback(props.onInfoWindowClose, (id: string) =>
+          console.log('InfoWindow close:', id)
         )}
         onInfoWindowLongPress={wrapCallback(
           props.onInfoWindowLongPress,
-          (id?: string) => console.log('InfoWindow long press:', id)
+          (id: string) => console.log('InfoWindow long press:', id)
         )}
         onMyLocationPress={wrapCallback(
           props.onMyLocationPress,

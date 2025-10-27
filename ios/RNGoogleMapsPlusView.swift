@@ -349,31 +349,31 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onPoiPress = onPoiPress }
   }
   @MainActor
-  var onMarkerPress: ((String?) -> Void)? {
+  var onMarkerPress: ((String) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
   @MainActor
-  var onPolylinePress: ((String?) -> Void)? {
+  var onPolylinePress: ((String) -> Void)? {
     didSet { impl.onPolylinePress = onPolylinePress }
   }
   @MainActor
-  var onPolygonPress: ((String?) -> Void)? {
+  var onPolygonPress: ((String) -> Void)? {
     didSet { impl.onPolygonPress = onPolygonPress }
   }
   @MainActor
-  var onCirclePress: ((String?) -> Void)? {
+  var onCirclePress: ((String) -> Void)? {
     didSet { impl.onCirclePress = onCirclePress }
   }
   @MainActor
-  var onMarkerDragStart: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDragStart: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragStart = onMarkerDragStart }
   }
   @MainActor
-  var onMarkerDrag: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDrag: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDrag = onMarkerDrag }
   }
   @MainActor
-  var onMarkerDragEnd: ((String?, RNLatLng) -> Void)? {
+  var onMarkerDragEnd: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
   @MainActor
@@ -385,15 +385,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
   }
   @MainActor
-  var onInfoWindowPress: ((String?) -> Void)? {
+  var onInfoWindowPress: ((String) -> Void)? {
     didSet { impl.onInfoWindowPress = onInfoWindowPress }
   }
   @MainActor
-  var onInfoWindowClose: ((String?) -> Void)? {
+  var onInfoWindowClose: ((String) -> Void)? {
     didSet { impl.onInfoWindowClose = onInfoWindowClose }
   }
   @MainActor
-  var onInfoWindowLongPress: ((String?) -> Void)? {
+  var onInfoWindowLongPress: ((String) -> Void)? {
     didSet { impl.onInfoWindowLongPress = onInfoWindowLongPress }
   }
   @MainActor
@@ -415,6 +415,16 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   @MainActor
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
+  }
+
+  @MainActor
+  func showMarkerInfoWindow(id: String) {
+    impl.showMarkerInfoWindow(id: id);
+  }
+
+  @MainActor
+  func hideMarkerInfoWindow(id: String) {
+    impl.hideMarkerInfoWindow(id: id);
   }
 
   @MainActor

@@ -31,6 +31,59 @@ export function makeSvgIcon(
 </svg>`;
 }
 
+export function makeInfoWindowIconSvg(
+  width: number,
+  height: number,
+  color?: string,
+  text?: string
+): string {
+  color = color ?? randomColor();
+  const label = text ?? 'Google Maps Plus';
+  const corner = 12;
+  const pointerHeight = 12;
+
+  const rectHeight = height - pointerHeight;
+  const textY = rectHeight / 2 + 5;
+
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.25"/>
+  </filter>
+
+  <path
+    d="
+      M${corner},0
+      h${width - corner * 2}
+      a${corner},${corner} 0 0 1 ${corner},${corner}
+      v${rectHeight - corner - pointerHeight}
+      a${corner},${corner} 0 0 1 -${corner},${corner}
+      h-${(width - corner * 2) / 2 - pointerHeight}
+      l-${pointerHeight},${pointerHeight}
+      l-${pointerHeight},-${pointerHeight}
+      h-${(width - corner * 2) / 2 - pointerHeight}
+      a${corner},${corner} 0 0 1 -${corner},-${corner}
+      v-${rectHeight - corner - pointerHeight}
+      a${corner},${corner} 0 0 1 ${corner},-${corner}
+      z
+    "
+    fill="${color}"
+    filter="url(#shadow)"
+  />
+
+  <text
+    x="50%"
+    y="${textY}"
+    font-size="14"
+    font-family="sans-serif"
+    fill="white"
+    text-anchor="middle"
+    dominant-baseline="middle"
+  >${label}</text>
+</svg>
+`.trim();
+}
+
 export const randomCoordinates = (
   baseLat: number,
   baseLng: number,
@@ -170,6 +223,11 @@ export function makeMarker(id: number): RNMarker {
       width: 32,
       height: 44,
       svgString: makeSvgIcon(32, 44, '#2D6BE9'),
+    },
+    infoWindowIconSvg: {
+      width: 150,
+      height: 50,
+      svgString: makeInfoWindowIconSvg(150, 50, '#2D6BE9'),
     },
   };
 }

@@ -169,6 +169,7 @@ export const RNMarkerValidator = object({
   rotation: optional(number()),
   infoWindowAnchor: optional(RNPositionValidator),
   iconSvg: optional(RNMarkerSvgValidator),
+  infoWindowIconSvg: optional(RNMarkerSvgValidator),
 });
 
 export const RNPolygonHoleValidator = object({

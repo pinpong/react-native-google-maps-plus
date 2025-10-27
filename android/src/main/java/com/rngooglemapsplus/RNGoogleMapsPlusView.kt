@@ -1,5 +1,6 @@
 package com.rngooglemapsplus
 
+import MarkerTag
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
@@ -149,7 +150,14 @@ class RNGoogleMapsPlusView(
         when {
           prev == null ->
             markerBuilder.buildIconAsync(id, next) { icon ->
-              view.addMarker(id, markerBuilder.build(next, icon))
+              view.addMarker(
+                id,
+                markerBuilder.build(next, icon),
+                MarkerTag(
+                  id = id,
+                  iconSvg = next.infoWindowIconSvg,
+                ),
+              )
             }
 
           !prev.markerEquals(next) ->
@@ -320,7 +328,7 @@ class RNGoogleMapsPlusView(
       view.onMapLongPress = cb
     }
 
-  override var onMarkerPress: ((String?) -> Unit)? = null
+  override var onMarkerPress: ((String) -> Unit)? = null
     set(cb) {
       view.onMarkerPress = cb
     }
@@ -330,32 +338,32 @@ class RNGoogleMapsPlusView(
       view.onPoiPress = cb
     }
 
-  override var onPolylinePress: ((String?) -> Unit)? = null
+  override var onPolylinePress: ((String) -> Unit)? = null
     set(cb) {
       view.onPolylinePress = cb
     }
 
-  override var onPolygonPress: ((String?) -> Unit)? = null
+  override var onPolygonPress: ((String) -> Unit)? = null
     set(cb) {
       view.onPolygonPress = cb
     }
 
-  override var onCirclePress: ((String?) -> Unit)? = null
+  override var onCirclePress: ((String) -> Unit)? = null
     set(cb) {
       view.onCirclePress = cb
     }
 
-  override var onMarkerDragStart: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDragStart: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDragStart = cb
     }
 
-  override var onMarkerDrag: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDrag: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDrag = cb
     }
 
-  override var onMarkerDragEnd: ((String?, RNLatLng) -> Unit)? = null
+  override var onMarkerDragEnd: ((String, RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMarkerDragEnd = cb
     }
@@ -370,17 +378,17 @@ class RNGoogleMapsPlusView(
       view.onIndoorLevelActivated = cb
     }
 
-  override var onInfoWindowPress: ((String?) -> Unit)? = null
+  override var onInfoWindowPress: ((String) -> Unit)? = null
     set(cb) {
       view.onInfoWindowPress = cb
     }
 
-  override var onInfoWindowClose: ((String?) -> Unit)? = null
+  override var onInfoWindowClose: ((String) -> Unit)? = null
     set(cb) {
       view.onInfoWindowClose = cb
     }
 
-  override var onInfoWindowLongPress: ((String?) -> Unit)? = null
+  override var onInfoWindowLongPress: ((String) -> Unit)? = null
     set(cb) {
       view.onInfoWindowLongPress = cb
     }
@@ -409,6 +417,14 @@ class RNGoogleMapsPlusView(
     set(cb) {
       view.onCameraChangeComplete = cb
     }
+
+  override fun showMarkerInfoWindow(id: String) {
+    view.showMarkerInfoWindow(id)
+  }
+
+  override fun hideMarkerInfoWindow(id: String) {
+    view.hideMarkerInfoWindow(id)
+  }
 
   override fun setCamera(
     camera: RNCamera,

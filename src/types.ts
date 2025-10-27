@@ -171,6 +171,7 @@ export type RNMarker = {
   rotation?: number;
   infoWindowAnchor?: RNPosition;
   iconSvg?: RNMarkerSvg;
+  infoWindowIconSvg?: RNMarkerSvg;
 };
 
 export type RNMarkerSvg = {

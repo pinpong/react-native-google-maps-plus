@@ -59,18 +59,18 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMapPress?: (coordinate: RNLatLng) => void;
   onMapLongPress?: (coordinate: RNLatLng) => void;
   onPoiPress?: (placeId: string, name: string, coordinate: RNLatLng) => void;
-  onMarkerPress?: (id?: string | undefined) => void;
-  onPolylinePress?: (id?: string | undefined) => void;
-  onPolygonPress?: (id?: string | undefined) => void;
-  onCirclePress?: (id?: string | undefined) => void;
-  onMarkerDragStart?: (id: string | undefined, location: RNLatLng) => void;
-  onMarkerDrag?: (id: string | undefined, location: RNLatLng) => void;
-  onMarkerDragEnd?: (id: string | undefined, location: RNLatLng) => void;
+  onMarkerPress?: (id: string) => void;
+  onPolylinePress?: (id: string) => void;
+  onPolygonPress?: (id: string) => void;
+  onCirclePress?: (id: string) => void;
+  onMarkerDragStart?: (id: string, location: RNLatLng) => void;
+  onMarkerDrag?: (id: string, location: RNLatLng) => void;
+  onMarkerDragEnd?: (id: string, location: RNLatLng) => void;
   onIndoorBuildingFocused?: (indoorBuilding: RNIndoorBuilding) => void;
   onIndoorLevelActivated?: (indoorLevel: RNIndoorLevel) => void;
-  onInfoWindowPress?: (id?: string) => void;
-  onInfoWindowClose?: (id?: string) => void;
-  onInfoWindowLongPress?: (id?: string) => void;
+  onInfoWindowPress?: (id: string) => void;
+  onInfoWindowClose?: (id: string) => void;
+  onInfoWindowLongPress?: (id: string) => void;
   onMyLocationPress?: (location: RNLocation) => void;
   onMyLocationButtonPress?: (pressed: boolean) => void;
   onCameraChangeStart?: (
@@ -91,6 +91,10 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 }
 
 export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
+  showMarkerInfoWindow(id: string): void;
+
+  hideMarkerInfoWindow(id: string): void;
+
   setCamera(camera: RNCamera, animated?: boolean, durationMs?: number): void;
 
   setCameraToCoordinates(
