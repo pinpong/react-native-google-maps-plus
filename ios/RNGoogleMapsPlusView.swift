@@ -41,6 +41,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       initialProps?.camera.map {
         options.camera = $0.toGMSCameraPosition(current: nil)
       }
+      initialProps?.backgroundColor.map {
+        options.backgroundColor = $0.toUIColor()
+      }
       impl.initMapView(googleMapOptions: options)
     }
   }

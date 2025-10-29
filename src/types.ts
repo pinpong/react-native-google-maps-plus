@@ -7,6 +7,7 @@ export type RNInitialProps = {
   mapId?: string;
   liteMode?: boolean;
   camera?: RNCamera;
+  backgroundColor?: string;
 };
 
 export type RNMapUiSettings = {
