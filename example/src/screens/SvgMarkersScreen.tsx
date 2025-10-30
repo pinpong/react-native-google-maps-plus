@@ -77,7 +77,7 @@ const MARKER_P_IMAGE_REMOTE_SVG = `
   <image
     width="64"
     height="64"
-    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.svg"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/refs/heads/main/example/assets/images/red_dot.svg"
   />
    ${buildText('F')}
 </svg>
@@ -88,7 +88,7 @@ const MARKER_P_IMAGE_REMOTE_PNG = `
   <image
     width="64"
     height="64"
-    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.png"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/refs/heads/main/example/assets/images/red_dot.png"
   />
  ${buildText('G')}
 
@@ -100,7 +100,7 @@ const MARKER_P_IMAGE_REMOTE_JPG = `
   <image
     width="64"
     height="64"
-    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/main/example/assets/red_dot.jpg"
+    href="https://raw.githubusercontent.com/pinpong/react-native-google-maps-plus/refs/heads/main/example/assets/images/red_dot.jpg"
   />
  ${buildText('H')}
 
