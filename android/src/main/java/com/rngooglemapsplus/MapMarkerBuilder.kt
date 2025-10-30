@@ -77,7 +77,10 @@ class MapMarkerBuilder(
                 val height = (svg.documentHeight.takeIf { it > 0 } ?: 128f).toInt()
 
                 createBitmap(width, height).apply {
-                  Canvas(this).also(svg::renderToCanvas)
+                  density = context.resources.displayMetrics.densityDpi
+                  Canvas(this).also {
+                    svg.renderToCanvas(it)
+                  }
                 }
               }
 
@@ -98,10 +101,12 @@ class MapMarkerBuilder(
                     val innerSvg = SVG.getFromString(svgText)
                     val w = innerSvg.documentWidth.takeIf { it > 0 } ?: 128f
                     val h = innerSvg.documentHeight.takeIf { it > 0 } ?: 128f
-                    val bmp = createBitmap(w.toInt(), h.toInt())
-                    val canvas = Canvas(bmp)
-                    innerSvg.renderToCanvas(canvas)
-                    bmp
+                    createBitmap(w.toInt(), h.toInt()).apply {
+                      density = context.resources.displayMetrics.densityDpi
+                      Canvas(this).also {
+                        innerSvg.renderToCanvas(it)
+                      }
+                    }
                   } else {
                     conn.inputStream.use { BitmapFactory.decodeStream(it) }
                   }
@@ -328,27 +333,28 @@ class MapMarkerBuilder(
       coroutineContext.ensureActive()
       val svg = SVG.getFromString(m.iconSvg.svgString)
 
+      val wPx =
+        m.iconSvg.width
+          .dpToPx()
+          .toInt()
+      val hPx =
+        m.iconSvg.height
+          .dpToPx()
+          .toInt()
+
       coroutineContext.ensureActive()
-      svg.setDocumentWidth(m.iconSvg.width.dpToPx())
-      svg.setDocumentHeight(m.iconSvg.height.dpToPx())
+      svg.setDocumentWidth(wPx.toFloat())
+      svg.setDocumentHeight(hPx.toFloat())
 
       coroutineContext.ensureActive()
       bmp =
-        createBitmap(
-          m.iconSvg.width
-            .dpToPx()
-            .toInt(),
-          m.iconSvg.height
-            .dpToPx()
-            .toInt(),
-          Bitmap.Config.ARGB_8888,
-        )
+        createBitmap(wPx, hPx, Bitmap.Config.ARGB_8888).apply {
+          density = context.resources.displayMetrics.densityDpi
+          Canvas(this).also {
+            svg.renderToCanvas(it)
+          }
+        }
 
-      coroutineContext.ensureActive()
-      val canvas = Canvas(bmp)
-      svg.renderToCanvas(canvas)
-
-      coroutineContext.ensureActive()
       return bmp
     } catch (t: Throwable) {
       try {
