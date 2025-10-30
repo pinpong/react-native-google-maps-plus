@@ -28,7 +28,7 @@ export default function PolylinesScreen() {
       <MapConfigDialog<RNPolyline>
         visible={dialogVisible}
         title="Edit polyline"
-        initialData={makePolyline(1)}
+        initialData={polylines ? polylines[0]! : makePolyline(1)}
         validator={RNPolylineValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setPolylines([c])}

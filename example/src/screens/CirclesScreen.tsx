@@ -26,7 +26,7 @@ export default function CirclesScreen() {
       <MapConfigDialog<RNCircle>
         visible={dialogVisible}
         title="Edit circle"
-        initialData={makeCircle(1)}
+        initialData={circles ? circles[0]! : makeCircle(1)}
         validator={RNCircleValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setCircles([c])}

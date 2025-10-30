@@ -51,7 +51,7 @@ export default function MarkersScreen() {
       <MapConfigDialog<RNMarker>
         visible={dialogVisible}
         title="Edit marker"
-        initialData={makeMarker(1)}
+        initialData={markers ? markers[0]! : makeMarker(1)}
         validator={RNMarkerValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setMarkers([c])}
