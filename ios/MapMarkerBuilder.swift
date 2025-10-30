@@ -142,11 +142,10 @@ final class MapMarkerBuilder {
 
   @MainActor
   func buildIconAsync(
-    _ id: String,
     _ m: RNMarker,
     onReady: @escaping (UIImage?) -> Void
   ) {
-    tasks[id]?.cancel()
+    tasks[m.id]?.cancel()
 
     if m.iconSvg == nil {
       onReady(nil)
@@ -161,7 +160,7 @@ final class MapMarkerBuilder {
 
     let task = Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
-      defer { self.tasks.removeValue(forKey: id) }
+      defer { self.tasks.removeValue(forKey: m.id) }
 
       let scale = UIScreen.main.scale
       let img = await self.renderUIImage(m, scale)
@@ -175,7 +174,7 @@ final class MapMarkerBuilder {
       }
     }
 
-    tasks[id] = task
+    tasks[m.id] = task
   }
 
   @MainActor

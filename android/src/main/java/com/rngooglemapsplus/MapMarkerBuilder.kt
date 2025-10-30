@@ -178,7 +178,7 @@ class MapMarkerBuilder(
     }
 
     if (!prev.markerStyleEquals(next)) {
-      buildIconAsync(marker.id, next) { icon ->
+      buildIconAsync(next) { icon ->
         marker.setIcon(icon)
         if (!prev.anchorEquals(next)) {
           marker.setAnchor(
@@ -242,11 +242,10 @@ class MapMarkerBuilder(
   }
 
   fun buildIconAsync(
-    id: String,
     m: RNMarker,
     onReady: (BitmapDescriptor?) -> Unit,
   ) {
-    jobsById[id]?.cancel()
+    jobsById[m.id]?.cancel()
 
     m.iconSvg ?: return onReady(null)
 
@@ -275,11 +274,11 @@ class MapMarkerBuilder(
           iconCache.evictAll()
         } catch (_: Throwable) {
         } finally {
-          jobsById.remove(id)
+          jobsById.remove(m.id)
         }
       }
 
-    jobsById[id] = job
+    jobsById[m.id] = job
   }
 
   fun cancelIconJob(id: String) {

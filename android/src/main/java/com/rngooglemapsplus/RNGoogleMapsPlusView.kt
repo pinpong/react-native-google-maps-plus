@@ -151,7 +151,7 @@ class RNGoogleMapsPlusView(
         val prev = prevById[id]
         when {
           prev == null ->
-            markerBuilder.buildIconAsync(id, next) { icon ->
+            markerBuilder.buildIconAsync(next) { icon ->
               view.addMarker(
                 id,
                 markerBuilder.build(next, icon),
