@@ -41,6 +41,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       initialProps?.camera.map {
         options.camera = $0.toGMSCameraPosition(current: nil)
       }
+      initialProps?.backgroundColor.map {
+        options.backgroundColor = $0.toUIColor()
+      }
       impl.initMapView(googleMapOptions: options)
     }
   }
@@ -143,7 +146,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
               }
             }
           } else {
-            self.markerBuilder.buildIconAsync(next.id, next) { icon in
+            self.markerBuilder.buildIconAsync(next) { icon in
               let marker = self.markerBuilder.build(next, icon: icon)
               self.impl.addMarker(id: id, marker: marker)
             }

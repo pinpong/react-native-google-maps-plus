@@ -2,16 +2,14 @@ package com.rngooglemapsplus
 
 import android.graphics.Color
 import com.facebook.react.uimanager.PixelUtil.dpToPx
-import com.google.android.gms.maps.model.ButtCap
-import com.google.android.gms.maps.model.Cap
-import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.gms.maps.model.RoundCap
-import com.google.android.gms.maps.model.SquareCap
+import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toMapJointType
+import com.rngooglemapsplus.extensions.toMapLineCap
 
 class MapPolylineBuilder {
   fun build(pl: RNPolyline): PolylineOptions =
@@ -21,10 +19,10 @@ class MapPolylineBuilder {
       }
       pl.width?.let { width(it.dpToPx()) }
       pl.lineCap?.let {
-        startCap(mapLineCap(it))
-        endCap(mapLineCap(it))
+        startCap(it.toMapLineCap())
+        endCap(it.toMapLineCap())
       }
-      pl.lineJoin?.let { jointType(mapLineJoin(it)) }
+      pl.lineJoin?.let { jointType(it.toMapJointType()) }
       pl.color?.let { color(it.toColor()) }
       pl.geodesic?.let { geodesic(it) }
       pl.pressable?.let { clickable(it) }
@@ -36,13 +34,7 @@ class MapPolylineBuilder {
     next: RNPolyline,
     polyline: Polyline,
   ) = onUi {
-    val coordsChanged =
-      prev.coordinates.size != next.coordinates.size ||
-        !prev.coordinates.zip(next.coordinates).all { (a, b) ->
-          a.latitude == b.latitude && a.longitude == b.longitude
-        }
-
-    if (coordsChanged) {
+    if (!prev.coordinatesEquals(next)) {
       polyline.points = next.coordinates.map { it.toLatLng() }
     }
 
@@ -50,17 +42,13 @@ class MapPolylineBuilder {
       polyline.width = next.width?.dpToPx() ?: 1f
     }
 
-    val newCap = mapLineCap(next.lineCap ?: RNLineCapType.BUTT)
-    val prevCap = mapLineCap(prev.lineCap ?: RNLineCapType.BUTT)
-    if (newCap != prevCap) {
-      polyline.startCap = newCap
-      polyline.endCap = newCap
+    if (prev.lineCap != next.lineCap) {
+      polyline.startCap = next.lineCap.toMapLineCap()
+      polyline.endCap = next.lineCap.toMapLineCap()
     }
 
-    val newJoin = mapLineJoin(next.lineJoin ?: RNLineJoinType.MITER)
-    val prevJoin = mapLineJoin(prev.lineJoin ?: RNLineJoinType.MITER)
-    if (newJoin != prevJoin) {
-      polyline.jointType = newJoin
+    if (prev.lineJoin != next.lineJoin) {
+      polyline.jointType = next.lineJoin.toMapJointType()
     }
 
     if (prev.color != next.color) {
@@ -79,19 +67,4 @@ class MapPolylineBuilder {
       polyline.zIndex = next.zIndex?.toFloat() ?: 0f
     }
   }
-
-  private fun mapLineCap(type: RNLineCapType?): Cap =
-    when (type) {
-      RNLineCapType.ROUND -> RoundCap()
-      RNLineCapType.SQUARE -> SquareCap()
-      else -> ButtCap()
-    }
-
-  private fun mapLineJoin(type: RNLineJoinType?): Int =
-    when (type) {
-      RNLineJoinType.ROUND -> JointType.ROUND
-      RNLineJoinType.BEVEL -> JointType.BEVEL
-      RNLineJoinType.MITER -> JointType.DEFAULT
-      null -> JointType.DEFAULT
-    }
 }

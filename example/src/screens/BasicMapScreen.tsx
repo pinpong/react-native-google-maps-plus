@@ -8,9 +8,11 @@ import { useNavigation } from '@react-navigation/native';
 import { RNBasicMapConfigValidator } from '../components/maptConfigDialog/validator';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderButton } from '../hooks/useHeaderButton';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 export default function BasicMapScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
+  const theme = useAppTheme();
   const layout = useSafeAreaInsets();
   const navigation = useNavigation();
   const [init, setInit] = useState(false);
@@ -22,6 +24,7 @@ export default function BasicMapScreen() {
         center: { latitude: 37.7749, longitude: -122.4194 },
         zoom: 12,
       },
+      backgroundColor: theme.bgAccent,
     },
     uiSettings: {
       allGesturesEnabled: true,

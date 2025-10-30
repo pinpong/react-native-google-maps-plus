@@ -7,6 +7,7 @@ export type RNInitialProps = {
   mapId?: string;
   liteMode?: boolean;
   camera?: RNCamera;
+  backgroundColor?: string;
 };
 
 export type RNMapUiSettings = {
@@ -162,7 +163,6 @@ export type RNMarker = {
   zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
-  showInfoWindow?: boolean;
   title?: string;
   snippet?: string;
   opacity?: number;

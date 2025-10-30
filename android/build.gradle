@@ -136,6 +136,6 @@ dependencies {
   implementation "com.google.android.gms:play-services-base:${getExtOrDefault('googlePlayServicesBaseVersion')}"
   implementation "com.google.android.gms:play-services-maps:${getExtOrDefault('googlePlayServicesMapsVersion')}"
   implementation "com.google.android.gms:play-services-location:${getExtOrDefault('googlePlayServicesLocationVersion')}"
-  implementation 'com.google.maps.android:android-maps-utils:3.10.0'
+  implementation "com.google.maps.android:android-maps-utils:${getExtOrDefault('mapsUtilsVersion')}"
   implementation 'com.caverock:androidsvg-aar:1.4'
 }

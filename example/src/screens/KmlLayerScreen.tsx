@@ -28,7 +28,9 @@ export default function KmlLayerScreen() {
       <MapConfigDialog<RNKMLayer>
         visible={dialogVisible}
         title="Edit KML layer"
-        initialData={{ id: '1', kmlString: kmlString }}
+        initialData={
+          kmlLayers ? kmlLayers[0]! : { id: '1', kmlString: kmlString }
+        }
         validator={RNKMLayerValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setKmlLayers([c])}

@@ -26,7 +26,7 @@ export default function PolygonsScreen() {
       <MapConfigDialog<RNPolygon>
         visible={dialogVisible}
         title="Edit polygon"
-        initialData={makePolygon(1)}
+        initialData={polygons ? polygons[0]! : makePolygon(1)}
         validator={RNPolygonValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setPolygons([c])}

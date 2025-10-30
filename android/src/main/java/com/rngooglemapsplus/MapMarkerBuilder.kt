@@ -19,6 +19,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.anchorEquals
+import com.rngooglemapsplus.extensions.coordinatesEquals
+import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
+import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.styleHash
@@ -73,7 +77,10 @@ class MapMarkerBuilder(
                 val height = (svg.documentHeight.takeIf { it > 0 } ?: 128f).toInt()
 
                 createBitmap(width, height).apply {
-                  Canvas(this).also(svg::renderToCanvas)
+                  density = context.resources.displayMetrics.densityDpi
+                  Canvas(this).also {
+                    svg.renderToCanvas(it)
+                  }
                 }
               }
 
@@ -94,10 +101,12 @@ class MapMarkerBuilder(
                     val innerSvg = SVG.getFromString(svgText)
                     val w = innerSvg.documentWidth.takeIf { it > 0 } ?: 128f
                     val h = innerSvg.documentHeight.takeIf { it > 0 } ?: 128f
-                    val bmp = createBitmap(w.toInt(), h.toInt())
-                    val canvas = Canvas(bmp)
-                    innerSvg.renderToCanvas(canvas)
-                    bmp
+                    createBitmap(w.toInt(), h.toInt()).apply {
+                      density = context.resources.displayMetrics.densityDpi
+                      Canvas(this).also {
+                        innerSvg.renderToCanvas(it)
+                      }
+                    }
                   } else {
                     conn.inputStream.use { BitmapFactory.decodeStream(it) }
                   }
@@ -169,49 +178,37 @@ class MapMarkerBuilder(
     next: RNMarker,
     marker: Marker,
   ) = onUi {
-    if (prev.coordinate.latitude != next.coordinate.latitude ||
-      prev.coordinate.longitude != next.coordinate.longitude
-    ) {
+    if (!prev.coordinatesEquals(next)) {
       marker.position = next.coordinate.toLatLng()
     }
 
     if (!prev.markerStyleEquals(next)) {
-      buildIconAsync(marker.id, next) { icon ->
+      buildIconAsync(next) { icon ->
         marker.setIcon(icon)
-        if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
-          prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
-        ) {
-          marker.setInfoWindowAnchor(
-            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-          )
-        }
-
-        if (prev.anchor?.x != next.anchor?.x ||
-          prev.anchor?.y != next.anchor?.y
-        ) {
+        if (!prev.anchorEquals(next)) {
           marker.setAnchor(
             (next.anchor?.x ?: 0.5f).toFloat(),
             (next.anchor?.y ?: 1.0f).toFloat(),
           )
         }
+        if (!prev.infoWindowAnchorEquals(next)) {
+          marker.setInfoWindowAnchor(
+            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+          )
+        }
       }
     } else {
-      if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
-        prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
-      ) {
-        marker.setInfoWindowAnchor(
-          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-        )
-      }
-
-      if (prev.anchor?.x != next.anchor?.x ||
-        prev.anchor?.y != next.anchor?.y
-      ) {
+      if (!prev.anchorEquals(next)) {
         marker.setAnchor(
           (next.anchor?.x ?: 0.5f).toFloat(),
           (next.anchor?.y ?: 1.0f).toFloat(),
+        )
+      }
+      if (!prev.infoWindowAnchorEquals(next)) {
+        marker.setInfoWindowAnchor(
+          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
         )
       }
     }
@@ -244,17 +241,16 @@ class MapMarkerBuilder(
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
 
-    if (prev.infoWindowIconSvg != next.infoWindowIconSvg) {
+    if (!prev.markerInfoWindowStyleEquals(next)) {
       marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
     }
   }
 
   fun buildIconAsync(
-    id: String,
     m: RNMarker,
     onReady: (BitmapDescriptor?) -> Unit,
   ) {
-    jobsById[id]?.cancel()
+    jobsById[m.id]?.cancel()
 
     m.iconSvg ?: return onReady(null)
 
@@ -283,11 +279,11 @@ class MapMarkerBuilder(
           iconCache.evictAll()
         } catch (_: Throwable) {
         } finally {
-          jobsById.remove(id)
+          jobsById.remove(m.id)
         }
       }
 
-    jobsById[id] = job
+    jobsById[m.id] = job
   }
 
   fun cancelIconJob(id: String) {
@@ -337,27 +333,28 @@ class MapMarkerBuilder(
       coroutineContext.ensureActive()
       val svg = SVG.getFromString(m.iconSvg.svgString)
 
+      val wPx =
+        m.iconSvg.width
+          .dpToPx()
+          .toInt()
+      val hPx =
+        m.iconSvg.height
+          .dpToPx()
+          .toInt()
+
       coroutineContext.ensureActive()
-      svg.setDocumentWidth(m.iconSvg.width.dpToPx())
-      svg.setDocumentHeight(m.iconSvg.height.dpToPx())
+      svg.setDocumentWidth(wPx.toFloat())
+      svg.setDocumentHeight(hPx.toFloat())
 
       coroutineContext.ensureActive()
       bmp =
-        createBitmap(
-          m.iconSvg.width
-            .dpToPx()
-            .toInt(),
-          m.iconSvg.height
-            .dpToPx()
-            .toInt(),
-          Bitmap.Config.ARGB_8888,
-        )
+        createBitmap(wPx, hPx, Bitmap.Config.ARGB_8888).apply {
+          density = context.resources.displayMetrics.densityDpi
+          Canvas(this).also {
+            svg.renderToCanvas(it)
+          }
+        }
 
-      coroutineContext.ensureActive()
-      val canvas = Canvas(bmp)
-      svg.renderToCanvas(canvas)
-
-      coroutineContext.ensureActive()
       return bmp
     } catch (t: Throwable) {
       try {

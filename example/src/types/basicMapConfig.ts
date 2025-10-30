@@ -13,6 +13,7 @@ export type RNBasicMapConfig = {
     mapId?: string;
     liteMode?: boolean;
     camera?: RNCamera;
+    backgroundColor?: string;
   };
   uiSettings?: RNMapUiSettings;
   myLocationEnabled?: boolean;

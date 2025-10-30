@@ -26,7 +26,7 @@ export default function HeatmapScreen() {
       <MapConfigDialog<RNHeatmap>
         visible={dialogVisible}
         title="Edit heatmap"
-        initialData={makeHeatmap(1)}
+        initialData={heatmaps ? heatmaps[0]! : makeHeatmap(1)}
         validator={RNHeatmapValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setHeatmaps([c])}

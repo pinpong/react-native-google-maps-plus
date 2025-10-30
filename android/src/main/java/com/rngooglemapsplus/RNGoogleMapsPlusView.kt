@@ -12,6 +12,7 @@ import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.polygonEquals
 import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
+import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toCompressFormat
 import com.rngooglemapsplus.extensions.toFileExtension
 import com.rngooglemapsplus.extensions.toGoogleMapType
@@ -48,6 +49,7 @@ class RNGoogleMapsPlusView(
           initialProps?.mapId?.let { mapId(it) }
           initialProps?.liteMode?.let { liteMode(it) }
           initialProps?.camera?.let { camera(it.toCameraPosition(current = null)) }
+          initialProps?.backgroundColor?.let { backgroundColor(it.toColor()) }
         }
       view.initMapView(options)
     }
@@ -149,7 +151,7 @@ class RNGoogleMapsPlusView(
         val prev = prevById[id]
         when {
           prev == null ->
-            markerBuilder.buildIconAsync(id, next) { icon ->
+            markerBuilder.buildIconAsync(next) { icon ->
               view.addMarker(
                 id,
                 markerBuilder.build(next, icon),

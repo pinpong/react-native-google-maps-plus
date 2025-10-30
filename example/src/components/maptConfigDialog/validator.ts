@@ -44,6 +44,8 @@ export function unionWithValues<T extends string | number>(
   return wrapped as any;
 }
 
+export const RNCustomMapStyleValidator = string();
+
 export const RNLatLngValidator = object({
   latitude: number(),
   longitude: number(),
@@ -317,6 +319,7 @@ export const RNBasicMapConfigValidator = object({
       mapId: optional(string()),
       liteMode: optional(boolean()),
       camera: optional(RNCameraValidator),
+      backgroundColor: optional(string()),
     })
   ),
   uiSettings: optional(RNMapUiSettingsValidator),

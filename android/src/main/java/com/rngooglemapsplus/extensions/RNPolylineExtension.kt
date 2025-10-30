@@ -5,11 +5,16 @@ import com.rngooglemapsplus.RNPolyline
 fun RNPolyline.polylineEquals(b: RNPolyline): Boolean {
   if (zIndex != b.zIndex) return false
   if (pressable != b.pressable) return false
-  if ((width ?: 0.0) != (b.width ?: 0.0)) return false
+  if (width != b.width) return false
   if (lineCap != b.lineCap) return false
   if (lineJoin != b.lineJoin) return false
   if (geodesic != b.geodesic) return false
   if (color != b.color) return false
+  if (!coordinatesEquals(b)) return false
+  return true
+}
+
+fun RNPolyline.coordinatesEquals(b: RNPolyline): Boolean {
   val ac = coordinates
   val bc = b.coordinates
   if (ac.size != bc.size) return false

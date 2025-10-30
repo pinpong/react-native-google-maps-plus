@@ -3,13 +3,7 @@ import GoogleMaps
 final class MapPolygonBuilder {
   @MainActor
   func build(_ p: RNPolygon) -> GMSPolygon {
-    let path = GMSMutablePath()
-    p.coordinates.forEach {
-      path.add(
-        $0.toCLLocationCoordinate2D()
-      )
-    }
-
+    let path = p.coordinates.toGMSPath()
     let pg = GMSPolygon(path: path)
 
     p.fillColor.map { pg.fillColor = $0.toUIColor() }
@@ -17,13 +11,7 @@ final class MapPolygonBuilder {
     p.strokeWidth.map { pg.strokeWidth = CGFloat($0) }
     p.pressable.map { pg.isTappable = $0 }
     p.geodesic.map { pg.geodesic = $0 }
-    p.holes.map {
-      pg.holes = $0.map { hole in
-        let path = GMSMutablePath()
-        hole.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
-        return path
-      }
-    }
+    pg.holes = p.holes.toMapPolygonHoles()
     p.zIndex.map { pg.zIndex = Int32($0) }
 
     return pg
@@ -31,35 +19,12 @@ final class MapPolygonBuilder {
 
   @MainActor
   func update(_ prev: RNPolygon, _ next: RNPolygon, _ pg: GMSPolygon) {
-    let coordsChanged =
-      prev.coordinates.count != next.coordinates.count
-        || !zip(prev.coordinates, next.coordinates).allSatisfy {
-          $0.latitude == $1.latitude && $0.longitude == $1.longitude
-        }
-
-    if coordsChanged {
-      let path = GMSMutablePath()
-      next.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
-      pg.path = path
+    if !prev.coordinatesEquals(next) {
+      pg.path = next.coordinates.toGMSPath()
     }
 
-    let prevHoles = prev.holes ?? []
-    let nextHoles = next.holes ?? []
-    let holesChanged =
-      prevHoles.count != nextHoles.count
-        || !zip(prevHoles, nextHoles).allSatisfy { a, b in
-          a.coordinates.count == b.coordinates.count
-            && zip(a.coordinates, b.coordinates).allSatisfy {
-              $0.latitude == $1.latitude && $0.longitude == $1.longitude
-            }
-        }
-
-    if holesChanged {
-      pg.holes = nextHoles.map { hole in
-        let path = GMSMutablePath()
-        hole.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
-        return path
-      }
+    if !prev.holesEquals(next) {
+      pg.holes = next.holes.toMapPolygonHoles()
     }
 
     if prev.fillColor != next.fillColor {

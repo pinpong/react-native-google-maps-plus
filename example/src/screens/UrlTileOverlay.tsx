@@ -32,7 +32,9 @@ export default function UrlTileOverlay() {
       <MapConfigDialog<RNUrlTileOverlay>
         visible={dialogVisible}
         title="Edit KML layer"
-        initialData={makeUrlTileOverlay(1)}
+        initialData={
+          urlTileOverlays ? urlTileOverlays[0]! : makeUrlTileOverlay(1)
+        }
         validator={RNUrlTileOverlayValidator}
         onClose={() => setDialogVisible(false)}
         onSave={(c) => setUrlTileOverlays([c])}

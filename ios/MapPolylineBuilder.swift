@@ -25,16 +25,8 @@ final class MapPolylineBuilder {
 
   @MainActor
   func update(_ prev: RNPolyline, _ next: RNPolyline, _ pl: GMSPolyline) {
-    let coordsChanged =
-      prev.coordinates.count != next.coordinates.count
-        || !zip(prev.coordinates, next.coordinates).allSatisfy {
-          $0.latitude == $1.latitude && $0.longitude == $1.longitude
-        }
-
-    if coordsChanged {
-      let path = GMSMutablePath()
-      next.coordinates.forEach { path.add($0.toCLLocationCoordinate2D()) }
-      pl.path = path
+    if !prev.coordinatesEquals(next) {
+      pl.path = next.coordinates.toGMSPath()
     }
 
     if prev.width != next.width {
