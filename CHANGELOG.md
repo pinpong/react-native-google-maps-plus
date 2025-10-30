@@ -1,3 +1,28 @@
+## [1.8.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.7.0...v1.8.0) (2025-10-30)
+
+### ✨ Features
+
+* map background color ([ffcab9c](https://github.com/pinpong/react-native-google-maps-plus/commit/ffcab9c6fc20c4b41aecab567d2ddea1e75fe7c2))
+
+### 🐛 Bug Fixes
+
+* map features build and update logic ([eba6560](https://github.com/pinpong/react-native-google-maps-plus/commit/eba6560e95da48054a8b27b18fc3b883b56f8fac))
+
+### 🔄 Code Refactors
+
+* **example:** use wrapCallback for hybridRef assignment ([7b2cd60](https://github.com/pinpong/react-native-google-maps-plus/commit/7b2cd609ca4b23d6798171e8721826465c5e532e))
+* remove unused id param from buildIconAsync ([cc00c2a](https://github.com/pinpong/react-native-google-maps-plus/commit/cc00c2ab812345e684452765b2064240ef1b99a4))
+
+### 🛠️ Other changes
+
+* add missing changes from last commit ([39f063f](https://github.com/pinpong/react-native-google-maps-plus/commit/39f063f8d0de5191e9a0d5c379056eb2622efd5d))
+* **android:** create bitmap with device density ([4cd4c82](https://github.com/pinpong/react-native-google-maps-plus/commit/4cd4c82134b160a6c7e594c1b4617860790d3f61))
+* **android:** update dependencies ([c69cffd](https://github.com/pinpong/react-native-google-maps-plus/commit/c69cffdf758a96b2336ef3514cfdc958c4616685))
+* **example:** map background color ([180c372](https://github.com/pinpong/react-native-google-maps-plus/commit/180c3724ab4b24fc5a758667e19101d74efd8745))
+* **example:** update ([9129005](https://github.com/pinpong/react-native-google-maps-plus/commit/91290059b0e55cf6a21efb03e2e326b3f4b73053))
+* **example:** update svg marker image links ([51144e0](https://github.com/pinpong/react-native-google-maps-plus/commit/51144e0353459375087e815a51e4bf9fcc754225))
+* merge dev into main ([12b7788](https://github.com/pinpong/react-native-google-maps-plus/commit/12b778827e10c5142fd5b71f5e3cba7e9bd91471))
+
 ## [1.7.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.6.2...v1.7.0) (2025-10-27)
 
 ### ✨ Features
