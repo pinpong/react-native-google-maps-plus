@@ -19,6 +19,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.anchorEquals
+import com.rngooglemapsplus.extensions.coordinatesEquals
+import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
+import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.styleHash
@@ -169,49 +173,37 @@ class MapMarkerBuilder(
     next: RNMarker,
     marker: Marker,
   ) = onUi {
-    if (prev.coordinate.latitude != next.coordinate.latitude ||
-      prev.coordinate.longitude != next.coordinate.longitude
-    ) {
+    if (!prev.coordinatesEquals(next)) {
       marker.position = next.coordinate.toLatLng()
     }
 
     if (!prev.markerStyleEquals(next)) {
       buildIconAsync(marker.id, next) { icon ->
         marker.setIcon(icon)
-        if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
-          prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
-        ) {
-          marker.setInfoWindowAnchor(
-            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-          )
-        }
-
-        if (prev.anchor?.x != next.anchor?.x ||
-          prev.anchor?.y != next.anchor?.y
-        ) {
+        if (!prev.anchorEquals(next)) {
           marker.setAnchor(
             (next.anchor?.x ?: 0.5f).toFloat(),
             (next.anchor?.y ?: 1.0f).toFloat(),
           )
         }
+        if (!prev.infoWindowAnchorEquals(next)) {
+          marker.setInfoWindowAnchor(
+            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+          )
+        }
       }
     } else {
-      if (prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x ||
-        prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y
-      ) {
-        marker.setInfoWindowAnchor(
-          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-        )
-      }
-
-      if (prev.anchor?.x != next.anchor?.x ||
-        prev.anchor?.y != next.anchor?.y
-      ) {
+      if (!prev.anchorEquals(next)) {
         marker.setAnchor(
           (next.anchor?.x ?: 0.5f).toFloat(),
           (next.anchor?.y ?: 1.0f).toFloat(),
+        )
+      }
+      if (!prev.infoWindowAnchorEquals(next)) {
+        marker.setInfoWindowAnchor(
+          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
         )
       }
     }
@@ -244,7 +236,7 @@ class MapMarkerBuilder(
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
 
-    if (prev.infoWindowIconSvg != next.infoWindowIconSvg) {
+    if (!prev.markerInfoWindowStyleEquals(next)) {
       marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
     }
   }

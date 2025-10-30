@@ -163,7 +163,6 @@ export type RNMarker = {
   zIndex?: number;
   coordinate: RNLatLng;
   anchor?: RNPosition;
-  showInfoWindow?: boolean;
   title?: string;
   snippet?: string;
   opacity?: number;

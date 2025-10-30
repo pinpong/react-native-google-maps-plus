@@ -4,6 +4,7 @@ import android.graphics.Color
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
+import com.rngooglemapsplus.extensions.centerEquals
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
@@ -25,9 +26,7 @@ class MapCircleBuilder {
     next: RNCircle,
     circle: Circle,
   ) = onUi {
-    if (prev.center.latitude != next.center.latitude ||
-      prev.center.longitude != next.center.longitude
-    ) {
+    if (!prev.centerEquals(next)) {
       circle.center = next.center.toLatLng()
     }
 

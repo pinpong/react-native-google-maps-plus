@@ -15,7 +15,6 @@ final class MapMarkerBuilder {
     let marker = GMSMarker(
       position: m.coordinate.toCLLocationCoordinate2D()
     )
-    marker.tracksViewChanges = true
     marker.icon = icon
     m.title.map { marker.title = $0 }
     m.snippet.map { marker.snippet = $0 }
@@ -42,27 +41,73 @@ final class MapMarkerBuilder {
       iconSvg: m.infoWindowIconSvg
     )
 
-    onMainAsync { [weak marker] in
-      try? await Task.sleep(nanoseconds: 250_000_000)
-      marker?.tracksViewChanges = false
-    }
-
     return marker
   }
 
   @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    if prev.coordinate.latitude != next.coordinate.latitude
-      || prev.coordinate.longitude != next.coordinate.longitude {
+    if !prev.coordinateEquals(next) {
       m.position = next.coordinate.toCLLocationCoordinate2D()
     }
 
+    if !prev.markerStyleEquals(next) {
+      buildIconAsync(next.id, next) { img in
+        m.tracksViewChanges = true
+        m.icon = img
+
+        if !prev.anchorEquals(next) {
+          m.groundAnchor = CGPoint(
+            x: next.anchor?.x ?? 0.5,
+            y: next.anchor?.y ?? 1
+          )
+        }
+
+        if !prev.infoWindowAnchorEquals(next) {
+          m.infoWindowAnchor = CGPoint(
+            x: next.infoWindowAnchor?.x ?? 0.5,
+            y: next.infoWindowAnchor?.y ?? 0
+          )
+        }
+
+        onMainAsync { [weak m] in
+          try? await Task.sleep(nanoseconds: 250_000_000)
+          m?.tracksViewChanges = false
+        }
+      }
+    } else {
+      if !prev.anchorEquals(next) {
+        m.groundAnchor = CGPoint(
+          x: next.anchor?.x ?? 0.5,
+          y: next.anchor?.y ?? 1
+        )
+      }
+
+      if !prev.infoWindowAnchorEquals(next) {
+        m.infoWindowAnchor = CGPoint(
+          x: next.infoWindowAnchor?.x ?? 0.5,
+          y: next.infoWindowAnchor?.y ?? 0
+        )
+      }
+    }
+
+    var tracksInfoWindowChanges = false
+
     if prev.title != next.title {
+      tracksInfoWindowChanges = true
       m.title = next.title
     }
 
     if prev.snippet != next.snippet {
+      tracksInfoWindowChanges = true
       m.snippet = next.snippet
+    }
+
+    if(tracksInfoWindowChanges) {
+      m.tracksInfoWindowChanges = true
+      onMainAsync { [weak m] in
+        try? await Task.sleep(nanoseconds: 250_000_000)
+        m?.tracksInfoWindowChanges = false
+      }
     }
 
     if prev.opacity != next.opacity {
@@ -87,52 +132,11 @@ final class MapMarkerBuilder {
       m.zIndex = Int32(next.zIndex ?? 0)
     }
 
-    if !prev.markerStyleEquals(next) {
-      buildIconAsync(next.id, next) { img in
-        m.tracksViewChanges = true
-        m.icon = img
-
-        if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
-          m.groundAnchor = CGPoint(
-            x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 1
-          )
-        }
-
-        if prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x
-          || prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y {
-          m.infoWindowAnchor = CGPoint(
-            x: next.infoWindowAnchor?.x ?? 0.5,
-            y: next.infoWindowAnchor?.y ?? 0
-          )
-        }
-
-        onMainAsync { [weak m] in
-          try? await Task.sleep(nanoseconds: 250_000_000)
-          m?.tracksViewChanges = false
-        }
-      }
-    } else {
-      if prev.anchor?.x != next.anchor?.x || prev.anchor?.y != next.anchor?.y {
-        m.groundAnchor = CGPoint(
-          x: next.anchor?.x ?? 0.5,
-          y: next.anchor?.y ?? 1
-        )
-      }
-
-      if prev.infoWindowAnchor?.x != next.infoWindowAnchor?.x
-        || prev.infoWindowAnchor?.y != next.infoWindowAnchor?.y {
-        m.infoWindowAnchor = CGPoint(
-          x: next.infoWindowAnchor?.x ?? 0.5,
-          y: next.infoWindowAnchor?.y ?? 0
-        )
-      }
-
+    if !prev.markerInfoWindowStyleEquals(next) {
       m.tagData = MarkerTag(
         id: next.id,
         iconSvg: next.infoWindowIconSvg
       )
-
     }
   }
 

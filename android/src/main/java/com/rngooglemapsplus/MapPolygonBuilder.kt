@@ -4,9 +4,12 @@ import android.graphics.Color
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
+import com.rngooglemapsplus.extensions.coordinatesEquals
+import com.rngooglemapsplus.extensions.holesEquals
 import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toMapsPolygonHoles
 
 class MapPolygonBuilder {
   fun build(poly: RNPolygon): PolygonOptions =
@@ -32,32 +35,12 @@ class MapPolygonBuilder {
     next: RNPolygon,
     poly: Polygon,
   ) = onUi {
-    val coordsChanged =
-      prev.coordinates.size != next.coordinates.size ||
-        !prev.coordinates.zip(next.coordinates).all { (a, b) ->
-          a.latitude == b.latitude && a.longitude == b.longitude
-        }
-
-    if (coordsChanged) {
+    if (!prev.coordinatesEquals(next)) {
       poly.points = next.coordinates.map { it.toLatLng() }
     }
 
-    val prevHoles = prev.holes?.toList() ?: emptyList()
-    val nextHoles = next.holes?.toList() ?: emptyList()
-    val holesChanged =
-      prevHoles.size != nextHoles.size ||
-        !prevHoles.zip(nextHoles).all { (ha, hb) ->
-          ha.coordinates.size == hb.coordinates.size &&
-            ha.coordinates.zip(hb.coordinates).all { (a, b) ->
-              a.latitude == b.latitude && a.longitude == b.longitude
-            }
-        }
-
-    if (holesChanged) {
-      poly.holes =
-        nextHoles.map { hole ->
-          hole.coordinates.map { it.toLatLng() }
-        }
+    if (!prev.holesEquals(next)) {
+      poly.holes = next.holes?.toMapsPolygonHoles() ?: emptyList()
     }
 
     if (prev.fillColor != next.fillColor) {

@@ -17,13 +17,12 @@ final class MapCircleBuilder {
 
   @MainActor
   func update(_ prev: RNCircle, _ next: RNCircle, _ c: GMSCircle) {
-    if prev.center.latitude != next.center.latitude
-      || prev.center.longitude != next.center.longitude {
+    if !prev.centerEquals(next) {
       c.position = next.center.toCLLocationCoordinate2D()
     }
 
     if prev.radius != next.radius {
-      c.radius = next.radius ?? 0
+      c.radius = next.radius
     }
 
     if prev.fillColor != next.fillColor {

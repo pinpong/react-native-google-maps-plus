@@ -2,37 +2,26 @@ import GoogleMaps
 
 extension RNPolyline {
   func polylineEquals(_ b: RNPolyline) -> Bool {
-    guard zIndex == b.zIndex,
-          (width ?? 0) == (b.width ?? 0),
-          lineCap == b.lineCap,
-          lineJoin == b.lineJoin,
-          color == b.color,
-          geodesic == b.geodesic,
-          coordinates.count == b.coordinates.count
-    else { return false }
+    if zIndex != b.zIndex { return false }
+    if width != b.width { return false }
+    if lineCap != b.lineCap { return false }
+    if lineJoin != b.lineJoin { return false }
+    if color != b.color { return false }
+    if geodesic != b.geodesic { return false }
+    if !coordinatesEquals(b) { return false }
 
-    for i in 0..<coordinates.count {
-      if coordinates[i].latitude != b.coordinates[i].latitude
-        || coordinates[i].longitude != b.coordinates[i].longitude {
-        return false
-      }
-    }
     return true
   }
 
-  private func mapLineCap(_ t: RNLineCapType) -> CGLineCap {
-    switch t {
-    case .round: return .round
-    case .square: return .square
-    default: return .butt
-    }
-  }
+  func coordinatesEquals(_ b: RNPolyline) -> Bool {
+    if coordinates.count != b.coordinates.count { return false }
 
-  private func mapLineJoin(_ t: RNLineJoinType) -> CGLineJoin {
-    switch t {
-    case .round: return .round
-    case .bevel: return .bevel
-    default: return .miter
+    for (a, c) in zip(coordinates, b.coordinates) {
+      if a.latitude != c.latitude || a.longitude != c.longitude {
+        return false
+      }
     }
+
+    return true
   }
 }
