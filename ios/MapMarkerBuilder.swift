@@ -51,7 +51,7 @@ final class MapMarkerBuilder {
     }
 
     if !prev.markerStyleEquals(next) {
-      buildIconAsync(next.id, next) { img in
+      buildIconAsync(next) { img in
         m.tracksViewChanges = true
         m.icon = img
 
