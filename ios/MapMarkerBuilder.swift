@@ -46,14 +46,35 @@ final class MapMarkerBuilder {
 
   @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    if !prev.coordinateEquals(next) {
-      m.position = next.coordinate.toCLLocationCoordinate2D()
-    }
+    withCATransaction(disableActions: true) {
 
-    if !prev.markerStyleEquals(next) {
-      buildIconAsync(next) { img in
-        m.icon = img
+      var tracksViewChanges = false
+      var tracksInfoWindowChanges = false
 
+      if !prev.coordinateEquals(next) {
+        m.position = next.coordinate.toCLLocationCoordinate2D()
+      }
+
+      if !prev.markerStyleEquals(next) {
+        self.buildIconAsync(next) { img in
+          tracksViewChanges = true
+          m.icon = img
+
+          if !prev.anchorEquals(next) {
+            m.groundAnchor = CGPoint(
+              x: next.anchor?.x ?? 0.5,
+              y: next.anchor?.y ?? 1
+            )
+          }
+
+          if !prev.infoWindowAnchorEquals(next) {
+            m.infoWindowAnchor = CGPoint(
+              x: next.infoWindowAnchor?.x ?? 0.5,
+              y: next.infoWindowAnchor?.y ?? 0
+            )
+          }
+        }
+      } else {
         if !prev.anchorEquals(next) {
           m.groundAnchor = CGPoint(
             x: next.anchor?.x ?? 0.5,
@@ -67,74 +88,67 @@ final class MapMarkerBuilder {
             y: next.infoWindowAnchor?.y ?? 0
           )
         }
+      }
 
-        m.tracksViewChanges = true
-        DispatchQueue.main.async {
-          m.tracksViewChanges = false
+      if prev.title != next.title {
+        tracksInfoWindowChanges = true
+        m.title = next.title
+      }
+
+      if prev.snippet != next.snippet {
+        tracksInfoWindowChanges = true
+        m.snippet = next.snippet
+      }
+
+      if prev.opacity != next.opacity {
+        let opacity = Float(next.opacity ?? 1)
+        m.opacity = opacity
+        m.iconView?.alpha = CGFloat(opacity)
+      }
+
+      if prev.flat != next.flat {
+        m.isFlat = next.flat ?? false
+      }
+
+      if prev.draggable != next.draggable {
+        m.isDraggable = next.draggable ?? false
+      }
+
+      if prev.rotation != next.rotation {
+        m.rotation = next.rotation ?? 0
+      }
+
+      if prev.zIndex != next.zIndex {
+        m.zIndex = Int32(next.zIndex ?? 0)
+      }
+
+      if !prev.markerInfoWindowStyleEquals(next) {
+        m.tagData = MarkerTag(
+          id: next.id,
+          iconSvg: next.infoWindowIconSvg
+        )
+      }
+
+      if tracksViewChanges {
+        m.tracksViewChanges = tracksViewChanges
+      }
+      if tracksInfoWindowChanges {
+        m.tracksInfoWindowChanges = tracksInfoWindowChanges
+      }
+
+      if tracksViewChanges || tracksInfoWindowChanges {
+        onMain { [weak m] in
+          guard let m = m else { return }
+
+          if tracksViewChanges {
+            m.tracksViewChanges = false
+          }
+
+          if tracksInfoWindowChanges {
+            m.tracksInfoWindowChanges = false
+          }
         }
       }
-    } else {
-      if !prev.anchorEquals(next) {
-        m.groundAnchor = CGPoint(
-          x: next.anchor?.x ?? 0.5,
-          y: next.anchor?.y ?? 1
-        )
-      }
-
-      if !prev.infoWindowAnchorEquals(next) {
-        m.infoWindowAnchor = CGPoint(
-          x: next.infoWindowAnchor?.x ?? 0.5,
-          y: next.infoWindowAnchor?.y ?? 0
-        )
-      }
-    }
-
-    var tracksInfoWindowChanges = false
-
-    if prev.title != next.title {
-      tracksInfoWindowChanges = true
-      m.title = next.title
-    }
-
-    if prev.snippet != next.snippet {
-      tracksInfoWindowChanges = true
-      m.snippet = next.snippet
-    }
-
-    if tracksInfoWindowChanges {
-      m.tracksInfoWindowChanges = true
-      DispatchQueue.main.async {
-        m.tracksInfoWindowChanges = false
-      }
-    }
-
-    if prev.opacity != next.opacity {
-      let opacity = Float(next.opacity ?? 1)
-      m.opacity = opacity
-      m.iconView?.alpha = CGFloat(opacity)
-    }
-
-    if prev.flat != next.flat {
-      m.isFlat = next.flat ?? false
-    }
-
-    if prev.draggable != next.draggable {
-      m.isDraggable = next.draggable ?? false
-    }
-
-    if prev.rotation != next.rotation {
-      m.rotation = next.rotation ?? 0
-    }
-
-    if prev.zIndex != next.zIndex {
-      m.zIndex = Int32(next.zIndex ?? 0)
-    }
-
-    if !prev.markerInfoWindowStyleEquals(next) {
-      m.tagData = MarkerTag(
-        id: next.id,
-        iconSvg: next.infoWindowIconSvg
-      )
     }
   }
 
@@ -170,9 +184,6 @@ final class MapMarkerBuilder {
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
-      }
-
-      Task { @MainActor in
         onReady(img)
       }
     }

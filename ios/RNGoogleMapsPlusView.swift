@@ -131,27 +131,25 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       )
 
       let removed = Set(prevById.keys).subtracting(nextById.keys)
-      withCATransaction(disableActions: true) {
 
-        removed.forEach {
-          self.impl.removeMarker(id: $0)
-          self.markerBuilder.cancelIconTask($0)
-        }
+      removed.forEach {
+        self.impl.removeMarker(id: $0)
+        self.markerBuilder.cancelIconTask($0)
+      }
 
-        for (id, next) in nextById {
-          if let prev = prevById[id] {
-            if !prev.markerEquals(next) {
-              self.impl.updateMarker(id: id) { [weak self] m in
-                guard let self else { return }
-                self.markerBuilder.update(prev, next, m)
-              }
-            }
-          } else {
-            self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+      for (id, next) in nextById {
+        if let prev = prevById[id] {
+          if !prev.markerEquals(next) {
+            self.impl.updateMarker(id: id) { [weak self] m in
               guard let self else { return }
-              let marker = self.markerBuilder.build(next, icon: icon)
-              self.impl.addMarker(id: id, marker: marker)
+              self.markerBuilder.update(prev, next, m)
             }
+          }
+        } else {
+          self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+            guard let self else { return }
+            let marker = self.markerBuilder.build(next, icon: icon)
+            self.impl.addMarker(id: id, marker: marker)
           }
         }
       }

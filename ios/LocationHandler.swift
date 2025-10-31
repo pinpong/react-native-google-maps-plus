@@ -35,6 +35,8 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   func showLocationDialog() {
     onMainAsync { [weak self] in
+      guard let self = self else { return }
+
       guard let vc = Self.topMostViewController() else { return }
       let title =
         Bundle.main.object(forInfoDictionaryKey: "LocationNotAvailableTitle")
@@ -61,7 +63,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
           title: openLocationSettingsButton ?? "Open settings",
           style: .default
         ) { _ in
-          self?.openLocationSettings()
+          self.openLocationSettings()
         }
       )
       vc.present(alert, animated: true, completion: nil)

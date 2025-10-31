@@ -32,11 +32,9 @@ func onMain(_ block: @escaping @MainActor () -> Void) {
 
 @inline(__always)
 func onMainAsync(
-  _ block: @MainActor @escaping () async -> Void
+  _ block: @escaping @MainActor () async -> Void
 ) {
-  if Thread.isMainThread {
-    Task { @MainActor in await block() }
-  } else {
-    Task { @MainActor in await block() }
+  Task { @MainActor in
+    await block()
   }
 }
