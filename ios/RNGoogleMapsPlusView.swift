@@ -331,7 +331,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapReady = onMapReady }
   }
   @MainActor
-  var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
+  var onMapLoaded: ((RNRegion, RNCameraChange) -> Void)? {
     didSet { impl.onMapLoaded = onMapLoaded }
   }
   @MainActor
@@ -411,15 +411,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
   @MainActor
-  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChangeStart: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
   @MainActor
-  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChange: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChange = onCameraChange }
   }
   @MainActor
-  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChangeComplete: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 

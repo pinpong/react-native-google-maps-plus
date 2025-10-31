@@ -261,7 +261,7 @@ GMSIndoorDisplayDelegate {
 
   var onMapError: ((RNMapErrorCode) -> Void)?
   var onMapReady: ((Bool) -> Void)?
-  var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
+  var onMapLoaded: ((RNRegion, RNCameraChange) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
@@ -281,9 +281,9 @@ GMSIndoorDisplayDelegate {
   var onInfoWindowLongPress: ((String) -> Void)?
   var onMyLocationPress: ((RNLocation) -> Void)?
   var onMyLocationButtonPress: ((Bool) -> Void)?
-  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
-  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
+  var onCameraChangeStart: ((RNRegion, RNCameraChange, Bool) -> Void)?
+  var onCameraChange: ((RNRegion, RNCameraChange, Bool) -> Void)?
+  var onCameraChangeComplete: ((RNRegion, RNCameraChange, Bool) -> Void)?
 
   @MainActor
   func showMarkerInfoWindow(id: String) {

@@ -130,6 +130,13 @@ export interface RNMapStyleElement {
   stylers: RNMapStyler[];
 }
 
+export type RNCameraChange = {
+  center: RNLatLng;
+  zoom: number;
+  bearing: number;
+  tilt: number;
+};
+
 export type RNCamera = {
   center?: RNLatLng;
   zoom?: number;
