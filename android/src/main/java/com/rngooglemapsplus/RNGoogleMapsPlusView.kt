@@ -305,7 +305,7 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
-  override var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
+  override var onMapLoaded: ((RNRegion, RNCameraChange) -> Unit)? = null
     set(cb) {
       view.onMapLoaded = cb
     }
@@ -405,17 +405,17 @@ class RNGoogleMapsPlusView(
       view.onMyLocationButtonPress = cb
     }
 
-  override var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+  override var onCameraChangeStart: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeStart = cb
     }
 
-  override var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+  override var onCameraChange: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChange = cb
     }
 
-  override var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+  override var onCameraChangeComplete: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
     set(cb) {
       view.onCameraChangeComplete = cb
     }

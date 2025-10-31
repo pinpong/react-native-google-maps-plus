@@ -131,25 +131,25 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       )
 
       let removed = Set(prevById.keys).subtracting(nextById.keys)
-      withCATransaction(disableActions: true) {
 
-        removed.forEach {
-          self.impl.removeMarker(id: $0)
-          self.markerBuilder.cancelIconTask($0)
-        }
+      removed.forEach {
+        self.impl.removeMarker(id: $0)
+        self.markerBuilder.cancelIconTask($0)
+      }
 
-        for (id, next) in nextById {
-          if let prev = prevById[id] {
-            if !prev.markerEquals(next) {
-              self.impl.updateMarker(id: id) { m in
-                self.markerBuilder.update(prev, next, m)
-              }
+      for (id, next) in nextById {
+        if let prev = prevById[id] {
+          if !prev.markerEquals(next) {
+            self.impl.updateMarker(id: id) { [weak self] m in
+              guard let self else { return }
+              self.markerBuilder.update(prev, next, m)
             }
-          } else {
-            self.markerBuilder.buildIconAsync(next) { icon in
-              let marker = self.markerBuilder.build(next, icon: icon)
-              self.impl.addMarker(id: id, marker: marker)
-            }
+          }
+        } else {
+          self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+            guard let self else { return }
+            let marker = self.markerBuilder.build(next, icon: icon)
+            self.impl.addMarker(id: id, marker: marker)
           }
         }
       }
@@ -174,7 +174,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.polylineEquals(next) {
-            impl.updatePolyline(id: id) { pl in
+            impl.updatePolyline(id: id) { [weak self] pl in
+              guard let self else { return }
               self.polylineBuilder.update(prev, next, pl)
             }
           }
@@ -206,7 +207,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.polygonEquals(next) {
-            impl.updatePolygon(id: id) { pg in
+            impl.updatePolygon(id: id) { [weak self] pg in
+              guard let self else { return }
               self.polygonBuilder.update(prev, next, pg)
             }
           }
@@ -235,7 +237,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.circleEquals(next) {
-            impl.updateCircle(id: id) { circle in
+            impl.updateCircle(id: id) { [weak self] circle in
+              guard let self else { return }
               self.circleBuilder.update(prev, next, circle)
             }
           }
@@ -328,7 +331,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapReady = onMapReady }
   }
   @MainActor
-  var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
+  var onMapLoaded: ((RNRegion, RNCameraChange) -> Void)? {
     didSet { impl.onMapLoaded = onMapLoaded }
   }
   @MainActor
@@ -408,26 +411,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
   @MainActor
-  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChangeStart: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
   @MainActor
-  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChange: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChange = onCameraChange }
   }
   @MainActor
-  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
+  var onCameraChangeComplete: ((RNRegion, RNCameraChange, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
   @MainActor
   func showMarkerInfoWindow(id: String) {
-    impl.showMarkerInfoWindow(id: id);
+    impl.showMarkerInfoWindow(id: id)
   }
 
   @MainActor
   func hideMarkerInfoWindow(id: String) {
-    impl.hideMarkerInfoWindow(id: id);
+    impl.hideMarkerInfoWindow(id: id)
   }
 
   @MainActor
