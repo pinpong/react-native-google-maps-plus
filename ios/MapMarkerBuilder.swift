@@ -52,7 +52,6 @@ final class MapMarkerBuilder {
 
     if !prev.markerStyleEquals(next) {
       buildIconAsync(next) { img in
-        m.tracksViewChanges = true
         m.icon = img
 
         if !prev.anchorEquals(next) {
@@ -69,9 +68,9 @@ final class MapMarkerBuilder {
           )
         }
 
-        onMainAsync { [weak m] in
-          try? await Task.sleep(nanoseconds: 250_000_000)
-          m?.tracksViewChanges = false
+        m.tracksViewChanges = true
+        DispatchQueue.main.async {
+          m.tracksViewChanges = false
         }
       }
     } else {
@@ -102,11 +101,10 @@ final class MapMarkerBuilder {
       m.snippet = next.snippet
     }
 
-    if(tracksInfoWindowChanges) {
+    if tracksInfoWindowChanges {
       m.tracksInfoWindowChanges = true
-      onMainAsync { [weak m] in
-        try? await Task.sleep(nanoseconds: 250_000_000)
-        m?.tracksInfoWindowChanges = false
+      DispatchQueue.main.async {
+        m.tracksInfoWindowChanges = false
       }
     }
 
@@ -140,7 +138,6 @@ final class MapMarkerBuilder {
     }
   }
 
-  @MainActor
   func buildIconAsync(
     _ m: RNMarker,
     onReady: @escaping (UIImage?) -> Void
@@ -158,11 +155,14 @@ final class MapMarkerBuilder {
       return
     }
 
+    let scale = UIScreen.main.scale
+
     let task = Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
-      defer { self.tasks.removeValue(forKey: m.id) }
+      defer {
+        Task { @MainActor in self.tasks.removeValue(forKey: m.id) }
+      }
 
-      let scale = UIScreen.main.scale
       let img = await self.renderUIImage(m, scale)
       guard let img, !Task.isCancelled else { return }
 
@@ -233,7 +233,6 @@ final class MapMarkerBuilder {
     return imageView
   }
 
-  @MainActor
   private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) async -> UIImage? {
     guard let iconSvg = m.iconSvg,
           let data = iconSvg.svgString.data(using: .utf8)
