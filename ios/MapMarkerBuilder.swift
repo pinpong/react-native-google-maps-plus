@@ -163,13 +163,16 @@ final class MapMarkerBuilder {
         Task { @MainActor in self.tasks.removeValue(forKey: m.id) }
       }
 
-      let img = await self.renderUIImage(m, scale)
+      let img = self.renderUIImage(m, scale)
       guard let img, !Task.isCancelled else { return }
 
       self.iconCache.setObject(img, forKey: key)
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
+      }
+
+      Task { @MainActor in
         onReady(img)
       }
     }
@@ -212,18 +215,11 @@ final class MapMarkerBuilder {
 
     svgImg.size = size
 
-    guard let base = svgImg.uiImage else {
+    guard let finalImage = SVGKExporterUIImage.export(asUIImage: svgImg) else {
+      svgImg.clear()
       return nil
     }
-
-    let fmt = UIGraphicsImageRendererFormat.default()
-    fmt.opaque = false
-    fmt.scale = UIScreen.main.scale
-    let renderer = UIGraphicsImageRenderer(size: size, format: fmt)
-
-    let finalImage = renderer.image { _ in
-      base.draw(in: CGRect(origin: .zero, size: size))
-    }
+    svgImg.clear()
 
     let imageView = UIImageView(image: finalImage)
     imageView.frame = CGRect(origin: .zero, size: size)
@@ -233,9 +229,10 @@ final class MapMarkerBuilder {
     return imageView
   }
 
-  private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) async -> UIImage? {
-    guard let iconSvg = m.iconSvg,
-          let data = iconSvg.svgString.data(using: .utf8)
+  private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) -> UIImage? {
+    guard
+      let iconSvg = m.iconSvg,
+      let data = iconSvg.svgString.data(using: .utf8)
     else { return nil }
 
     let size = CGSize(
@@ -243,28 +240,21 @@ final class MapMarkerBuilder {
       height: max(1, CGFloat(iconSvg.height))
     )
 
-    return await Task.detached(priority: .userInitiated) {
-      autoreleasepool {
-        guard let svgImg = SVGKImage(data: data) else { return nil }
-        svgImg.size = size
+    return autoreleasepool { () -> UIImage? in
+      guard !Task.isCancelled else { return nil }
+      guard let svgImg = SVGKImage(data: data) else { return nil }
 
-        guard !Task.isCancelled else { return nil }
-        guard let base = svgImg.uiImage else { return nil }
+      svgImg.size = size
 
-        if let cg = base.cgImage {
-          return UIImage(cgImage: cg, scale: scale, orientation: .up)
-        }
-        guard !Task.isCancelled else { return nil }
-        let fmt = UIGraphicsImageRendererFormat.default()
-        fmt.opaque = false
-        fmt.scale = scale
-        guard !Task.isCancelled else { return nil }
-        let renderer = UIGraphicsImageRenderer(size: size, format: fmt)
-        return renderer.image { _ in
-          base.draw(in: CGRect(origin: .zero, size: size))
-        }
+      guard !Task.isCancelled else {
+        svgImg.clear()
+        return nil
       }
-    }.value
+
+      let uiImage = SVGKExporterUIImage.export(asUIImage: svgImg)
+      svgImg.clear()
+      return uiImage
+    }
   }
 
 }

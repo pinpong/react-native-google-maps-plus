@@ -141,12 +141,14 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         for (id, next) in nextById {
           if let prev = prevById[id] {
             if !prev.markerEquals(next) {
-              self.impl.updateMarker(id: id) { m in
+              self.impl.updateMarker(id: id) { [weak self] m in
+                guard let self else { return }
                 self.markerBuilder.update(prev, next, m)
               }
             }
           } else {
-            self.markerBuilder.buildIconAsync(next) { icon in
+            self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+              guard let self else { return }
               let marker = self.markerBuilder.build(next, icon: icon)
               self.impl.addMarker(id: id, marker: marker)
             }
@@ -174,7 +176,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.polylineEquals(next) {
-            impl.updatePolyline(id: id) { pl in
+            impl.updatePolyline(id: id) { [weak self] pl in
+              guard let self else { return }
               self.polylineBuilder.update(prev, next, pl)
             }
           }
@@ -206,7 +209,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.polygonEquals(next) {
-            impl.updatePolygon(id: id) { pg in
+            impl.updatePolygon(id: id) { [weak self] pg in
+              guard let self else { return }
               self.polygonBuilder.update(prev, next, pg)
             }
           }
@@ -235,7 +239,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.circleEquals(next) {
-            impl.updateCircle(id: id) { circle in
+            impl.updateCircle(id: id) { [weak self] circle in
+              guard let self else { return }
               self.circleBuilder.update(prev, next, circle)
             }
           }
@@ -422,12 +427,12 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   @MainActor
   func showMarkerInfoWindow(id: String) {
-    impl.showMarkerInfoWindow(id: id);
+    impl.showMarkerInfoWindow(id: id)
   }
 
   @MainActor
   func hideMarkerInfoWindow(id: String) {
-    impl.hideMarkerInfoWindow(id: id);
+    impl.hideMarkerInfoWindow(id: id)
   }
 
   @MainActor

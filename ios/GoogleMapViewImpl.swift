@@ -444,7 +444,10 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   func removeMarker(id: String) {
-    markersById.removeValue(forKey: id).map { $0.map = nil }
+    markersById.removeValue(forKey: id).map {
+      $0.icon = nil
+      $0.map = nil
+    }
   }
 
   @MainActor
