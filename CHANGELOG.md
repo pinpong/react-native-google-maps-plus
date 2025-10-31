@@ -1,3 +1,19 @@
+## [1.8.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.0...v1.8.1) (2025-10-31)
+
+### 🐛 Bug Fixes
+
+* camera event type ([4066932](https://github.com/pinpong/react-native-google-maps-plus/commit/4066932183d221017a2643de76ac95e7af1ec4df))
+* **ios:** correct marker build & update threading ([9508db2](https://github.com/pinpong/react-native-google-maps-plus/commit/9508db29747bac38f016a5f7986864f1fbff5c92))
+* **ios:** proper MainActor handling and tracksViewChanges toggle timing ([1d8de9a](https://github.com/pinpong/react-native-google-maps-plus/commit/1d8de9a442dd8337ac8368a16a9e6f604f04b14b))
+
+### 💨 Performance Improvements
+
+* **ios:** optimize marker icon rendering and task cleanup ([b51b1da](https://github.com/pinpong/react-native-google-maps-plus/commit/b51b1da890f823601f1dc5f16aaff04fba6af5c1))
+
+### 🛠️ Other changes
+
+* merge dev into main ([a66cc25](https://github.com/pinpong/react-native-google-maps-plus/commit/a66cc25656784a2e93e7198e091449065f94ee0f))
+
 ## [1.8.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.7.0...v1.8.0) (2025-10-30)
 
 ### ✨ Features
