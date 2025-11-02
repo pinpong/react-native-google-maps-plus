@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
@@ -105,6 +106,7 @@ class GoogleMapsViewImpl(
   private var cameraMoveReason = -1
 
   init {
+    MapsInitializer.initialize(reactContext)
     reactContext.addLifecycleEventListener(this)
   }
 

@@ -265,19 +265,32 @@ class MapMarkerBuilder(
         try {
           ensureActive()
           val bmp = renderBitmap(m)
-          if (bmp != null) {
+
+          if (bmp == null) {
+            withContext(Dispatchers.Main) { onReady(null) }
+            return@launch
+          }
+          ensureActive()
+          val desc = BitmapDescriptorFactory.fromBitmap(bmp)
+
+          iconCache.put(key, desc)
+          bmp.recycle()
+
+          withContext(Dispatchers.Main) {
             ensureActive()
-            val desc = BitmapDescriptorFactory.fromBitmap(bmp)
-            iconCache.put(key, desc)
-            bmp.recycle()
-            withContext(Dispatchers.Main) {
-              ensureActive()
-              onReady(desc)
-            }
+            onReady(desc)
           }
         } catch (_: OutOfMemoryError) {
           iconCache.evictAll()
+          withContext(Dispatchers.Main) {
+            ensureActive()
+            onReady(null)
+          }
         } catch (_: Throwable) {
+          withContext(Dispatchers.Main) {
+            ensureActive()
+            onReady(null)
+          }
         } finally {
           jobsById.remove(m.id)
         }
