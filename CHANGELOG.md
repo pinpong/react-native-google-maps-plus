@@ -1,3 +1,17 @@
+## [1.8.4](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.3...v1.8.4) (2025-11-02)
+
+### 🐛 Bug Fixes
+
+* **android:** bitmap descriptor factory not initialized ([23e8f01](https://github.com/pinpong/react-native-google-maps-plus/commit/23e8f01911363ca8021f9867583da7cec3385f55))
+
+### 🛠️ Other changes
+
+* merge dev into main ([3164b41](https://github.com/pinpong/react-native-google-maps-plus/commit/3164b413e91056390d7e40d556da71972794c0e1))
+* merge dev into main ([d0a11b8](https://github.com/pinpong/react-native-google-maps-plus/commit/d0a11b8edf2c5ff4ec5a36cffb291c4c5f297fda))
+* merge dev into main ([a66cc25](https://github.com/pinpong/react-native-google-maps-plus/commit/a66cc25656784a2e93e7198e091449065f94ee0f))
+* merge dev into main ([12b7788](https://github.com/pinpong/react-native-google-maps-plus/commit/12b778827e10c5142fd5b71f5e3cba7e9bd91471))
+* merge dev into main ([cb265a7](https://github.com/pinpong/react-native-google-maps-plus/commit/cb265a7651fd5e2eb792979813e4abd8de788f4d))
+
 ## [1.8.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.1...v1.8.2) (2025-11-02)
 
 ### 🐛 Bug Fixes
