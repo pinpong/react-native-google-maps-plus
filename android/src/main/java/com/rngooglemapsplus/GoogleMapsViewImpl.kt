@@ -368,7 +368,7 @@ class GoogleMapsViewImpl(
 
   var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
-  var onMapLoaded: ((RNRegion, RNCameraChange) -> Unit)? = null
+  var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
@@ -388,9 +388,9 @@ class GoogleMapsViewImpl(
   var onInfoWindowLongPress: ((String) -> Unit)? = null
   var onMyLocationPress: ((RNLocation) -> Unit)? = null
   var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
-  var onCameraChangeStart: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
-  var onCameraChange: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
-  var onCameraChangeComplete: ((RNRegion, RNCameraChange, Boolean) -> Unit)? = null
+  var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+  var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
+  var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
 
   fun showMarkerInfoWindow(id: String) =
     onUi {

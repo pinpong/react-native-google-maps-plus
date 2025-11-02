@@ -2,9 +2,9 @@ package com.rngooglemapsplus.extensions
 
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.rngooglemapsplus.RNCamera
+import com.rngooglemapsplus.RNCameraUpdate
 
-fun RNCamera.toCameraPosition(current: CameraPosition?) =
+fun RNCameraUpdate.toCameraPosition(current: CameraPosition?) =
   CameraPosition
     .builder()
     .target(center?.toLatLng() ?: current?.target ?: LatLng(0.0, 0.0))

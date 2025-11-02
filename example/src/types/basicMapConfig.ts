@@ -1,5 +1,5 @@
 import type {
-  RNCamera,
+  RNCameraUpdate,
   RNLocationConfig,
   RNMapPadding,
   RNMapType,
@@ -12,7 +12,7 @@ export type RNBasicMapConfig = {
   initialProps?: {
     mapId?: string;
     liteMode?: boolean;
-    camera?: RNCamera;
+    camera?: RNCameraUpdate;
     backgroundColor?: string;
   };
   uiSettings?: RNMapUiSettings;
