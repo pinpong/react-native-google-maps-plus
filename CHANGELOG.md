@@ -1,3 +1,13 @@
+## [1.8.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.1...v1.8.2) (2025-11-02)
+
+### 🐛 Bug Fixes
+
+* camera event type ([51b6f08](https://github.com/pinpong/react-native-google-maps-plus/commit/51b6f0833432972c457224673ba66af7f3db55b1))
+
+### 🛠️ Other changes
+
+* merge dev into main ([d0a11b8](https://github.com/pinpong/react-native-google-maps-plus/commit/d0a11b8edf2c5ff4ec5a36cffb291c4c5f297fda))
+
 ## [1.8.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.0...v1.8.1) (2025-10-31)
 
 ### 🐛 Bug Fixes
