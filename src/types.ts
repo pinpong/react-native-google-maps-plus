@@ -6,7 +6,7 @@ export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 export type RNInitialProps = {
   mapId?: string;
   liteMode?: boolean;
-  camera?: RNCamera;
+  camera?: RNCameraUpdate;
   backgroundColor?: string;
 };
 
@@ -130,14 +130,14 @@ export interface RNMapStyleElement {
   stylers: RNMapStyler[];
 }
 
-export type RNCameraChange = {
+export type RNCamera = {
   center: RNLatLng;
   zoom: number;
   bearing: number;
   tilt: number;
 };
 
-export type RNCamera = {
+export type RNCameraUpdate = {
   center?: RNLatLng;
   zoom?: number;
   bearing?: number;

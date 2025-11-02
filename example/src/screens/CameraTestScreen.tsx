@@ -3,7 +3,7 @@ import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
 import type {
   GoogleMapsViewRef,
-  RNCamera,
+  RNCameraUpdate,
   RNLatLng,
   RNLatLngBounds,
 } from 'react-native-google-maps-plus';
@@ -34,7 +34,7 @@ export default function CameraTestScreen() {
       {
         title: 'Set Camera to SF',
         onPress: () => {
-          const camera: RNCamera = {
+          const camera: RNCameraUpdate = {
             center: { latitude: 37.7749, longitude: -122.4194 },
             zoom: 12,
             bearing: 0,

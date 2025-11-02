@@ -105,7 +105,7 @@ export const RNPositionValidator = object({
   y: number(),
 });
 
-export const RNCameraValidator = object({
+export const RNCameraUpdateValidator = object({
   center: optional(RNLatLngValidator),
   zoom: optional(number()),
   bearing: optional(number()),
@@ -318,7 +318,7 @@ export const RNBasicMapConfigValidator = object({
     object({
       mapId: optional(string()),
       liteMode: optional(boolean()),
-      camera: optional(RNCameraValidator),
+      camera: optional(RNCameraUpdateValidator),
       backgroundColor: optional(string()),
     })
   ),

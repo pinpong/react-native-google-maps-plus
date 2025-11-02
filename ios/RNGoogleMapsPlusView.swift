@@ -331,7 +331,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMapReady = onMapReady }
   }
   @MainActor
-  var onMapLoaded: ((RNRegion, RNCameraChange) -> Void)? {
+  var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
     didSet { impl.onMapLoaded = onMapLoaded }
   }
   @MainActor
@@ -411,15 +411,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
   @MainActor
-  var onCameraChangeStart: ((RNRegion, RNCameraChange, Bool) -> Void)? {
+  var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
   @MainActor
-  var onCameraChange: ((RNRegion, RNCameraChange, Bool) -> Void)? {
+  var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChange = onCameraChange }
   }
   @MainActor
-  var onCameraChangeComplete: ((RNRegion, RNCameraChange, Bool) -> Void)? {
+  var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
@@ -434,7 +434,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  func setCamera(camera: RNCamera, animated: Bool?, durationMs: Double?) {
+  func setCamera(camera: RNCameraUpdate, animated: Bool?, durationMs: Double?) {
     let cam = camera.toGMSCameraPosition(current: impl.currentCamera)
     impl.setCamera(
       camera: cam,

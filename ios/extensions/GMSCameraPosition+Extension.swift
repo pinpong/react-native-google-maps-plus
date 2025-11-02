@@ -1,8 +1,8 @@
 import GoogleMaps
 
 extension GMSCameraPosition {
-  func toRNCamera() -> RNCameraChange {
-    return RNCameraChange(
+  func toRNCamera() -> RNCamera {
+    return RNCamera(
       center: target.toRNLatLng(),
       zoom: Double(zoom),
       bearing: bearing,

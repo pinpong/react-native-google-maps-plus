@@ -1,7 +1,7 @@
 import CoreLocation
 import GoogleMaps
 
-extension RNCamera {
+extension RNCameraUpdate {
   func toGMSCameraPosition(current: GMSCameraPosition?) -> GMSCameraPosition {
     let center = CLLocationCoordinate2D(
       latitude: center?.latitude ?? current?.target.latitude ?? 0.0,

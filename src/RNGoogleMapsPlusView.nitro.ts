@@ -5,7 +5,7 @@ import type {
 } from 'react-native-nitro-modules';
 import type {
   RNCamera,
-  RNCameraChange,
+  RNCameraUpdate,
   RNLatLng,
   RNMapPadding,
   RNPolygon,
@@ -54,7 +54,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   locationConfig?: RNLocationConfig;
   onMapError?: (error: RNMapErrorCode) => void;
   onMapReady?: (ready: boolean) => void;
-  onMapLoaded?: (region: RNRegion, camera: RNCameraChange) => void;
+  onMapLoaded?: (region: RNRegion, camera: RNCamera) => void;
   onLocationUpdate?: (location: RNLocation) => void;
   onLocationError?: (error: RNLocationErrorCode) => void;
   onMapPress?: (coordinate: RNLatLng) => void;
@@ -76,17 +76,17 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMyLocationButtonPress?: (pressed: boolean) => void;
   onCameraChangeStart?: (
     region: RNRegion,
-    camera: RNCameraChange,
+    camera: RNCamera,
     isGesture: boolean
   ) => void;
   onCameraChange?: (
     region: RNRegion,
-    camera: RNCameraChange,
+    camera: RNCamera,
     isGesture: boolean
   ) => void;
   onCameraChangeComplete?: (
     region: RNRegion,
-    camera: RNCameraChange,
+    camera: RNCamera,
     isGesture: boolean
   ) => void;
 }
@@ -96,7 +96,11 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
 
   hideMarkerInfoWindow(id: string): void;
 
-  setCamera(camera: RNCamera, animated?: boolean, durationMs?: number): void;
+  setCamera(
+    camera: RNCameraUpdate,
+    animated?: boolean,
+    durationMs?: number
+  ): void;
 
   setCameraToCoordinates(
     coordinates: RNLatLng[],
