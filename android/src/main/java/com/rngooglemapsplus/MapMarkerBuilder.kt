@@ -45,7 +45,7 @@ class MapMarkerBuilder(
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
-    object : LruCache<Int, BitmapDescriptor>(512) {
+    object : LruCache<Int, BitmapDescriptor>(256) {
       override fun sizeOf(
         key: Int,
         value: BitmapDescriptor,
@@ -281,7 +281,7 @@ class MapMarkerBuilder(
             onReady(desc)
           }
         } catch (_: OutOfMemoryError) {
-          iconCache.evictAll()
+          clearIconCache()
           withContext(Dispatchers.Main) {
             ensureActive()
             onReady(null)
@@ -310,6 +310,10 @@ class MapMarkerBuilder(
       jobsById[id]?.cancel()
     }
     jobsById.clear()
+    clearIconCache()
+  }
+
+  fun clearIconCache() {
     iconCache.evictAll()
   }
 

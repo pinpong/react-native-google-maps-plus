@@ -43,18 +43,38 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
+  private var lifecycleTasks = [Task<Void, Never>]()
+
+  @MainActor
   private func setupAppLifecycleObservers() {
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(appDidBecomeActive),
-      name: UIApplication.didBecomeActiveNotification,
-      object: nil
+    lifecycleTasks.append(
+      Task { @MainActor in
+        for await _ in NotificationCenter.default.notifications(
+          named: UIApplication.didBecomeActiveNotification
+        ) {
+          appDidBecomeActive()
+        }
+      }
     )
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(appDidEnterBackground),
-      name: UIApplication.didEnterBackgroundNotification,
-      object: nil
+
+    lifecycleTasks.append(
+      Task { @MainActor in
+        for await _ in NotificationCenter.default.notifications(
+          named: UIApplication.didEnterBackgroundNotification
+        ) {
+          appDidEnterBackground()
+        }
+      }
+    )
+
+    lifecycleTasks.append(
+      Task { @MainActor in
+        for await _ in NotificationCenter.default.notifications(
+          named: UIApplication.didReceiveMemoryWarningNotification
+        ) {
+          onLowMemory()
+        }
+      }
     )
   }
 
@@ -688,14 +708,18 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  @objc private func appDidBecomeActive() {
+  private func appDidBecomeActive() {
     if window != nil {
       locationHandler.start()
     }
   }
 
-  @objc private func appDidEnterBackground() {
+  private func appDidEnterBackground() {
     locationHandler.stop()
+  }
+
+  private func onLowMemory() {
+    markerBuilder.cancelAllIconTasks()
   }
 
   override func didMoveToWindow() {
@@ -708,8 +732,9 @@ GMSIndoorDisplayDelegate {
   }
 
   deinit {
-    NotificationCenter.default.removeObserver(self)
     deinitInternal()
+    lifecycleTasks.forEach { $0.cancel() }
+    lifecycleTasks.removeAll()
   }
 
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
