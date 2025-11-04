@@ -5,6 +5,8 @@ import MarkerTag
 import PolygonTag
 import PolylineTag
 import android.annotation.SuppressLint
+import android.content.ComponentCallbacks2
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Size
@@ -105,8 +107,24 @@ class GoogleMapsViewImpl(
 
   private var cameraMoveReason = -1
 
+  val componentCallbacks =
+    object : ComponentCallbacks2 {
+      override fun onConfigurationChanged(newConfig: Configuration) {}
+
+      override fun onLowMemory() {
+        mapView?.onLowMemory()
+        markerBuilder.clearIconCache()
+      }
+
+      override fun onTrimMemory(level: Int) {
+        mapView?.onLowMemory()
+        markerBuilder.cancelAllJobs()
+      }
+    }
+
   init {
     MapsInitializer.initialize(reactContext)
+    reactContext.registerComponentCallbacks(componentCallbacks)
     reactContext.addLifecycleEventListener(this)
   }
 
@@ -822,6 +840,7 @@ class GoogleMapsViewImpl(
         removeAllViews()
       }
       super.removeAllViews()
+      reactContext.unregisterComponentCallbacks(componentCallbacks)
       reactContext.removeLifecycleEventListener(this)
       initialized = false
     }

@@ -5,7 +5,7 @@ import UIKit
 final class MapMarkerBuilder {
   private let iconCache: NSCache<NSNumber, UIImage> = {
     let c = NSCache<NSNumber, UIImage>()
-    c.countLimit = 512
+    c.countLimit = 256
     return c
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
@@ -205,6 +205,7 @@ final class MapMarkerBuilder {
     }
     tasks.removeAll()
     iconCache.removeAllObjects()
+    CATransaction.flush()
   }
 
   @MainActor

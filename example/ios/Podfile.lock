@@ -1849,7 +1849,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-safe-area-context (5.6.1):
+  - react-native-safe-area-context (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -1867,8 +1867,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.6.1)
-    - react-native-safe-area-context/fabric (= 5.6.1)
+    - react-native-safe-area-context/common (= 5.6.2)
+    - react-native-safe-area-context/fabric (= 5.6.2)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1879,7 +1879,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/common (5.6.1):
+  - react-native-safe-area-context/common (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -1907,7 +1907,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/fabric (5.6.1):
+  - react-native-safe-area-context/fabric (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2475,7 +2475,7 @@ PODS:
     - React-perflogger (= 0.82.1)
     - React-utils (= 0.82.1)
     - SocketRocket
-  - RNGestureHandler (2.29.0):
+  - RNGestureHandler (2.29.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3086,7 +3086,7 @@ SPEC CHECKSUMS:
   React-logger: 500f2fa5697d224e63c33d913c8a4765319e19bf
   React-Mapbuffer: 4c50cf6af44286015a20a5995d5321f625c93459
   React-microtasksnativemodule: a84b9331106616ab1fa36de9ae555718d4bbdcf5
-  react-native-safe-area-context: ee1e8e2a7abf737a8d4d9d1a5686a7f2e7466236
+  react-native-safe-area-context: 0a3b034bb63a5b684dd2f5fffd3c90ef6ed41ee8
   React-NativeModulesApple: efd0906463c79d9b86197dbcf0d58358dff8c5ed
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
   React-perflogger: 2e229bf33e42c094fd64516d89ec1187a2b79b5b
@@ -3119,7 +3119,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: a45ef34bb22dc1c9b2ac1f74167d9a28af961176
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
-  RNGestureHandler: 332c71177cd5c856673c7e7875fa3f92ba5a5cc2
+  RNGestureHandler: 67501c6d447027581aa1d8e5a7a3ea5a7f0a89ff
   RNGoogleMapsPlus: 2e51359c4ec90a88a315950cfd8d055c1615d7df
   RNReanimated: 8f0185df21f0dea34ee8c9611ba88c17a290ed9a
   RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
