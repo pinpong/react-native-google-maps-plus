@@ -1,3 +1,16 @@
+## [1.8.5](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.4...v1.8.5) (2025-11-04)
+
+### 🐛 Bug Fixes
+
+* **memory:** proper low-memory cleanup & marker cache reduction ([55ce7e9](https://github.com/pinpong/react-native-google-maps-plus/commit/55ce7e9ab9d33cd650b1aab38dab3e8ba5d61d8f))
+
+### 🛠️ Other changes
+
+* downgrade nitro ([f2039d7](https://github.com/pinpong/react-native-google-maps-plus/commit/f2039d7e509f6129468d358e50bb7b8fb603cec3))
+* downgrade nitro ([d07480a](https://github.com/pinpong/react-native-google-maps-plus/commit/d07480a534b8c0943f2d6d93831ecc26d951e4c8))
+* merge dev into main ([ea68a0d](https://github.com/pinpong/react-native-google-maps-plus/commit/ea68a0d3495a030f3097b7f02649273fa13d2d57))
+* updated dependencies ([4788c4c](https://github.com/pinpong/react-native-google-maps-plus/commit/4788c4c9c9ee61e68cf85257c31b2a5d180efb5d))
+
 ## [1.8.4](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.3...v1.8.4) (2025-11-02)
 
 ### 🐛 Bug Fixes
