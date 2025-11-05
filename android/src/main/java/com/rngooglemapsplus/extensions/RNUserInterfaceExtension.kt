@@ -7,6 +7,6 @@ fun RNUserInterfaceStyle?.toMapColorScheme(): Int? =
   when (this) {
     RNUserInterfaceStyle.LIGHT -> MapColorScheme.LIGHT
     RNUserInterfaceStyle.DARK -> MapColorScheme.DARK
-    RNUserInterfaceStyle.DEFAULT -> MapColorScheme.FOLLOW_SYSTEM
+    RNUserInterfaceStyle.SYSTEM -> MapColorScheme.FOLLOW_SYSTEM
     null -> null
   }

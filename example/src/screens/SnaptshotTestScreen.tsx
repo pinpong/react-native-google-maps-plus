@@ -4,6 +4,7 @@ import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
 import { useAppTheme } from '../hooks/useAppTheme';
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
+import type { AppTheme } from '../theme';
 
 export default function SnapshotTestScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -90,7 +91,7 @@ export default function SnapshotTestScreen() {
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme) =>
   StyleSheet.create({
     backdrop: {
       flex: 1,
@@ -125,7 +126,7 @@ const getThemedStyles = (theme: any) =>
       backgroundColor: theme.bgHeader,
     },
     noImage: {
-      color: theme.textSecondary,
+      color: theme.textOnAccent,
       marginBottom: 20,
     },
     closeButton: {

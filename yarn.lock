@@ -2755,17 +2755,17 @@ __metadata:
   linkType: hard
 
 "@npmcli/package-json@npm:^7.0.0, @npmcli/package-json@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@npmcli/package-json@npm:7.0.1"
+  version: 7.0.2
+  resolution: "@npmcli/package-json@npm:7.0.2"
   dependencies:
     "@npmcli/git": ^7.0.0
     glob: ^11.0.3
     hosted-git-info: ^9.0.0
-    json-parse-even-better-errors: ^4.0.0
-    proc-log: ^5.0.0
+    json-parse-even-better-errors: ^5.0.0
+    proc-log: ^6.0.0
     semver: ^7.5.3
     validate-npm-package-license: ^3.0.4
-  checksum: 8d6415999c80c744b1d59cdd03e9c9a3e7efe1ec744923d65e0f0cc5f72dc20fa87ad9dab95574b10d2d54b6b1d0846b9b7fd94812ecd32a5fed52eda65eaae9
+  checksum: cb237240c0f844f8e4b0fb13fb425c1abbfdc510e894412cdf88071c3bfb1bd864867797bd13d214a396ae51cc4f6d68a31eb23f9682f6898a7eb09d6e5be58b
   languageName: node
   linkType: hard
 
@@ -6084,9 +6084,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.238":
-  version: 1.5.244
-  resolution: "electron-to-chromium@npm:1.5.244"
-  checksum: 0ca55077fa97c6a59e571d066bb1483399522d849758d878dd8e6b5ed0324c973da2448beb6cf630c2d700853824a633742158194d1345e6d2a53fa278dc8937
+  version: 1.5.245
+  resolution: "electron-to-chromium@npm:1.5.245"
+  checksum: 6262655d0dec8663df58056559a8f1f47648657debf0c868e49d8e3b5f866318c4a9105261272a5aaa529fc6140f4401e0e2c5fadbd24ed50cf9b5cd7e961bfc
   languageName: node
   linkType: hard
 
@@ -10541,18 +10541,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitrogen@npm:0.30.2":
-  version: 0.30.2
-  resolution: "nitrogen@npm:0.30.2"
+"nitrogen@npm:0.31.4":
+  version: 0.31.4
+  resolution: "nitrogen@npm:0.31.4"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.30.2
+    react-native-nitro-modules: ^0.31.4
     ts-morph: ^27.0.0
     yargs: ^18.0.0
     zod: ^4.0.5
   bin:
     nitrogen: lib/index.js
-  checksum: b8692111891d70715b200d1c7adf129fe302cc8d85055ccb60144269970460b747d78caa110eadaee5c10f3cc077da46d53edbbc63ee9a5112a396e3256a2b32
+  checksum: 566abe01767d03860834b7b95093f1de5d7d7e010a556508e727afafc7476765d146452047adeee3aeaa5b0d361c504762695d8d3d6386e77f0091ff53e00d9c
   languageName: node
   linkType: hard
 
@@ -11955,12 +11955,12 @@ __metadata:
     eslint-plugin-prettier: 5.5.4
     jest: 30.2.0
     lefthook: 2.0.2
-    nitrogen: 0.30.2
+    nitrogen: 0.31.4
     prettier: 3.6.2
     react: 19.1.1
     react-native: 0.82.1
     react-native-builder-bob: 0.40.14
-    react-native-nitro-modules: 0.30.2
+    react-native-nitro-modules: 0.31.4
     semantic-release: 25.0.1
     typescript: 5.9.3
   peerDependencies:
@@ -12004,13 +12004,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.30.2, react-native-nitro-modules@npm:^0.30.2":
+"react-native-nitro-modules@npm:0.30.2":
   version: 0.30.2
   resolution: "react-native-nitro-modules@npm:0.30.2"
   peerDependencies:
     react: "*"
     react-native: "*"
   checksum: da06b99c7f2def27c43da39a9eef2535b36bef48ef4cd45f49c0180fa735a0407a6f2feb6a30d39c4645a849230827e391ebc23e74236bde98a6f6176c6b291a
+  languageName: node
+  linkType: hard
+
+"react-native-nitro-modules@npm:0.31.4, react-native-nitro-modules@npm:^0.31.4":
+  version: 0.31.4
+  resolution: "react-native-nitro-modules@npm:0.31.4"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 9d251ec788eafb5c66033a1f376e2a8f9dfc8962a22e8511f6451bc50bf324549fd4e5113ee5bed59a993c0afc3288e8722d854239a33c00faae26848a211fde
   languageName: node
   linkType: hard
 
@@ -12496,9 +12506,9 @@ __metadata:
   linkType: hard
 
 "sax@npm:>=0.6.0":
-  version: 1.4.2
-  resolution: "sax@npm:1.4.2"
-  checksum: 2a036105f12793350f74e1a20e96c1fd4857353b65d6905c19bb9ce2ffa2c8df7a8ced901e65f34ba464001425a49d91178c47449056dd08a307e08cbe6e74f8
+  version: 1.4.3
+  resolution: "sax@npm:1.4.3"
+  checksum: 136a202eee9364f312fb1c6abadb045ef430a7468853f804758d8f2dc8d2560801245620e2bfd4ead2e332c025bef50865271974d142a0c26f69d5fc3de9baf1
   languageName: node
   linkType: hard
 
@@ -13520,9 +13530,9 @@ __metadata:
   linkType: hard
 
 "tinyexec@npm:^1.0.0":
-  version: 1.0.1
-  resolution: "tinyexec@npm:1.0.1"
-  checksum: 40f5219abf891884863b085ebe5e8c8bf95bde802f6480f279588b355835ad1604fa01eada2afe90063b48b53cd4b0be5c37393980e23f06fd10689d92fb9586
+  version: 1.0.2
+  resolution: "tinyexec@npm:1.0.2"
+  checksum: af22de2191cc70bb782eef29bbba7cf6ac16664e550b547b0db68804f988eeb2c70e12fbb7d2d688ee994b28ba831d746e9eded98c3d10042fd3a9b8de208514
   languageName: node
   linkType: hard
 
