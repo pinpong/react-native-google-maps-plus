@@ -7,7 +7,7 @@ extension RNUserInterfaceStyle {
       return .light
     case .dark:
       return .dark
-    case .default:
+    case .system:
       return .unspecified
     @unknown default:
       return .unspecified

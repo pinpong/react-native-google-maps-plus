@@ -61,7 +61,7 @@ export type RNMapPadding = {
 
 export type RNMapType = 'none' | 'normal' | 'hybrid' | 'satellite' | 'terrain';
 
-export type RNUserInterfaceStyle = 'light' | 'dark' | 'default';
+export type RNUserInterfaceStyle = 'light' | 'dark' | 'system';
 
 export type RNFeatureType = string;
 
