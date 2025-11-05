@@ -101,8 +101,6 @@ Expo projects should use the config plugin instead (see Expo section above).
 
 See the official [Google Maps Android SDK configuration guide](https://developers.google.com/maps/documentation/android-sdk/config#step_3_add_your_api_key_to_the_project) for more details.
 
----
-
 ### iOS
 
 **Note:** These instructions apply to **bare React Native apps only**.
@@ -110,23 +108,61 @@ Expo projects should use the config plugin instead (see Expo section above).
 
 See the official [Google Maps iOS SDK configuration guide](https://developers.google.com/maps/documentation/ios-sdk/config#get-key) for more details.
 
----
+## Dependencies & Native Documentation
 
-# Dependencies
+This package is React Native wrapper around the official Google Maps SDKs.
+For full API behavior, configuration options, and feature reference, please consult the native documentation:
 
-This package builds on native libraries for SVG rendering and Google Maps integration:
+- **iOS Google Maps SDK**
+  https://developers.google.com/maps/documentation/ios-sdk
 
-- **iOS**: [SVGKit](https://github.com/SVGKit/SVGKit)
-- **Android**: [AndroidSVG](https://bigbadaboom.github.io/androidsvg/)
-- **iOS Maps SDK**: [Google Maps SDK for iOS](https://developers.google.com/maps/documentation/ios-sdk)
-- **Android Maps SDK**: [Google Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk)
-- **Maps Utility Libraries**: [Google Maps Utils for iOS](https://developers.google.com/maps/documentation/ios-sdk/utility) and [Google Maps Utils for Android](https://developers.google.com/maps/documentation/android-sdk/utility)
+- **Android Google Maps SDK**
+  https://developers.google.com/maps/documentation/android-sdk
 
-These are automatically linked when you install the package, but you may need to clean/rebuild your native projects after first install.
+- **Maps Utility Libraries (iOS & Android)**
+  https://developers.google.com/maps/documentation/ios-sdk/utility
+  https://developers.google.com/maps/documentation/android-sdk/utility
+
+- **SVG Rendering** (used for custom marker icons)
+  - iOS: https://github.com/SVGKit/SVGKit
+  - Android: https://bigbadaboom.github.io/androidsvg/
+
+These libraries are automatically linked during installation.
+If you encounter build issues, try cleaning and rebuilding your native project.
+
+> **Note:** This package follows the native SDKs closely. Props and behavior match the underlying Google Maps APIs whenever possible.
 
 ## Usage
 
-Checkout the example app in the [example](./example) folder.
+Basic map:
+
+```tsx
+import React from 'react';
+import { GoogleMapsView } from 'react-native-google-maps-plus';
+
+export default function App() {
+  return (
+    <GoogleMapsView
+      style={{ flex: 1 }}
+      initialProps={{
+        camera: {
+          center: { latitude: 37.7749, longitude: -122.4194 },
+          zoom: 12,
+        },
+      }}
+      markers={[
+        {
+          id: '1',
+          zIndex: 1,
+          coordinate: { latitude: 37.7749, longitude: -122.4194 },
+        },
+      ]}
+    />
+  );
+}
+```
+
+Check out the example app in the [example](./example) folder.
 
 ## Contributing
 
