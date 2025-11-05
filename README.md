@@ -1,16 +1,11 @@
 # react-native-google-maps-plus
 
 [![npm version](https://img.shields.io/npm/v/react-native-google-maps-plus.svg?logo=npm&color=cb0000)](https://www.npmjs.com/package/react-native-google-maps-plus)
-[![Dev Release](https://img.shields.io/npm/v/react-native-google-maps-plus/dev.svg?label=dev%20release&color=orange&logo=githubactions)](https://www.npmjs.com/package/react-native-google-maps-plus)
-[![Release](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml/badge.svg)](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml)
-[![Issues](https://img.shields.io/github/issues/pinpong/react-native-google-maps-plus?logo=github)](https://github.com/pinpong/react-native-google-maps-plus/issues)
-[![License](https://img.shields.io/github/license/pinpong/react-native-google-maps-plus?logo=open-source-initiative&logoColor=green)](./LICENSE)
-[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?logo=prettier&logoColor=white)](https://prettier.io/)
-[![TypeScript](https://img.shields.io/badge/%3C/%3E-TypeScript-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
-[![Lint](https://img.shields.io/badge/lint-eslint-green.svg?logo=eslint&logoColor=white)](https://eslint.org/)
-[![React Native](https://img.shields.io/badge/react--native-%3E%3D0.81.0-61dafb.svg?logo=react)](https://reactnative.dev/)
-[![Platform: Android](https://img.shields.io/badge/platform-android-green.svg?logo=android&logoColor=white)](https://developer.android.com/)
-[![Platform: iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg?logo=apple&logoColor=black)](https://developer.apple.com/ios/)
+[![Dev Release](https://img.shields.io/npm/v/react-native-google-maps-plus/dev.svg?label=dev%20release&color=orange)](https://www.npmjs.com/package/react-native-google-maps-plus)
+[![Build](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml/badge.svg)](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml)
+![React Native](https://img.shields.io/badge/react--native-%3E%3D0.81.0-61dafb.svg?logo=react)
+![Platform: Android](https://img.shields.io/badge/android-supported-brightgreen.svg?logo=android&logoColor=white)
+![Platform: iOS](https://img.shields.io/badge/ios-supported-lightgrey.svg?logo=apple&logoColor=black)
 
 React Native wrapper for Android & iOS Google Maps SDK.
 
@@ -20,6 +15,58 @@ React Native wrapper for Android & iOS Google Maps SDK.
 
 ```sh
 yarn add react-native-google-maps-plus react-native-nitro-modules
+```
+
+**iOS**
+
+Add this to your Podfile only for bare React Native apps.
+(Not required for Expo, handled by the config plugin.)
+
+```ruby
+post_install do |installer|
+  react_native_post_install(
+    installer,
+    config[:reactNativePath],
+    :mac_catalyst_enabled => false,
+  )
+  # Force iOS 16+ to avoid deployment target warnings
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+    end
+  end
+
+  # --- SVGKit Patch ---
+  require 'fileutils'
+  svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
+
+  # node fix
+  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+    FileUtils.chmod("u+w", file)
+    text = File.read(file)
+    new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
+    File.open(file, 'w') { |f| f.write(new_contents) }
+    # puts "Patched Node import in: #{file}"
+  end
+
+  # import CSSValue.h
+  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+    FileUtils.chmod("u+w", file)
+    text = File.read(file)
+    new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
+    File.open(file, 'w') { |f| f.write(new_contents) }
+    # puts "Patched CSSValue import in: #{file}"
+  end
+
+  # import SVGLength.h
+  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
+    FileUtils.chmod("u+w", file)
+    text = File.read(file)
+    new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
+    File.open(file, 'w') { |f| f.write(new_contents) }
+    # puts "Patched SVGLength import in: #{file}"
+  end
+end
 ```
 
 ### Expo Projects
@@ -43,6 +90,28 @@ The config plugin automatically injects them into your native Android and iOS bu
 }
 ```
 
+## Setup API Key
+
+You will need a valid **Google Maps API Key** from the [Google Cloud Console](https://console.cloud.google.com/).
+
+### Android
+
+**Note:** These instructions apply to **bare React Native apps only**.
+Expo projects should use the config plugin instead (see Expo section above).
+
+See the official [Google Maps Android SDK configuration guide](https://developers.google.com/maps/documentation/android-sdk/config#step_3_add_your_api_key_to_the_project) for more details.
+
+---
+
+### iOS
+
+**Note:** These instructions apply to **bare React Native apps only**.
+Expo projects should use the config plugin instead (see Expo section above).
+
+See the official [Google Maps iOS SDK configuration guide](https://developers.google.com/maps/documentation/ios-sdk/config#get-key) for more details.
+
+---
+
 # Dependencies
 
 This package builds on native libraries for SVG rendering and Google Maps integration:
@@ -55,136 +124,9 @@ This package builds on native libraries for SVG rendering and Google Maps integr
 
 These are automatically linked when you install the package, but you may need to clean/rebuild your native projects after first install.
 
-## Setup API Key
-
-You will need a valid **Google Maps API Key** from the [Google Cloud Console](https://console.cloud.google.com/).
-
-### Android
-
-It's recommend to use [Secrets Gradle Plugin](https://developers.google.com/maps/documentation/android-sdk/secrets-gradle-plugin) to securely manage your Google Maps API Key.
-
----
-
-### iOS
-
-See the official [Google Maps iOS SDK configuration guide](https://developers.google.com/maps/documentation/ios-sdk/config#get-key) for more details.
-
-1. Create a `Secrets.xcconfig` file inside the **ios/** folder:
-
-   ```properties
-   MAPS_API_KEY=YOUR_IOS_MAPS_API_KEY
-   ```
-
-   Include it in your project configuration file:
-
-   ```xcconfig
-   #include? "Secrets.xcconfig"
-   ```
-
-2. Reference the API key in your **Info.plist**:
-
-   ```xml
-   <key>MAPS_API_KEY</key>
-   <string>$(MAPS_API_KEY)</string>
-   ```
-
-3. Provide the key programmatically in **AppDelegate.swift**:
-
-   ```swift
-   import GoogleMaps
-
-   @UIApplicationMain
-   class AppDelegate: UIResponder, UIApplicationDelegate {
-     func application(_ application: UIApplication,
-                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-       if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MAPS_API_KEY") as? String {
-           GMSServices.provideAPIKey(apiKey)
-       }
-       return true
-     }
-   }
-   ```
-
----
-
 ## Usage
 
 Checkout the example app in the [example](./example) folder.
-
-# Troubleshooting
-
-## Android
-
-- **API key not found**
-  Make sure `secrets.properties` exists under `android/` and contains your `MAPS_API_KEY`.
-  Run `./gradlew clean` and rebuild.
-
-## iOS
-
-- **`GMSServices must be configured before use`**
-  Ensure your key is in `Info.plist` and/or provided via `GMSServices.provideAPIKey(...)` in `AppDelegate.swift`.
-
-- **Build fails with `Node.h`, `CSSValue.h`, or `SVGLength.h` import errors from SVGKit**
-  SVGKit includes headers (`Node.h`, `CSSValue.h`, `SVGLength.h`) that can conflict with
-  iOS system headers and React Native Reanimated’s internal types.
-  You can patch them automatically in your **Podfile** inside the `post_install`
-
-  ```ruby
-  post_install do |installer|
-    react_native_post_install(
-      installer,
-      config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-    )
-    # Force iOS 16+ to avoid deployment target warnings
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-      end
-    end
-
-    # --- SVGKit Patch ---
-    require 'fileutils'
-    svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
-
-    # node fix
-    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-      FileUtils.chmod("u+w", file)
-      text = File.read(file)
-      new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
-      File.open(file, 'w') { |f| f.write(new_contents) }
-      # puts "Patched Node import in: #{file}"
-    end
-
-    # import CSSValue.h
-    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-      FileUtils.chmod("u+w", file)
-      text = File.read(file)
-      new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
-      File.open(file, 'w') { |f| f.write(new_contents) }
-      # puts "Patched CSSValue import in: #{file}"
-    end
-
-    # import SVGLength.h
-    Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-      FileUtils.chmod("u+w", file)
-      text = File.read(file)
-      new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
-      File.open(file, 'w') { |f| f.write(new_contents) }
-      # puts "Patched SVGLength import in: #{file}"
-    end
-  end
-  ```
-
-  After applying this, run:
-
-  ```sh
-  cd ios && pod install --repo-update
-  ```
-
-- **Maps not rendering**
-  - Check that your API key has **Maps SDK for Android/iOS** enabled in Google Cloud Console.
-  - Make sure the key is not restricted to wrong bundle IDs or SHA1 fingerprints.
 
 ## Contributing
 
