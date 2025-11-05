@@ -1,3 +1,19 @@
+## [1.8.6](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.5...v1.8.6) (2025-11-05)
+
+### 🐛 Bug Fixes
+
+* **example:** styles ([606d319](https://github.com/pinpong/react-native-google-maps-plus/commit/606d3197dba6c6176517008104b36c3180f533de))
+* rename user interface style default to system ([fc056e6](https://github.com/pinpong/react-native-google-maps-plus/commit/fc056e63b5e3463786200d8eb9c9c41df5bec632))
+
+### 🛠️ Other changes
+
+* **example:** add marker animation ([6b3d34d](https://github.com/pinpong/react-native-google-maps-plus/commit/6b3d34db4595588ef166c02c7f01009c6da973ab))
+* **example:** style ([3b4fbef](https://github.com/pinpong/react-native-google-maps-plus/commit/3b4fbefc47684194c45adcf01d55b2d37fbcbad3))
+* merge dev into main ([76d4289](https://github.com/pinpong/react-native-google-maps-plus/commit/76d42890437c25c27852417cefcdc697415a0588))
+* update nitrogen ([995b851](https://github.com/pinpong/react-native-google-maps-plus/commit/995b8511595f4567415dd3e04fc5ebc771f6c6b5))
+* update README.md ([eca2eeb](https://github.com/pinpong/react-native-google-maps-plus/commit/eca2eebc09c57df70b62ce8241e20efe0801e6e9))
+* update README.md ([0ef9453](https://github.com/pinpong/react-native-google-maps-plus/commit/0ef9453695030ecece1249c73a705202fa889060))
+
 ## [1.8.5](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.4...v1.8.5) (2025-11-04)
 
 ### 🐛 Bug Fixes
