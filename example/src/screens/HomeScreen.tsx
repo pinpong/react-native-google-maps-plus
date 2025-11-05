@@ -7,6 +7,10 @@ import type {
   RootNavigationProp,
   RootStackParamList,
 } from '../types/navigation';
+import {
+  type EdgeInsets,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
@@ -30,7 +34,8 @@ const screens = [
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
   const theme = useAppTheme();
-  const styles = useMemo(() => getThemedStyles(theme), [theme]);
+  const layout = useSafeAreaInsets();
+  const styles = useMemo(() => getThemedStyles(theme, layout), [theme, layout]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -51,13 +56,13 @@ export default function HomeScreen() {
   );
 }
 
-const getThemedStyles = (theme: AppTheme) =>
+const getThemedStyles = (theme: AppTheme, layout: EdgeInsets) =>
   StyleSheet.create({
     container: {
       flexGrow: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 40,
+      paddingVertical: layout.bottom + 8,
       backgroundColor: theme.bgPrimary,
     },
     title: {
