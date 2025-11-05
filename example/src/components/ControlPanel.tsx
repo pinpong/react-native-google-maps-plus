@@ -17,6 +17,11 @@ import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import type { RootNavigationProp } from '../types/navigation';
+import {
+  type EdgeInsets,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import type { AppTheme } from '../theme';
 
 export type ButtonItem = { title: string; onPress: () => void };
 
@@ -29,7 +34,8 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   const theme = useAppTheme();
   const navigation = useNavigation<RootNavigationProp>();
   const progress = useSharedValue(0);
-  const styles = useMemo(() => getThemedStyles(theme), [theme]);
+  const layout = useSafeAreaInsets();
+  const styles = useMemo(() => getThemedStyles(theme, layout), [layout, theme]);
 
   const toggle = () => {
     progress.value = withTiming(progress.value === 1 ? 0 : 1, {
@@ -124,7 +130,7 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme, layout: EdgeInsets) =>
   StyleSheet.create({
     scrollView: {
       position: 'absolute',
@@ -136,7 +142,7 @@ const getThemedStyles = (theme: any) =>
       backgroundColor: theme.bgPrimary,
     },
     scrollContent: {
-      paddingBottom: 40,
+      paddingBottom: layout.bottom + 8,
     },
     header: {
       borderRadius: 10,

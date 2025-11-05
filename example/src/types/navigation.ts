@@ -1,3 +1,5 @@
+import type { StackNavigationProp } from '@react-navigation/stack';
+
 export type RootStackParamList = {
   Home: undefined;
   Blank: undefined;
@@ -19,6 +21,4 @@ export type RootStackParamList = {
   Stress: undefined;
 };
 
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-export type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+export type RootNavigationProp = StackNavigationProp<RootStackParamList>;

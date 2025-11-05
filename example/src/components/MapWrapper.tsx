@@ -25,7 +25,8 @@ import {
 } from 'react-native-google-maps-plus';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { callback } from 'react-native-nitro-modules';
-import { useTheme } from '@react-navigation/native';
+import type { AppTheme } from '../theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
@@ -47,7 +48,7 @@ function wrapCallback<T extends (...args: any[]) => void>(
 
 export default function MapWrapper(props: Props) {
   const { children, ...rest } = props;
-  const theme = useTheme();
+  const theme = useAppTheme();
   const styles = useMemo(() => getThemedStyles(theme), [theme]);
   const layout = useSafeAreaInsets();
 
@@ -119,7 +120,8 @@ export default function MapWrapper(props: Props) {
         indoorEnabled={props.indoorEnabled ?? false}
         style={[styles.map, props.style]}
         userInterfaceStyle={
-          props.userInterfaceStyle ?? (theme.dark ? 'dark' : 'light')
+          props.userInterfaceStyle ??
+          (theme.theme === 'dark' ? 'dark' : 'light')
         }
         mapType={props.mapType ?? 'normal'}
         mapZoomConfig={props.mapZoomConfig ?? mapZoomConfig}
@@ -231,18 +233,18 @@ export default function MapWrapper(props: Props) {
       {children}
       {!mapLoaded && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ActivityIndicator size="large" color={theme.bgAccent} />
         </View>
       )}
     </View>
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.background,
+      backgroundColor: theme.bgPrimary,
     },
     map: {
       position: 'absolute',

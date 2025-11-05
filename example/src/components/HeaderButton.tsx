@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
+import type { AppTheme } from '../theme';
 
 type Props = {
   title: string;
@@ -18,7 +19,7 @@ export default function HeaderButton({ title, onPress }: Props) {
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme) =>
   StyleSheet.create({
     headerButton: {
       paddingHorizontal: 12,

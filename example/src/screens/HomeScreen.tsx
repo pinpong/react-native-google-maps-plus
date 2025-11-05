@@ -1,8 +1,12 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import type { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useAppTheme';
+import type { AppTheme } from '../theme';
+import type {
+  RootNavigationProp,
+  RootStackParamList,
+} from '../types/navigation';
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
@@ -24,7 +28,7 @@ const screens = [
 ];
 
 export default function HomeScreen() {
-  const navigation = useNavigation<StackNavigationProp<any>>();
+  const navigation = useNavigation<RootNavigationProp>();
   const theme = useAppTheme();
   const styles = useMemo(() => getThemedStyles(theme), [theme]);
 
@@ -35,7 +39,9 @@ export default function HomeScreen() {
         <TouchableOpacity
           key={s.name}
           style={styles.button}
-          onPress={() => navigation.navigate(s.name)}
+          onPress={() =>
+            navigation.navigate(s.name as keyof RootStackParamList)
+          }
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>{s.title}</Text>
@@ -45,7 +51,7 @@ export default function HomeScreen() {
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flexGrow: 1,

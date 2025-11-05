@@ -97,7 +97,7 @@ export const RNMapTypeValidator = unionWithValues(
 export const RNUserInterfaceStyleValidator = unionWithValues(
   'light',
   'dark',
-  'default'
+  'system'
 );
 
 export const RNPositionValidator = object({

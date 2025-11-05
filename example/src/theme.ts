@@ -1,4 +1,5 @@
 export const lightTheme = {
+  theme: 'light',
   bgPrimary: '#FFFFFF',
   bgAccent: '#3B82F6',
   bgHeader: '#E5E7EB',
@@ -16,6 +17,7 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
+  theme: 'dark',
   bgPrimary: '#1E1E1E',
   bgAccent: '#2D6BE9',
   bgHeader: '#2C2C2E',

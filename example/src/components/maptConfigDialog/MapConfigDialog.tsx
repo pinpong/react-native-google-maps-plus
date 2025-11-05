@@ -17,6 +17,7 @@ import {
   parseWithUndefined,
   stringifyWithUndefined,
 } from './utils';
+import type { AppTheme } from '../../theme';
 
 type Props<T> = {
   visible: boolean;
@@ -152,7 +153,7 @@ export default function MapConfigDialog<T>({
   );
 }
 
-const getThemedStyles = (theme: any) =>
+const getThemedStyles = (theme: AppTheme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -176,9 +177,10 @@ const getThemedStyles = (theme: any) =>
       alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 12,
+      borderRadius: 16,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderColor: theme.border,
-      backgroundColor: theme.bgSecondary,
+      backgroundColor: theme.bgPrimary,
     },
     headerActions: { flexDirection: 'row', gap: 8 },
     headerButtonText: {
