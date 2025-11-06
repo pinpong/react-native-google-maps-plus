@@ -345,7 +345,14 @@ class GoogleMapsViewImpl(
   var userInterfaceStyle: Int? = null
     set(value) {
       field = value
-      onUi { googleMap?.mapColorScheme = value ?: MapColorScheme.FOLLOW_SYSTEM }
+      onUi {
+        try {
+          // / not supported when liteMode enabled on latest renderer
+          googleMap?.mapColorScheme = value ?: MapColorScheme.FOLLOW_SYSTEM
+        } catch (_: UnsupportedOperationException) {
+          // / ignore
+        }
+      }
     }
 
   var mapZoomConfig: RNMapZoomConfig? = null
