@@ -40,8 +40,8 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
     }
 
     const podFilePatch = `
-  require_relative '../node_modules/react-native-google-maps-plus/scripts/ios_post_install'
-  apply_ios_post_install_settings(installer)
+  require_relative '../node_modules/react-native-google-maps-plus/scripts/apply_ios_min_target'
+  apply_ios_min_target(installer)
 
   require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
   apply_svgkit_patch(installer)

@@ -24,10 +24,15 @@ Add this to your Podfile only for bare React Native apps.
 
 ```ruby
 post_install do |installer|
-  react_native_post_install(installer)
+  react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
 
-  require_relative '../node_modules/react-native-google-maps-plus/scripts/ios_post_install'
-  apply_ios_post_install_settings(installer)
+  require_relative '../node_modules/react-native-google-maps-plus/scripts/apply_ios_min_target'
+  apply_ios_min_target(installer)
 
   require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
   apply_svgkit_patch(installer)

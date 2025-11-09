@@ -29,7 +29,7 @@ target 'GoogleMapsPlusExample' do
       # :ccache_enabled => true
     )
 
-    require_relative '../../scripts/ios_post_install'
+    require_relative '../../scripts/apply_ios_min_target'
     apply_ios_min_target(installer)
 
     require_relative '../../scripts/svgkit_patch'
