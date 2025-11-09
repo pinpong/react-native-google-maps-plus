@@ -29,7 +29,6 @@ def apply_svgkit_patch(installer)
 
     File.write(file, new_text)
     count += 1
-    puts "  Patched #{File.basename(file)}"
   end
 
   if count > 0
@@ -38,17 +37,5 @@ def apply_svgkit_patch(installer)
     puts "[#{package_name}] SVGKit was already patched or no matches"
   end
 
-  installer.pods_project.targets.each do |target|
-    next unless target.name.include?("SVGKit")
 
-    target.build_configurations.each do |config|
-      current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      v = current.to_f > 0 ? current.to_f : 0.0
-
-      if v < 16.0
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = "16.0"
-        puts "[#{package_name}] Set iOS deployment target for SVGKit (#{current || 'none'} → 16.0)"
-      end
-    end
-  end
 end

@@ -113,25 +113,4 @@ jobs:
         run: echo MAPS_API_KEY="API_KEY" >> example/ios/Secrets.xcconfig
 
       - name: Build example for iOS
-        working-directory: example/ios
-        run: |
-          set -o pipefail
-          xcodebuild \
-            -workspace GoogleMapsPlusExample.xcworkspace \
-            -scheme GoogleMapsPlusExample \
-            -configuration Debug \
-            -destination "generic/platform=iOS Simulator" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="-" \
-            EXPANDED_CODE_SIGN_IDENTITY="-" \
-            DEVELOPMENT_TEAM="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            | tee build_raw.log
-          exit ${PIPESTATUS[0]}
-
-      - name: Dump raw Xcode logs
-        if: failure()
-        run: |
-          echo "------ RAW BUILD LOG ------"
-          cat example/ios/build_raw.log
+        run: yarn build:ios
