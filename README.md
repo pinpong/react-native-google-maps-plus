@@ -26,7 +26,9 @@ Add this to your Podfile only for bare React Native apps.
 post_install do |installer|
   react_native_post_install(installer)
 
-  # Fix SVGKit imports required by react-native-google-maps-plus
+  require_relative '../node_modules/react-native-google-maps-plus/scripts/ios_post_install'
+  apply_ios_post_install_settings(installer)
+
   require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
   apply_svgkit_patch(installer)
 end
