@@ -2,6 +2,7 @@ import CoreLocation
 import GoogleMaps
 import GoogleMapsUtils
 import UIKit
+import NitroModules
 
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
 GMSIndoorDisplayDelegate {
