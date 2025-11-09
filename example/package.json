@@ -8,7 +8,7 @@
     "start": "watchman watch-del-all && react-native start",
     "ios:pods": "rm -f ios/Podfile.lock && rm -rf ios/Pods && cd ios && bundle install && bundle exec pod install --repo-update",
     "build:android": "react-native build-android",
-    "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=\"-\" EXPANDED_CODE_SIGN_IDENTITY=\"-\" DEVELOPMENT_TEAM=\"\" PROVISIONING_PROFILE_SPECIFIER=\"\" COCOAPODS_PARALLEL_CODE_SIGN=false -destination generic/platform=iOS'"
+    "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO'"
   },
   "dependencies": {
     "@react-navigation/native": "7.1.19",
