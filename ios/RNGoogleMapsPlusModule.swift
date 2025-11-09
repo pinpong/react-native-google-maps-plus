@@ -1,3 +1,5 @@
+import NitroModules
+
 final class RNGoogleMapsPlusModule: HybridRNGoogleMapsPlusModuleSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
