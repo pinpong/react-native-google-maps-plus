@@ -26,14 +26,7 @@ const execPlugin = isDev
   : [
       '@semantic-release/exec',
       {
-        successCmd: `
-          VERSION=\${nextRelease.version}
-          IFS='.' read -r major minor patch <<<"$VERSION"
-          NEXT_MINOR=$((minor + 1))
-          DEV_TAG="v\${major}.\${NEXT_MINOR}.0-dev.0"
-          git tag "$DEV_TAG"
-          git push origin "$DEV_TAG"
-        `,
+        successCmd: './scripts/create-dev-tag.sh ${nextRelease.version}',
       },
     ];
 
