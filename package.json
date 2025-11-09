@@ -63,6 +63,7 @@
     "ios/**/*.swift",
     "app.plugin.js",
     "*.podspec",
+    "scripts",
     "README.md"
   ],
   "workspaces": [
