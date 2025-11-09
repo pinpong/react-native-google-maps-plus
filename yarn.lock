@@ -3554,6 +3554,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@semantic-release/exec@npm:7.1.0":
+  version: 7.1.0
+  resolution: "@semantic-release/exec@npm:7.1.0"
+  dependencies:
+    "@semantic-release/error": ^4.0.0
+    aggregate-error: ^3.0.0
+    debug: ^4.0.0
+    execa: ^9.0.0
+    lodash-es: ^4.17.21
+    parse-json: ^8.0.0
+  peerDependencies:
+    semantic-release: ">=24.1.0"
+  checksum: 26b7dc072a39406ac6d08177206f1f4c3bf92bbc77685a9dc4589a04b1379794692aadc22828adc4230e056f2068ffc46f0f8726e2638e015db219bf40a965a3
+  languageName: node
+  linkType: hard
+
 "@semantic-release/git@npm:10.0.1":
   version: 10.0.1
   resolution: "@semantic-release/git@npm:10.0.1"
@@ -11942,6 +11958,7 @@ __metadata:
     "@react-native/babel-preset": 0.82.1
     "@react-native/eslint-config": 0.82.1
     "@semantic-release/changelog": 6.0.3
+    "@semantic-release/exec": 7.1.0
     "@semantic-release/git": 10.0.1
     "@semantic-release/npm": 13.1.1
     "@types/jest": 30.0.0
