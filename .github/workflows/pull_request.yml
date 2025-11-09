@@ -112,5 +112,10 @@ jobs:
       - name: Create Secrets.xcconfig
         run: echo MAPS_API_KEY="API_KEY" >> example/ios/Secrets.xcconfig
 
+      - name: Install iOS Simulator runtime
+        run: |
+          sudo xcodebuild -runFirstLaunch
+          sudo xcodebuild -downloadPlatform iOS
+
       - name: Build example for iOS
         run: yarn build:ios

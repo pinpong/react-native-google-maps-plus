@@ -63,6 +63,7 @@
     "ios/**/*.swift",
     "app.plugin.js",
     "*.podspec",
+    "scripts",
     "README.md"
   ],
   "workspaces": [
@@ -88,6 +89,7 @@
     "@react-native/babel-preset": "0.82.1",
     "@react-native/eslint-config": "0.82.1",
     "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/exec": "7.1.0",
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "13.1.1",
     "@types/jest": "30.0.0",
@@ -101,12 +103,12 @@
     "eslint-plugin-prettier": "5.5.4",
     "jest": "30.2.0",
     "lefthook": "2.0.2",
-    "nitrogen": "0.31.4",
+    "nitrogen": "0.31.5",
     "prettier": "3.6.2",
     "react": "19.1.1",
     "react-native": "0.82.1",
     "react-native-builder-bob": "0.40.14",
-    "react-native-nitro-modules": "0.31.4",
+    "react-native-nitro-modules": "0.31.5",
     "semantic-release": "25.0.1",
     "typescript": "5.9.3"
   },

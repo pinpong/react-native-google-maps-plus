@@ -25,47 +25,14 @@ Add this to your Podfile only for bare React Native apps.
 ```ruby
 post_install do |installer|
   react_native_post_install(
-    installer,
-    config[:reactNativePath],
-    :mac_catalyst_enabled => false,
-  )
-  # Force iOS 16+ to avoid deployment target warnings
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-    end
-  end
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
 
-  # --- SVGKit Patch ---
-  require 'fileutils'
-  svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
-
-  # node fix
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-    # puts "Patched Node import in: #{file}"
-  end
-
-  # import CSSValue.h
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-    # puts "Patched CSSValue import in: #{file}"
-  end
-
-  # import SVGLength.h
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-    # puts "Patched SVGLength import in: #{file}"
-  end
+  require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
+  apply_svgkit_patch(installer)
 end
 ```
 

@@ -2504,7 +2504,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNGoogleMapsPlus (1.6.2):
+  - RNGoogleMapsPlus (1.8.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3120,7 +3120,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
   RNGestureHandler: 67501c6d447027581aa1d8e5a7a3ea5a7f0a89ff
-  RNGoogleMapsPlus: 2e51359c4ec90a88a315950cfd8d055c1615d7df
+  RNGoogleMapsPlus: d94844f2d397099f2153d5f9a29e96f70f547bde
   RNReanimated: 8f0185df21f0dea34ee8c9611ba88c17a290ed9a
   RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
@@ -3128,6 +3128,6 @@ SPEC CHECKSUMS:
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   Yoga: 526f25666395d30c297d53154398ffd249eaf9e1
 
-PODFILE CHECKSUM: 18d25340bc263a2eab86e2d8e5cfd9ad55ef6458
+PODFILE CHECKSUM: 53fea21acf44c419ecb277b368cb4c1e34124dfb
 
 COCOAPODS: 1.15.2

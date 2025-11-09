@@ -3554,6 +3554,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@semantic-release/exec@npm:7.1.0":
+  version: 7.1.0
+  resolution: "@semantic-release/exec@npm:7.1.0"
+  dependencies:
+    "@semantic-release/error": ^4.0.0
+    aggregate-error: ^3.0.0
+    debug: ^4.0.0
+    execa: ^9.0.0
+    lodash-es: ^4.17.21
+    parse-json: ^8.0.0
+  peerDependencies:
+    semantic-release: ">=24.1.0"
+  checksum: 26b7dc072a39406ac6d08177206f1f4c3bf92bbc77685a9dc4589a04b1379794692aadc22828adc4230e056f2068ffc46f0f8726e2638e015db219bf40a965a3
+  languageName: node
+  linkType: hard
+
 "@semantic-release/git@npm:10.0.1":
   version: 10.0.1
   resolution: "@semantic-release/git@npm:10.0.1"
@@ -3573,8 +3589,8 @@ __metadata:
   linkType: hard
 
 "@semantic-release/github@npm:^12.0.0":
-  version: 12.0.1
-  resolution: "@semantic-release/github@npm:12.0.1"
+  version: 12.0.2
+  resolution: "@semantic-release/github@npm:12.0.2"
   dependencies:
     "@octokit/core": ^7.0.0
     "@octokit/plugin-paginate-rest": ^14.0.0
@@ -3591,10 +3607,11 @@ __metadata:
     mime: ^4.0.0
     p-filter: ^4.0.0
     tinyglobby: ^0.2.14
+    undici: ^7.0.0
     url-join: ^5.0.0
   peerDependencies:
     semantic-release: ">=24.1.0"
-  checksum: 01675a05e2fb32e30d07ac29e40d64107c53ef9d5469dda782523c0abe6349b2464483d9304adbfc266eff72ae7f44aeac43e6e1c346f8ccca29b7837bbbad39
+  checksum: f4f18a5eed7f01f441bd29cb171aac2d93d8d4d8c5941bf486df1a2d28f0aa9ccbd4d13984405b1dcc245580615176518e05a3fccca201a6f77c6930d57c6eaa
   languageName: node
   linkType: hard
 
@@ -4914,11 +4931,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.19":
-  version: 2.8.24
-  resolution: "baseline-browser-mapping@npm:2.8.24"
+  version: 2.8.25
+  resolution: "baseline-browser-mapping@npm:2.8.25"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 426df57ec914b3934e8d5ee294e84a8dfc0430acfda075cc2f6e321018ed9f8ebc4d416457c434da41c15d36ab2077fadad32f8b92a3266f1d59daa4278e8874
+  checksum: d11bdd2cce30ad96d65f6fdf92cf485152beaf7b1dfc81ad028a94022d702b439dee942984f62c2328c0b6ff468629eb42c2e62ad0ab7d8586b33837b738e560
   languageName: node
   linkType: hard
 
@@ -5181,9 +5198,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001751":
-  version: 1.0.30001753
-  resolution: "caniuse-lite@npm:1.0.30001753"
-  checksum: d38b17895a99bf1ba9f1a8076233e3d4a606cd0121ccdb381ea94c651aaea0e1587ba3922b11dde4eb153b6741ac3e129fc670df0a7251987ed8619f09059b8a
+  version: 1.0.30001754
+  resolution: "caniuse-lite@npm:1.0.30001754"
+  checksum: f5a956d820c6a4de16d0c22eb6bbbbaec346f502f324523311bbbfe4dd8ed0d69ae6034dd96a2f901156f3e4571606670be01f74c8234ac56ea7820383b6aca0
   languageName: node
   linkType: hard
 
@@ -5288,9 +5305,9 @@ __metadata:
   linkType: hard
 
 "cjs-module-lexer@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "cjs-module-lexer@npm:2.1.0"
-  checksum: beeece5cfc4fd77f5c41c30c3942f6219be5bf9f323148a5e52a87414bf35017e2a0aec5d8e25e694af26f05ff833515ccae6dbe1316e4cd44b4c38f11ba949e
+  version: 2.1.1
+  resolution: "cjs-module-lexer@npm:2.1.1"
+  checksum: d87f106cfe40b751060fc7e4a59c5aa893054ea14377c33aab1b09c9c2b353106ac44519f2911eeafceef08da9e4b87185a92a1f7d15992c1e7fa73a0bab8e55
   languageName: node
   linkType: hard
 
@@ -6084,9 +6101,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.238":
-  version: 1.5.245
-  resolution: "electron-to-chromium@npm:1.5.245"
-  checksum: 6262655d0dec8663df58056559a8f1f47648657debf0c868e49d8e3b5f866318c4a9105261272a5aaa529fc6140f4401e0e2c5fadbd24ed50cf9b5cd7e961bfc
+  version: 1.5.249
+  resolution: "electron-to-chromium@npm:1.5.249"
+  checksum: 495a8bf12a3c7bad017f0082b9581ae3a0b6cbe860cc8b89f749aa0ff9f22fd95af765b8e891507c101f5a6d56c404a4e94c4cafd9db0a2784f769fdf0184037
   languageName: node
   linkType: hard
 
@@ -7971,9 +7988,9 @@ __metadata:
   linkType: hard
 
 "ip-address@npm:^10.0.1":
-  version: 10.0.1
-  resolution: "ip-address@npm:10.0.1"
-  checksum: 525d5391cfd31a91f80f5857e98487aeaa8474e860a6725a0b6461ac8e436c7f8c869774dece391c8f8e7486306a34a4d1c094778c4c583a3f1f2cd905e5ed50
+  version: 10.1.0
+  resolution: "ip-address@npm:10.1.0"
+  checksum: 76b1abcdf52a32e2e05ca1f202f3a8ab8547e5651a9233781b330271bd7f1a741067748d71c4cbb9d9906d9f1fa69e7ddc8b4a11130db4534fdab0e908c84e0d
   languageName: node
   linkType: hard
 
@@ -10541,18 +10558,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitrogen@npm:0.31.4":
-  version: 0.31.4
-  resolution: "nitrogen@npm:0.31.4"
+"nitrogen@npm:0.31.5":
+  version: 0.31.5
+  resolution: "nitrogen@npm:0.31.5"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.31.4
+    react-native-nitro-modules: ^0.31.5
     ts-morph: ^27.0.0
     yargs: ^18.0.0
     zod: ^4.0.5
   bin:
     nitrogen: lib/index.js
-  checksum: 566abe01767d03860834b7b95093f1de5d7d7e010a556508e727afafc7476765d146452047adeee3aeaa5b0d361c504762695d8d3d6386e77f0091ff53e00d9c
+  checksum: defb6948f1f5727ae4e6412870226fb52a2b6ebe96fe5501a4093c5c513d55c465ae20f066c914d8540125818d55ab03b156b4e085213667724425b730c11ab3
   languageName: node
   linkType: hard
 
@@ -11417,12 +11434,12 @@ __metadata:
   linkType: hard
 
 "path-scurry@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "path-scurry@npm:2.0.0"
+  version: 2.0.1
+  resolution: "path-scurry@npm:2.0.1"
   dependencies:
     lru-cache: ^11.0.0
     minipass: ^7.1.2
-  checksum: 9953ce3857f7e0796b187a7066eede63864b7e1dfc14bf0484249801a5ab9afb90d9a58fc533ebb1b552d23767df8aa6a2c6c62caf3f8a65f6ce336a97bbb484
+  checksum: a022c6c38fed836079d03f96540eafd4cd989acf287b99613c82300107f366e889513ad8b671a2039a9d251122621f9c6fa649f0bd4d50acf95a6943a6692dbf
   languageName: node
   linkType: hard
 
@@ -11942,6 +11959,7 @@ __metadata:
     "@react-native/babel-preset": 0.82.1
     "@react-native/eslint-config": 0.82.1
     "@semantic-release/changelog": 6.0.3
+    "@semantic-release/exec": 7.1.0
     "@semantic-release/git": 10.0.1
     "@semantic-release/npm": 13.1.1
     "@types/jest": 30.0.0
@@ -11955,12 +11973,12 @@ __metadata:
     eslint-plugin-prettier: 5.5.4
     jest: 30.2.0
     lefthook: 2.0.2
-    nitrogen: 0.31.4
+    nitrogen: 0.31.5
     prettier: 3.6.2
     react: 19.1.1
     react-native: 0.82.1
     react-native-builder-bob: 0.40.14
-    react-native-nitro-modules: 0.31.4
+    react-native-nitro-modules: 0.31.5
     semantic-release: 25.0.1
     typescript: 5.9.3
   peerDependencies:
@@ -12014,13 +12032,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.31.4, react-native-nitro-modules@npm:^0.31.4":
-  version: 0.31.4
-  resolution: "react-native-nitro-modules@npm:0.31.4"
+"react-native-nitro-modules@npm:0.31.5, react-native-nitro-modules@npm:^0.31.5":
+  version: 0.31.5
+  resolution: "react-native-nitro-modules@npm:0.31.5"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 9d251ec788eafb5c66033a1f376e2a8f9dfc8962a22e8511f6451bc50bf324549fd4e5113ee5bed59a993c0afc3288e8722d854239a33c00faae26848a211fde
+  checksum: 957c1c264d5a7bb791ca7aa0c97b577c0ba60bb5765f4bf6fdf64a6f414d33702d94909823b33a4fc1b01f3d51175669c779212e645c21ccd204197ea66ed701
   languageName: node
   linkType: hard
 
@@ -13433,8 +13451,8 @@ __metadata:
   linkType: hard
 
 "terser@npm:^5.15.0":
-  version: 5.44.0
-  resolution: "terser@npm:5.44.0"
+  version: 5.44.1
+  resolution: "terser@npm:5.44.1"
   dependencies:
     "@jridgewell/source-map": ^0.3.3
     acorn: ^8.15.0
@@ -13442,7 +13460,7 @@ __metadata:
     source-map-support: ~0.5.20
   bin:
     terser: bin/terser
-  checksum: 4e1868d9662ea280dad7b49cfe61b7693187be2b529b31b1f86782db00833c03ba05f2b82fc513d928e937260f2a5fbf42a93724e86eaf55f069288f934ccdb3
+  checksum: 1113c5711bb53127f9886e3c906fde8a93a665b532db9c7e36ff7bf287e032ed48ea0e5a3a1a27f6a27c3c0f934e47e7590fcd15c76b7b7bd44ad751b8a9ede4
   languageName: node
   linkType: hard
 
@@ -13802,6 +13820,13 @@ __metadata:
   dependencies:
     "@fastify/busboy": ^2.0.0
   checksum: a25b5462c1b6ffb974f5ffc492ffd64146a9983aad0cbda6fde65e2b22f6f1acd43f09beacc66cc47624a113bd0c684ffc60366102b6a21b038fbfafb7d75195
+  languageName: node
+  linkType: hard
+
+"undici@npm:^7.0.0":
+  version: 7.16.0
+  resolution: "undici@npm:7.16.0"
+  checksum: dca60e323e44c2d408e0d1f5eb540632ad4e75631d5b6fcd7791876bab54e0e263a66e5606eaa717d436b2db5988c2f4af912dfa221ce53e3fc7fcb7d224c9cd
   languageName: node
   linkType: hard
 

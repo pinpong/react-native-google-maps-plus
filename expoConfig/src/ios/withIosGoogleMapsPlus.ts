@@ -39,41 +39,9 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
       }).contents;
     }
 
-    const patchSnippet = `
-  # Force iOS 16+ to avoid deployment target warnings
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-    end
-  end
-
-  # --- SVGKit Patch ---
-  require 'fileutils'
-  svgkit_path = File.join(installer.sandbox.pod_dir('SVGKit'), 'Source')
-
-  # --- Patch Node.h imports ---
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "Node.h"', '#import "SVGKit/Node.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-  end
-
-  # --- Patch CSSValue.h imports ---
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "CSSValue.h"', '#import "SVGKit/CSSValue.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-  end
-
-  # --- Patch SVGLength.h imports ---
-  Dir.glob(File.join(svgkit_path, '**', '*.{h,m}')).each do |file|
-    FileUtils.chmod("u+w", file)
-    text = File.read(file)
-    new_contents = text.gsub('#import "SVGLength.h"', '#import "SVGKit/SVGLength.h"')
-    File.open(file, 'w') { |f| f.write(new_contents) }
-  end
+    const podFilePatch = `
+  require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
+  apply_svgkit_patch(installer)
   `;
 
     if (src.includes('post_install do |installer|')) {
@@ -81,11 +49,11 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
         /post_install do \|installer\|([\s\S]*?)end/,
         (match, inner) => {
           if (inner.includes('SVGKit Patch')) return match; // idempotent
-          return `post_install do |installer|${inner}\n${patchSnippet}\nend`;
+          return `post_install do |installer|${inner}\n${podFilePatch}\nend`;
         }
       );
     } else {
-      src += `\npost_install do |installer|\n${patchSnippet}\nend\n`;
+      src += `\npost_install do |installer|\n${podFilePatch}\nend\n`;
     }
 
     conf.modResults.contents = src;
