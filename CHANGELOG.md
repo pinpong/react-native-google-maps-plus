@@ -1,3 +1,26 @@
+## [1.8.7](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.6...v1.8.7) (2025-11-09)
+
+### 🐛 Bug Fixes
+
+* **android:** prevent UnsupportedOperationException in lite mode ([482c25d](https://github.com/pinpong/react-native-google-maps-plus/commit/482c25d7733b095ad5e1a9789a305a3e77c4fd87)), closes [#73](https://github.com/pinpong/react-native-google-maps-plus/issues/73)
+
+### 🛠️ Other changes
+
+* added SVGKit patch ([df3f401](https://github.com/pinpong/react-native-google-maps-plus/commit/df3f401161c0d9774b0f074e5fe2ad87af23e0d9))
+* **example:** apply SVGKit patch ([4b3b3f7](https://github.com/pinpong/react-native-google-maps-plus/commit/4b3b3f7ca39ced08b093ef7c88df9a036b6d0dbb))
+* **example:** ios build ([1b2e1f2](https://github.com/pinpong/react-native-google-maps-plus/commit/1b2e1f240e893c0a7c1bef0796ca2698e9aaf62f))
+* **example:** update build script ([2efdc25](https://github.com/pinpong/react-native-google-maps-plus/commit/2efdc25bd739fce7a0f1e51d1aac7798e9d45b61))
+* **example:** update Podfile ([79947e6](https://github.com/pinpong/react-native-google-maps-plus/commit/79947e64fd96b4b1f81964b8f303242db9ddb2cc))
+* **example:** update Podfile ([2b4e9d9](https://github.com/pinpong/react-native-google-maps-plus/commit/2b4e9d953a06d4fc4f6fe589f2f0a073b231ba5c))
+* **example:** update Podfile ([5cf5a45](https://github.com/pinpong/react-native-google-maps-plus/commit/5cf5a45fd12390c448d1c03026b3e01b9932173a))
+* **example:** update Podfile ([804f9d9](https://github.com/pinpong/react-native-google-maps-plus/commit/804f9d9d1f8c878ac5f12a95fcaf821bca98161f))
+* **example:** update Podfile ([31e3ace](https://github.com/pinpong/react-native-google-maps-plus/commit/31e3acedfda464cb1bbd00e81c2cc467ba1762b5))
+* **example:** update Podfile ([fe26037](https://github.com/pinpong/react-native-google-maps-plus/commit/fe26037256b0c89db73745db32bdfccba38f0f5f))
+* **example:** update Podfile ([3588429](https://github.com/pinpong/react-native-google-maps-plus/commit/3588429951ef23ef7c6031a37160cbdf127055a1))
+* fix dev tag ([6c4cde3](https://github.com/pinpong/react-native-google-maps-plus/commit/6c4cde3c2b1bab6b0afec46db4c29249fce645b2))
+* merge dev into main ([7146ef3](https://github.com/pinpong/react-native-google-maps-plus/commit/7146ef38de54cb19ed58986836056a403fc4513e))
+* update dependencies ([ab05220](https://github.com/pinpong/react-native-google-maps-plus/commit/ab05220b16aedee139e5ac9ba6daedf166f376ca))
+
 ## [1.8.6](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.5...v1.8.6) (2025-11-05)
 
 ### 🐛 Bug Fixes
