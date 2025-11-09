@@ -2504,7 +2504,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNGoogleMapsPlus (1.6.2):
+  - RNGoogleMapsPlus (1.8.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3120,7 +3120,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
   RNGestureHandler: 67501c6d447027581aa1d8e5a7a3ea5a7f0a89ff
-  RNGoogleMapsPlus: 2e51359c4ec90a88a315950cfd8d055c1615d7df
+  RNGoogleMapsPlus: d94844f2d397099f2153d5f9a29e96f70f547bde
   RNReanimated: 8f0185df21f0dea34ee8c9611ba88c17a290ed9a
   RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
