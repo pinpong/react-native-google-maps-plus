@@ -28,13 +28,7 @@ target 'GoogleMapsPlusExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-      end
-    end
 
-    # Fix SVGKit imports required by react-native-google-maps-plus
     require_relative '../../scripts/svgkit_patch'
     apply_svgkit_patch(installer)
   end
