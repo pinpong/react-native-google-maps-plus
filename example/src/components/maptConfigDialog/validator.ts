@@ -15,6 +15,7 @@ import {
   RNAndroidLocationPermissionResult,
   RNAndroidLocationPriority,
   RNIOSLocationAccuracy,
+  RNIOSLocationActivityType,
   RNIOSPermissionResult,
   RNLocationErrorCode,
   RNMapErrorCode,
@@ -272,6 +273,7 @@ const RNAndroidLocationConfigValidator = object({
 export const RNIOSLocationConfigValidator = object({
   desiredAccuracy: optional(enums(enumValues(RNIOSLocationAccuracy))),
   distanceFilterMeters: optional(number()),
+  activityType: optional(enums(enumValues(RNIOSLocationActivityType))),
 });
 
 export const RNLocationConfigValidator = object({
