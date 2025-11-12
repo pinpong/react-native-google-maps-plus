@@ -13,13 +13,14 @@ import type {
   RNMapUiSettings,
   RNMapZoomConfig,
   RNRegion,
+  RNIndoorBuilding,
+  RNIndoorLevel,
 } from 'react-native-google-maps-plus';
 import {
   GoogleMapsView,
   RNAndroidLocationPriority,
-  type RNIndoorBuilding,
-  type RNIndoorLevel,
   RNIOSLocationAccuracy,
+  RNIOSLocationActivityType,
   RNLocationErrorCode,
   RNMapErrorCode,
 } from 'react-native-google-maps-plus';
@@ -103,6 +104,7 @@ export default function MapWrapper(props: Props) {
       ios: {
         desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,
         distanceFilterMeters: 10,
+        activityType: RNIOSLocationActivityType.NAVIGATION,
       },
     }),
     []
