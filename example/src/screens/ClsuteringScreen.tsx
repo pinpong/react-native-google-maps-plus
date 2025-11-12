@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useCallback } from 'react';
 import MapWrapper from '../components/MapWrapper';
 import ControlPanel from '../components/ControlPanel';
 import type {
@@ -106,12 +106,16 @@ export default function ClusteringScreen() {
     });
   }, [points]);
 
+  const handleMapLoaded = useCallback((r: RNRegion) => setRegion(r), []);
+
+  const handleCameraChange = useCallback((r: RNRegion) => setRegion(r), []);
+
   return (
     <MapWrapper
       mapRef={mapRef}
       markers={markers}
-      onMapLoaded={(r: RNRegion) => setRegion(r)}
-      onCameraChange={(r: RNRegion) => setRegion(r)}
+      onMapLoaded={handleMapLoaded}
+      onCameraChange={handleCameraChange}
     >
       <ControlPanel mapRef={mapRef} buttons={[]} />
     </MapWrapper>

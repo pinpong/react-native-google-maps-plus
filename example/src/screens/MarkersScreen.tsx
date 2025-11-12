@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import MapWrapper from '../components/MapWrapper';
 import { makeMarker } from '../utils/mapGenerators';
 import type {
@@ -98,13 +98,17 @@ export default function MarkersScreen() {
     [markers]
   );
 
+  const handleMarkerPress = useCallback((id: string) => {
+    mapRef.current?.showMarkerInfoWindow(id);
+  }, []);
+
   return (
     <>
       <MapWrapper
         mapRef={mapRef}
         uiSettings={uiSettings}
         markers={markers ? markers : []}
-        onMarkerPress={(id: string) => mapRef.current?.showMarkerInfoWindow(id)}
+        onMarkerPress={handleMarkerPress}
       >
         <ControlPanel mapRef={mapRef} buttons={buttons} />
       </MapWrapper>
