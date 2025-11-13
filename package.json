@@ -22,11 +22,10 @@
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "test": "jest",
     "git:clean": "git clean -dfX",
-    "release": "semantic-release",
-    "build": "yarn nitrogen && bob build && yarn build:plugin",
     "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
-    "prepare": "bob build"
+    "release": "semantic-release",
+    "build": "yarn nitrogen && bob build && yarn build:plugin"
   },
   "keywords": [
     "react-native",
