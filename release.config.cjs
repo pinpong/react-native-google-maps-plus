@@ -21,15 +21,6 @@ const gitPlugin = isDev
       },
     ];
 
-const execPlugin = isDev
-  ? false
-  : [
-      '@semantic-release/exec',
-      {
-        successCmd: './scripts/create-dev-tag.sh ${nextRelease.version}',
-      },
-    ];
-
 const sortMap = Object.fromEntries(
   rules.map((rule, index) => [rule.title, index])
 );
@@ -91,6 +82,5 @@ module.exports = {
       },
     ],
     ...(gitPlugin ? [gitPlugin] : []),
-    ...(execPlugin ? [execPlugin] : []),
   ],
 };
