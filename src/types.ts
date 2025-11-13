@@ -343,7 +343,7 @@ export type RNLocation = {
 };
 
 export type RNLocationAndroid = {
-  provider?: string | null;
+  provider?: string;
   elapsedRealtimeNanos?: number;
   bearingAccuracyDegrees?: number;
   speedAccuracyMetersPerSecond?: number;
@@ -357,7 +357,7 @@ export type RNLocationIOS = {
   verticalAccuracy?: number;
   speedAccuracy?: number;
   courseAccuracy?: number;
-  floor?: number | null;
+  floor?: number;
   isFromMockProvider?: boolean;
   timestamp?: number;
 };
