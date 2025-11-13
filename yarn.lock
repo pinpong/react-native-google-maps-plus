@@ -10558,18 +10558,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitrogen@npm:0.31.5":
-  version: 0.31.5
-  resolution: "nitrogen@npm:0.31.5"
+"nitrogen@npm:0.31.6":
+  version: 0.31.6
+  resolution: "nitrogen@npm:0.31.6"
   dependencies:
     chalk: ^5.3.0
-    react-native-nitro-modules: ^0.31.5
+    react-native-nitro-modules: ^0.31.6
     ts-morph: ^27.0.0
     yargs: ^18.0.0
     zod: ^4.0.5
   bin:
     nitrogen: lib/index.js
-  checksum: defb6948f1f5727ae4e6412870226fb52a2b6ebe96fe5501a4093c5c513d55c465ae20f066c914d8540125818d55ab03b156b4e085213667724425b730c11ab3
+  checksum: 8c0ea6fa929fd8a358e1cca9e6518902b0ebfd11a1b5ad325fd0807aefa4e7ee4231ded3448208b10765a687d32a99f8e35f46e45effaedec176c16ffdf36eed
   languageName: node
   linkType: hard
 
@@ -11863,9 +11863,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-builder-bob@npm:0.40.14":
-  version: 0.40.14
-  resolution: "react-native-builder-bob@npm:0.40.14"
+"react-native-builder-bob@npm:0.40.15":
+  version: 0.40.15
+  resolution: "react-native-builder-bob@npm:0.40.15"
   dependencies:
     "@babel/core": ^7.25.2
     "@babel/plugin-transform-flow-strip-types": ^7.26.5
@@ -11891,7 +11891,7 @@ __metadata:
     yargs: ^17.5.1
   bin:
     bob: bin/bob
-  checksum: f7a95477535ccf749affb79f539faf925ff23a3864b0ad4fd4eb0e729f246e1c6357b392857156695d22005a60aa9f9f7bb773e2582f0e06b5c3f77e5258f00d
+  checksum: abe76dfce15679da3c8c475d39127bc1cb970118be3bd964b63bb6aeabe8d3eb42698f5d86b05386af12ba378f924a7a1e4e22194ca400c92e6961d2000dc682
   languageName: node
   linkType: hard
 
@@ -11942,12 +11942,12 @@ __metadata:
     react: 19.1.1
     react-hook-form: 7.66.0
     react-native: 0.82.1
-    react-native-builder-bob: 0.40.14
+    react-native-builder-bob: 0.40.15
     react-native-clusterer: 5.0.2
     react-native-gesture-handler: 2.29.1
     react-native-google-maps-plus: "workspace:*"
     react-native-monorepo-config: 0.3.0
-    react-native-nitro-modules: 0.31.5
+    react-native-nitro-modules: 0.31.6
     react-native-reanimated: 4.1.5
     react-native-safe-area-context: 5.6.2
     react-native-screens: 4.18.0
@@ -11984,12 +11984,12 @@ __metadata:
     eslint-plugin-prettier: 5.5.4
     jest: 30.2.0
     lefthook: 2.0.3
-    nitrogen: 0.31.5
+    nitrogen: 0.31.6
     prettier: 3.6.2
     react: 19.1.1
     react-native: 0.82.1
-    react-native-builder-bob: 0.40.14
-    react-native-nitro-modules: 0.31.5
+    react-native-builder-bob: 0.40.15
+    react-native-nitro-modules: 0.31.6
     semantic-release: 25.0.2
     typescript: 5.9.3
   peerDependencies:
@@ -12033,13 +12033,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-nitro-modules@npm:0.31.5, react-native-nitro-modules@npm:^0.31.5":
-  version: 0.31.5
-  resolution: "react-native-nitro-modules@npm:0.31.5"
+"react-native-nitro-modules@npm:0.31.6, react-native-nitro-modules@npm:^0.31.6":
+  version: 0.31.6
+  resolution: "react-native-nitro-modules@npm:0.31.6"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 957c1c264d5a7bb791ca7aa0c97b577c0ba60bb5765f4bf6fdf64a6f414d33702d94909823b33a4fc1b01f3d51175669c779212e645c21ccd204197ea66ed701
+  checksum: d9b5074ae30901d5ef305c3771c87a7eb4872b9f0411fbc0c12d51a3be28d016dc21419fedad9119cdba19977ed826c5c5d716601115f306faccce6a3392d8da
   languageName: node
   linkType: hard
 

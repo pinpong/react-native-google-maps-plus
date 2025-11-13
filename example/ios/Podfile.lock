@@ -46,7 +46,7 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
-  - NitroModules (0.31.5):
+  - NitroModules (0.31.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3052,7 +3052,7 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: bed22fa703c919259b3901449434d60d994fae20
   GoogleMaps: a40d3b1f511f0fa2036e7b08c920c33279b1d5fd
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
-  NitroModules: afc462ff4c87c9a405ac7e93cd133137c407a7f9
+  NitroModules: edf2d33c02fd8cbb0021e031d380d286b17f527b
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
   RCTRequired: e2c574c1b45231f7efb0834936bd609d75072b63
