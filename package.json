@@ -40,31 +40,28 @@
     "expo"
   ],
   "files": [
-    "src",
     "lib",
-    "expoConfig/build",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
-    "react-native.config.js",
+    "src",
     "nitrogen",
-    "cpp",
     "nitro.json",
+    "android/src",
     "android/build.gradle",
     "android/fix-prefab.gradle",
     "android/gradle.properties",
     "android/CMakeLists.txt",
     "android/proguard-rules.pro",
-    "android/src",
     "ios/**/*.h",
     "ios/**/*.m",
     "ios/**/*.mm",
     "ios/**/*.cpp",
     "ios/**/*.swift",
+    "scripts/svgkit_patch.rb",
     "app.plugin.js",
+    "expoConfig/build",
+    "react-native.config.js",
     "*.podspec",
-    "scripts",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "workspaces": [
     "example"
@@ -122,52 +119,6 @@
     "expo": {
       "optional": true
     }
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native",
-      "prettier"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "warn",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      "module",
-      [
-        "typescript",
-        {
-          "project": "tsconfig.json"
-        }
-      ]
-    ]
   },
   "packageManager": "yarn@3.6.1"
 }
