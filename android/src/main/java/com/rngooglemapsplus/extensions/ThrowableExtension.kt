@@ -16,10 +16,12 @@ fun Throwable.toLocationErrorCode(context: Context): RNLocationErrorCode {
       when (statusCode) {
         CommonStatusCodes.NETWORK_ERROR ->
           RNLocationErrorCode.POSITION_UNAVAILABLE
+
         LocationSettingsStatusCodes.RESOLUTION_REQUIRED,
         LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE,
         ->
           RNLocationErrorCode.SETTINGS_NOT_SATISFIED
+
         else ->
           RNLocationErrorCode.INTERNAL_ERROR
       }

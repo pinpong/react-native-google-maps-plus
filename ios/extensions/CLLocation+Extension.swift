@@ -18,7 +18,7 @@ extension CLLocation {
         verticalAccuracy: verticalAccuracy,
         speedAccuracy: speedAccuracy,
         courseAccuracy: courseAccuracy,
-        floor: floor.map { Double($0.level)},
+        floor: floor.map { Double($0.level) },
         isFromMockProvider: false,
         timestamp: timestamp.timeIntervalSince1970 * 1000
       )
