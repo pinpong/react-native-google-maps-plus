@@ -1,15 +1,17 @@
-import type { ConfigPlugin } from '@expo/config-plugins';
-import type { RNGoogleMapsPlusExpoPluginProps } from './types';
 import fs from 'fs';
 import path from 'path';
+
+import { createRunOncePlugin } from '@expo/config-plugins';
+
+import withAndroidGoogleMapsPlus from './android/withAndroidGoogleMapsPlus';
+import withIosGoogleMapsPlus from './ios/withIosGoogleMapsPlus';
+
+import type { RNGoogleMapsPlusExpoPluginProps } from './types';
+import type { ConfigPlugin } from '@expo/config-plugins';
 
 const pkg = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8')
 );
-
-import { createRunOncePlugin } from '@expo/config-plugins';
-import withIosGoogleMapsPlus from './ios/withIosGoogleMapsPlus';
-import withAndroidGoogleMapsPlus from './android/withAndroidGoogleMapsPlus';
 
 const withGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
   config,

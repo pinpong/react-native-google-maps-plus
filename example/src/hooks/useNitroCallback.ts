@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+
 import { callback } from 'react-native-nitro-modules';
+
 export function useNitroCallback<T extends (...args: any[]) => void>(
   propCallback: T | undefined,
   fallback?: (...args: Parameters<T>) => void

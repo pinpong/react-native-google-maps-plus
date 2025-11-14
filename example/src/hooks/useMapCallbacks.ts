@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+
 import {
   type GoogleMapsViewRef,
   type RNCamera,
@@ -11,7 +12,8 @@ import {
   RNMapErrorCode,
   type RNRegion,
 } from 'react-native-google-maps-plus';
-import { useNitroCallback } from './useNitroCallback';
+
+import { useNitroCallback } from '@src/hooks/useNitroCallback';
 
 export function useMapCallbacks(
   props: RNGoogleMapsPlusViewProps,

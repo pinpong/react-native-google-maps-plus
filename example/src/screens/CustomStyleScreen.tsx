@@ -1,7 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
-import { silverMapStyle, standardMapStyle } from '../utils/mapStyles';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapWrapper from '@src/components/MapWrapper';
+import { silverMapStyle, standardMapStyle } from '@src/data/mapStylesData';
+
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 
 export default function CustomStyleScreen() {

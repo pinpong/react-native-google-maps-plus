@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
+
+import { useNavigation } from '@react-navigation/native';
 import {
   type GoogleMapsViewRef,
   RNAndroidLocationPriority,
@@ -8,10 +8,12 @@ import {
   RNIOSLocationActivityType,
   type RNLocationConfig,
 } from 'react-native-google-maps-plus';
-import { RNLocationConfigValidator } from '../components/maptConfigDialog/validator';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useHeaderButton } from '../hooks/useHeaderButton';
-import { useNavigation } from '@react-navigation/native';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { RNLocationConfigValidator } from '@src/utils/validator';
 
 export default function LocationScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

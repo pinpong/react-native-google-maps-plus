@@ -1,9 +1,4 @@
 import type {
-  HybridView,
-  HybridViewMethods,
-  HybridViewProps,
-} from 'react-native-nitro-modules';
-import type {
   RNCamera,
   RNCameraUpdate,
   RNLatLng,
@@ -31,6 +26,11 @@ import type {
   RNSnapshotOptions,
   RNUrlTileOverlay,
 } from './types';
+import type {
+  HybridView,
+  HybridViewMethods,
+  HybridViewProps,
+} from 'react-native-nitro-modules';
 
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   initialProps?: RNInitialProps;

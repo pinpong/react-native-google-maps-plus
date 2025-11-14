@@ -1,6 +1,20 @@
 import React, { useMemo, useState } from 'react';
+
 import type { ViewProps } from 'react-native';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import {
+  GoogleMapsView,
+  RNAndroidLocationPriority,
+  RNIOSLocationAccuracy,
+  RNIOSLocationActivityType,
+} from 'react-native-google-maps-plus';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import { useMapCallbacks } from '@src/hooks/useMapCallbacks';
+import type { AppTheme } from '@src/theme';
+
 import type {
   GoogleMapsViewRef,
   RNGoogleMapsPlusViewProps,
@@ -10,16 +24,6 @@ import type {
   RNMapUiSettings,
   RNMapZoomConfig,
 } from 'react-native-google-maps-plus';
-import {
-  GoogleMapsView,
-  RNAndroidLocationPriority,
-  RNIOSLocationAccuracy,
-  RNIOSLocationActivityType,
-} from 'react-native-google-maps-plus';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { AppTheme } from '../theme';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { useMapCallbacks } from '../hooks/useMapCallbacks';
 
 type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
@@ -65,8 +69,8 @@ export default function MapWrapper(props: Props) {
 
   const mapPadding: RNMapPadding = useMemo(() => {
     return props.children
-      ? { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 }
-      : { top: 20, left: 20, bottom: layout.bottom, right: 20 };
+      ? { top: 0, left: 0, bottom: layout.bottom + 70, right: 0 }
+      : { top: 0, left: 0, bottom: layout.bottom, right: 0 };
   }, [layout.bottom, props.children]);
 
   const mapZoomConfig: RNMapZoomConfig = useMemo(

@@ -1,16 +1,19 @@
 import React, { useRef, useState, useMemo, useCallback } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
+
+import { useClusterer } from 'react-native-clusterer';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapWrapper from '@src/components/MapWrapper';
+import { randomCoordinates } from '@src/utils/mapGenerators';
+import { rnRegionToRegion } from '@src/utils/mapUtils';
+
+import type { Supercluster } from 'react-native-clusterer';
 import type {
   GoogleMapsViewRef,
   RNMarker,
   RNMarkerSvg,
   RNRegion,
 } from 'react-native-google-maps-plus';
-import type { Supercluster } from 'react-native-clusterer';
-import { useClusterer } from 'react-native-clusterer';
-import { randomCoordinates } from '../utils/mapGenerators';
-import { rnRegionToRegion } from '../utils/mapUtils';
 
 export default function ClusteringScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

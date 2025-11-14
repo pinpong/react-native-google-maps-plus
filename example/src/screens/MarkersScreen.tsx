@@ -1,17 +1,20 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import { makeMarker } from '../utils/mapGenerators';
+
+import { useNavigation } from '@react-navigation/native';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { makeMarker } from '@src/utils/mapGenerators';
+import { RNMarkerValidator } from '@src/utils/validator';
+
 import type {
   GoogleMapsViewRef,
   RNLatLng,
   RNMarker,
 } from 'react-native-google-maps-plus';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useNavigation } from '@react-navigation/native';
-import { RNMarkerValidator } from '../components/maptConfigDialog/validator';
-import { useHeaderButton } from '../hooks/useHeaderButton';
 import type { RNMapUiSettings } from 'react-native-google-maps-plus';
-import ControlPanel from '../components/ControlPanel';
 
 export function animateSpiral(
   center: RNLatLng,

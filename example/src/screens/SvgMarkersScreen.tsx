@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import { randomCoordinates } from '../utils/mapGenerators';
+
+import MapWrapper from '@src/components/MapWrapper';
+import { randomCoordinates } from '@src/utils/mapGenerators';
+
 import type {
   GoogleMapsViewRef,
   RNMarker,
