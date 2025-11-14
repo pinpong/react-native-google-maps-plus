@@ -1,17 +1,22 @@
 --swiftversion 5.10
+--xcode-indentation enabled
 --disable conditionalAssignment
 --disable redundantType
 --disable unusedArguments
+
 --binary-grouping none
 --decimal-grouping none
 --hex-literal-case lowercase
 --indent 2
---no-space-operators
---semicolons never
---trailing-commas never
---rules braces,indent
---wrap-arguments preserve
---wrap-parameters preserve
---wrap-collections preserve
---closing-paren same-line
---xcode-indentation enabled
+
+--max-width 150
+
+--wrap-arguments disabled
+--wrap-parameters disabled
+--wrap-return-type never
+--disable wrapMultilineStatementBraces
+
+--rules indent,braces,spaceInsideParens,spaceInsideBraces,spaceAroundOperators
+
+--trim-whitespace nonblank-lines
+--linebreaks lf

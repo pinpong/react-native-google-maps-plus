@@ -1,16 +1,19 @@
 import React, { useMemo } from 'react';
+
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
-import { useAppTheme } from '../hooks/useAppTheme';
-import type { AppTheme } from '../theme';
-import type {
-  RootNavigationProp,
-  RootStackParamList,
-} from '../types/navigation';
 import {
   type EdgeInsets,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
+import type {
+  RootNavigationProp,
+  RootStackParamList,
+} from '@src/types/navigation';
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },

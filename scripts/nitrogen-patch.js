@@ -12,11 +12,11 @@
  *  - Inserts `+ (BOOL)shouldBeRecycled`
  *  nitrogen/generated/ios/c++/views/HybridRNGoogleMapsPlusViewComponent.mm
  */
-import { fileURLToPath } from 'url';
-import { basename } from 'path';
-import path from 'node:path';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { mkdir, copyFile } from 'node:fs/promises';
+import path from 'node:path';
+import { basename } from 'path';
+import { fileURLToPath } from 'url';
 
 const ROOT_ANDROID = path.join(
   process.cwd(),

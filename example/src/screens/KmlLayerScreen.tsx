@@ -1,14 +1,17 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import { kmlString } from '../utils/kmlData';
+
+import { useNavigation } from '@react-navigation/native';
+
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { kmlString } from '@src/data/kmlData';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { RNKMLayerValidator } from '@src/utils/validator';
+
 import type {
   GoogleMapsViewRef,
   RNKMLayer,
 } from 'react-native-google-maps-plus';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useNavigation } from '@react-navigation/native';
-import { RNKMLayerValidator } from '../components/maptConfigDialog/validator';
-import { useHeaderButton } from '../hooks/useHeaderButton';
 
 export default function KmlLayerScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

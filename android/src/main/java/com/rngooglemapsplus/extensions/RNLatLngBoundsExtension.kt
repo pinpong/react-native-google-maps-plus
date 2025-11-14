@@ -1,6 +1,5 @@
 package com.rngooglemapsplus.extensions
 
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.rngooglemapsplus.RNLatLngBounds
 

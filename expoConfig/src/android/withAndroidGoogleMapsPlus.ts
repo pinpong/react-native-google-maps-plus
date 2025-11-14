@@ -1,11 +1,12 @@
 import { withAndroidManifest } from '@expo/config-plugins';
-import type { ConfigPlugin } from '@expo/config-plugins';
 import {
   addMetaDataItemToMainApplication,
   getMainApplicationOrThrow,
   removeMetaDataItemFromMainApplication,
 } from '@expo/config-plugins/build/android/Manifest';
+
 import type { RNGoogleMapsPlusExpoPluginProps } from '../types';
+import type { ConfigPlugin } from '@expo/config-plugins';
 
 const withMapsAndroid: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
   config,

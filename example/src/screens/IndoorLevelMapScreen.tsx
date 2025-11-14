@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
-import MapWrapper from '../components/MapWrapper';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapWrapper from '@src/components/MapWrapper';
+
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
-import ControlPanel from '../components/ControlPanel';
 
 export default function IndoorLevelMapScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

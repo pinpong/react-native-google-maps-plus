@@ -1,9 +1,10 @@
 import { GoogleMapsView, GoogleMapsModule } from './GoogleMapsPlus';
+
+import type { RNGoogleMapsPlusModule } from './RNGoogleMapsPlusModule.nitro';
 import type {
   RNGoogleMapsPlusViewMethods,
   RNGoogleMapsPlusViewProps,
 } from './RNGoogleMapsPlusView.nitro';
-import type { RNGoogleMapsPlusModule } from './RNGoogleMapsPlusModule.nitro';
 
 export * from './types';
 

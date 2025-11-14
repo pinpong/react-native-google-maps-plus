@@ -1,32 +1,34 @@
 import React from 'react';
+
+import { useColorScheme } from 'react-native';
+
 import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
-import HomeScreen from './screens/HomeScreen';
-import BasicMapScreen from './screens/BasicMapScreen';
-import MarkersScreen from './screens/MarkersScreen';
-import PolygonsScreen from './screens/PolygonsScreen';
-import PolylinesScreen from './screens/PolylinesScreen';
-import CirclesScreen from './screens/CirclesScreen';
-import HeatmapScreen from './screens/HeatmapScreen';
-import KmlLayerScreen from './screens/KmlLayerScreen';
-import LocationScreen from './screens/LocationScreen';
-import CustomStyleScreen from './screens/CustomStyleScreen';
-import StressTestScreen from './screens/StressTestScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useColorScheme } from 'react-native';
-import BlankScreen from './screens/BlankScreen';
-import IndoorLevelMapScreen from './screens/IndoorLevelMapScreen';
-import CameraTestScreen from './screens/CameraTestScreen';
-import type { RootStackParamList } from './types/navigation';
-import SnapshotTestScreen from './screens/SnaptshotTestScreen';
-import ClusteringScreen from './screens/ClsuteringScreen';
-import SvgMarkersScreen from './screens/SvgMarkersScreen';
-import UrlTileOverlay from './screens/UrlTileOverlay';
+
+import BasicMapScreen from '@src/screens/BasicMapScreen';
+import BlankScreen from '@src/screens/BlankScreen';
+import CameraTestScreen from '@src/screens/CameraTestScreen';
+import CirclesScreen from '@src/screens/CirclesScreen';
+import ClusteringScreen from '@src/screens/ClsuteringScreen';
+import CustomStyleScreen from '@src/screens/CustomStyleScreen';
+import HeatmapScreen from '@src/screens/HeatmapScreen';
+import HomeScreen from '@src/screens/HomeScreen';
+import IndoorLevelMapScreen from '@src/screens/IndoorLevelMapScreen';
+import KmlLayerScreen from '@src/screens/KmlLayerScreen';
+import LocationScreen from '@src/screens/LocationScreen';
+import MarkersScreen from '@src/screens/MarkersScreen';
+import PolygonsScreen from '@src/screens/PolygonsScreen';
+import PolylinesScreen from '@src/screens/PolylinesScreen';
+import SnapshotTestScreen from '@src/screens/SnaptshotTestScreen';
+import StressTestScreen from '@src/screens/StressTestScreen';
+import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
+import UrlTileOverlay from '@src/screens/UrlTileOverlay';
+import type { RootStackParamList } from '@src/types/navigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
 

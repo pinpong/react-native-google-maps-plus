@@ -1,14 +1,17 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
-import ControlPanel from '../components/ControlPanel';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import type { RNBasicMapConfig } from '../types/basicMapConfig';
+
 import { useNavigation } from '@react-navigation/native';
-import { RNBasicMapConfigValidator } from '../components/maptConfigDialog/validator';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useHeaderButton } from '../hooks/useHeaderButton';
-import { useAppTheme } from '../hooks/useAppTheme';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import type { RNBasicMapConfig } from '@src/types/basicMapConfig';
+import { RNBasicMapConfigValidator } from '@src/utils/validator';
+
+import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 
 export default function BasicMapScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
@@ -47,7 +50,7 @@ export default function BasicMapScreen() {
     indoorEnabled: undefined,
     customMapStyle: undefined,
     mapZoomConfig: { min: 0, max: 20 },
-    mapPadding: { top: 20, left: 20, bottom: layout.bottom + 80, right: 20 },
+    mapPadding: { top: 0, left: 0, bottom: layout.bottom + 70, right: 0 },
     mapType: 'normal',
   });
 

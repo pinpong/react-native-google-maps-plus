@@ -21,22 +21,6 @@ const gitPlugin = isDev
       },
     ];
 
-const execPlugin = isDev
-  ? false
-  : [
-      '@semantic-release/exec',
-      {
-        successCmd: `
-          VERSION=\${nextRelease.version}
-          IFS='.' read -r major minor patch <<<"$VERSION"
-          NEXT_MINOR=$((minor + 1))
-          DEV_TAG="v\${major}.\${NEXT_MINOR}.0-dev.0"
-          git tag "$DEV_TAG"
-          git push origin "$DEV_TAG"
-        `,
-      },
-    ];
-
 const sortMap = Object.fromEntries(
   rules.map((rule, index) => [rule.title, index])
 );
@@ -98,6 +82,5 @@ module.exports = {
       },
     ],
     ...(gitPlugin ? [gitPlugin] : []),
-    ...(execPlugin ? [execPlugin] : []),
   ],
 };

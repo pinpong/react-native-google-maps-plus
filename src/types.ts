@@ -297,6 +297,7 @@ export enum RNAndroidLocationPriority {
 export type RNIOSLocationConfig = {
   desiredAccuracy?: RNIOSLocationAccuracy;
   distanceFilterMeters?: number;
+  activityType?: RNIOSLocationActivityType;
 };
 
 export enum RNIOSLocationAccuracy {
@@ -304,6 +305,14 @@ export enum RNIOSLocationAccuracy {
   ACCURACY_NEAREST_TEN_METER = 1,
   ACCURACY_NEAREST_HUNDRED_METER = 2,
   ACCURACY_KILOMETER = 3,
+}
+
+export enum RNIOSLocationActivityType {
+  OTHER = 0,
+  NAVIGATION = 1,
+  AUTOMOTIVE = 2,
+  FITNESS = 3,
+  AIRBORNE = 4,
 }
 
 export type RNLocationPermissionResult = {
@@ -334,7 +343,7 @@ export type RNLocation = {
 };
 
 export type RNLocationAndroid = {
-  provider?: string | null;
+  provider?: string;
   elapsedRealtimeNanos?: number;
   bearingAccuracyDegrees?: number;
   speedAccuracyMetersPerSecond?: number;
@@ -348,7 +357,7 @@ export type RNLocationIOS = {
   verticalAccuracy?: number;
   speedAccuracy?: number;
   courseAccuracy?: number;
-  floor?: number | null;
+  floor?: number;
   isFromMockProvider?: boolean;
   timestamp?: number;
 };

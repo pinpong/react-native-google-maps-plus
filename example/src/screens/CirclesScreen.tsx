@@ -1,14 +1,17 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import { makeCircle } from '../utils/mapGenerators';
+
+import { useNavigation } from '@react-navigation/native';
+
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { makeCircle } from '@src/utils/mapGenerators';
+import { RNCircleValidator } from '@src/utils/validator';
+
 import type {
   GoogleMapsViewRef,
   RNCircle,
 } from 'react-native-google-maps-plus';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useNavigation } from '@react-navigation/native';
-import { RNCircleValidator } from '../components/maptConfigDialog/validator';
-import { useHeaderButton } from '../hooks/useHeaderButton';
 
 export default function CirclesScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+
 import {
   View,
   Text,
@@ -10,14 +11,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+
 import { type Struct, validate } from 'superstruct';
-import { useAppTheme } from '../../hooks/useAppTheme';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
 import {
   formatSuperstructError,
   parseWithUndefined,
   stringifyWithUndefined,
-} from './utils';
-import type { AppTheme } from '../../theme';
+} from '@src/utils/validatorUtils';
 
 type Props<T> = {
   visible: boolean;

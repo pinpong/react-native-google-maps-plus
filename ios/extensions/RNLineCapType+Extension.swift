@@ -7,4 +7,3 @@ extension RNLineCapType {
     }
   }
 }
-

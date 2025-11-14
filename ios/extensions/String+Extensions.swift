@@ -90,12 +90,12 @@ extension UIColor {
     // swiftlint:disable:next large_tuple
     let (r1, g1, b1): (Double, Double, Double)
     switch h {
-    case 0..<60: (r1, g1, b1) = (c, x, 0)
-    case 60..<120: (r1, g1, b1) = (x, c, 0)
-    case 120..<180: (r1, g1, b1) = (0, c, x)
-    case 180..<240: (r1, g1, b1) = (0, x, c)
-    case 240..<300: (r1, g1, b1) = (x, 0, c)
-    case 300..<360: (r1, g1, b1) = (c, 0, x)
+    case 0 ..< 60: (r1, g1, b1) = (c, x, 0)
+    case 60 ..< 120: (r1, g1, b1) = (x, c, 0)
+    case 120 ..< 180: (r1, g1, b1) = (0, c, x)
+    case 180 ..< 240: (r1, g1, b1) = (0, x, c)
+    case 240 ..< 300: (r1, g1, b1) = (x, 0, c)
+    case 300 ..< 360: (r1, g1, b1) = (c, 0, x)
     default: (r1, g1, b1) = (0, 0, 0)
     }
     return UIColor(

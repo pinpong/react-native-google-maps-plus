@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
-import { makeRandomMarkerForStressTest } from '../utils/mapGenerators';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapWrapper from '@src/components/MapWrapper';
+import { makeRandomMarkerForStressTest } from '@src/utils/mapGenerators';
+
 import type {
   GoogleMapsViewRef,
   RNMarker,

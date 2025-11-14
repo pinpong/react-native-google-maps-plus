@@ -1,6 +1,7 @@
 import CoreLocation
 import GoogleMaps
 import GoogleMapsUtils
+import NitroModules
 import UIKit
 
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
@@ -272,10 +273,12 @@ GMSIndoorDisplayDelegate {
   @MainActor
   var locationConfig: RNLocationConfig? {
     didSet {
-      locationHandler.desiredAccuracy =
-        locationConfig?.ios?.desiredAccuracy?.toCLLocationAccuracy
-      locationHandler.distanceFilterMeters =
-        locationConfig?.ios?.distanceFilterMeters
+      locationHandler.updateConfig(
+        desiredAccuracy: locationConfig?.ios?.desiredAccuracy?
+          .toCLLocationAccuracy,
+        distanceFilterMeters: locationConfig?.ios?.distanceFilterMeters,
+        activityType: locationConfig?.ios?.activityType?.toCLActivityType,
+      )
     }
   }
 

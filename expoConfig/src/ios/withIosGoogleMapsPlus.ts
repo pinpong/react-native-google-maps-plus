@@ -5,6 +5,7 @@ import {
   type ConfigPlugin,
 } from '@expo/config-plugins';
 import { mergeContents } from '@expo/config-plugins/build/utils/generateCode';
+
 import type { RNGoogleMapsPlusExpoPluginProps } from '../types';
 
 const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (

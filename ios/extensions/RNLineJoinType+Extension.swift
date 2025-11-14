@@ -6,6 +6,4 @@ extension RNLineJoinType {
     default: return .miter
     }
   }
-
 }
-
