@@ -4866,7 +4866,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-module-resolver@npm:^5.0.2":
+"babel-plugin-module-resolver@npm:5.0.2":
   version: 5.0.2
   resolution: "babel-plugin-module-resolver@npm:5.0.2"
   dependencies:
@@ -12290,7 +12290,7 @@ __metadata:
     "@react-navigation/native-stack": 7.6.2
     "@react-navigation/stack": 7.6.3
     "@types/react": 19.1.1
-    babel-plugin-module-resolver: ^5.0.2
+    babel-plugin-module-resolver: 5.0.2
     react: 19.1.1
     react-hook-form: 7.66.0
     react-native: 0.82.1
