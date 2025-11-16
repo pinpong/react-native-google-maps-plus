@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'react-native';
 
 import {
   DarkTheme,
@@ -10,6 +10,7 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { useAppTheme } from '@src/hooks/useAppTheme';
 import BasicMapScreen from '@src/screens/BasicMapScreen';
 import BlankScreen from '@src/screens/BlankScreen';
 import CameraTestScreen from '@src/screens/CameraTestScreen';
@@ -33,10 +34,17 @@ import type { RootStackParamList } from '@src/types/navigation';
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
-  const scheme = useColorScheme();
+  const appTheme = useAppTheme();
+  const isDark = appTheme.theme === 'dark';
+
   return (
     <GestureHandlerRootView>
-      <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
+        <StatusBar
+          barStyle={isDark ? 'light-content' : 'dark-content'}
+          backgroundColor="transparent"
+          translucent
+        />
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={({ theme }) => ({
@@ -44,7 +52,6 @@ export default function App() {
             headerTitleAlign: 'center',
             headerStyle: { backgroundColor: theme.colors.card },
             headerTintColor: theme.colors.text,
-            contentStyle: { backgroundColor: theme.colors.background },
           })}
         >
           <Stack.Screen

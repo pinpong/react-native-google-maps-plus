@@ -42,7 +42,6 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>React Native Google Maps Plus Examples</Text>
       {screens.map((s) => (
         <TouchableOpacity
           key={s.name}
@@ -65,7 +64,8 @@ const getThemedStyles = (theme: AppTheme, layout: EdgeInsets) =>
       flexGrow: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: layout.bottom + 8,
+      paddingTop: 8,
+      paddingBottom: layout.bottom + 8,
       backgroundColor: theme.bgPrimary,
     },
     title: {
