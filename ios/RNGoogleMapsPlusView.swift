@@ -8,7 +8,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
 
-  private var propsInitialized = false
   private let markerBuilder = MapMarkerBuilder()
   private let polylineBuilder = MapPolylineBuilder()
   private let polygonBuilder = MapPolygonBuilder()
@@ -32,9 +31,13 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   @MainActor
-  func afterUpdate() {
-    if !propsInitialized {
-      propsInitialized = true
+  func dispose() {
+    impl.deinitInternal()
+  }
+
+  @MainActor
+  var initialProps: RNInitialProps? {
+    didSet {
       let options = GMSMapViewOptions()
       initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
       initialProps?.liteMode.map { _ in /* not supported */ }
@@ -44,19 +47,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       initialProps?.backgroundColor.map {
         options.backgroundColor = $0.toUIColor()
       }
-      impl.initMapView(googleMapOptions: options)
-    }
-  }
 
-  @MainActor
-  func dispose() {
-    impl.deinitInternal()
-  }
-
-  @MainActor
-  var initialProps: RNInitialProps? {
-    didSet {
-      impl.initialProps = initialProps
+      impl.googleMapOptions = options
     }
   }
 

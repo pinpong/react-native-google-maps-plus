@@ -40,14 +40,18 @@ GMSIndoorDisplayDelegate {
     self.locationHandler = locationHandler
     self.markerBuilder = markerBuilder
     super.init(frame: frame)
-    setupAppLifecycleObservers()
   }
+
+  @MainActor
+  private var lifecycleAttached = false
 
   @MainActor
   private var lifecycleTasks = [Task<Void, Never>]()
 
   @MainActor
-  private func setupAppLifecycleObservers() {
+  private func attachLifecycleObservers() {
+    if lifecycleAttached { return }
+    lifecycleAttached = true
     lifecycleTasks.append(
       Task { @MainActor in
         for await _ in NotificationCenter.default.notifications(
@@ -79,12 +83,20 @@ GMSIndoorDisplayDelegate {
     )
   }
 
+  @MainActor
+  private func detachLifecycleObservers() {
+    if !lifecycleAttached { return }
+    lifecycleAttached = false
+    lifecycleTasks.forEach { $0.cancel() }
+    lifecycleTasks.removeAll()
+  }
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   @MainActor
-  func initMapView(googleMapOptions: GMSMapViewOptions) {
+  func initMapView() {
     if initialized { return }
     initialized = true
     googleMapOptions.frame = bounds
@@ -108,7 +120,6 @@ GMSIndoorDisplayDelegate {
     locationHandler.onError = { [weak self] error in
       self?.onLocationError?(error)
     }
-    locationHandler.start()
   }
 
   @MainActor
@@ -171,9 +182,7 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
-  var initialProps: RNInitialProps? {
-    didSet {}
-  }
+  var googleMapOptions: GMSMapViewOptions = GMSMapViewOptions()
 
   @MainActor
   var uiSettings: RNMapUiSettings? {
@@ -693,6 +702,7 @@ GMSIndoorDisplayDelegate {
   func deinitInternal() {
     guard !deInitialized else { return }
     deInitialized = true
+    detachLifecycleObservers()
     onMain {
       self.locationHandler.stop()
       self.markerBuilder.cancelAllIconTasks()
@@ -728,16 +738,17 @@ GMSIndoorDisplayDelegate {
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
+      attachLifecycleObservers()
       locationHandler.start()
+      initMapView()
     } else {
       locationHandler.stop()
+      detachLifecycleObservers()
     }
   }
 
   deinit {
     deinitInternal()
-    lifecycleTasks.forEach { $0.cancel() }
-    lifecycleTasks.removeAll()
   }
 
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
