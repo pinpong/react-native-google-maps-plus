@@ -24,7 +24,6 @@ import com.rngooglemapsplus.extensions.toSize
 class RNGoogleMapsPlusView(
   val context: ThemedReactContext,
 ) : HybridRNGoogleMapsPlusViewSpec() {
-  private var propsInitialized = false
   private var currentCustomMapStyle: String? = null
   private var permissionHandler = PermissionHandler(context)
   private var locationHandler = LocationHandler(context)
@@ -40,10 +39,11 @@ class RNGoogleMapsPlusView(
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
 
-  override fun afterUpdate() {
-    super.afterUpdate()
-    if (!propsInitialized) {
-      propsInitialized = true
+  override var initialProps: RNInitialProps? = null
+    set(value) {
+      if (field == value) return
+      field = value
+
       val options =
         GoogleMapOptions().apply {
           initialProps?.mapId?.let { mapId(it) }
@@ -51,15 +51,8 @@ class RNGoogleMapsPlusView(
           initialProps?.camera?.let { camera(it.toCameraPosition(current = null)) }
           initialProps?.backgroundColor?.let { backgroundColor(it.toColor()) }
         }
-      view.initMapView(options)
-    }
-  }
 
-  override var initialProps: RNInitialProps? = null
-    set(value) {
-      if (field == value) return
-      field = value
-      view.initialProps = value
+      view.googleMapsOptions = options
     }
 
   override var uiSettings: RNMapUiSettings? = null
