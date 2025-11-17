@@ -17,6 +17,7 @@ import CameraTestScreen from '@src/screens/CameraTestScreen';
 import CirclesScreen from '@src/screens/CirclesScreen';
 import ClusteringScreen from '@src/screens/ClsuteringScreen';
 import CustomStyleScreen from '@src/screens/CustomStyleScreen';
+import GoogleMapPlusModuleScreen from '@src/screens/GoogleMapPlusModuleScreen';
 import HeatmapScreen from '@src/screens/HeatmapScreen';
 import HomeScreen from '@src/screens/HomeScreen';
 import IndoorLevelMapScreen from '@src/screens/IndoorLevelMapScreen';
@@ -28,7 +29,7 @@ import PolylinesScreen from '@src/screens/PolylinesScreen';
 import SnapshotTestScreen from '@src/screens/SnaptshotTestScreen';
 import StressTestScreen from '@src/screens/StressTestScreen';
 import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
-import UrlTileOverlay from '@src/screens/UrlTileOverlay';
+import UrlTileOverlayScreen from '@src/screens/UrlTileOverlayScreen';
 import type { RootStackParamList } from '@src/types/navigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -106,7 +107,7 @@ export default function App() {
           />
           <Stack.Screen
             name="UrlTileOverlay"
-            component={UrlTileOverlay}
+            component={UrlTileOverlayScreen}
             options={{ title: 'Url Tile Overlay' }}
           />
           <Stack.Screen
@@ -143,6 +144,11 @@ export default function App() {
             name="Stress"
             component={StressTestScreen}
             options={{ title: 'Stress test' }}
+          />
+          <Stack.Screen
+            name="Module"
+            component={GoogleMapPlusModuleScreen}
+            options={{ title: 'Module test' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

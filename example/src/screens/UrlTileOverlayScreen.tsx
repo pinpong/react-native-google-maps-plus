@@ -13,7 +13,7 @@ import type {
   RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
 
-export default function UrlTileOverlay() {
+export default function UrlTileOverlayScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
   const [urlTileOverlays, setUrlTileOverlays] = useState<
