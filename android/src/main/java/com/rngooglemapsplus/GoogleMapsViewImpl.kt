@@ -152,6 +152,7 @@ class GoogleMapsViewImpl(
           super.addView(it)
           it.getMapAsync { map ->
             googleMap = map
+            googleMap?.setLocationSource(locationHandler)
             googleMap?.setOnMapLoadedCallback {
               googleMap?.setOnCameraMoveStartedListener(this@GoogleMapsViewImpl)
               googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
@@ -288,11 +289,7 @@ class GoogleMapsViewImpl(
           isCompassEnabled = value?.compassEnabled ?: false
           isIndoorLevelPickerEnabled = value?.indoorLevelPickerEnabled ?: false
           isMapToolbarEnabled = value?.mapToolbarEnabled ?: false
-
-          val myLocationEnabled = value?.myLocationButtonEnabled ?: false
-          googleMap?.setLocationSource(if (myLocationEnabled) locationHandler else null)
-          isMyLocationButtonEnabled = myLocationEnabled
-
+          isMyLocationButtonEnabled = value?.myLocationButtonEnabled ?: false
           isRotateGesturesEnabled = value?.rotateEnabled ?: true
           isScrollGesturesEnabled = value?.scrollEnabled ?: true
           isScrollGesturesEnabledDuringRotateOrZoom =
