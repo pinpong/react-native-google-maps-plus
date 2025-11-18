@@ -34,10 +34,12 @@ class LocationHandler(
   private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
+  private var lastLocation: Location? = null
+  private var isActive = false
+
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
   private var minUpdateInterval: Long = MIN_UPDATE_INTERVAL
-  private var isActive = false
 
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
@@ -142,21 +144,23 @@ class LocationHandler(
       return
     }
     try {
-      fusedLocationClientProviderClient.lastLocation
+      fusedLocationClientProviderClient
+        .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
         .addOnSuccessListener { location ->
           if (location != null) {
+            lastLocation = location
             listener?.onLocationChanged(location)
             onUpdate?.invoke(location)
           }
         }.addOnFailureListener { e ->
-          val error = e.toLocationErrorCode(context)
-          onError?.invoke(error)
+          onError?.invoke(e.toLocationErrorCode(context))
         }
       locationCallback =
         object : LocationCallback() {
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
+              lastLocation = location
               listener?.onLocationChanged(location)
               onUpdate?.invoke(location)
             } else {
@@ -192,6 +196,9 @@ class LocationHandler(
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {
     this.listener = listener
+    lastLocation?.let {
+      listener.onLocationChanged(it)
+    }
   }
 
   override fun deactivate() {
