@@ -56,6 +56,8 @@ class LocationHandler(
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
     buildLocationRequest(this.priority, this.interval, this.minUpdateInterval)
+
+    if (!isActive) return
     stop()
     start()
   }
@@ -173,7 +175,7 @@ class LocationHandler(
           val error = e.toLocationErrorCode(context)
           onError?.invoke(error)
         }
-    } catch (se: SecurityException) {
+    } catch (_: SecurityException) {
       onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {
       val error = ex.toLocationErrorCode(context)
@@ -193,11 +195,9 @@ class LocationHandler(
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {
     this.listener = listener
-    start()
   }
 
   override fun deactivate() {
     listener = null
-    stop()
   }
 }
