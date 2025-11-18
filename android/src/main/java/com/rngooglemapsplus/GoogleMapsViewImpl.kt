@@ -845,7 +845,6 @@ class GoogleMapsViewImpl(
       mapView?.removeAllViews()
       super.removeAllViews()
       reactContext.unregisterComponentCallbacks(componentCallbacks)
-      mapViewInitialized = false
     }
 
   override fun requestLayout() {
