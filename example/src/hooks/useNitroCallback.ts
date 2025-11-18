@@ -7,7 +7,6 @@ export function useNitroCallback<T extends (...args: any[]) => void>(
   fallback?: (...args: Parameters<T>) => void
 ) {
   return useMemo(() => {
-    console.log('useNitroCallback');
     const fn = (...args: Parameters<T>) => {
       propCallback?.(...args);
       fallback?.(...args);
