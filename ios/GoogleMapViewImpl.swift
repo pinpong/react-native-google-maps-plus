@@ -221,7 +221,7 @@ GMSIndoorDisplayDelegate {
   @MainActor
   var trafficEnabled: Bool? {
     didSet {
-      mapView?.isTrafficEnabled = false
+      mapView?.isTrafficEnabled = trafficEnabled ?? false
     }
   }
 
