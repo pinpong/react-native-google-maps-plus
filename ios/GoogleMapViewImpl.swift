@@ -10,8 +10,8 @@ GMSIndoorDisplayDelegate {
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
-  private var initialized = false
-  private var loaded = false
+  private var mapViewInitialized = false
+  private var mapViewLoaded = false
   private var deInitialized = false
 
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
@@ -97,8 +97,8 @@ GMSIndoorDisplayDelegate {
 
   @MainActor
   func initMapView() {
-    if initialized { return }
-    initialized = true
+    if mapViewInitialized { return }
+    mapViewInitialized = true
     googleMapOptions.frame = bounds
 
     mapView = GMSMapView.init(options: googleMapOptions)
@@ -717,7 +717,6 @@ GMSIndoorDisplayDelegate {
       self.mapView?.indoorDisplay.delegate = nil
       self.mapView?.delegate = nil
       self.mapView = nil
-      self.initialized = false
     }
   }
 
@@ -752,8 +751,8 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
-    guard !loaded else { return }
-    loaded = true
+    guard !mapViewLoaded else { return }
+    mapViewLoaded = true
     let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
     let camera = mapView.camera.toRNCamera()
 
@@ -761,7 +760,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       self.cameraMoveReasonIsGesture = gesture
 
@@ -773,7 +772,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
@@ -784,7 +783,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
