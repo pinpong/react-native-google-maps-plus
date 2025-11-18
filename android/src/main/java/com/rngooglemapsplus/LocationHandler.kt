@@ -130,6 +130,17 @@ class LocationHandler(
       }
   }
 
+  private fun isNewerLocation(location: Location): Boolean {
+    val prev = lastLocation ?: return true
+    return location.elapsedRealtimeNanos > prev.elapsedRealtimeNanos
+  }
+
+  private fun notifyListener(location: Location) {
+    lastLocation = location
+    listener?.onLocationChanged(location)
+    onUpdate?.invoke(location)
+  }
+
   @SuppressLint("MissingPermission")
   fun start() {
     if (isActive) return
@@ -147,11 +158,9 @@ class LocationHandler(
       fusedLocationClientProviderClient
         .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
         .addOnSuccessListener { location ->
-          if (location != null) {
-            lastLocation = location
-            listener?.onLocationChanged(location)
-            onUpdate?.invoke(location)
-          }
+          if (location == null) return@addOnSuccessListener
+          if (!isNewerLocation(location)) return@addOnSuccessListener
+          notifyListener(location)
         }.addOnFailureListener { e ->
           onError?.invoke(e.toLocationErrorCode(context))
         }
@@ -160,9 +169,8 @@ class LocationHandler(
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
-              lastLocation = location
-              listener?.onLocationChanged(location)
-              onUpdate?.invoke(location)
+              if (!isNewerLocation(location)) return
+              notifyListener(location)
             } else {
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
             }
