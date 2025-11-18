@@ -85,10 +85,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     guard !isActive else { return }
     isActive = true
 
-    manager.location.map {
-      onUpdate?($0)
-    }
-
+    manager.requestLocation()
     manager.startUpdatingLocation()
   }
 
