@@ -19,7 +19,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
-import com.google.android.gms.tasks.OnSuccessListener
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 private const val REQ_LOCATION_SETTINGS = 2001
@@ -144,13 +143,12 @@ class LocationHandler(
     }
     try {
       fusedLocationClientProviderClient.lastLocation
-        .addOnSuccessListener(
-          OnSuccessListener { location ->
-            if (location != null) {
-              onUpdate?.invoke(location)
-            }
-          },
-        ).addOnFailureListener { e ->
+        .addOnSuccessListener { location ->
+          if (location != null) {
+            listener?.onLocationChanged(location)
+            onUpdate?.invoke(location)
+          }
+        }.addOnFailureListener { e ->
           val error = e.toLocationErrorCode(context)
           onError?.invoke(error)
         }
@@ -166,14 +164,14 @@ class LocationHandler(
             }
           }
         }
+
+      val req = locationRequest ?: return
+      val callback = locationCallback ?: return
+
       fusedLocationClientProviderClient
-        .requestLocationUpdates(
-          locationRequest!!,
-          locationCallback!!,
-          Looper.getMainLooper(),
-        ).addOnFailureListener { e ->
-          val error = e.toLocationErrorCode(context)
-          onError?.invoke(error)
+        .requestLocationUpdates(req, callback, Looper.getMainLooper())
+        .addOnFailureListener { e ->
+          onError?.invoke(e.toLocationErrorCode(context))
         }
     } catch (_: SecurityException) {
       onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
@@ -186,11 +184,10 @@ class LocationHandler(
   fun stop() {
     if (!isActive) return
     isActive = false
-    if (locationCallback != null) {
-      fusedLocationClientProviderClient.removeLocationUpdates(locationCallback!!)
-      fusedLocationClientProviderClient.flushLocations()
-      locationCallback = null
-    }
+    val callback = locationCallback ?: return
+    fusedLocationClientProviderClient.removeLocationUpdates(callback)
+    fusedLocationClientProviderClient.flushLocations()
+    locationCallback = null
   }
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {
