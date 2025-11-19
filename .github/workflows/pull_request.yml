@@ -95,7 +95,7 @@ jobs:
     runs-on: macos-latest
     needs: [lint, test]
     env:
-      XCODE_VERSION: latest-stable
+      XCODE_VERSION: '26.0.1'
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
