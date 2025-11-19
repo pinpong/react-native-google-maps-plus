@@ -1,3 +1,52 @@
+## [1.10.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.9.0...v1.10.0) (2025-11-19)
+
+### ✨ Features
+
+* **ios:** add location activity type support ([ddf3303](https://github.com/pinpong/react-native-google-maps-plus/commit/ddf33036386f00b7ecfd1eb588fefa868e7ecb75))
+
+### 🐛 Bug Fixes
+
+* **android:** forward last known location to LocationSource listener ([89884db](https://github.com/pinpong/react-native-google-maps-plus/commit/89884db59766021a1a6525a611f08ba5f2f97f56))
+* **android:** isMyLocationButtonEnabled and use always custom LocationSource ([73c0659](https://github.com/pinpong/react-native-google-maps-plus/commit/73c065996fb06940d0a65ebe7ebf4ca9fdf95ef7))
+* **android:** location updates now fully controlled by lifecycle ([2761229](https://github.com/pinpong/react-native-google-maps-plus/commit/2761229db7badbcfc7c4914fe998b2fa92cb2762))
+* **android:** mapview onDestroy ([5afeb22](https://github.com/pinpong/react-native-google-maps-plus/commit/5afeb22daa6493ef73a902ef2f43a7966b7d954d))
+* **android:** prevent same location update ([dbd13a1](https://github.com/pinpong/react-native-google-maps-plus/commit/dbd13a102d04c623edac7706b8b161bec5976f35))
+* **android:** request immediate location update instead of using last known ([873c034](https://github.com/pinpong/react-native-google-maps-plus/commit/873c034a8eda9557ecfc543b437710881770bf0d))
+* **example:** statusbar ([4e20d8a](https://github.com/pinpong/react-native-google-maps-plus/commit/4e20d8a376fe237daddb5c5b7b11df9a127082ea))
+* **ios:** added nitromodules import to module & view impl files ([0cee1b2](https://github.com/pinpong/react-native-google-maps-plus/commit/0cee1b2144dd840a5caa47f095aa4460a9564ff4))
+* **ios:** mapview deinit ([3df1eed](https://github.com/pinpong/react-native-google-maps-plus/commit/3df1eed30a21300abc4238658225b229c7b6e879))
+* **ios:** request immediate location update instead of using last known ([6d15e4c](https://github.com/pinpong/react-native-google-maps-plus/commit/6d15e4c2304a2b0c686e95e00ef781dad4c2c17e))
+* **ios:** traffic enabled ([f5358b7](https://github.com/pinpong/react-native-google-maps-plus/commit/f5358b72f7b2db93d02339b8580355b66ce79b05))
+* trigger release ([bb7d196](https://github.com/pinpong/react-native-google-maps-plus/commit/bb7d196480e6891d1276dc65f4e79eb59d2e1e45))
+
+### 🔄 Code Refactors
+
+* **android:** lifecycle ([0f4cec0](https://github.com/pinpong/react-native-google-maps-plus/commit/0f4cec0dacb5b4bb9b76280ee08a41ef931109dc))
+* **ios:** lifecycle ([fd8b8da](https://github.com/pinpong/react-native-google-maps-plus/commit/fd8b8da87f8d9acdd6e29301218bc8721d82cd2c))
+
+### 🛠️ Other changes
+
+* add dev tag script ([8f06ec0](https://github.com/pinpong/react-native-google-maps-plus/commit/8f06ec0191d86fb751f46cfcdfba1dea0943e7f1))
+* **android:** remove packagingOptions ([e7af5dc](https://github.com/pinpong/react-native-google-maps-plus/commit/e7af5dccec97a7fbc2cd6b2e3e24c28d4923aa16))
+* **android:** update google maps utils ([605d600](https://github.com/pinpong/react-native-google-maps-plus/commit/605d600c847a65300c4470cca2bb6959924ca417))
+* **example:** add modules example ([e758ac8](https://github.com/pinpong/react-native-google-maps-plus/commit/e758ac8be10015223fcef24560932f9715dfc733))
+* **example:** memoize callbacks ([b6d00e3](https://github.com/pinpong/react-native-google-maps-plus/commit/b6d00e3866317ebf74e62569b91e701f44b6799f))
+* **example:** remove log ([cec18d7](https://github.com/pinpong/react-native-google-maps-plus/commit/cec18d7cc8fe7e5f26ad911deab93a86e8a6b490))
+* **example:** update dependencies ([3662eb7](https://github.com/pinpong/react-native-google-maps-plus/commit/3662eb7627683e62ceb0cc258b4597c2bb52709f))
+* merge dev into main ([39bc703](https://github.com/pinpong/react-native-google-maps-plus/commit/39bc703f5d9c3a9a23e9f26eb1bcff5bcbf78753))
+* **refactor:** package.json ([6086de3](https://github.com/pinpong/react-native-google-maps-plus/commit/6086de398bde08eefa2fbdd18093730cbbd43abc))
+* remove unused dependencies ([813dca2](https://github.com/pinpong/react-native-google-maps-plus/commit/813dca27db45b038ae12512dcb5badefe39c0d93))
+* update dependencies ([a1bfca1](https://github.com/pinpong/react-native-google-maps-plus/commit/a1bfca144cdd431d2e241c0bc635a2113994cfd3))
+* update dependencies ([2c89c93](https://github.com/pinpong/react-native-google-maps-plus/commit/2c89c93c7a9f2a7d996eed11a4a4fc561b13f4ed))
+* update formatter style ([9ffbba2](https://github.com/pinpong/react-native-google-maps-plus/commit/9ffbba204ce938b83b7e0a16a8928969a0698d37))
+* update package.json ([8d52cd9](https://github.com/pinpong/react-native-google-maps-plus/commit/8d52cd9725c4007aa15195491a072cabc8f98eb9))
+* update PR template ([0f3fa22](https://github.com/pinpong/react-native-google-maps-plus/commit/0f3fa22978bb77cacbccb7d143f7c516c0627cec))
+* update yarn.lock ([e951abe](https://github.com/pinpong/react-native-google-maps-plus/commit/e951abeaa427924ca0536a4651423da27ff788ee))
+* updated dependencies ([b216ca4](https://github.com/pinpong/react-native-google-maps-plus/commit/b216ca4d9f841584511b8b1b4524d39cb74248bd))
+* updated eslint ([5b1a898](https://github.com/pinpong/react-native-google-maps-plus/commit/5b1a89809904cb51d890355cc89b35da1a4631ea))
+* updated nitro ([eea7b57](https://github.com/pinpong/react-native-google-maps-plus/commit/eea7b57303556dd2dad5758b9e4ab4f4e2efefcc))
+* updated README.md ([b573d7e](https://github.com/pinpong/react-native-google-maps-plus/commit/b573d7e0297c2bf9e1fb17e26cafd794977a62ed))
+
 ## [1.8.7](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.8.6...v1.8.7) (2025-11-09)
 
 ### 🐛 Bug Fixes
