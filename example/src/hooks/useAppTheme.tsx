@@ -1,5 +1,6 @@
 import { useColorScheme } from 'react-native';
-import { type AppTheme, darkTheme, lightTheme } from '../theme';
+
+import { type AppTheme, darkTheme, lightTheme } from '@src/theme';
 
 export function useAppTheme(): AppTheme {
   const scheme = useColorScheme();

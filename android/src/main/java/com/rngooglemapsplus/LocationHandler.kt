@@ -19,7 +19,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
-import com.google.android.gms.tasks.OnSuccessListener
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 private const val REQ_LOCATION_SETTINGS = 2001
@@ -35,10 +34,12 @@ class LocationHandler(
   private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
+  private var lastLocation: Location? = null
+  private var isActive = false
+
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
   private var minUpdateInterval: Long = MIN_UPDATE_INTERVAL
-  private var isActive = false
 
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
@@ -56,6 +57,8 @@ class LocationHandler(
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
     buildLocationRequest(this.priority, this.interval, this.minUpdateInterval)
+
+    if (!isActive) return
     stop()
     start()
   }
@@ -127,6 +130,17 @@ class LocationHandler(
       }
   }
 
+  private fun isNewerLocation(location: Location): Boolean {
+    val prev = lastLocation ?: return true
+    return location.elapsedRealtimeNanos > prev.elapsedRealtimeNanos
+  }
+
+  private fun notifyListener(location: Location) {
+    lastLocation = location
+    listener?.onLocationChanged(location)
+    onUpdate?.invoke(location)
+  }
+
   @SuppressLint("MissingPermission")
   fun start() {
     if (isActive) return
@@ -141,39 +155,37 @@ class LocationHandler(
       return
     }
     try {
-      fusedLocationClientProviderClient.lastLocation
-        .addOnSuccessListener(
-          OnSuccessListener { location ->
-            if (location != null) {
-              onUpdate?.invoke(location)
-            }
-          },
-        ).addOnFailureListener { e ->
-          val error = e.toLocationErrorCode(context)
-          onError?.invoke(error)
+      fusedLocationClientProviderClient
+        .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+        .addOnSuccessListener { location ->
+          if (location == null) return@addOnSuccessListener
+          if (!isNewerLocation(location)) return@addOnSuccessListener
+          notifyListener(location)
+        }.addOnFailureListener { e ->
+          onError?.invoke(e.toLocationErrorCode(context))
         }
       locationCallback =
         object : LocationCallback() {
           override fun onLocationResult(locationResult: LocationResult) {
             val location = locationResult.lastLocation
             if (location != null) {
-              listener?.onLocationChanged(location)
-              onUpdate?.invoke(location)
+              if (!isNewerLocation(location)) return
+              notifyListener(location)
             } else {
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
             }
           }
         }
+
+      val req = locationRequest ?: return
+      val callback = locationCallback ?: return
+
       fusedLocationClientProviderClient
-        .requestLocationUpdates(
-          locationRequest!!,
-          locationCallback!!,
-          Looper.getMainLooper(),
-        ).addOnFailureListener { e ->
-          val error = e.toLocationErrorCode(context)
-          onError?.invoke(error)
+        .requestLocationUpdates(req, callback, Looper.getMainLooper())
+        .addOnFailureListener { e ->
+          onError?.invoke(e.toLocationErrorCode(context))
         }
-    } catch (se: SecurityException) {
+    } catch (_: SecurityException) {
       onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {
       val error = ex.toLocationErrorCode(context)
@@ -184,20 +196,20 @@ class LocationHandler(
   fun stop() {
     if (!isActive) return
     isActive = false
-    if (locationCallback != null) {
-      fusedLocationClientProviderClient.removeLocationUpdates(locationCallback!!)
-      fusedLocationClientProviderClient.flushLocations()
-      locationCallback = null
-    }
+    val callback = locationCallback ?: return
+    fusedLocationClientProviderClient.removeLocationUpdates(callback)
+    fusedLocationClientProviderClient.flushLocations()
+    locationCallback = null
   }
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {
     this.listener = listener
-    start()
+    lastLocation?.let {
+      listener.onLocationChanged(it)
+    }
   }
 
   override fun deactivate() {
     listener = null
-    stop()
   }
 }

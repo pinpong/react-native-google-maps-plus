@@ -1,3 +1,5 @@
+import { weightData } from '@src/data/heatMapWeightData';
+
 import type {
   RNCircle,
   RNHeatmap,
@@ -6,7 +8,6 @@ import type {
   RNPolyline,
   RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
-import { weightData } from './heatMapWeightData';
 
 export function randomColor() {
   return (

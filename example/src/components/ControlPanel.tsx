@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+
 import {
   ScrollView,
   StyleSheet,
@@ -6,6 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import { useNavigation } from '@react-navigation/native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -13,15 +16,16 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { useNavigation } from '@react-navigation/native';
-import type { RootNavigationProp } from '../types/navigation';
 import {
   type EdgeInsets,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import type { AppTheme } from '../theme';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
+import type { RootNavigationProp } from '@src/types/navigation';
+
+import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
 
 export type ButtonItem = { title: string; onPress: () => void };
 

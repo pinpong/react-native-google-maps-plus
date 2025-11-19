@@ -16,17 +16,16 @@
     "lint:android": "cd android && ktlint -F ./**/*.kt*",
     "lint:ios": "cd ios && swiftlint --quiet && swiftformat . --lint",
     "format": "yarn format:js && yarn format:ios && yarn format:android",
-    "format:js": "prettier --write .",
+    "format:js": "eslint . --fix && prettier --write .",
     "format:android": "cd android && ktlint --format ./**/*.kt*",
     "format:ios": "cd ios && swiftformat .",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "test": "jest",
     "git:clean": "git clean -dfX",
-    "release": "semantic-release",
-    "build": "yarn nitrogen && bob build && yarn build:plugin",
     "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
-    "prepare": "bob build"
+    "release": "semantic-release",
+    "build": "yarn nitrogen && bob build && yarn build:plugin"
   },
   "keywords": [
     "react-native",
@@ -40,31 +39,28 @@
     "expo"
   ],
   "files": [
-    "src",
     "lib",
-    "expoConfig/build",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
-    "react-native.config.js",
+    "src",
     "nitrogen",
-    "cpp",
     "nitro.json",
+    "android/src",
     "android/build.gradle",
     "android/fix-prefab.gradle",
     "android/gradle.properties",
     "android/CMakeLists.txt",
     "android/proguard-rules.pro",
-    "android/src",
     "ios/**/*.h",
     "ios/**/*.m",
     "ios/**/*.mm",
     "ios/**/*.cpp",
     "ios/**/*.swift",
+    "scripts/svgkit_patch.rb",
     "app.plugin.js",
+    "expoConfig/build",
+    "react-native.config.js",
     "*.podspec",
-    "scripts",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "workspaces": [
     "example"
@@ -85,31 +81,31 @@
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.39.1",
     "@expo/config-plugins": "54.0.2",
-    "@jamesacarr/eslint-formatter-github-actions": "0.2.0",
     "@react-native/babel-preset": "0.82.1",
     "@react-native/eslint-config": "0.82.1",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/exec": "7.1.0",
     "@semantic-release/git": "10.0.1",
-    "@semantic-release/npm": "13.1.1",
+    "@semantic-release/npm": "13.1.2",
     "@types/jest": "30.0.0",
     "@types/react": "19.1.1",
-    "clang-format-node": "2.0.3",
     "conventional-changelog-conventionalcommits": "9.1.0",
     "del-cli": "7.0.0",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-ft-flow": "3.0.11",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-unused-imports": "4.3.0",
     "jest": "30.2.0",
-    "lefthook": "2.0.2",
-    "nitrogen": "0.31.5",
+    "lefthook": "2.0.4",
+    "nitrogen": "0.31.6",
     "prettier": "3.6.2",
     "react": "19.1.1",
     "react-native": "0.82.1",
-    "react-native-builder-bob": "0.40.14",
-    "react-native-nitro-modules": "0.31.5",
-    "semantic-release": "25.0.1",
+    "react-native-builder-bob": "0.40.15",
+    "react-native-nitro-modules": "0.31.6",
+    "semantic-release": "25.0.2",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
@@ -122,52 +118,6 @@
     "expo": {
       "optional": true
     }
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native",
-      "prettier"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "warn",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      "module",
-      [
-        "typescript",
-        {
-          "project": "tsconfig.json"
-        }
-      ]
-    ]
   },
   "packageManager": "yarn@3.6.1"
 }

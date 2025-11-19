@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
+
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
-import type { RootNavigationProp } from '../types/navigation';
-import { useAppTheme } from '../hooks/useAppTheme';
-import type { AppTheme } from '../theme';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
+import type { RootNavigationProp } from '@src/types/navigation';
 
 export default function BlankScreen() {
   const navigation = useNavigation<RootNavigationProp>();

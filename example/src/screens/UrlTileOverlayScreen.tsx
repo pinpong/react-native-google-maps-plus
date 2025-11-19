@@ -1,16 +1,19 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
+
+import { useNavigation } from '@react-navigation/native';
+
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { makeUrlTileOverlay } from '@src/utils/mapGenerators';
+import { RNUrlTileOverlayValidator } from '@src/utils/validator';
+
 import type {
   GoogleMapsViewRef,
   RNUrlTileOverlay,
 } from 'react-native-google-maps-plus';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useNavigation } from '@react-navigation/native';
-import { RNUrlTileOverlayValidator } from '../components/maptConfigDialog/validator';
-import { useHeaderButton } from '../hooks/useHeaderButton';
-import { makeUrlTileOverlay } from '../utils/mapGenerators';
 
-export default function UrlTileOverlay() {
+export default function UrlTileOverlayScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
   const [urlTileOverlays, setUrlTileOverlays] = useState<

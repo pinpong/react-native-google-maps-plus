@@ -1,16 +1,20 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+
+import { ScrollView, StyleSheet } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
-import { useAppTheme } from '../hooks/useAppTheme';
-import type { AppTheme } from '../theme';
-import type {
-  RootNavigationProp,
-  RootStackParamList,
-} from '../types/navigation';
 import {
   type EdgeInsets,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+
+import ActionButton from '@src/components/ActionButton';
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
+import type {
+  RootNavigationProp,
+  RootStackParamList,
+} from '@src/types/navigation';
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
@@ -29,6 +33,7 @@ const screens = [
   { name: 'Snapshot', title: 'Snapshot Test' },
   { name: 'Clustering', title: 'Clustering' },
   { name: 'Stress', title: 'Stress Test' },
+  { name: 'Module', title: 'Module Test' },
 ];
 
 export default function HomeScreen() {
@@ -39,18 +44,14 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>React Native Google Maps Plus Examples</Text>
       {screens.map((s) => (
-        <TouchableOpacity
+        <ActionButton
           key={s.name}
-          style={styles.button}
+          label={s.title}
           onPress={() =>
             navigation.navigate(s.name as keyof RootStackParamList)
           }
-          activeOpacity={0.85}
-        >
-          <Text style={styles.buttonText}>{s.title}</Text>
-        </TouchableOpacity>
+        />
       ))}
     </ScrollView>
   );
@@ -62,34 +63,8 @@ const getThemedStyles = (theme: AppTheme, layout: EdgeInsets) =>
       flexGrow: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: layout.bottom + 8,
+      paddingTop: 8,
+      paddingBottom: layout.bottom + 8,
       backgroundColor: theme.bgPrimary,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      marginBottom: 24,
-      color: theme.textPrimary,
-      textAlign: 'center',
-    },
-    button: {
-      backgroundColor: theme.bgAccent,
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      borderRadius: 10,
-      marginVertical: 6,
-      width: '80%',
-      alignItems: 'center',
-      justifyContent: 'center',
-      shadowColor: theme.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    buttonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.textOnAccent,
     },
   });

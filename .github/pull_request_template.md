@@ -1,6 +1,6 @@
 ## Pull request
 
-Please ensure this PR targets the **`dev` branch** and follows the project conventions.  
+Please ensure this PR targets the **`dev` branch** and follows the project conventions.
 CI already runs linting, formatting, and build checks automatically.
 
 ---
@@ -33,7 +33,7 @@ Short description of what this PR changes or adds.
 
 - [ ] Android
 - [ ] iOS
-- [ ] Core
+- [ ] JS
 - [ ] Example App
 - [ ] Docs
 
@@ -41,8 +41,8 @@ Short description of what this PR changes or adds.
 
 ### Related
 
-List any related issues, pull requests, or discussions.  
-Use the format:  
+List any related issues, pull requests, or discussions.
+Use the format:
 `Fixes #123`, `Refs #456`, `Close #789`
 
 ---

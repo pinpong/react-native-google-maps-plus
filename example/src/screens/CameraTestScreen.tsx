@@ -1,6 +1,8 @@
 import React, { useMemo, useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import ControlPanel from '../components/ControlPanel';
+
+import ControlPanel from '@src/components/ControlPanel';
+import MapWrapper from '@src/components/MapWrapper';
+
 import type {
   GoogleMapsViewRef,
   RNCameraUpdate,

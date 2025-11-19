@@ -1,14 +1,17 @@
 import React, { useRef, useState } from 'react';
-import MapWrapper from '../components/MapWrapper';
-import { makeHeatmap } from '../utils/mapGenerators';
+
+import { useNavigation } from '@react-navigation/native';
+
+import MapConfigDialog from '@src/components/MapConfigDialog';
+import MapWrapper from '@src/components/MapWrapper';
+import { useHeaderButton } from '@src/hooks/useHeaderButton';
+import { makeHeatmap } from '@src/utils/mapGenerators';
+import { RNHeatmapValidator } from '@src/utils/validator';
+
 import type {
   GoogleMapsViewRef,
   RNHeatmap,
 } from 'react-native-google-maps-plus';
-import MapConfigDialog from '../components/maptConfigDialog/MapConfigDialog';
-import { useNavigation } from '@react-navigation/native';
-import { RNHeatmapValidator } from '../components/maptConfigDialog/validator';
-import { useHeaderButton } from '../hooks/useHeaderButton';
 
 export default function HeatmapScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);

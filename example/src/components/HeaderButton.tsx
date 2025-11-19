@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
+
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { useAppTheme } from '../hooks/useAppTheme';
-import type { AppTheme } from '../theme';
+
+import { useAppTheme } from '@src/hooks/useAppTheme';
+import type { AppTheme } from '@src/theme';
 
 type Props = {
   title: string;

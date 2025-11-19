@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -37,6 +39,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -50,6 +54,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -89,10 +95,12 @@ jobs:
     runs-on: macos-latest
     needs: [lint, test]
     env:
-      XCODE_VERSION: latest-stable
+      XCODE_VERSION: '26.0.1'
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -111,11 +119,6 @@ jobs:
 
       - name: Create Secrets.xcconfig
         run: echo MAPS_API_KEY="API_KEY" >> example/ios/Secrets.xcconfig
-
-      - name: Install iOS Simulator runtime
-        run: |
-          sudo xcodebuild -runFirstLaunch
-          sudo xcodebuild -downloadPlatform iOS
 
       - name: Build example for iOS
         run: yarn build:ios

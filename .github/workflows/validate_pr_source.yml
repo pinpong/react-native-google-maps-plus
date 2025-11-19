@@ -1,0 +1,25 @@
+name: Validate main branch PR source
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  close:
+    if: ${{ github.event.pull_request.head.ref != 'dev' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Close PR
+        run: |
+          echo "Closing PR from invalid source branch: ${{ github.event.pull_request.head.ref }}"
+
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "This PR targets **main**, but it was created from **${{ github.event.pull_request.head.ref }}**. Only PRs from **dev** are allowed."
+          gh pr close ${{ github.event.pull_request.number }}

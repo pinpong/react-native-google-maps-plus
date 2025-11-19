@@ -1,4 +1,5 @@
 import { type HybridObject } from 'react-native-nitro-modules';
+
 import type { RNLocationPermissionResult } from './types';
 
 export interface RNGoogleMapsPlusModule

@@ -1,6 +1,7 @@
 import CoreLocation
 import GoogleMaps
 import GoogleMapsUtils
+import NitroModules
 import UIKit
 
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
@@ -9,8 +10,8 @@ GMSIndoorDisplayDelegate {
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
-  private var initialized = false
-  private var loaded = false
+  private var mapViewInitialized = false
+  private var mapViewLoaded = false
   private var deInitialized = false
 
   private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
@@ -39,14 +40,18 @@ GMSIndoorDisplayDelegate {
     self.locationHandler = locationHandler
     self.markerBuilder = markerBuilder
     super.init(frame: frame)
-    setupAppLifecycleObservers()
   }
+
+  @MainActor
+  private var lifecycleAttached = false
 
   @MainActor
   private var lifecycleTasks = [Task<Void, Never>]()
 
   @MainActor
-  private func setupAppLifecycleObservers() {
+  private func attachLifecycleObservers() {
+    if lifecycleAttached { return }
+    lifecycleAttached = true
     lifecycleTasks.append(
       Task { @MainActor in
         for await _ in NotificationCenter.default.notifications(
@@ -78,14 +83,22 @@ GMSIndoorDisplayDelegate {
     )
   }
 
+  @MainActor
+  private func detachLifecycleObservers() {
+    if !lifecycleAttached { return }
+    lifecycleAttached = false
+    lifecycleTasks.forEach { $0.cancel() }
+    lifecycleTasks.removeAll()
+  }
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   @MainActor
-  func initMapView(googleMapOptions: GMSMapViewOptions) {
-    if initialized { return }
-    initialized = true
+  func initMapView() {
+    if mapViewInitialized { return }
+    mapViewInitialized = true
     googleMapOptions.frame = bounds
 
     mapView = GMSMapView.init(options: googleMapOptions)
@@ -107,7 +120,6 @@ GMSIndoorDisplayDelegate {
     locationHandler.onError = { [weak self] error in
       self?.onLocationError?(error)
     }
-    locationHandler.start()
   }
 
   @MainActor
@@ -170,9 +182,7 @@ GMSIndoorDisplayDelegate {
   }
 
   @MainActor
-  var initialProps: RNInitialProps? {
-    didSet {}
-  }
+  var googleMapOptions: GMSMapViewOptions = GMSMapViewOptions()
 
   @MainActor
   var uiSettings: RNMapUiSettings? {
@@ -211,7 +221,7 @@ GMSIndoorDisplayDelegate {
   @MainActor
   var trafficEnabled: Bool? {
     didSet {
-      mapView?.isTrafficEnabled = false
+      mapView?.isTrafficEnabled = trafficEnabled ?? false
     }
   }
 
@@ -272,10 +282,12 @@ GMSIndoorDisplayDelegate {
   @MainActor
   var locationConfig: RNLocationConfig? {
     didSet {
-      locationHandler.desiredAccuracy =
-        locationConfig?.ios?.desiredAccuracy?.toCLLocationAccuracy
-      locationHandler.distanceFilterMeters =
-        locationConfig?.ios?.distanceFilterMeters
+      locationHandler.updateConfig(
+        desiredAccuracy: locationConfig?.ios?.desiredAccuracy?
+          .toCLLocationAccuracy,
+        distanceFilterMeters: locationConfig?.ios?.distanceFilterMeters,
+        activityType: locationConfig?.ios?.activityType?.toCLActivityType,
+      )
     }
   }
 
@@ -690,6 +702,7 @@ GMSIndoorDisplayDelegate {
   func deinitInternal() {
     guard !deInitialized else { return }
     deInitialized = true
+    detachLifecycleObservers()
     onMain {
       self.locationHandler.stop()
       self.markerBuilder.cancelAllIconTasks()
@@ -704,7 +717,6 @@ GMSIndoorDisplayDelegate {
       self.mapView?.indoorDisplay.delegate = nil
       self.mapView?.delegate = nil
       self.mapView = nil
-      self.initialized = false
     }
   }
 
@@ -725,21 +737,22 @@ GMSIndoorDisplayDelegate {
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
+      attachLifecycleObservers()
       locationHandler.start()
+      initMapView()
     } else {
       locationHandler.stop()
+      detachLifecycleObservers()
     }
   }
 
   deinit {
     deinitInternal()
-    lifecycleTasks.forEach { $0.cancel() }
-    lifecycleTasks.removeAll()
   }
 
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
-    guard !loaded else { return }
-    loaded = true
+    guard !mapViewLoaded else { return }
+    mapViewLoaded = true
     let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
     let camera = mapView.camera.toRNCamera()
 
@@ -747,7 +760,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       self.cameraMoveReasonIsGesture = gesture
 
@@ -759,7 +772,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
@@ -770,7 +783,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-    if !loaded { return }
+    if !mapViewLoaded { return }
     onMain {
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()

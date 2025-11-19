@@ -6,22 +6,19 @@ private let kCLLocationAccuracyDefault: CLLocationAccuracy =
   kCLLocationAccuracyBest
 private let kCLDistanceFilterNoneDefault: CLLocationDistance =
   kCLDistanceFilterNone
+private let kCLActivityTypeDefault: CLActivityType = .other
 
 final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   private let manager = CLLocationManager()
 
-  var desiredAccuracy: CLLocationAccuracy? = kCLLocationAccuracyDefault {
-    didSet {
-      manager.desiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyBest
-    }
-  }
+  private var isActive = false
 
-  var distanceFilterMeters: CLLocationDistance? = kCLDistanceFilterNoneDefault {
-    didSet {
-      manager.distanceFilter = distanceFilterMeters ?? kCLDistanceFilterNone
-    }
-  }
+  private var currentDesiredAccuracy: CLLocationAccuracy =
+    kCLLocationAccuracyDefault
+  private var currentDistanceFilter: CLLocationDistance =
+    kCLDistanceFilterNoneDefault
+  private var currentActivityType: CLActivityType = kCLActivityTypeDefault
 
   var onUpdate: ((CLLocation) -> Void)?
   var onError: ((_ error: RNLocationErrorCode) -> Void)?
@@ -30,7 +27,21 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     super.init()
     manager.delegate = self
     manager.pausesLocationUpdatesAutomatically = true
-    manager.activityType = .other
+  }
+
+  func updateConfig(
+    desiredAccuracy: CLLocationAccuracy?,
+    distanceFilterMeters: CLLocationDistance?,
+    activityType: CLActivityType?
+  ) {
+    currentDesiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyDefault
+    manager.desiredAccuracy = currentDesiredAccuracy
+
+    currentDistanceFilter = distanceFilterMeters ?? kCLDistanceFilterNoneDefault
+    manager.distanceFilter = currentDistanceFilter
+
+    currentActivityType = activityType ?? kCLActivityTypeDefault
+    manager.activityType = currentActivityType
   }
 
   func showLocationDialog() {
@@ -71,11 +82,16 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   }
 
   func start() {
-    stop()
-    startUpdates()
+    guard !isActive else { return }
+    isActive = true
+
+    manager.requestLocation()
+    manager.startUpdatingLocation()
   }
 
   func stop() {
+    guard isActive else { return }
+    isActive = false
     manager.stopUpdatingLocation()
   }
 
@@ -102,13 +118,6 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
       openSettings()
     }
-  }
-
-  private func startUpdates() {
-    manager.desiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyDefault
-    manager.distanceFilter =
-      distanceFilterMeters ?? kCLDistanceFilterNoneDefault
-    manager.startUpdatingLocation()
   }
 
   func locationManager(

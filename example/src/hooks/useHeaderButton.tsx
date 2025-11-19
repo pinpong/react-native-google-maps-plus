@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect } from 'react';
-import HeaderButton from '../components/HeaderButton';
 import React from 'react';
+
+import HeaderButton from '@src/components/HeaderButton';
 
 export function useHeaderButton(
   navigation: any,

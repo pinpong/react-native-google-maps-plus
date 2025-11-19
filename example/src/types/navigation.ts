@@ -19,6 +19,7 @@ export type RootStackParamList = {
   Snapshot: undefined;
   Clustering: undefined;
   Stress: undefined;
+  Module: undefined;
 };
 
 export type RootNavigationProp = StackNavigationProp<RootStackParamList>;

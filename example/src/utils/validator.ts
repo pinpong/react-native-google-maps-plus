@@ -1,4 +1,13 @@
 import {
+  RNAndroidLocationPermissionResult,
+  RNAndroidLocationPriority,
+  RNIOSLocationAccuracy,
+  RNIOSLocationActivityType,
+  RNIOSPermissionResult,
+  RNLocationErrorCode,
+  RNMapErrorCode,
+} from 'react-native-google-maps-plus';
+import {
   array,
   boolean,
   enums,
@@ -10,15 +19,6 @@ import {
   type Struct,
   union,
 } from 'superstruct';
-
-import {
-  RNAndroidLocationPermissionResult,
-  RNAndroidLocationPriority,
-  RNIOSLocationAccuracy,
-  RNIOSPermissionResult,
-  RNLocationErrorCode,
-  RNMapErrorCode,
-} from 'react-native-google-maps-plus';
 
 const enumValues = <T extends object>(e: T): T[keyof T][] =>
   Object.values(e).filter(
@@ -272,6 +272,7 @@ const RNAndroidLocationConfigValidator = object({
 export const RNIOSLocationConfigValidator = object({
   desiredAccuracy: optional(enums(enumValues(RNIOSLocationAccuracy))),
   distanceFilterMeters: optional(number()),
+  activityType: optional(enums(enumValues(RNIOSLocationActivityType))),
 });
 
 export const RNLocationConfigValidator = object({
