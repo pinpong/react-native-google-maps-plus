@@ -239,7 +239,6 @@ final class MapMarkerBuilder {
       let iconSvg = m.iconSvg,
       let data = iconSvg.svgString.data(using: .utf8)
     else { return nil }
-    print("Is main thread:", Thread.isMainThread)
 
     let size = CGSize(
       width: max(1, CGFloat(iconSvg.width)),
