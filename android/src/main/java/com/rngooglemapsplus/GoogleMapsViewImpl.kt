@@ -53,7 +53,6 @@ import com.rngooglemapsplus.extensions.toRnCamera
 import com.rngooglemapsplus.extensions.toRnLatLng
 import com.rngooglemapsplus.extensions.toRnLocation
 import com.rngooglemapsplus.extensions.toRnRegion
-import com.rngooglemapsplus.extensions.withPaddingPixels
 import idTag
 import tagData
 import java.io.ByteArrayInputStream
@@ -451,27 +450,25 @@ class GoogleMapsViewImpl(
   ) = onUi {
     if (coordinates.isEmpty()) return@onUi
 
-    val w = mapView?.width ?: 0
-    val h = mapView?.height ?: 0
+    val bounds =
+      LatLngBounds
+        .builder()
+        .apply {
+          coordinates.forEach { include(it.toLatLng()) }
+        }.build()
 
-    val builder = LatLngBounds.builder()
-    coordinates.forEach { coord -> builder.include(coord.toLatLng()) }
+    val previousMapPadding = mapPadding
+    mapPadding = padding
 
-    val baseBounds = builder.build()
-    val paddedBounds = baseBounds.withPaddingPixels(w, h, padding)
-
-    val adjustedWidth =
-      (w - padding.left.dpToPx() - padding.right.dpToPx()).toInt().coerceAtLeast(0)
-    val adjustedHeight =
-      (h - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt().coerceAtLeast(0)
-
-    val update = CameraUpdateFactory.newLatLngBounds(paddedBounds, adjustedWidth, adjustedHeight, 0)
+    val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
 
     if (animated) {
       googleMap?.animateCamera(update, durationMs, null)
     } else {
       googleMap?.moveCamera(update)
     }
+
+    mapPadding = previousMapPadding
   }
 
   fun setCameraBounds(bounds: LatLngBounds?) =
