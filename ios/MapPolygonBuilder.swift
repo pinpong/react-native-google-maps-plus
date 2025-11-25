@@ -1,7 +1,6 @@
 import GoogleMaps
 
 final class MapPolygonBuilder {
-  @MainActor
   func build(_ p: RNPolygon) -> GMSPolygon {
     let path = p.coordinates.toGMSPath()
     let pg = GMSPolygon(path: path)
@@ -17,38 +16,39 @@ final class MapPolygonBuilder {
     return pg
   }
 
-  @MainActor
   func update(_ prev: RNPolygon, _ next: RNPolygon, _ pg: GMSPolygon) {
-    if !prev.coordinatesEquals(next) {
-      pg.path = next.coordinates.toGMSPath()
-    }
+    onMain {
+      if !prev.coordinatesEquals(next) {
+        pg.path = next.coordinates.toGMSPath()
+      }
 
-    if !prev.holesEquals(next) {
-      pg.holes = next.holes.toMapPolygonHoles()
-    }
+      if !prev.holesEquals(next) {
+        pg.holes = next.holes.toMapPolygonHoles()
+      }
 
-    if prev.fillColor != next.fillColor {
-      pg.fillColor = next.fillColor?.toUIColor() ?? .clear
-    }
+      if prev.fillColor != next.fillColor {
+        pg.fillColor = next.fillColor?.toUIColor() ?? .clear
+      }
 
-    if prev.strokeColor != next.strokeColor {
-      pg.strokeColor = next.strokeColor?.toUIColor() ?? .black
-    }
+      if prev.strokeColor != next.strokeColor {
+        pg.strokeColor = next.strokeColor?.toUIColor() ?? .black
+      }
 
-    if prev.strokeWidth != next.strokeWidth {
-      pg.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
-    }
+      if prev.strokeWidth != next.strokeWidth {
+        pg.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
+      }
 
-    if prev.pressable != next.pressable {
-      pg.isTappable = next.pressable ?? false
-    }
+      if prev.pressable != next.pressable {
+        pg.isTappable = next.pressable ?? false
+      }
 
-    if prev.geodesic != next.geodesic {
-      pg.geodesic = next.geodesic ?? false
-    }
+      if prev.geodesic != next.geodesic {
+        pg.geodesic = next.geodesic ?? false
+      }
 
-    if prev.zIndex != next.zIndex {
-      pg.zIndex = Int32(next.zIndex ?? 0)
+      if prev.zIndex != next.zIndex {
+        pg.zIndex = Int32(next.zIndex ?? 0)
+      }
     }
   }
 }

@@ -42,13 +42,10 @@ GMSIndoorDisplayDelegate {
     super.init(frame: frame)
   }
 
-  @MainActor
   private var lifecycleAttached = false
 
-  @MainActor
   private var lifecycleTasks = [Task<Void, Never>]()
 
-  @MainActor
   private func attachLifecycleObservers() {
     if lifecycleAttached { return }
     lifecycleAttached = true
@@ -83,7 +80,6 @@ GMSIndoorDisplayDelegate {
     )
   }
 
-  @MainActor
   private func detachLifecycleObservers() {
     if !lifecycleAttached { return }
     lifecycleAttached = false
@@ -95,34 +91,39 @@ GMSIndoorDisplayDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  @MainActor
   func initMapView() {
-    if mapViewInitialized { return }
-    mapViewInitialized = true
-    googleMapOptions.frame = bounds
+    onMain {
+      if self.mapViewInitialized { return }
+      self.mapViewInitialized = true
+      self.googleMapOptions.frame = self.bounds
 
-    mapView = GMSMapView.init(options: googleMapOptions)
-    mapView?.delegate = self
-    mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    mapView?.paddingAdjustmentBehavior = .never
-    mapView.map { addSubview($0) }
-    applyProps()
-    initLocationCallbacks()
-    onMapReady?(true)
+      self.mapView = GMSMapView.init(options: self.googleMapOptions)
+      self.mapView?.delegate = self
+      self.mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      self.mapView?.paddingAdjustmentBehavior = .never
+      self.mapView.map { self.addSubview($0) }
+      self.applyProps()
+      self.initLocationCallbacks()
+      self.onMapReady?(true)
+    }
   }
 
-  @MainActor
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
-      guard let self = self else { return }
-      self.onLocationUpdate?(loc.toRnLocation())
+      onMain { [weak self] in
+        guard let self = self else { return }
+        self.onLocationUpdate?(loc.toRnLocation())
+      }
     }
+
     locationHandler.onError = { [weak self] error in
-      self?.onLocationError?(error)
+      onMain { [weak self] in
+        guard let self = self else { return }
+        self.onLocationError?(error)
+      }
     }
   }
 
-  @MainActor
   private func applyProps() {
     ({ self.uiSettings = self.uiSettings })()
     ({ self.mapPadding = self.mapPadding })()
@@ -176,110 +177,124 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  @MainActor
   var currentCamera: GMSCameraPosition? {
-    mapView?.camera
+    return mapView?.camera
   }
 
-  @MainActor
   var googleMapOptions: GMSMapViewOptions = GMSMapViewOptions()
 
-  @MainActor
   var uiSettings: RNMapUiSettings? {
     didSet {
-      mapView?.settings.setAllGesturesEnabled(
-        uiSettings?.allGesturesEnabled ?? true
-      )
-      mapView?.settings.compassButton = uiSettings?.compassEnabled ?? false
-      mapView?.settings.indoorPicker =
-        uiSettings?.indoorLevelPickerEnabled ?? false
-      mapView?.settings.myLocationButton =
-        uiSettings?.myLocationButtonEnabled ?? false
-      mapView?.settings.rotateGestures = uiSettings?.rotateEnabled ?? true
-      mapView?.settings.scrollGestures = uiSettings?.scrollEnabled ?? true
-      mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
-        uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
-      mapView?.settings.tiltGestures = uiSettings?.tiltEnabled ?? true
-      mapView?.settings.zoomGestures = uiSettings?.zoomGesturesEnabled ?? true
+      onMain {
+        self.mapView?.settings.setAllGesturesEnabled(
+          self.uiSettings?.allGesturesEnabled ?? true
+        )
+        self.mapView?.settings.compassButton =
+          self.uiSettings?.compassEnabled ?? false
+        self.mapView?.settings.indoorPicker =
+          self.uiSettings?.indoorLevelPickerEnabled ?? false
+        self.mapView?.settings.myLocationButton =
+          self.uiSettings?.myLocationButtonEnabled ?? false
+        self.mapView?.settings.rotateGestures =
+          self.uiSettings?.rotateEnabled ?? true
+        self.mapView?.settings.scrollGestures =
+          self.uiSettings?.scrollEnabled ?? true
+        self.mapView?.settings.allowScrollGesturesDuringRotateOrZoom =
+          self.uiSettings?.scrollDuringRotateOrZoomEnabled ?? true
+        self.mapView?.settings.tiltGestures =
+          self.uiSettings?.tiltEnabled ?? true
+        self.mapView?.settings.zoomGestures =
+          self.uiSettings?.zoomGesturesEnabled ?? true
+      }
     }
   }
 
-  @MainActor
   var myLocationEnabled: Bool? {
     didSet {
-      mapView?.isMyLocationEnabled = myLocationEnabled ?? false
+      onMain {
+        self.mapView?.isMyLocationEnabled = self.myLocationEnabled ?? false
+      }
     }
   }
 
-  @MainActor
   var buildingEnabled: Bool? {
     didSet {
-      mapView?.isBuildingsEnabled = buildingEnabled ?? false
+      onMain {
+        self.mapView?.isBuildingsEnabled = self.buildingEnabled ?? false
+      }
     }
   }
 
-  @MainActor
   var trafficEnabled: Bool? {
     didSet {
-      mapView?.isTrafficEnabled = trafficEnabled ?? false
+      onMain {
+        self.mapView?.isTrafficEnabled = self.trafficEnabled ?? false
+      }
     }
   }
 
-  @MainActor
   var indoorEnabled: Bool? {
     didSet {
-      mapView?.isIndoorEnabled = indoorEnabled ?? false
-      mapView?.indoorDisplay.delegate = indoorEnabled == true ? self : nil
+      onMain {
+        self.mapView?.isIndoorEnabled = self.indoorEnabled ?? false
+        self.mapView?.indoorDisplay.delegate =
+          self.indoorEnabled == true ? self : nil
+      }
     }
   }
 
-  @MainActor
   var customMapStyle: GMSMapStyle? {
     didSet {
-      mapView?.mapStyle = customMapStyle
+      onMain {
+        self.mapView?.mapStyle = self.customMapStyle
+      }
     }
   }
 
-  @MainActor
   var userInterfaceStyle: UIUserInterfaceStyle? {
     didSet {
-      mapView?.overrideUserInterfaceStyle = userInterfaceStyle ?? .unspecified
+      onMain {
+        self.mapView?.overrideUserInterfaceStyle =
+          self.userInterfaceStyle ?? .unspecified
+      }
     }
   }
 
-  @MainActor
   var mapZoomConfig: RNMapZoomConfig? {
     didSet {
-      mapView?.setMinZoom(
-        Float(mapZoomConfig?.min ?? 2),
-        maxZoom: Float(mapZoomConfig?.max ?? 21)
-      )
+      onMain {
+        self.mapView?.setMinZoom(
+          Float(self.mapZoomConfig?.min ?? 2),
+          maxZoom: Float(self.mapZoomConfig?.max ?? 21)
+        )
+      }
     }
   }
 
-  @MainActor
   var mapPadding: RNMapPadding? {
     didSet {
-      mapView?.padding =
-        mapPadding.map {
-          UIEdgeInsets(
-            top: $0.top,
-            left: $0.left,
-            bottom: $0.bottom,
-            right: $0.right
-          )
-        } ?? .zero
+      onMain {
+        self.mapView?.padding =
+          self.mapPadding.map {
+            UIEdgeInsets(
+              top: $0.top,
+              left: $0.left,
+              bottom: $0.bottom,
+              right: $0.right
+            )
+          } ?? .zero
+      }
     }
   }
 
-  @MainActor
   var mapType: GMSMapViewType? {
     didSet {
-      mapView?.mapType = mapType ?? .normal
+      onMain {
+        self.mapView?.mapType = self.mapType ?? .normal
+      }
     }
   }
 
-  @MainActor
   var locationConfig: RNLocationConfig? {
     didSet {
       locationHandler.updateConfig(
@@ -317,7 +332,6 @@ GMSIndoorDisplayDelegate {
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
 
-  @MainActor
   func showMarkerInfoWindow(id: String) {
     onMain {
       guard let marker = self.markersById[id] else { return }
@@ -326,7 +340,6 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  @MainActor
   func hideMarkerInfoWindow(id: String) {
     onMain {
       guard let marker = self.markersById[id] else { return }
@@ -336,81 +349,87 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  @MainActor
   func setCamera(camera: GMSCameraPosition, animated: Bool, durationMs: Double) {
-    if animated {
-      withCATransaction(
-        disableActions: false,
-        duration: durationMs / 1000.0
-      ) {
-        self.mapView?.animate(to: camera)
+    onMain {
+      if animated {
+        withCATransaction(
+          disableActions: false,
+          duration: durationMs / 1000.0
+        ) {
+          self.mapView?.animate(to: camera)
+        }
+      } else {
+        let update = GMSCameraUpdate.setCamera(camera)
+        self.mapView?.moveCamera(update)
       }
-    } else {
-      let update = GMSCameraUpdate.setCamera(camera)
-      mapView?.moveCamera(update)
     }
   }
 
-  @MainActor
   func setCameraToCoordinates(
     coordinates: [RNLatLng],
     padding: RNMapPadding,
     animated: Bool,
     durationMs: Double
   ) {
-    guard let firstCoordinates = coordinates.first else {
-      return
-    }
-    var bounds = GMSCoordinateBounds(
-      coordinate: firstCoordinates.toCLLocationCoordinate2D(),
-      coordinate: firstCoordinates.toCLLocationCoordinate2D()
-    )
-
-    for coord in coordinates.dropFirst() {
-      bounds = bounds.includingCoordinate(coord.toCLLocationCoordinate2D())
-    }
-
-    let insets = UIEdgeInsets(
-      top: padding.top,
-      left: padding.left,
-      bottom: padding.bottom,
-      right: padding.right
-    )
-
-    let update = GMSCameraUpdate.fit(bounds, with: insets)
-    if animated {
-      withCATransaction(
-        disableActions: false,
-        duration: durationMs / 1000.0
-      ) {
-        self.mapView?.animate(with: update)
+    onMain {
+      guard let firstCoordinates = coordinates.first else {
+        return
       }
-    } else {
-      mapView?.moveCamera(update)
+      var bounds = GMSCoordinateBounds(
+        coordinate: firstCoordinates.toCLLocationCoordinate2D(),
+        coordinate: firstCoordinates.toCLLocationCoordinate2D()
+      )
+
+      for coordinate in coordinates.dropFirst() {
+        bounds = bounds.includingCoordinate(
+          coordinate.toCLLocationCoordinate2D()
+        )
+      }
+
+      let insets = UIEdgeInsets(
+        top: padding.top,
+        left: padding.left,
+        bottom: padding.bottom,
+        right: padding.right
+      )
+
+      let update = GMSCameraUpdate.fit(bounds, with: insets)
+
+      if animated {
+        withCATransaction(
+          disableActions: false,
+          duration: durationMs / 1000.0
+        ) {
+          self.mapView?.animate(with: update)
+        }
+      } else {
+        self.mapView?.moveCamera(update)
+      }
     }
   }
 
-  @MainActor
   func setCameraBounds(_ bounds: GMSCoordinateBounds?) {
-    mapView?.cameraTargetBounds = bounds
+    onMain {
+      self.mapView?.cameraTargetBounds = bounds
+    }
   }
 
-  @MainActor
   func animateToBounds(
     _ bounds: GMSCoordinateBounds,
     padding: Double,
     durationMs: Double,
     lockBounds: Bool
   ) {
-    if lockBounds {
-      mapView?.cameraTargetBounds = bounds
-    }
+    onMain {
+      if lockBounds {
+        self.mapView?.cameraTargetBounds = bounds
+      }
 
-    let update = GMSCameraUpdate.fit(bounds, withPadding: CGFloat(padding))
-    mapView?.animate(with: update)
+      let update = GMSCameraUpdate.fit(bounds, withPadding: CGFloat(padding))
+      self.mapView?.animate(with: update)
+    }
   }
 
-  @MainActor
   func snapshot(
     size: CGSize?,
     format: String,
@@ -420,7 +439,7 @@ GMSIndoorDisplayDelegate {
   ) -> NitroModules.Promise<String?> {
     let promise = Promise<String?>()
 
-    onMainAsync {
+    onMain {
       guard let mapView = self.mapView else {
         promise.resolve(withResult: nil)
         return
@@ -447,256 +466,289 @@ GMSIndoorDisplayDelegate {
     return promise
   }
 
-  @MainActor
   func addMarker(id: String, marker: GMSMarker) {
-    if mapView == nil {
-      pendingMarkers.append((id, marker))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingMarkers.append((id, marker))
+        return
+      }
+      self.markersById.removeValue(forKey: id).map { $0.map = nil }
+      self.addMarkerInternal(id: id, marker: marker)
     }
-    markersById.removeValue(forKey: id).map { $0.map = nil }
-    addMarkerInternal(id: id, marker: marker)
   }
 
-  @MainActor
   private func addMarkerInternal(id: String, marker: GMSMarker) {
-    marker.map = mapView
-    markersById[id] = marker
+    onMain {
+      marker.map = self.mapView
+      self.markersById[id] = marker
+    }
   }
 
-  @MainActor
   func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
-    markersById[id].map {
-      block($0)
-      if let mapView, mapView.selectedMarker == $0 {
-        mapView.selectedMarker = nil
-        mapView.selectedMarker = $0
+    onMain {
+      self.markersById[id].map {
+        block($0)
+        if let mapView = self.mapView, mapView.selectedMarker == $0 {
+          mapView.selectedMarker = nil
+          mapView.selectedMarker = $0
+        }
       }
     }
   }
 
-  @MainActor
   func removeMarker(id: String) {
-    markersById.removeValue(forKey: id).map {
-      $0.icon = nil
-      $0.map = nil
+    onMain {
+      self.markersById.removeValue(forKey: id).map {
+        $0.icon = nil
+        $0.map = nil
+      }
     }
   }
 
-  @MainActor
   func clearMarkers() {
-    markersById.values.forEach { $0.map = nil }
-    markersById.removeAll()
-    pendingMarkers.removeAll()
+    onMain {
+      self.markersById.values.forEach { $0.map = nil }
+      self.markersById.removeAll()
+      self.pendingMarkers.removeAll()
+    }
   }
 
-  @MainActor
   func addPolyline(id: String, polyline: GMSPolyline) {
-    if mapView == nil {
-      pendingPolylines.append((id, polyline))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingPolylines.append((id, polyline))
+        return
+      }
+      self.polylinesById.removeValue(forKey: id).map { $0.map = nil }
+      self.addPolylineInternal(id: id, polyline: polyline)
     }
-    polylinesById.removeValue(forKey: id).map { $0.map = nil }
-    addPolylineInternal(id: id, polyline: polyline)
   }
 
-  @MainActor
   private func addPolylineInternal(id: String, polyline: GMSPolyline) {
-    polyline.tagData = PolylineTag(id: id)
-    polyline.map = mapView
-    polylinesById[id] = polyline
+    onMain {
+      polyline.tagData = PolylineTag(id: id)
+      polyline.map = self.mapView
+      self.polylinesById[id] = polyline
+    }
   }
 
-  @MainActor
   func updatePolyline(id: String, block: @escaping (GMSPolyline) -> Void) {
-    polylinesById[id].map { block($0) }
+    onMain {
+      self.polylinesById[id].map { block($0) }
+    }
   }
 
-  @MainActor
   func removePolyline(id: String) {
-    polylinesById.removeValue(forKey: id).map { $0.map = nil }
+    onMain {
+      self.polylinesById.removeValue(forKey: id).map { $0.map = nil }
+    }
   }
 
-  @MainActor
   func clearPolylines() {
-    polylinesById.values.forEach { $0.map = nil }
-    polylinesById.removeAll()
-    pendingPolylines.removeAll()
+    onMain {
+      self.polylinesById.values.forEach { $0.map = nil }
+      self.polylinesById.removeAll()
+      self.pendingPolylines.removeAll()
+    }
   }
 
-  @MainActor
   func addPolygon(id: String, polygon: GMSPolygon) {
-    if mapView == nil {
-      pendingPolygons.append((id, polygon))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingPolygons.append((id, polygon))
+        return
+      }
+      self.polygonsById.removeValue(forKey: id).map { $0.map = nil }
+      self.addPolygonInternal(id: id, polygon: polygon)
     }
-    polygonsById.removeValue(forKey: id).map { $0.map = nil }
-    addPolygonInternal(id: id, polygon: polygon)
   }
 
-  @MainActor
   private func addPolygonInternal(id: String, polygon: GMSPolygon) {
-    polygon.tagData = PolygonTag(id: id)
-    polygon.map = mapView
-    polygonsById[id] = polygon
+    onMain {
+      polygon.tagData = PolygonTag(id: id)
+      polygon.map = self.mapView
+      self.polygonsById[id] = polygon
+    }
   }
 
-  @MainActor
   func updatePolygon(id: String, block: @escaping (GMSPolygon) -> Void) {
-    polygonsById[id].map { block($0) }
+    onMain {
+      self.polygonsById[id].map { block($0) }
+    }
   }
 
-  @MainActor
   func removePolygon(id: String) {
-    polygonsById.removeValue(forKey: id).map { $0.map = nil }
+    onMain {
+      self.polygonsById.removeValue(forKey: id).map { $0.map = nil }
+    }
   }
 
-  @MainActor
   func clearPolygons() {
-    polygonsById.values.forEach { $0.map = nil }
-    polygonsById.removeAll()
-    pendingPolygons.removeAll()
+    onMain {
+      self.polygonsById.values.forEach { $0.map = nil }
+      self.polygonsById.removeAll()
+      self.pendingPolygons.removeAll()
+    }
   }
 
-  @MainActor
   func addCircle(id: String, circle: GMSCircle) {
-    if mapView == nil {
-      pendingCircles.append((id, circle))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingCircles.append((id, circle))
+        return
+      }
+      self.circlesById.removeValue(forKey: id).map { $0.map = nil }
+      self.addCircleInternal(id: id, circle: circle)
     }
-    circlesById.removeValue(forKey: id).map { $0.map = nil }
-    addCircleInternal(id: id, circle: circle)
   }
 
-  @MainActor
   private func addCircleInternal(id: String, circle: GMSCircle) {
-    circle.tagData = CircleTag(id: id)
-    circle.map = mapView
-    circlesById[id] = circle
+    onMain {
+      circle.tagData = CircleTag(id: id)
+      circle.map = self.mapView
+      self.circlesById[id] = circle
+    }
   }
 
-  @MainActor
   func updateCircle(id: String, block: @escaping (GMSCircle) -> Void) {
-    circlesById[id].map { block($0) }
+    onMain {
+      self.circlesById[id].map { block($0) }
+    }
   }
 
-  @MainActor
   func removeCircle(id: String) {
-    circlesById.removeValue(forKey: id).map { $0.map = nil }
+    onMain {
+      self.circlesById.removeValue(forKey: id).map { $0.map = nil }
+    }
   }
 
-  @MainActor
   func clearCircles() {
-    circlesById.values.forEach { $0.map = nil }
-    circlesById.removeAll()
-    pendingCircles.removeAll()
+    onMain {
+      self.circlesById.values.forEach { $0.map = nil }
+      self.circlesById.removeAll()
+      self.pendingCircles.removeAll()
+    }
   }
 
-  @MainActor
   func addHeatmap(id: String, heatmap: GMUHeatmapTileLayer) {
-    if mapView == nil {
-      pendingHeatmaps.append((id, heatmap))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingHeatmaps.append((id, heatmap))
+        return
+      }
+      self.heatmapsById.removeValue(forKey: id).map { $0.map = nil }
+      self.addHeatmapInternal(id: id, heatmap: heatmap)
     }
-    heatmapsById.removeValue(forKey: id).map { $0.map = nil }
-    addHeatmapInternal(id: id, heatmap: heatmap)
   }
 
-  @MainActor
   private func addHeatmapInternal(id: String, heatmap: GMUHeatmapTileLayer) {
-    heatmap.map = mapView
-    heatmapsById[id] = heatmap
+    onMain {
+      heatmap.map = self.mapView
+      self.heatmapsById[id] = heatmap
+    }
   }
 
-  @MainActor
   func removeHeatmap(id: String) {
-    heatmapsById.removeValue(forKey: id).map {
-      $0.clearTileCache()
-      $0.map = nil
+    onMain {
+      self.heatmapsById.removeValue(forKey: id).map {
+        $0.clearTileCache()
+        $0.map = nil
+      }
     }
   }
 
-  @MainActor
   func clearHeatmaps() {
-    heatmapsById.values.forEach {
-      $0.clearTileCache()
-      $0.map = nil
+    onMain {
+      self.heatmapsById.values.forEach {
+        $0.clearTileCache()
+        $0.map = nil
+      }
+      self.heatmapsById.removeAll()
+      self.pendingHeatmaps.removeAll()
     }
-    heatmapsById.removeAll()
-    pendingHeatmaps.removeAll()
   }
 
-  @MainActor
   func addKmlLayer(id: String, kmlString: String) {
-    if mapView == nil {
-      pendingKmlLayers.append((id, kmlString))
-      return
+    onMain {
+      if self.mapView == nil {
+        self.pendingKmlLayers.append((id, kmlString))
+        return
+      }
+      self.kmlLayerById.removeValue(forKey: id).map { $0.clear() }
+      self.addKmlLayerInternal(id: id, kmlString: kmlString)
     }
-    kmlLayerById.removeValue(forKey: id).map { $0.clear() }
-    addKmlLayerInternal(id: id, kmlString: kmlString)
   }
 
-  @MainActor
   private func addKmlLayerInternal(id: String, kmlString: String) {
-    guard let data = kmlString.data(using: .utf8) else { return }
-    let parser = GMUKMLParser(data: data)
-    parser.parse()
-    mapView.map { mapView in
-      let renderer = GMUGeometryRenderer(
-        map: mapView,
-        geometries: parser.placemarks
-      )
-      renderer.render()
-      kmlLayerById[id] = renderer
+    onMain {
+      guard let data = kmlString.data(using: .utf8) else { return }
+      let parser = GMUKMLParser(data: data)
+      parser.parse()
+
+      self.mapView.map { mapView in
+        let renderer = GMUGeometryRenderer(
+          map: mapView,
+          geometries: parser.placemarks
+        )
+        renderer.render()
+        self.kmlLayerById[id] = renderer
+      }
     }
   }
 
-  @MainActor
   func removeKmlLayer(id: String) {
-    kmlLayerById.removeValue(forKey: id).map { $0.clear() }
-  }
-
-  @MainActor
-  func clearKmlLayers() {
-    kmlLayerById.values.forEach { $0.clear() }
-    kmlLayerById.removeAll()
-    pendingKmlLayers.removeAll()
-  }
-
-  @MainActor
-  func addUrlTileOverlay(id: String, urlTileOverlay: GMSURLTileLayer) {
-    if mapView == nil {
-      pendingUrlTileOverlays.append((id, urlTileOverlay))
-      return
+    onMain {
+      self.kmlLayerById.removeValue(forKey: id).map { $0.clear() }
     }
-    urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
-    addUrlTileOverlayInternal(id: id, urlTileOverlay: urlTileOverlay)
   }
 
-  @MainActor
+  func clearKmlLayers() {
+    onMain {
+      self.kmlLayerById.values.forEach { $0.clear() }
+      self.kmlLayerById.removeAll()
+      self.pendingKmlLayers.removeAll()
+    }
+  }
+
+  func addUrlTileOverlay(id: String, urlTileOverlay: GMSURLTileLayer) {
+    onMain {
+      if self.mapView == nil {
+        self.pendingUrlTileOverlays.append((id, urlTileOverlay))
+        return
+      }
+      self.urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
+      self.addUrlTileOverlayInternal(id: id, urlTileOverlay: urlTileOverlay)
+    }
+  }
+
   private func addUrlTileOverlayInternal(
     id: String,
     urlTileOverlay: GMSURLTileLayer
   ) {
-    urlTileOverlay.map = mapView
-    urlTileOverlays[id] = urlTileOverlay
+    onMain {
+      urlTileOverlay.map = self.mapView
+      self.urlTileOverlays[id] = urlTileOverlay
+    }
   }
 
-  @MainActor
   func removeUrlTileOverlay(id: String) {
-    urlTileOverlays.removeValue(forKey: id).map {
-      $0.clearTileCache()
-      $0.map = nil
+    onMain {
+      self.urlTileOverlays.removeValue(forKey: id).map {
+        $0.clearTileCache()
+        $0.map = nil
+      }
     }
   }
 
-  @MainActor
   func clearUrlTileOverlay() {
-    urlTileOverlays.values.forEach {
-      $0.clearTileCache()
-      $0.map = nil
+    onMain {
+      self.urlTileOverlays.values.forEach {
+        $0.clearTileCache()
+        $0.map = nil
+      }
+      self.urlTileOverlays.removeAll()
+      self.pendingUrlTileOverlays.removeAll()
     }
-    urlTileOverlays.removeAll()
-    pendingUrlTileOverlays.removeAll()
   }
 
   func deinitInternal() {
@@ -757,11 +809,14 @@ GMSIndoorDisplayDelegate {
 
   func mapViewDidFinishTileRendering(_ mapView: GMSMapView) {
     guard !mapViewLoaded else { return }
-    mapViewLoaded = true
-    let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
-    let camera = mapView.camera.toRNCamera()
+    onMain {
+      self.mapViewLoaded = true
 
-    self.onMapLoaded?(visibleRegion, camera)
+      let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
+      let camera = mapView.camera.toRNCamera()
+
+      self.onMapLoaded?(visibleRegion, camera)
+    }
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {

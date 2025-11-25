@@ -10,7 +10,6 @@ final class MapMarkerBuilder {
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
 
-  @MainActor
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
       position: m.coordinate.toCLLocationCoordinate2D()
@@ -44,22 +43,37 @@ final class MapMarkerBuilder {
     return marker
   }
 
-  @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    withCATransaction(disableActions: true) {
+    onMain {
+      withCATransaction(disableActions: true) {
 
-      var tracksViewChanges = false
-      var tracksInfoWindowChanges = false
+        var tracksViewChanges = false
+        var tracksInfoWindowChanges = false
 
-      if !prev.coordinateEquals(next) {
-        m.position = next.coordinate.toCLLocationCoordinate2D()
-      }
+        if !prev.coordinateEquals(next) {
+          m.position = next.coordinate.toCLLocationCoordinate2D()
+        }
 
-      if !prev.markerStyleEquals(next) {
-        self.buildIconAsync(next) { img in
-          tracksViewChanges = true
-          m.icon = img
+        if !prev.markerStyleEquals(next) {
+          self.buildIconAsync(next) { img in
+            tracksViewChanges = true
+            m.icon = img
 
+            if !prev.anchorEquals(next) {
+              m.groundAnchor = CGPoint(
+                x: next.anchor?.x ?? 0.5,
+                y: next.anchor?.y ?? 1
+              )
+            }
+
+            if !prev.infoWindowAnchorEquals(next) {
+              m.infoWindowAnchor = CGPoint(
+                x: next.infoWindowAnchor?.x ?? 0.5,
+                y: next.infoWindowAnchor?.y ?? 0
+              )
+            }
+          }
+        } else {
           if !prev.anchorEquals(next) {
             m.groundAnchor = CGPoint(
               x: next.anchor?.x ?? 0.5,
@@ -74,72 +88,54 @@ final class MapMarkerBuilder {
             )
           }
         }
-      } else {
-        if !prev.anchorEquals(next) {
-          m.groundAnchor = CGPoint(
-            x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 1
+
+        if prev.title != next.title {
+          tracksInfoWindowChanges = true
+          m.title = next.title
+        }
+
+        if prev.snippet != next.snippet {
+          tracksInfoWindowChanges = true
+          m.snippet = next.snippet
+        }
+
+        if prev.opacity != next.opacity {
+          let opacity = Float(next.opacity ?? 1)
+          m.opacity = opacity
+          m.iconView?.alpha = CGFloat(opacity)
+        }
+
+        if prev.flat != next.flat {
+          m.isFlat = next.flat ?? false
+        }
+
+        if prev.draggable != next.draggable {
+          m.isDraggable = next.draggable ?? false
+        }
+
+        if prev.rotation != next.rotation {
+          m.rotation = next.rotation ?? 0
+        }
+
+        if prev.zIndex != next.zIndex {
+          m.zIndex = Int32(next.zIndex ?? 0)
+        }
+
+        if !prev.markerInfoWindowStyleEquals(next) {
+          m.tagData = MarkerTag(
+            id: next.id,
+            iconSvg: next.infoWindowIconSvg
           )
         }
 
-        if !prev.infoWindowAnchorEquals(next) {
-          m.infoWindowAnchor = CGPoint(
-            x: next.infoWindowAnchor?.x ?? 0.5,
-            y: next.infoWindowAnchor?.y ?? 0
-          )
+        if tracksViewChanges {
+          m.tracksViewChanges = tracksViewChanges
         }
-      }
+        if tracksInfoWindowChanges {
+          m.tracksInfoWindowChanges = tracksInfoWindowChanges
+        }
 
-      if prev.title != next.title {
-        tracksInfoWindowChanges = true
-        m.title = next.title
-      }
-
-      if prev.snippet != next.snippet {
-        tracksInfoWindowChanges = true
-        m.snippet = next.snippet
-      }
-
-      if prev.opacity != next.opacity {
-        let opacity = Float(next.opacity ?? 1)
-        m.opacity = opacity
-        m.iconView?.alpha = CGFloat(opacity)
-      }
-
-      if prev.flat != next.flat {
-        m.isFlat = next.flat ?? false
-      }
-
-      if prev.draggable != next.draggable {
-        m.isDraggable = next.draggable ?? false
-      }
-
-      if prev.rotation != next.rotation {
-        m.rotation = next.rotation ?? 0
-      }
-
-      if prev.zIndex != next.zIndex {
-        m.zIndex = Int32(next.zIndex ?? 0)
-      }
-
-      if !prev.markerInfoWindowStyleEquals(next) {
-        m.tagData = MarkerTag(
-          id: next.id,
-          iconSvg: next.infoWindowIconSvg
-        )
-      }
-
-      if tracksViewChanges {
-        m.tracksViewChanges = tracksViewChanges
-      }
-      if tracksInfoWindowChanges {
-        m.tracksInfoWindowChanges = tracksInfoWindowChanges
-      }
-
-      if tracksViewChanges || tracksInfoWindowChanges {
-        onMain { [weak m] in
-          guard let m = m else { return }
-
+        if tracksViewChanges || tracksInfoWindowChanges {
           if tracksViewChanges {
             m.tracksViewChanges = false
           }
@@ -191,13 +187,11 @@ final class MapMarkerBuilder {
     tasks[m.id] = task
   }
 
-  @MainActor
   func cancelIconTask(_ id: String) {
     tasks[id]?.cancel()
     tasks.removeValue(forKey: id)
   }
 
-  @MainActor
   func cancelAllIconTasks() {
     let ids = Array(tasks.keys)
     for id in ids {
@@ -208,7 +202,6 @@ final class MapMarkerBuilder {
     CATransaction.flush()
   }
 
-  @MainActor
   func buildInfoWindow(iconSvg: RNMarkerSvg?) -> UIImageView? {
     guard let iconSvg = iconSvg else {
       return nil
@@ -246,6 +239,7 @@ final class MapMarkerBuilder {
       let iconSvg = m.iconSvg,
       let data = iconSvg.svgString.data(using: .utf8)
     else { return nil }
+    print("Is main thread:", Thread.isMainThread)
 
     let size = CGSize(
       width: max(1, CGFloat(iconSvg.width)),

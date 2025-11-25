@@ -1,12 +1,12 @@
 import QuartzCore
 
-@MainActor @inline(__always)
+@inline(__always)
 func withCATransaction(
   disableActions: Bool = true,
   duration: CFTimeInterval? = nil,
   timingFunction: CAMediaTimingFunction? = nil,
   completion: (() -> Void)? = nil,
-  _ body: @escaping @MainActor () -> Void
+  _ body: @escaping () -> Void
 ) {
   onMain {
     CATransaction.begin()
@@ -21,20 +21,15 @@ func withCATransaction(
   }
 }
 
-@MainActor @inline(__always)
-func onMain(_ block: @escaping @MainActor () -> Void) {
+@inline(__always)
+func onMain(
+  _ block: @escaping () -> Void
+) {
   if Thread.isMainThread {
     block()
   } else {
-    Task { @MainActor in block() }
-  }
-}
-
-@inline(__always)
-func onMainAsync(
-  _ block: @escaping @MainActor () async -> Void
-) {
-  Task { @MainActor in
-    await block()
+    Task { @MainActor in
+      block()
+    }
   }
 }
