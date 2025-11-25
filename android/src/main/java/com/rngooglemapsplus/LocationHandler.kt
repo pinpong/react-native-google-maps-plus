@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
+import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 private const val REQ_LOCATION_SETTINGS = 2001
@@ -64,8 +65,8 @@ class LocationHandler(
   }
 
   fun showLocationDialog() {
-    UiThreadUtil.runOnUiThread {
-      val activity = context.currentActivity ?: run { return@runOnUiThread }
+    onUi {
+      val activity = context.currentActivity ?: run { return@onUi }
 
       val lr =
         if (Build.VERSION.SDK_INT >= 31) {
