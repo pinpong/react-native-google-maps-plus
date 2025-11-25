@@ -714,6 +714,11 @@ GMSIndoorDisplayDelegate {
       self.clearKmlLayers()
       self.clearUrlTileOverlay()
       self.mapView?.clear()
+      self.mapView?.isTrafficEnabled = false
+      self.mapView?.isIndoorEnabled = false
+      self.mapView?.isMyLocationEnabled = false
+      self.mapView?.cameraTargetBounds = nil
+      self.mapView?.layer.removeAllAnimations()
       self.mapView?.indoorDisplay.delegate = nil
       self.mapView?.delegate = nil
       self.mapView = nil
