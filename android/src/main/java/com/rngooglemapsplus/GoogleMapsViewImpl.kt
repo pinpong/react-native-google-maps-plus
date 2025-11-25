@@ -837,9 +837,15 @@ class GoogleMapsViewImpl(
         setOnMyLocationClickListener(null)
         setOnMyLocationButtonClickListener(null)
         setInfoWindowAdapter(null)
+        isTrafficEnabled = false
+        isIndoorEnabled = false
+        myLocationEnabled = false
+        setLocationSource(null)
+        setLatLngBoundsForCameraTarget(null)
       }
       googleMap = null
       mapView?.removeAllViews()
+      mapView = null
       super.removeAllViews()
       reactContext.unregisterComponentCallbacks(componentCallbacks)
     }
