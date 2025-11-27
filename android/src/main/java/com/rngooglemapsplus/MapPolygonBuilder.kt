@@ -6,7 +6,6 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.holesEquals
-import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toMapsPolygonHoles

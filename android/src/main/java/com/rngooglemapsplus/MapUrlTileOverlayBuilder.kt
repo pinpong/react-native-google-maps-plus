@@ -25,6 +25,7 @@ class MapUrlTileOverlayBuilder {
           return try {
             URL(url)
           } catch (e: Exception) {
+            mapsLog("tile url invalid: $url", e)
             null
           }
         }

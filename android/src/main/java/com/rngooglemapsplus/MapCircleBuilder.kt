@@ -5,7 +5,6 @@ import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.rngooglemapsplus.extensions.centerEquals
-import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
 

@@ -1,4 +1,4 @@
-package com.rngooglemapsplus.extensions
+package com.rngooglemapsplus
 
 import com.facebook.react.bridge.UiThreadUtil
 import kotlinx.coroutines.CompletableDeferred
@@ -19,4 +19,17 @@ inline fun <T> onUiSync(crossinline block: () -> T): T {
     runCatching(block).onSuccess(result::complete).onFailure(result::completeExceptionally)
   }
   return runBlocking { result.await() }
+}
+
+private const val MAPS_LOG_TAG = "react-native-google-maps-plus"
+
+fun mapsLog(msg: String) {
+  android.util.Log.w(MAPS_LOG_TAG, msg)
+}
+
+fun mapsLog(
+  msg: String,
+  t: Throwable,
+) {
+  android.util.Log.w(MAPS_LOG_TAG, msg, t)
 }

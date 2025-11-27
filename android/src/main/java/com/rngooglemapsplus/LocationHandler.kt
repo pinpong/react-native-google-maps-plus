@@ -19,7 +19,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
-import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 
 private const val REQ_LOCATION_SETTINGS = 2001

@@ -20,7 +20,8 @@ GMSIndoorDisplayDelegate {
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
   private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
   private var pendingKmlLayers: [(id: String, kmlString: String)] = []
-  private var pendingUrlTileOverlays: [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
+  private var pendingUrlTileOverlays:
+    [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
 
   private var markersById: [String: GMSMarker] = [:]
   private var polylinesById: [String: GMSPolyline] = [:]
@@ -1004,11 +1005,10 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
-    return markerBuilder.buildInfoWindow(iconSvg: marker.tagData.iconSvg)
+    return markerBuilder.buildInfoWindow(markerTag: marker.tagData)
   }
 
-  func mapView(_ mapView: GMSMapView, markerInfoContents marker: GMSMarker)
-  -> UIView? {
+  func mapView(_ mapView: GMSMapView, markerInfoContents marker: GMSMarker) -> UIView? {
     return nil
   }
 }

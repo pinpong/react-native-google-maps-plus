@@ -33,3 +33,17 @@ func onMain(
     }
   }
 }
+
+@inline(__always)
+func mapsLog(_ message: String) {
+  NSLog("[react-native-google-maps-plus] %@", message)
+}
+
+@inline(__always)
+func mapsLog(_ message: String, _ error: Error) {
+  NSLog(
+    "[react-native-google-maps-plus] %@ | %@",
+    message,
+    String(describing: error)
+  )
+}

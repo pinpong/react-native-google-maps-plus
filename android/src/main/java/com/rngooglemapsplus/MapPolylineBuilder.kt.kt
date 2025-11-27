@@ -5,7 +5,6 @@ import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.rngooglemapsplus.extensions.coordinatesEquals
-import com.rngooglemapsplus.extensions.onUi
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toMapJointType

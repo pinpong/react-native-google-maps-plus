@@ -41,8 +41,6 @@ import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.encode
-import com.rngooglemapsplus.extensions.onUi
-import com.rngooglemapsplus.extensions.onUiSync
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toLocationErrorCode
@@ -749,7 +747,7 @@ class GoogleMapsViewImpl(
       kmlLayersById[id] = layer
       layer.addLayerToMap()
     } catch (_: Exception) {
-      // ignore
+      mapsLog("kml layer parse failed: id=$id")
     }
   }
 
@@ -971,5 +969,5 @@ class GoogleMapsViewImpl(
 
   override fun getInfoContents(marker: Marker): View? = null
 
-  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData.iconSvg)
+  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData)
 }
