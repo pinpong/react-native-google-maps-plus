@@ -41,8 +41,6 @@ import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.data.kml.KmlLayer
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.encode
-import com.rngooglemapsplus.extensions.onUi
-import com.rngooglemapsplus.extensions.onUiSync
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toLocationErrorCode
@@ -53,7 +51,6 @@ import com.rngooglemapsplus.extensions.toRnCamera
 import com.rngooglemapsplus.extensions.toRnLatLng
 import com.rngooglemapsplus.extensions.toRnLocation
 import com.rngooglemapsplus.extensions.toRnRegion
-import com.rngooglemapsplus.extensions.withPaddingPixels
 import idTag
 import tagData
 import java.io.ByteArrayInputStream
@@ -451,27 +448,25 @@ class GoogleMapsViewImpl(
   ) = onUi {
     if (coordinates.isEmpty()) return@onUi
 
-    val w = mapView?.width ?: 0
-    val h = mapView?.height ?: 0
+    val bounds =
+      LatLngBounds
+        .builder()
+        .apply {
+          coordinates.forEach { include(it.toLatLng()) }
+        }.build()
 
-    val builder = LatLngBounds.builder()
-    coordinates.forEach { coord -> builder.include(coord.toLatLng()) }
+    val previousMapPadding = mapPadding
+    mapPadding = padding
 
-    val baseBounds = builder.build()
-    val paddedBounds = baseBounds.withPaddingPixels(w, h, padding)
-
-    val adjustedWidth =
-      (w - padding.left.dpToPx() - padding.right.dpToPx()).toInt().coerceAtLeast(0)
-    val adjustedHeight =
-      (h - padding.top.dpToPx() - padding.bottom.dpToPx()).toInt().coerceAtLeast(0)
-
-    val update = CameraUpdateFactory.newLatLngBounds(paddedBounds, adjustedWidth, adjustedHeight, 0)
+    val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
 
     if (animated) {
       googleMap?.animateCamera(update, durationMs, null)
     } else {
       googleMap?.moveCamera(update)
     }
+
+    mapPadding = previousMapPadding
   }
 
   fun setCameraBounds(bounds: LatLngBounds?) =
@@ -752,7 +747,7 @@ class GoogleMapsViewImpl(
       kmlLayersById[id] = layer
       layer.addLayerToMap()
     } catch (_: Exception) {
-      // ignore
+      mapsLog("kml layer parse failed: id=$id")
     }
   }
 
@@ -837,9 +832,15 @@ class GoogleMapsViewImpl(
         setOnMyLocationClickListener(null)
         setOnMyLocationButtonClickListener(null)
         setInfoWindowAdapter(null)
+        isTrafficEnabled = false
+        isIndoorEnabled = false
+        myLocationEnabled = false
+        setLocationSource(null)
+        setLatLngBoundsForCameraTarget(null)
       }
       googleMap = null
       mapView?.removeAllViews()
+      mapView = null
       super.removeAllViews()
       reactContext.unregisterComponentCallbacks(componentCallbacks)
     }
@@ -968,5 +969,5 @@ class GoogleMapsViewImpl(
 
   override fun getInfoContents(marker: Marker): View? = null
 
-  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData.iconSvg)
+  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData)
 }

@@ -10,7 +10,10 @@ final class MapMarkerBuilder {
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
 
-  @MainActor
+  init() {
+    warmupSVGKit()
+  }
+
   func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
     let marker = GMSMarker(
       position: m.coordinate.toCLLocationCoordinate2D()
@@ -44,22 +47,37 @@ final class MapMarkerBuilder {
     return marker
   }
 
-  @MainActor
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
-    withCATransaction(disableActions: true) {
+    onMain {
+      withCATransaction(disableActions: true) {
 
-      var tracksViewChanges = false
-      var tracksInfoWindowChanges = false
+        var tracksViewChanges = false
+        var tracksInfoWindowChanges = false
 
-      if !prev.coordinateEquals(next) {
-        m.position = next.coordinate.toCLLocationCoordinate2D()
-      }
+        if !prev.coordinateEquals(next) {
+          m.position = next.coordinate.toCLLocationCoordinate2D()
+        }
 
-      if !prev.markerStyleEquals(next) {
-        self.buildIconAsync(next) { img in
-          tracksViewChanges = true
-          m.icon = img
+        if !prev.markerStyleEquals(next) {
+          self.buildIconAsync(next) { img in
+            tracksViewChanges = true
+            m.icon = img
 
+            if !prev.anchorEquals(next) {
+              m.groundAnchor = CGPoint(
+                x: next.anchor?.x ?? 0.5,
+                y: next.anchor?.y ?? 1
+              )
+            }
+
+            if !prev.infoWindowAnchorEquals(next) {
+              m.infoWindowAnchor = CGPoint(
+                x: next.infoWindowAnchor?.x ?? 0.5,
+                y: next.infoWindowAnchor?.y ?? 0
+              )
+            }
+          }
+        } else {
           if !prev.anchorEquals(next) {
             m.groundAnchor = CGPoint(
               x: next.anchor?.x ?? 0.5,
@@ -74,72 +92,54 @@ final class MapMarkerBuilder {
             )
           }
         }
-      } else {
-        if !prev.anchorEquals(next) {
-          m.groundAnchor = CGPoint(
-            x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 1
+
+        if prev.title != next.title {
+          tracksInfoWindowChanges = true
+          m.title = next.title
+        }
+
+        if prev.snippet != next.snippet {
+          tracksInfoWindowChanges = true
+          m.snippet = next.snippet
+        }
+
+        if prev.opacity != next.opacity {
+          let opacity = Float(next.opacity ?? 1)
+          m.opacity = opacity
+          m.iconView?.alpha = CGFloat(opacity)
+        }
+
+        if prev.flat != next.flat {
+          m.isFlat = next.flat ?? false
+        }
+
+        if prev.draggable != next.draggable {
+          m.isDraggable = next.draggable ?? false
+        }
+
+        if prev.rotation != next.rotation {
+          m.rotation = next.rotation ?? 0
+        }
+
+        if prev.zIndex != next.zIndex {
+          m.zIndex = Int32(next.zIndex ?? 0)
+        }
+
+        if !prev.markerInfoWindowStyleEquals(next) {
+          m.tagData = MarkerTag(
+            id: next.id,
+            iconSvg: next.infoWindowIconSvg
           )
         }
 
-        if !prev.infoWindowAnchorEquals(next) {
-          m.infoWindowAnchor = CGPoint(
-            x: next.infoWindowAnchor?.x ?? 0.5,
-            y: next.infoWindowAnchor?.y ?? 0
-          )
+        if tracksViewChanges {
+          m.tracksViewChanges = tracksViewChanges
         }
-      }
+        if tracksInfoWindowChanges {
+          m.tracksInfoWindowChanges = tracksInfoWindowChanges
+        }
 
-      if prev.title != next.title {
-        tracksInfoWindowChanges = true
-        m.title = next.title
-      }
-
-      if prev.snippet != next.snippet {
-        tracksInfoWindowChanges = true
-        m.snippet = next.snippet
-      }
-
-      if prev.opacity != next.opacity {
-        let opacity = Float(next.opacity ?? 1)
-        m.opacity = opacity
-        m.iconView?.alpha = CGFloat(opacity)
-      }
-
-      if prev.flat != next.flat {
-        m.isFlat = next.flat ?? false
-      }
-
-      if prev.draggable != next.draggable {
-        m.isDraggable = next.draggable ?? false
-      }
-
-      if prev.rotation != next.rotation {
-        m.rotation = next.rotation ?? 0
-      }
-
-      if prev.zIndex != next.zIndex {
-        m.zIndex = Int32(next.zIndex ?? 0)
-      }
-
-      if !prev.markerInfoWindowStyleEquals(next) {
-        m.tagData = MarkerTag(
-          id: next.id,
-          iconSvg: next.infoWindowIconSvg
-        )
-      }
-
-      if tracksViewChanges {
-        m.tracksViewChanges = tracksViewChanges
-      }
-      if tracksInfoWindowChanges {
-        m.tracksInfoWindowChanges = tracksInfoWindowChanges
-      }
-
-      if tracksViewChanges || tracksInfoWindowChanges {
-        onMain { [weak m] in
-          guard let m = m else { return }
-
+        if tracksViewChanges || tracksInfoWindowChanges {
           if tracksViewChanges {
             m.tracksViewChanges = false
           }
@@ -158,7 +158,7 @@ final class MapMarkerBuilder {
   ) {
     tasks[m.id]?.cancel()
 
-    if m.iconSvg == nil {
+    guard let iconSvg = m.iconSvg else {
       onReady(nil)
       return
     }
@@ -177,27 +177,35 @@ final class MapMarkerBuilder {
         Task { @MainActor in self.tasks.removeValue(forKey: m.id) }
       }
 
-      let img = self.renderUIImage(m, scale)
-      guard let img, !Task.isCancelled else { return }
+      let renderResult = self.renderUIImage(iconSvg, m.id, scale)
+      guard !Task.isCancelled else { return }
 
-      self.iconCache.setObject(img, forKey: key)
+      guard let renderResult = renderResult else {
+        await MainActor.run {
+          guard !Task.isCancelled else { return }
+          onReady(self.createFallbackUIImage())
+        }
+        return
+      }
+
+      if !renderResult.isFallback {
+        self.iconCache.setObject(renderResult.image, forKey: key)
+      }
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
-        onReady(img)
+        onReady(renderResult.image)
       }
     }
 
     tasks[m.id] = task
   }
 
-  @MainActor
   func cancelIconTask(_ id: String) {
     tasks[id]?.cancel()
     tasks.removeValue(forKey: id)
   }
 
-  @MainActor
   func cancelAllIconTasks() {
     let ids = Array(tasks.keys)
     for id in ids {
@@ -208,28 +216,36 @@ final class MapMarkerBuilder {
     CATransaction.flush()
   }
 
-  @MainActor
-  func buildInfoWindow(iconSvg: RNMarkerSvg?) -> UIImageView? {
-    guard let iconSvg = iconSvg else {
+  func buildInfoWindow(markerTag: MarkerTag) -> UIImageView? {
+    guard let iconSvg = markerTag.iconSvg else {
       return nil
+    }
+
+    let w = CGFloat(iconSvg.width)
+    let h = CGFloat(iconSvg.height)
+
+    if w <= 0 || h <= 0 {
+      mapsLog("markerId=\(markerTag.id) icon: invalid svg size")
+      return createFallbackImageView()
     }
 
     guard let data = iconSvg.svgString.data(using: .utf8),
           let svgImg = SVGKImage(data: data)
     else {
-      return nil
+      mapsLog("markerId=\(markerTag.id) infoWindow: svg utf8 decode failed")
+      return createFallbackImageView()
     }
 
-    let size = CGSize(
-      width: max(1, CGFloat(iconSvg.width)),
-      height: max(1, CGFloat(iconSvg.height))
-    )
+    let size = CGSize(width: w, height: h)
 
     svgImg.size = size
 
     guard let finalImage = SVGKExporterUIImage.export(asUIImage: svgImg) else {
+      mapsLog(
+        "markerId=\(markerTag.id) infoWindow: svg export to UIImage failed"
+      )
       svgImg.clear()
-      return nil
+      return createFallbackImageView()
     }
     svgImg.clear()
 
@@ -241,20 +257,63 @@ final class MapMarkerBuilder {
     return imageView
   }
 
-  private func renderUIImage(_ m: RNMarker, _ scale: CGFloat) -> UIImage? {
+  private func warmupSVGKit() {
+    autoreleasepool {
+      let emptySvg = """
+      <svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>
+      """
+      guard let data = emptySvg.data(using: .utf8),
+            let svgImg = SVGKImage(data: data)
+      else { return }
+      svgImg.clear()
+    }
+  }
+
+  private func createFallbackUIImage() -> UIImage {
+    let size = CGSize(width: 1, height: 1)
+    let renderer = UIGraphicsImageRenderer(size: size)
+    return renderer.image { _ in }
+  }
+
+  private func createFallbackImageView() -> UIImageView {
+    let iv = UIImageView(image: createFallbackUIImage())
+    iv.contentMode = .scaleAspectFit
+    iv.backgroundColor = .clear
+    return iv
+  }
+
+  private func renderUIImage(
+    _ iconSvg: RNMarkerSvg,
+    _ markerId: String,
+    _ scale: CGFloat
+  ) -> (
+    image: UIImage, isFallback: Bool
+  )? {
+
+    let w = CGFloat(iconSvg.width)
+    let h = CGFloat(iconSvg.height)
+
+    if w <= 0 || h <= 0 {
+      mapsLog("markerId=\(markerId) icon: invalid svg size")
+      return (createFallbackUIImage(), true)
+    }
+
     guard
-      let iconSvg = m.iconSvg,
       let data = iconSvg.svgString.data(using: .utf8)
-    else { return nil }
+    else {
+      mapsLog("markerId=\(markerId) icon: svg utf8 decode failed")
+      return (createFallbackUIImage(), true)
+    }
 
-    let size = CGSize(
-      width: max(1, CGFloat(iconSvg.width)),
-      height: max(1, CGFloat(iconSvg.height))
-    )
+    let size = CGSize(width: w, height: h)
 
-    return autoreleasepool { () -> UIImage? in
+    return autoreleasepool { () -> (image: UIImage, isFallback: Bool)? in
       guard !Task.isCancelled else { return nil }
-      guard let svgImg = SVGKImage(data: data) else { return nil }
+
+      guard let svgImg = SVGKImage(data: data) else {
+        mapsLog("markerId=\(markerId) icon: SVGKImage init failed")
+        return (createFallbackUIImage(), true)
+      }
 
       svgImg.size = size
 
@@ -265,8 +324,14 @@ final class MapMarkerBuilder {
 
       let uiImage = SVGKExporterUIImage.export(asUIImage: svgImg)
       svgImg.clear()
-      return uiImage
+
+      guard !Task.isCancelled else { return nil }
+
+      if let uiImage = uiImage {
+        return (uiImage, false)
+      } else {
+        return (createFallbackUIImage(), true)
+      }
     }
   }
-
 }

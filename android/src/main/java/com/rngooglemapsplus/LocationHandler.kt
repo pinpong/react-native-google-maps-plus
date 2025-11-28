@@ -64,8 +64,8 @@ class LocationHandler(
   }
 
   fun showLocationDialog() {
-    UiThreadUtil.runOnUiThread {
-      val activity = context.currentActivity ?: run { return@runOnUiThread }
+    onUi {
+      val activity = context.currentActivity ?: run { return@onUi }
 
       val lr =
         if (Build.VERSION.SDK_INT >= 31) {

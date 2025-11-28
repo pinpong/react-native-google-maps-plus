@@ -30,12 +30,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  @MainActor
   func dispose() {
     impl.deinitInternal()
   }
 
-  @MainActor
   var initialProps: RNInitialProps? {
     didSet {
       let options = GMSMapViewOptions()
@@ -52,32 +50,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var uiSettings: RNMapUiSettings? {
     didSet { impl.uiSettings = uiSettings }
   }
 
-  @MainActor
   var myLocationEnabled: Bool? {
     didSet { impl.myLocationEnabled = myLocationEnabled }
   }
 
-  @MainActor
   var buildingEnabled: Bool? {
     didSet { impl.buildingEnabled = buildingEnabled }
   }
 
-  @MainActor
   var trafficEnabled: Bool? {
     didSet { impl.trafficEnabled = trafficEnabled }
   }
 
-  @MainActor
   var indoorEnabled: Bool? {
     didSet { impl.indoorEnabled = indoorEnabled }
   }
 
-  @MainActor
   var customMapStyle: String? {
     didSet {
       if let value = customMapStyle {
@@ -86,31 +78,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var userInterfaceStyle: RNUserInterfaceStyle? {
     didSet {
       impl.userInterfaceStyle = userInterfaceStyle?.toUIUserInterfaceStyle
     }
   }
 
-  @MainActor
   var mapZoomConfig: RNMapZoomConfig? {
     didSet { impl.mapZoomConfig = mapZoomConfig }
   }
 
-  @MainActor
   var mapPadding: RNMapPadding? {
     didSet { impl.mapPadding = mapPadding }
   }
 
-  @MainActor
   var mapType: RNMapType? {
     didSet {
       impl.mapType = mapType?.toGMSMapViewType
     }
   }
 
-  @MainActor
   var markers: [RNMarker]? {
     didSet {
       let prevById = Dictionary(
@@ -148,7 +135,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var polylines: [RNPolyline]? {
     didSet {
       let prevById = Dictionary(
@@ -181,7 +167,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var polygons: [RNPolygon]? {
     didSet {
       let prevById = Dictionary(
@@ -211,7 +196,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var circles: [RNCircle]? {
     didSet {
       let prevById = Dictionary(
@@ -241,7 +225,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var heatmaps: [RNHeatmap]? {
     didSet {
       let prevById = Dictionary(
@@ -262,7 +245,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var kmlLayers: [RNKMLayer]? {
     didSet {
       let prevById = Dictionary(
@@ -283,7 +265,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var urlTileOverlays: [RNUrlTileOverlay]? {
     didSet {
       let prevById = Dictionary(
@@ -307,135 +288,107 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  @MainActor
   var locationConfig: RNLocationConfig? {
     didSet {
       impl.locationConfig = locationConfig
     }
   }
 
-  @MainActor
   var onMapError: ((RNMapErrorCode) -> Void)? {
     didSet { impl.onMapError = onMapError }
   }
-  @MainActor
   var onMapReady: ((Bool) -> Void)? {
     didSet { impl.onMapReady = onMapReady }
   }
-  @MainActor
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
     didSet { impl.onMapLoaded = onMapLoaded }
   }
-  @MainActor
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
-  @MainActor
   var onLocationError: ((_ error: RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
   }
-  @MainActor
   var onMapPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapPress = onMapPress }
   }
-  @MainActor
   var onMapLongPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapLongPress = onMapLongPress }
   }
-  @MainActor
   var onPoiPress: ((String, String, RNLatLng) -> Void)? {
     didSet { impl.onPoiPress = onPoiPress }
   }
-  @MainActor
   var onMarkerPress: ((String) -> Void)? {
     didSet { impl.onMarkerPress = onMarkerPress }
   }
-  @MainActor
   var onPolylinePress: ((String) -> Void)? {
     didSet { impl.onPolylinePress = onPolylinePress }
   }
-  @MainActor
   var onPolygonPress: ((String) -> Void)? {
     didSet { impl.onPolygonPress = onPolygonPress }
   }
-  @MainActor
   var onCirclePress: ((String) -> Void)? {
     didSet { impl.onCirclePress = onCirclePress }
   }
-  @MainActor
   var onMarkerDragStart: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragStart = onMarkerDragStart }
   }
-  @MainActor
   var onMarkerDrag: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDrag = onMarkerDrag }
   }
-  @MainActor
   var onMarkerDragEnd: ((String, RNLatLng) -> Void)? {
     didSet { impl.onMarkerDragEnd = onMarkerDragEnd }
   }
-  @MainActor
   var onIndoorBuildingFocused: ((RNIndoorBuilding) -> Void)? {
     didSet { impl.onIndoorBuildingFocused = onIndoorBuildingFocused }
   }
-  @MainActor
   var onIndoorLevelActivated: ((RNIndoorLevel) -> Void)? {
     didSet { impl.onIndoorLevelActivated = onIndoorLevelActivated }
   }
-  @MainActor
   var onInfoWindowPress: ((String) -> Void)? {
     didSet { impl.onInfoWindowPress = onInfoWindowPress }
   }
-  @MainActor
   var onInfoWindowClose: ((String) -> Void)? {
     didSet { impl.onInfoWindowClose = onInfoWindowClose }
   }
-  @MainActor
   var onInfoWindowLongPress: ((String) -> Void)? {
     didSet { impl.onInfoWindowLongPress = onInfoWindowLongPress }
   }
-  @MainActor
   var onMyLocationPress: ((RNLocation) -> Void)? {
     didSet { impl.onMyLocationPress = onMyLocationPress }
   }
-  @MainActor
   var onMyLocationButtonPress: ((Bool) -> Void)? {
     didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
-  @MainActor
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeStart = onCameraChangeStart }
   }
-  @MainActor
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChange = onCameraChange }
   }
-  @MainActor
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)? {
     didSet { impl.onCameraChangeComplete = onCameraChangeComplete }
   }
 
-  @MainActor
   func showMarkerInfoWindow(id: String) {
     impl.showMarkerInfoWindow(id: id)
   }
 
-  @MainActor
   func hideMarkerInfoWindow(id: String) {
     impl.hideMarkerInfoWindow(id: id)
   }
 
-  @MainActor
   func setCamera(camera: RNCameraUpdate, animated: Bool?, durationMs: Double?) {
-    let cam = camera.toGMSCameraPosition(current: impl.currentCamera)
-    impl.setCamera(
-      camera: cam,
-      animated: animated ?? true,
-      durationMs: durationMs ?? 3000
-    )
+    onMain {
+      let cam = camera.toGMSCameraPosition(current: self.impl.currentCamera)
+      self.impl.setCamera(
+        camera: cam,
+        animated: animated ?? true,
+        durationMs: durationMs ?? 3000
+      )
+    }
   }
 
-  @MainActor
   func setCameraToCoordinates(
     coordinates: [RNLatLng],
     padding: RNMapPadding?,
@@ -450,12 +403,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  @MainActor
   func setCameraBounds(bounds: RNLatLngBounds?) {
     impl.setCameraBounds(bounds?.toCoordinateBounds())
   }
 
-  @MainActor
   func animateToBounds(
     bounds: RNLatLngBounds,
     padding: Double?,
@@ -470,7 +421,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  @MainActor
   func snapshot(
     options: RNSnapshotOptions,
   ) -> NitroModules.Promise<String?> {
@@ -484,25 +434,21 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   }
 
-  @MainActor
   func showLocationDialog() {
     locationHandler.showLocationDialog()
   }
 
-  @MainActor
   func openLocationSettings() {
     locationHandler.openLocationSettings()
   }
 
-  @MainActor
   func requestLocationPermission()
   -> NitroModules.Promise<RNLocationPermissionResult> {
     return permissionHandler.requestLocationPermission()
   }
 
-  @MainActor
   func isGooglePlayServicesAvailable() -> Bool {
     /// not supported
-    return true
+    return false
   }
 }

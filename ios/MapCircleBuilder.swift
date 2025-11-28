@@ -1,7 +1,6 @@
 import GoogleMaps
 
 final class MapCircleBuilder {
-  @MainActor
   func build(_ c: RNCircle) -> GMSCircle {
     let circle = GMSCircle()
     circle.position = c.center.toCLLocationCoordinate2D()
@@ -15,34 +14,35 @@ final class MapCircleBuilder {
     return circle
   }
 
-  @MainActor
   func update(_ prev: RNCircle, _ next: RNCircle, _ c: GMSCircle) {
-    if !prev.centerEquals(next) {
-      c.position = next.center.toCLLocationCoordinate2D()
-    }
+    onMain {
+      if !prev.centerEquals(next) {
+        c.position = next.center.toCLLocationCoordinate2D()
+      }
 
-    if prev.radius != next.radius {
-      c.radius = next.radius
-    }
+      if prev.radius != next.radius {
+        c.radius = next.radius
+      }
 
-    if prev.fillColor != next.fillColor {
-      c.fillColor = next.fillColor?.toUIColor() ?? .clear
-    }
+      if prev.fillColor != next.fillColor {
+        c.fillColor = next.fillColor?.toUIColor() ?? .clear
+      }
 
-    if prev.strokeColor != next.strokeColor {
-      c.strokeColor = next.strokeColor?.toUIColor() ?? .black
-    }
+      if prev.strokeColor != next.strokeColor {
+        c.strokeColor = next.strokeColor?.toUIColor() ?? .black
+      }
 
-    if prev.strokeWidth != next.strokeWidth {
-      c.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
-    }
+      if prev.strokeWidth != next.strokeWidth {
+        c.strokeWidth = CGFloat(next.strokeWidth ?? 1.0)
+      }
 
-    if prev.pressable != next.pressable {
-      c.isTappable = next.pressable ?? false
-    }
+      if prev.pressable != next.pressable {
+        c.isTappable = next.pressable ?? false
+      }
 
-    if prev.zIndex != next.zIndex {
-      c.zIndex = Int32(next.zIndex ?? 0)
+      if prev.zIndex != next.zIndex {
+        c.zIndex = Int32(next.zIndex ?? 0)
+      }
     }
   }
 }

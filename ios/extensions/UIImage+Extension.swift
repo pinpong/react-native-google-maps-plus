@@ -35,6 +35,7 @@ extension UIImage {
         try imageData.write(to: fileURL)
         return fileURL.path
       } catch {
+        mapsLog("snapshot write failed", error)
         return nil
       }
     } else {

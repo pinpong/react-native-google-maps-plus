@@ -1,7 +1,6 @@
 import GoogleMaps
 
 final class MapPolylineBuilder {
-  @MainActor
   func build(_ p: RNPolyline) -> GMSPolyline {
     let path = GMSMutablePath()
     p.coordinates.forEach {
@@ -23,30 +22,31 @@ final class MapPolylineBuilder {
     return pl
   }
 
-  @MainActor
   func update(_ prev: RNPolyline, _ next: RNPolyline, _ pl: GMSPolyline) {
-    if !prev.coordinatesEquals(next) {
-      pl.path = next.coordinates.toGMSPath()
-    }
+    onMain {
+      if !prev.coordinatesEquals(next) {
+        pl.path = next.coordinates.toGMSPath()
+      }
 
-    if prev.width != next.width {
-      pl.strokeWidth = CGFloat(next.width ?? 1.0)
-    }
+      if prev.width != next.width {
+        pl.strokeWidth = CGFloat(next.width ?? 1.0)
+      }
 
-    if prev.color != next.color {
-      pl.strokeColor = next.color?.toUIColor() ?? .black
-    }
+      if prev.color != next.color {
+        pl.strokeColor = next.color?.toUIColor() ?? .black
+      }
 
-    if prev.pressable != next.pressable {
-      pl.isTappable = next.pressable ?? false
-    }
+      if prev.pressable != next.pressable {
+        pl.isTappable = next.pressable ?? false
+      }
 
-    if prev.geodesic != next.geodesic {
-      pl.geodesic = next.geodesic ?? false
-    }
+      if prev.geodesic != next.geodesic {
+        pl.geodesic = next.geodesic ?? false
+      }
 
-    if prev.zIndex != next.zIndex {
-      pl.zIndex = Int32(next.zIndex ?? 0)
+      if prev.zIndex != next.zIndex {
+        pl.zIndex = Int32(next.zIndex ?? 0)
+      }
     }
   }
 }
