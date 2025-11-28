@@ -1,3 +1,22 @@
+## [1.10.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.0...v1.10.1) (2025-11-28)
+
+### 🐛 Bug Fixes
+
+* add safe fallback handling for marker icon rendering ([c2d83ad](https://github.com/pinpong/react-native-google-maps-plus/commit/c2d83ad57d6d2a5de0eb06182b8e9ab2872e1899))
+* **android:** properly dispose mapview ([573e901](https://github.com/pinpong/react-native-google-maps-plus/commit/573e901b633a62eaa9cf349ae3b00b13b8ed9fc1))
+* **android:** setCameraToCoordinates padding ([59a163c](https://github.com/pinpong/react-native-google-maps-plus/commit/59a163ce611be1e12408db1e4254cfa1a911de86))
+* **ios:** prevent non-main thread UI access in map view ([f874151](https://github.com/pinpong/react-native-google-maps-plus/commit/f874151e2c855296005d639af52d67ad6c79e35c))
+* **ios:** properly dispose mapview ([aaad0d2](https://github.com/pinpong/react-native-google-maps-plus/commit/aaad0d2d956aa5c0f45f354bcfa6fc6dbbcabf93))
+
+### 🔄 Code Refactors
+
+* **android:** showLocationDialog ([ff0e1ec](https://github.com/pinpong/react-native-google-maps-plus/commit/ff0e1ecf3a7db465a705f97f0530d59e4e01f1f9))
+
+### 🛠️ Other changes
+
+* **ios:** remove log ([0aae5b0](https://github.com/pinpong/react-native-google-maps-plus/commit/0aae5b0e4e535d5c082fc6e4e0c0f58ce86906ba))
+* merge dev into main ([e9af3f6](https://github.com/pinpong/react-native-google-maps-plus/commit/e9af3f61fd5b8ee181eafe271881f5acb9e4cc05))
+
 ## [1.10.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.9.0...v1.10.0) (2025-11-19)
 
 ### ✨ Features
