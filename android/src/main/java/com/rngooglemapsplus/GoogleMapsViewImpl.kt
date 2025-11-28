@@ -867,10 +867,9 @@ class GoogleMapsViewImpl(
   }
 
   override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
     lifecycleObserver?.let { lifecycle?.removeObserver(it) }
     lifecycle = null
-    lifecycleObserver?.toCreatedState()
+    super.onDetachedFromWindow()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
