@@ -11,16 +11,16 @@
     "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO'"
   },
   "dependencies": {
-    "@react-navigation/native": "7.1.20",
-    "@react-navigation/native-stack": "7.6.3",
-    "@react-navigation/stack": "7.6.4",
+    "@react-navigation/native": "7.1.22",
+    "@react-navigation/native-stack": "7.8.2",
+    "@react-navigation/stack": "7.6.8",
     "react": "19.1.1",
-    "react-hook-form": "7.66.0",
+    "react-hook-form": "7.67.0",
     "react-native": "0.82.1",
     "react-native-clusterer": "5.0.2",
     "react-native-gesture-handler": "2.29.1",
     "react-native-google-maps-plus": "workspace:*",
-    "react-native-nitro-modules": "0.31.6",
+    "react-native-nitro-modules": "0.31.10",
     "react-native-reanimated": "4.1.5",
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "4.18.0",
@@ -39,7 +39,7 @@
     "@react-native/typescript-config": "0.82.1",
     "@types/react": "19.1.1",
     "babel-plugin-module-resolver": "5.0.2",
-    "react-native-builder-bob": "0.40.15",
+    "react-native-builder-bob": "0.40.16",
     "react-native-monorepo-config": "0.3.0"
   },
   "engines": {

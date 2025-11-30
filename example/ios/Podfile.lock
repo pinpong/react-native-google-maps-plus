@@ -46,7 +46,7 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
-  - NitroModules (0.31.6):
+  - NitroModules (0.31.10):
     - boost
     - DoubleConversion
     - fast_float
@@ -2504,7 +2504,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNGoogleMapsPlus (1.10.0):
+  - RNGoogleMapsPlus (1.10.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3052,7 +3052,7 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: bed22fa703c919259b3901449434d60d994fae20
   GoogleMaps: a40d3b1f511f0fa2036e7b08c920c33279b1d5fd
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
-  NitroModules: edf2d33c02fd8cbb0021e031d380d286b17f527b
+  NitroModules: cf8804dafa637b6535c73fd113c3202b11307bfd
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
   RCTRequired: e2c574c1b45231f7efb0834936bd609d75072b63
@@ -3120,7 +3120,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
   RNGestureHandler: 67501c6d447027581aa1d8e5a7a3ea5a7f0a89ff
-  RNGoogleMapsPlus: 9561d3fa02c06f374b38dd95c2321b27c71b55c6
+  RNGoogleMapsPlus: 86ba03df25878d125da670854ba6d4da6a3be09d
   RNReanimated: 05c5a85c3ee54ac68d60c8a9b42dbc441e3326ca
   RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
