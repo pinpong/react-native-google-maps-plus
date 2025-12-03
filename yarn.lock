@@ -3498,9 +3498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/core@npm:^7.13.3":
-  version: 7.13.3
-  resolution: "@react-navigation/core@npm:7.13.3"
+"@react-navigation/core@npm:^7.13.5":
+  version: 7.13.5
+  resolution: "@react-navigation/core@npm:7.13.5"
   dependencies:
     "@react-navigation/routers": ^7.5.2
     escape-string-regexp: ^4.0.0
@@ -3512,53 +3512,53 @@ __metadata:
     use-sync-external-store: ^1.5.0
   peerDependencies:
     react: ">= 18.2.0"
-  checksum: 461ee9cfae877e385e3e138218c7f482e4d3b772441cf362ca642ea351248aef48c1ca822cf0df488d2eb43a7f478de9b037f2581b090aecade67015325bd2f1
+  checksum: 37457ad802281a84c77abd2eaaf93f485e195486a0e2239d50381fbf81bed4b8a7f648f8d9b2f1fb976a882f2c229e6e048a56b126fd73bfc61a09f6b396ae50
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.8.4":
-  version: 2.8.4
-  resolution: "@react-navigation/elements@npm:2.8.4"
+"@react-navigation/elements@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "@react-navigation/elements@npm:2.9.1"
   dependencies:
     color: ^4.2.3
     use-latest-callback: ^0.2.4
     use-sync-external-store: ^1.5.0
   peerDependencies:
     "@react-native-masked-view/masked-view": ">= 0.2.0"
-    "@react-navigation/native": ^7.1.22
+    "@react-navigation/native": ^7.1.24
     react: ">= 18.2.0"
     react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
   peerDependenciesMeta:
     "@react-native-masked-view/masked-view":
       optional: true
-  checksum: be55c141c33511174d9f8a0c63950ccf4072989a7e0ed2cb537017fcfe4a0bd83dd7e2d03ffea77bac1fd0401d6d26c0a604c4495040aae9220ae5ae672dd50d
+  checksum: d6a787a4c252b1e50d2e6f5a3da177aed13b8906a7ba8eb2037df069c8db2927bed48d10cf3c886726354f7d210048df3da3f6dcf7bfe7f59cffe6d5b8d07f7a
   languageName: node
   linkType: hard
 
-"@react-navigation/native-stack@npm:7.8.2":
-  version: 7.8.2
-  resolution: "@react-navigation/native-stack@npm:7.8.2"
+"@react-navigation/native-stack@npm:7.8.5":
+  version: 7.8.5
+  resolution: "@react-navigation/native-stack@npm:7.8.5"
   dependencies:
-    "@react-navigation/elements": ^2.8.4
+    "@react-navigation/elements": ^2.9.1
     color: ^4.2.3
     sf-symbols-typescript: ^2.1.0
     warn-once: ^0.1.1
   peerDependencies:
-    "@react-navigation/native": ^7.1.22
+    "@react-navigation/native": ^7.1.24
     react: ">= 18.2.0"
     react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: 1940eced8ae0dde166eef9080d302a832ee18ddb6458faef50d6784e116369c7cd430e02c2f1eda1b6c4826f984cf27e6b20fbfb3be9465ab30b6b6b4ddf18cc
+  checksum: 909d2b8cf65ab93884d956d248aedb3885c161dcfa8a80de45fa25a7c6f42f7960a0549c036d967f4452a5c2557d737a51f060f351b60db33f75308227f9a893
   languageName: node
   linkType: hard
 
-"@react-navigation/native@npm:7.1.22":
-  version: 7.1.22
-  resolution: "@react-navigation/native@npm:7.1.22"
+"@react-navigation/native@npm:7.1.24":
+  version: 7.1.24
+  resolution: "@react-navigation/native@npm:7.1.24"
   dependencies:
-    "@react-navigation/core": ^7.13.3
+    "@react-navigation/core": ^7.13.5
     escape-string-regexp: ^4.0.0
     fast-deep-equal: ^3.1.3
     nanoid: ^3.3.11
@@ -3566,7 +3566,7 @@ __metadata:
   peerDependencies:
     react: ">= 18.2.0"
     react-native: "*"
-  checksum: f460161db582318c8ccfc887c57929341d18da7ded8741dedb0f5c104161ca1bbba56bece00a45f572c358249ba7f9932c484f02963ed44bc3b36fe8f0139cdd
+  checksum: 79366319cfc239aed7bdac1697696ed4f8523e7161a56a4829c38d396c2ae115ed2a0789b1bf6edfd798ec4c89886b704f1e797eb6d4d532e2697c9f899d3f28
   languageName: node
   linkType: hard
 
@@ -3579,21 +3579,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/stack@npm:7.6.8":
-  version: 7.6.8
-  resolution: "@react-navigation/stack@npm:7.6.8"
+"@react-navigation/stack@npm:7.6.11":
+  version: 7.6.11
+  resolution: "@react-navigation/stack@npm:7.6.11"
   dependencies:
-    "@react-navigation/elements": ^2.8.4
+    "@react-navigation/elements": ^2.9.1
     color: ^4.2.3
     use-latest-callback: ^0.2.4
   peerDependencies:
-    "@react-navigation/native": ^7.1.22
+    "@react-navigation/native": ^7.1.24
     react: ">= 18.2.0"
     react-native: "*"
     react-native-gesture-handler: ">= 2.0.0"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: d11a4670e587cff59e6d56dbef4be6817f9c029fa5c67177b068879b635933edd3ff19167eb169f2ef2ade28b878761244c6af925c00e0048378f9f57e85dd32
+  checksum: b7a940601d3549874786e3d4b1977c218d2870360695e4714a0eafe529491054fbd5080ed4abf20de706b1c7df573435e0c3619e8c6a490414c843fb68fdad25
   languageName: node
   linkType: hard
 
@@ -9874,90 +9874,90 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lefthook-darwin-arm64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-darwin-arm64@npm:2.0.4"
+"lefthook-darwin-arm64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-darwin-arm64@npm:2.0.5"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"lefthook-darwin-x64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-darwin-x64@npm:2.0.4"
+"lefthook-darwin-x64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-darwin-x64@npm:2.0.5"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"lefthook-freebsd-arm64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-freebsd-arm64@npm:2.0.4"
+"lefthook-freebsd-arm64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-freebsd-arm64@npm:2.0.5"
   conditions: os=freebsd & cpu=arm64
   languageName: node
   linkType: hard
 
-"lefthook-freebsd-x64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-freebsd-x64@npm:2.0.4"
+"lefthook-freebsd-x64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-freebsd-x64@npm:2.0.5"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"lefthook-linux-arm64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-linux-arm64@npm:2.0.4"
+"lefthook-linux-arm64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-linux-arm64@npm:2.0.5"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"lefthook-linux-x64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-linux-x64@npm:2.0.4"
+"lefthook-linux-x64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-linux-x64@npm:2.0.5"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"lefthook-openbsd-arm64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-openbsd-arm64@npm:2.0.4"
+"lefthook-openbsd-arm64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-openbsd-arm64@npm:2.0.5"
   conditions: os=openbsd & cpu=arm64
   languageName: node
   linkType: hard
 
-"lefthook-openbsd-x64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-openbsd-x64@npm:2.0.4"
+"lefthook-openbsd-x64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-openbsd-x64@npm:2.0.5"
   conditions: os=openbsd & cpu=x64
   languageName: node
   linkType: hard
 
-"lefthook-windows-arm64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-windows-arm64@npm:2.0.4"
+"lefthook-windows-arm64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-windows-arm64@npm:2.0.5"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"lefthook-windows-x64@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook-windows-x64@npm:2.0.4"
+"lefthook-windows-x64@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook-windows-x64@npm:2.0.5"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"lefthook@npm:2.0.4":
-  version: 2.0.4
-  resolution: "lefthook@npm:2.0.4"
+"lefthook@npm:2.0.5":
+  version: 2.0.5
+  resolution: "lefthook@npm:2.0.5"
   dependencies:
-    lefthook-darwin-arm64: 2.0.4
-    lefthook-darwin-x64: 2.0.4
-    lefthook-freebsd-arm64: 2.0.4
-    lefthook-freebsd-x64: 2.0.4
-    lefthook-linux-arm64: 2.0.4
-    lefthook-linux-x64: 2.0.4
-    lefthook-openbsd-arm64: 2.0.4
-    lefthook-openbsd-x64: 2.0.4
-    lefthook-windows-arm64: 2.0.4
-    lefthook-windows-x64: 2.0.4
+    lefthook-darwin-arm64: 2.0.5
+    lefthook-darwin-x64: 2.0.5
+    lefthook-freebsd-arm64: 2.0.5
+    lefthook-freebsd-x64: 2.0.5
+    lefthook-linux-arm64: 2.0.5
+    lefthook-linux-x64: 2.0.5
+    lefthook-openbsd-arm64: 2.0.5
+    lefthook-openbsd-x64: 2.0.5
+    lefthook-windows-arm64: 2.0.5
+    lefthook-windows-x64: 2.0.5
   dependenciesMeta:
     lefthook-darwin-arm64:
       optional: true
@@ -9981,7 +9981,7 @@ __metadata:
       optional: true
   bin:
     lefthook: bin/index.js
-  checksum: 9d509469703d318df716a1c3f667059840d823809aabccec5239b6a2e0e5ede1cb1f6be539e258a8908a4dc7a38d554c036d08880d28021f827c1c3140dc9a6f
+  checksum: 57edb9062d57eae945adafd9f274d1a823f069b49b014acf095929f1457b20a4dcf6482b812fd00f5a4d681696797bba525862bc8d6c6f5155d15e2ca31238dc
   languageName: node
   linkType: hard
 
@@ -12222,12 +12222,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.7.3":
-  version: 3.7.3
-  resolution: "prettier@npm:3.7.3"
+"prettier@npm:3.7.4":
+  version: 3.7.4
+  resolution: "prettier@npm:3.7.4"
   bin:
     prettier: bin/prettier.cjs
-  checksum: fc3da17f1394f7e634eee762b1a42e0324cc6d78f8f966c746aed82c2712d24451db919e9dfa381b6fb4684b9cb04e25cfd08f47c55da92a814f9fa1e2427433
+  checksum: 955e37e87b1151ca3b3282463f5295f4c415821884791df152ff66e6eb1c5257115153cccba61b13962546100dd00ae45670ff27077dcab04c977d84036eaf80
   languageName: node
   linkType: hard
 
@@ -12591,9 +12591,9 @@ __metadata:
     "@react-native/babel-preset": 0.82.1
     "@react-native/metro-config": 0.82.1
     "@react-native/typescript-config": 0.82.1
-    "@react-navigation/native": 7.1.22
-    "@react-navigation/native-stack": 7.8.2
-    "@react-navigation/stack": 7.6.8
+    "@react-navigation/native": 7.1.24
+    "@react-navigation/native-stack": 7.8.5
+    "@react-navigation/stack": 7.6.11
     "@types/react": 19.1.1
     babel-plugin-module-resolver: 5.0.2
     react: 19.1.1
@@ -12642,9 +12642,9 @@ __metadata:
     eslint-plugin-tsdoc: 0.5.0
     eslint-plugin-unused-imports: 4.3.0
     jest: 30.2.0
-    lefthook: 2.0.4
+    lefthook: 2.0.5
     nitrogen: 0.31.10
-    prettier: 3.7.3
+    prettier: 3.7.4
     react: 19.1.1
     react-native: 0.82.1
     react-native-builder-bob: 0.40.16
