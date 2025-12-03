@@ -2,3 +2,5 @@ CHANGELOG.md
 node_modules/
 lib/
 expoConfig/build/
+docs/
+.yarn

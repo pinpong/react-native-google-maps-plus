@@ -6,6 +6,8 @@ export default [
     files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
       'import/no-relative-parent-imports': 'error',
+      'jsdoc/require-jsdoc': 'off',
+      'tsdoc/syntax': 'off',
     },
   },
 ];

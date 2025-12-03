@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { useAppTheme } from '@src/hooks/useAppTheme';
 import type { AppTheme } from '@src/theme';

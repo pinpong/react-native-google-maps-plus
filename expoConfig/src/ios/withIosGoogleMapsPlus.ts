@@ -1,8 +1,8 @@
 import {
+  type ConfigPlugin,
+  withAppDelegate,
   withInfoPlist,
   withPodfile,
-  withAppDelegate,
-  type ConfigPlugin,
 } from '@expo/config-plugins';
 import { mergeContents } from '@expo/config-plugins/build/utils/generateCode';
 

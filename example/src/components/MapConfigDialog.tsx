@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import {
-  View,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
-  Alert,
-  Pressable,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from 'react-native';
 
 import { type Struct, validate } from 'superstruct';

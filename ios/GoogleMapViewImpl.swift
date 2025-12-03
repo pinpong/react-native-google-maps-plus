@@ -206,6 +206,9 @@ GMSIndoorDisplayDelegate {
           self.uiSettings?.tiltEnabled ?? true
         self.mapView?.settings.zoomGestures =
           self.uiSettings?.zoomGesturesEnabled ?? true
+
+        /* self.uiSettings?.mapToolbarEnabled → unsupported on iOS */
+        /* self.uiSettings?.zoomControlsEnabled → unsupported on iOS */
       }
     }
   }

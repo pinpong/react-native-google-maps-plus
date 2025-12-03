@@ -12,8 +12,8 @@
  *  - Inserts `+ (BOOL)shouldBeRecycled`
  *  nitrogen/generated/ios/c++/views/HybridRNGoogleMapsPlusViewComponent.mm
  */
-import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { mkdir, copyFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { basename } from 'path';
 import { fileURLToPath } from 'url';
