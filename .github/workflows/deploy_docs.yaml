@@ -1,8 +1,8 @@
 name: Deploy docs to GH pages
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.target_commitish, 'main')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -28,7 +27,9 @@ jobs:
           fetch-depth: 0
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Build
+      - name: Generate nitrogen code
+        run: yarn nitrogen
+      - name: Build docs
         run: yarn docs
       - name: Setup Pages
         uses: actions/configure-pages@v5.0.0
