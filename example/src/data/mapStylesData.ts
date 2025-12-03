@@ -1,6 +1,4 @@
-import type { RNMapStyleElement } from 'react-native-google-maps-plus';
-
-export const standardMapStyle: RNMapStyleElement[] = [
+export const standardMapStyle: any[] = [
   { featureType: 'poi.attraction', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi.government', stylers: [{ visibility: 'off' }] },
@@ -15,7 +13,7 @@ export const standardMapStyle: RNMapStyleElement[] = [
   { featureType: 'poi.sports_complex', stylers: [{ visibility: 'off' }] },
 ];
 
-export const silverMapStyle: RNMapStyleElement[] = [
+export const silverMapStyle: any[] = [
   { featureType: 'poi.attraction', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi.government', stylers: [{ visibility: 'off' }] },
