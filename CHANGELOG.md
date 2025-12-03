@@ -1,3 +1,21 @@
+## [1.10.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.1...v1.10.2) (2025-12-03)
+
+### 🐛 Bug Fixes
+
+* **android:** guard RNLocation against IllegalStateException ([4ec58a4](https://github.com/pinpong/react-native-google-maps-plus/commit/4ec58a4bcc3276da9bf0561e9430520b08e125cf))
+* **android:** stabilize lifecycle handling for MapView detachment ([2172696](https://github.com/pinpong/react-native-google-maps-plus/commit/217269692a4d26cf699753e36fc731e678d3a8ad))
+* **example:** mapStyle type ([94971d9](https://github.com/pinpong/react-native-google-maps-plus/commit/94971d96d08cc1e6100eba300313194bc641af57))
+
+### 📚 Documentation
+
+* add Typedoc and API docs (GH Pages deploy) ([8384533](https://github.com/pinpong/react-native-google-maps-plus/commit/8384533e526bd7dfabfe340ee3487d6d80e96e06))
+
+### 🛠️ Other changes
+
+* merge dev into main ([3f1b18d](https://github.com/pinpong/react-native-google-maps-plus/commit/3f1b18de6016399204f41293fc72ec2c92c9fe74))
+* update dependencies ([1088a79](https://github.com/pinpong/react-native-google-maps-plus/commit/1088a790fbb185877a189ff9021d34e8337a3b4b))
+* update dependencies ([5a3e486](https://github.com/pinpong/react-native-google-maps-plus/commit/5a3e4861861c88cf2c920ae85a953b6360460c2d))
+
 ## [1.10.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.0...v1.10.1) (2025-11-28)
 
 ### 🐛 Bug Fixes
