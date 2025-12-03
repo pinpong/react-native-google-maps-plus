@@ -9,12 +9,12 @@ import { useHeaderButton } from '@src/hooks/useHeaderButton';
 import { makeMarker } from '@src/utils/mapGenerators';
 import { RNMarkerValidator } from '@src/utils/validator';
 
+import type { RNMapUiSettings } from 'react-native-google-maps-plus';
 import type {
   GoogleMapsViewRef,
   RNLatLng,
   RNMarker,
 } from 'react-native-google-maps-plus';
-import type { RNMapUiSettings } from 'react-native-google-maps-plus';
 
 export function animateSpiral(
   center: RNLatLng,

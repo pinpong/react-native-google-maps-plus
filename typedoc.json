@@ -1,0 +1,28 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.tsx"],
+  "entryPointStrategy": "resolve",
+  "readme": "none",
+  "tsconfig": "./tsconfig.json",
+  "out": "docs",
+  "cleanOutputDir": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "sort": [
+    "kind",
+    "static-first",
+    "instance-first",
+    "visibility",
+    "alphabetical"
+  ],
+  "kindSortOrder": ["Variable", "Interface", "Module"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/pinpong/react-native-google-maps-plus"
+  },
+  "visibilityFilters": {
+    "inherited": true,
+    "external": true,
+    "protected": true,
+    "private": true
+  }
+}

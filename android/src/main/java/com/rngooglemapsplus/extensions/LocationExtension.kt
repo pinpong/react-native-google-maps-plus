@@ -20,38 +20,53 @@ fun Location.toRnLocation(): RNLocation =
         elapsedRealtimeNanos = elapsedRealtimeNanos.toDouble(),
         bearingAccuracyDegrees =
           when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-              bearingAccuracyDegrees.toDouble()
-
-            else -> null
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> null
+            else ->
+              try {
+                if (hasBearingAccuracy()) bearingAccuracyDegrees.toDouble() else null
+              } catch (_: IllegalStateException) {
+                null
+              }
           },
         speedAccuracyMetersPerSecond =
           when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-              speedAccuracyMetersPerSecond.toDouble()
-
-            else -> null
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> null
+            else ->
+              try {
+                if (hasSpeedAccuracy()) speedAccuracyMetersPerSecond.toDouble() else null
+              } catch (_: IllegalStateException) {
+                null
+              }
           },
         verticalAccuracyMeters =
           when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-              verticalAccuracyMeters.toDouble()
-
-            else -> null
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> null
+            else ->
+              try {
+                if (hasVerticalAccuracy()) verticalAccuracyMeters.toDouble() else null
+              } catch (_: IllegalStateException) {
+                null
+              }
           },
         mslAltitudeMeters =
           when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
-              mslAltitudeMeters
-
-            else -> null
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> null
+            else ->
+              try {
+                if (hasMslAltitude()) mslAltitudeMeters else null
+              } catch (_: IllegalStateException) {
+                null
+              }
           },
         mslAltitudeAccuracyMeters =
           when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
-              mslAltitudeAccuracyMeters.toDouble()
-
-            else -> null
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> null
+            else ->
+              try {
+                if (hasMslAltitude()) mslAltitudeAccuracyMeters.toDouble() else null
+              } catch (_: IllegalStateException) {
+                null
+              }
           },
         isMock =
           when {

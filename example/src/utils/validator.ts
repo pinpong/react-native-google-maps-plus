@@ -8,6 +8,7 @@ import {
   RNMapErrorCode,
 } from 'react-native-google-maps-plus';
 import {
+  type Struct,
   array,
   boolean,
   enums,
@@ -16,7 +17,6 @@ import {
   object,
   optional,
   string,
-  type Struct,
   union,
 } from 'superstruct';
 

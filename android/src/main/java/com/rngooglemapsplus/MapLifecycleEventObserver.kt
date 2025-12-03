@@ -35,6 +35,7 @@ class MapLifecycleEventObserver(
   }
 
   private fun toState(state: Lifecycle.State) {
+    if (currentState == Lifecycle.State.DESTROYED) return
     while (currentState != state) {
       when {
         currentState < state -> upFromCurrentState()

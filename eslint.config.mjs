@@ -8,6 +8,8 @@ import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 import prettierPlugin from 'eslint-plugin-prettier';
+import jsdoc from 'eslint-plugin-jsdoc';
+import tsdoc from 'eslint-plugin-tsdoc';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +28,8 @@ export default defineConfig([
       'import': importPlugin,
       'unused-imports': unusedImportsPlugin,
       'prettier': prettierPlugin,
+      'jsdoc': jsdoc,
+      'tsdoc': tsdoc,
     },
     rules: {
       'prettier/prettier': 'error',
@@ -89,6 +93,28 @@ export default defineConfig([
           ],
         },
       ],
+      'tsdoc/syntax': 'off',
+      'jsdoc/require-jsdoc': 'off',
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'tsdoc/syntax': 'error',
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          contexts: [
+            'TSInterfaceDeclaration > TSPropertySignature',
+            'TSTypeAliasDeclaration > TSTypeLiteral > TSPropertySignature',
+            'ExportNamedDeclaration > TSTypeAliasDeclaration',
+            'ExportNamedDeclaration > TSInterfaceDeclaration',
+            'ExportNamedDeclaration > TSEnumDeclaration',
+            'ExportNamedDeclaration > FunctionDeclaration',
+            'ExportNamedDeclaration > ClassDeclaration',
+          ],
+        },
+      ],
     },
   },
   {
@@ -100,6 +126,7 @@ export default defineConfig([
       'dist/',
       'android/',
       'ios/',
+      'docs/',
     ],
   },
 ]);
