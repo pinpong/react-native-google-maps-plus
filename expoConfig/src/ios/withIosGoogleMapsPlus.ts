@@ -40,23 +40,6 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
       }).contents;
     }
 
-    const podFilePatch = `
-  require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
-  apply_svgkit_patch(installer)
-  `;
-
-    if (src.includes('post_install do |installer|')) {
-      src = src.replace(
-        /post_install do \|installer\|([\s\S]*?)end/,
-        (match, inner) => {
-          if (inner.includes('SVGKit Patch')) return match; // idempotent
-          return `post_install do |installer|${inner}\n${podFilePatch}\nend`;
-        }
-      );
-    } else {
-      src += `\npost_install do |installer|\n${podFilePatch}\nend\n`;
-    }
-
     conf.modResults.contents = src;
     return conf;
   });
