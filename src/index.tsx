@@ -9,23 +9,6 @@
  * yarn add react-native-google-maps-plus react-native-nitro-modules
  * ```
  *
- * ## iOS Setup (Bare RN only)
- *
- * Add this to your Podfile:
- *
- * ```ruby
- * post_install do |installer|
- *   react_native_post_install(
- *       installer,
- *       config[:reactNativePath],
- *       :mac_catalyst_enabled => false,
- *     )
- *
- *   require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
- *   apply_svgkit_patch(installer)
- * end
- * ```
- *
  * ## Expo Setup
  *
  * Add your keys via the config plugin:

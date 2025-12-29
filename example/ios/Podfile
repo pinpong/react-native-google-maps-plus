@@ -28,8 +28,5 @@ target 'GoogleMapsPlusExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
-
-    require_relative '../../scripts/svgkit_patch'
-    apply_svgkit_patch(installer)
   end
 end
