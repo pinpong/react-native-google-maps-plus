@@ -30,19 +30,11 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - CocoaLumberjack (3.9.0):
-    - CocoaLumberjack/Core (= 3.9.0)
-  - CocoaLumberjack/Core (3.9.0)
   - DoubleConversion (1.1.6)
   - fast_float (8.0.0)
   - FBLazyVector (0.82.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - Google-Maps-iOS-Utils (6.1.3):
-    - GoogleMaps (~> 10.0)
-  - GoogleMaps (10.4.0):
-    - GoogleMaps/Maps (= 10.4.0)
-  - GoogleMaps/Maps (10.4.0)
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
@@ -2504,14 +2496,12 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNGoogleMapsPlus (1.10.1):
+  - RNGoogleMapsPlus (1.10.2):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - glog
-    - Google-Maps-iOS-Utils (= 6.1.3)
-    - GoogleMaps (= 10.4.0)
     - hermes-engine
     - NitroModules
     - RCT-Folly
@@ -2535,7 +2525,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - SocketRocket
-    - SVGKit (= 3.0.0)
     - Yoga
   - RNReanimated (4.1.5):
     - boost
@@ -2778,8 +2767,6 @@ PODS:
     - SocketRocket
     - Yoga
   - SocketRocket (0.7.1)
-  - SVGKit (3.0.0):
-    - CocoaLumberjack (~> 3.0)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2869,11 +2856,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - CocoaLumberjack
-    - Google-Maps-iOS-Utils
-    - GoogleMaps
     - SocketRocket
-    - SVGKit
 
 EXTERNAL SOURCES:
   boost:
@@ -3043,14 +3026,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   Clusterer: 6b8e946e6d4593644d04acd9c1fca686e8d4f5cb
-  CocoaLumberjack: 5644158777912b7de7469fa881f8a3f259c2512a
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 0aa6183b9afe3c31fc65b5d1eeef1f3c19b63bfa
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  Google-Maps-iOS-Utils: bed22fa703c919259b3901449434d60d994fae20
-  GoogleMaps: a40d3b1f511f0fa2036e7b08c920c33279b1d5fd
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   NitroModules: cf8804dafa637b6535c73fd113c3202b11307bfd
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
@@ -3120,12 +3100,11 @@ SPEC CHECKSUMS:
   ReactCodegen: 0bce2d209e2e802589f4c5ff76d21618200e74cb
   ReactCommon: 801eff8cb9c940c04d3a89ce399c343ee3eff654
   RNGestureHandler: 67501c6d447027581aa1d8e5a7a3ea5a7f0a89ff
-  RNGoogleMapsPlus: 86ba03df25878d125da670854ba6d4da6a3be09d
+  RNGoogleMapsPlus: b03dfe02d5c76529862b307ad8ed0af9fa96421e
   RNReanimated: 05c5a85c3ee54ac68d60c8a9b42dbc441e3326ca
   RNScreens: 98771ad898d1c0528fc8139606bbacf5a2e9d237
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   Yoga: 526f25666395d30c297d53154398ffd249eaf9e1
 
 PODFILE CHECKSUM: 53fea21acf44c419ecb277b368cb4c1e34124dfb
