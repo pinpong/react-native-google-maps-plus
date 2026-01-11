@@ -42,6 +42,19 @@ Pod::Spec.new do |s|
     products: ["SVGKit"]
   )
 
+  Pod::UI.puts "\n"
+  Pod::UI.puts "  ╔═══════════════════════════════════════════════════════════════════════════╗".green
+  Pod::UI.puts "  ║                                                                           ║".green
+  Pod::UI.puts "  ║   react-native-google-maps-plus                                           ║".green
+  Pod::UI.puts "  ║                                                                           ║".green
+  Pod::UI.puts "  ║   Static framework linking is fully supported!                            ║".green
+  Pod::UI.puts "  ║                                                                           ║".green
+  Pod::UI.puts "  ║   If you see a CocoaPods warning about SPM packages with static           ║".green
+  Pod::UI.puts "  ║   linking, you can safely ignore it - it's a generic warning.             ║".green
+  Pod::UI.puts "  ║                                                                           ║".green
+  Pod::UI.puts "  ╚═══════════════════════════════════════════════════════════════════════════╝".green
+  Pod::UI.puts "\n"
+
   load 'nitrogen/generated/ios/RNGoogleMapsPlus+autolinking.rb'
   add_nitrogen_files(s)
 
