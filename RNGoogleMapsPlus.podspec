@@ -13,11 +13,9 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => 16.0 }
   s.source       = { :git => "https://github.com/pinpong/react-native-google-maps-plus.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm,swift}"
-
   s.source_files = [
     "ios/**/*.{swift}",
-    "ios/**/*.{m,mm}",
+    "ios/**/*.{h,m,mm}",
     "cpp/**/*.{hpp,cpp}",
   ]
 
