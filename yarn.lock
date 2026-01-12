@@ -1657,54 +1657,54 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/cli@npm:20.3.0":
-  version: 20.3.0
-  resolution: "@commitlint/cli@npm:20.3.0"
+"@commitlint/cli@npm:20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/cli@npm:20.3.1"
   dependencies:
-    "@commitlint/format": ^20.2.0
-    "@commitlint/lint": ^20.3.0
-    "@commitlint/load": ^20.3.0
-    "@commitlint/read": ^20.2.0
-    "@commitlint/types": ^20.2.0
+    "@commitlint/format": ^20.3.1
+    "@commitlint/lint": ^20.3.1
+    "@commitlint/load": ^20.3.1
+    "@commitlint/read": ^20.3.1
+    "@commitlint/types": ^20.3.1
     tinyexec: ^1.0.0
     yargs: ^17.0.0
   bin:
     commitlint: ./cli.js
-  checksum: a8b178a319e7bf843b158e66edf172ef3cb78236fb184ca7be61554fabebf70b377c22e9951120558dac0961ccd7c7efb6f9fe176a086e25b889a41f418b76dd
+  checksum: 01ab0be2c79e8d160d9858263bda91d0a93a3bc860be571df1acc6ac8264c507e94f16e2f27a8b1822c2df227ef17456011258341b61e91afc0009b485fc4577
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:20.3.0":
-  version: 20.3.0
-  resolution: "@commitlint/config-conventional@npm:20.3.0"
+"@commitlint/config-conventional@npm:20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/config-conventional@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     conventional-changelog-conventionalcommits: ^7.0.2
-  checksum: 69658c603e27624081de95b67e41dc28c24ef1880e0709ab16d7ab55cc9a812b4bbbf5197ef0934725b18612f350fa50ea34512ffb954c0b7ff484df7158fec4
+  checksum: c34005d5d40a64013fa46567dbd4b9bada2100910973cd5cf169425b973718da12ab6cb9c1bb8a6f958a6b6d7a51b56ee263a39bd9385e11fe6fcfe3f161d46c
   languageName: node
   linkType: hard
 
-"@commitlint/config-validator@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/config-validator@npm:20.2.0"
+"@commitlint/config-validator@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/config-validator@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     ajv: ^8.11.0
-  checksum: befd687fe29a80a8ae27cb713be2dc0351fbb23803f0b3bbaf4da76fda6ee1581d6b326a9aaecb47a66fabac5cf51cbea14b8c0dfcd0a27d2ce0cb8b06aff08d
+  checksum: d123e0864586463f3eb42c22f3525af882eaed2057651e2cae338fbdf461e1e64f439df1033363d7930aff72a81e5ffb6762ffc51890aa25c273b2d616f2aadd
   languageName: node
   linkType: hard
 
-"@commitlint/ensure@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/ensure@npm:20.2.0"
+"@commitlint/ensure@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/ensure@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     lodash.camelcase: ^4.3.0
     lodash.kebabcase: ^4.1.1
     lodash.snakecase: ^4.1.1
     lodash.startcase: ^4.4.0
     lodash.upperfirst: ^4.3.1
-  checksum: ccdf65eeff0e905896579cbe6e0aeb318b80d27aca02e0a8f5c7c299528a174b552b02346834f875df13b15cc0bdd81562d99e0cfebb17ebf3ed11235b3d7326
+  checksum: 550f218fd1c18cb014f3ab5f5a50ece087f30772b755cb18e6090f2a79c1f5844391599a5c95224b9eec15ce63b5377a9d516bdb27b313fea2443c25de127fb4
   languageName: node
   linkType: hard
 
@@ -1715,53 +1715,53 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/format@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/format@npm:20.2.0"
+"@commitlint/format@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/format@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     chalk: ^5.3.0
-  checksum: 5a9902fc24aa33a505c32e0b86943be3e13cfdcc00c3bcc276d4c182bdb3367687d62e98515407db250e5d21b633432e04108c2ef2852cd72a7ec19201116bbf
+  checksum: 61de1e9874be8f0ab2e2942e1a118015a57619447df551913c7f9bdc7884cdbb7713b545b7db5fe38f8d8d8e29ec058c4aba54cd0412e8eb91782c09a3eda39c
   languageName: node
   linkType: hard
 
-"@commitlint/is-ignored@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/is-ignored@npm:20.2.0"
+"@commitlint/is-ignored@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/is-ignored@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     semver: ^7.6.0
-  checksum: 5636ab248f96446b6d5380076f65b43a52dd15bc1ecfdb4d90a2e6ad6b36461d0ad4af347632c588d8a73958d84c740de2e37c7e62405a01651b9e9114bedb15
+  checksum: 9862c955edb7eeeffb3947d29a5f1cbb6063076cc4068798f7675a4e0d630ef39e20cc1a159ed0c74c41d216f9448d45453c00837c60e3afc0246f0bc3f6bdda
   languageName: node
   linkType: hard
 
-"@commitlint/lint@npm:^20.3.0":
-  version: 20.3.0
-  resolution: "@commitlint/lint@npm:20.3.0"
+"@commitlint/lint@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/lint@npm:20.3.1"
   dependencies:
-    "@commitlint/is-ignored": ^20.2.0
-    "@commitlint/parse": ^20.2.0
-    "@commitlint/rules": ^20.3.0
-    "@commitlint/types": ^20.2.0
-  checksum: 2f574b7fee7a4d832ba584632ed4ba74ebf484ccdbcd2a60a8863e450a5105afc4b33e3222f57d59cd106d752f25ab8b5773cd6110ca402f211de97b0acdfd93
+    "@commitlint/is-ignored": ^20.3.1
+    "@commitlint/parse": ^20.3.1
+    "@commitlint/rules": ^20.3.1
+    "@commitlint/types": ^20.3.1
+  checksum: 853c3c75b2233219470f9eede0f893c3852c9bfa1ba0d362f80199972ea71f50de370bc145a399b8e7d96cde2d6bd256b049d9a1df137aa2f900aa21bbbaaaec
   languageName: node
   linkType: hard
 
-"@commitlint/load@npm:^20.3.0":
-  version: 20.3.0
-  resolution: "@commitlint/load@npm:20.3.0"
+"@commitlint/load@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/load@npm:20.3.1"
   dependencies:
-    "@commitlint/config-validator": ^20.2.0
+    "@commitlint/config-validator": ^20.3.1
     "@commitlint/execute-rule": ^20.0.0
-    "@commitlint/resolve-extends": ^20.2.0
-    "@commitlint/types": ^20.2.0
+    "@commitlint/resolve-extends": ^20.3.1
+    "@commitlint/types": ^20.3.1
     chalk: ^5.3.0
     cosmiconfig: ^9.0.0
     cosmiconfig-typescript-loader: ^6.1.0
     lodash.isplainobject: ^4.0.6
     lodash.merge: ^4.6.2
     lodash.uniq: ^4.5.0
-  checksum: d55989ecc080f44c5113acd0a9a2f29c656262ddaf747212d9c3aa0b96bba2a96ac6b65d3623238eebf0043636cb5a6e09f528362a17753ff48938b400db543b
+  checksum: 952dfea7e8b7e5c9a4f13de95afbe1c8c137da8b54ca4ab6c9b5ed49cb97af2e87a4ae0ddbbd6f435c38ab797ba08d6c8ff3f5d93131a5fffeecce4528734492
   languageName: node
   linkType: hard
 
@@ -1772,53 +1772,53 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/parse@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/parse@npm:20.2.0"
+"@commitlint/parse@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/parse@npm:20.3.1"
   dependencies:
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     conventional-changelog-angular: ^7.0.0
     conventional-commits-parser: ^5.0.0
-  checksum: 6bf3ba99f0ed862ba94dd238b37201c4df066e8de2848a76955592bc48140e5167e40bb3c794797cc32e0297e8ef8be2c0f2b52d9f11ef8d4f6ba2b2a8aa16a5
+  checksum: cbfe562a1c895bef4f2c56e26a2280132d7f8d9e718a37b872a4636c3ae827b6e8541cb1c775701df7ca734b6d842cb4baed72940658577a2ccc6ec4a0ecb5a9
   languageName: node
   linkType: hard
 
-"@commitlint/read@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/read@npm:20.2.0"
+"@commitlint/read@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/read@npm:20.3.1"
   dependencies:
     "@commitlint/top-level": ^20.0.0
-    "@commitlint/types": ^20.2.0
+    "@commitlint/types": ^20.3.1
     git-raw-commits: ^4.0.0
     minimist: ^1.2.8
     tinyexec: ^1.0.0
-  checksum: 6909a1755fa789bfeaf241fe11ec8591315a316e010ef20ba4304575012815e57f4837da5904f502b7e003add09e1813cedca223d8bfcf4b59e0d79398a0e1d8
+  checksum: 64b1d2bda260c13fb22f553b3c49638d4d96289710d1664da88408ee2d8a5e24d7853432d96b7d6468afe4205c86b2b76a40c45a42ed69aa409c357505641494
   languageName: node
   linkType: hard
 
-"@commitlint/resolve-extends@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/resolve-extends@npm:20.2.0"
+"@commitlint/resolve-extends@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/resolve-extends@npm:20.3.1"
   dependencies:
-    "@commitlint/config-validator": ^20.2.0
-    "@commitlint/types": ^20.2.0
+    "@commitlint/config-validator": ^20.3.1
+    "@commitlint/types": ^20.3.1
     global-directory: ^4.0.1
     import-meta-resolve: ^4.0.0
     lodash.mergewith: ^4.6.2
     resolve-from: ^5.0.0
-  checksum: 0eb5b5889d8b74c6ec5f59d269cfed12294aa10943f0c19a3e73c29455301e4efdd62e2d3198c5f02e959ef4bbfebcf137eccb6bb806e7aee9233512b577ce29
+  checksum: 14470d54d794453e70ba5c136bd85bd5de8a4aa69571ee8c3a9c89d1d25b5bd6680836ec8f342599ae85f5d7391969bb5522e7070e74fc1dae908190027dbc9a
   languageName: node
   linkType: hard
 
-"@commitlint/rules@npm:^20.3.0":
-  version: 20.3.0
-  resolution: "@commitlint/rules@npm:20.3.0"
+"@commitlint/rules@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/rules@npm:20.3.1"
   dependencies:
-    "@commitlint/ensure": ^20.2.0
+    "@commitlint/ensure": ^20.3.1
     "@commitlint/message": ^20.0.0
     "@commitlint/to-lines": ^20.0.0
-    "@commitlint/types": ^20.2.0
-  checksum: 20e3c94cb9b906d91d74488e957a7a00eaa0308a6d1e6d294fb31c88bfbfe518902670473a615ee56782b69d47c50d46ac537576329ffc40ddbc255012c7a349
+    "@commitlint/types": ^20.3.1
+  checksum: da7b386412f8782af4a8136527af919a298816ebaa5597b6ac09b5d8fa4c6a42bb62f65902c7b43d4ab0f8e1b94d0b5933ee4f1d66f55d1bf89629626367642b
   languageName: node
   linkType: hard
 
@@ -1838,13 +1838,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/types@npm:^20.2.0":
-  version: 20.2.0
-  resolution: "@commitlint/types@npm:20.2.0"
+"@commitlint/types@npm:^20.3.1":
+  version: 20.3.1
+  resolution: "@commitlint/types@npm:20.3.1"
   dependencies:
     "@types/conventional-commits-parser": ^5.0.0
     chalk: ^5.3.0
-  checksum: 456aa1701ca75df4dcf369b391948880832ab0b661bb00242d1c372abf1680fd92c1d2d5279596e5d5581b7ff9db4dacb9138717f690777b668f2a8eaf0b65b9
+  checksum: 9ca85cdad3bc8604d98e71d3c0c35aca7f6e84777f6f49e5218f83b8df7f58777e6436ee1101ee72c2a776123de605086bf90372679f919ad0293d40382d1f91
   languageName: node
   linkType: hard
 
@@ -1885,16 +1885,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@es-joy/jsdoccomment@npm:~0.76.0":
-  version: 0.76.0
-  resolution: "@es-joy/jsdoccomment@npm:0.76.0"
+"@es-joy/jsdoccomment@npm:~0.79.0":
+  version: 0.79.0
+  resolution: "@es-joy/jsdoccomment@npm:0.79.0"
   dependencies:
     "@types/estree": ^1.0.8
-    "@typescript-eslint/types": ^8.46.0
+    "@typescript-eslint/types": ^8.52.0
     comment-parser: 1.4.1
-    esquery: ^1.6.0
-    jsdoc-type-pratt-parser: ~6.10.0
-  checksum: 899714ad039b81173f726a800a8a8d824d44a2404739d7874788d9aec0086a5cbfb84d436cd96ae64bf4bb69fd282476ae7ccdbfb860624503065975f5124930
+    esquery: ^1.7.0
+    jsdoc-type-pratt-parser: ~7.0.0
+  checksum: 6e69ba7bdb8ca4c2cec5dcd168f34c593942fdc384d8f390aa27cfa8850c36cc8f34e2eaa933e11f266b5772a713851ec697624b34d2c07ba26be328480baca1
   languageName: node
   linkType: hard
 
@@ -1923,17 +1923,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/compat@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@eslint/compat@npm:2.0.0"
+"@eslint/compat@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@eslint/compat@npm:2.0.1"
   dependencies:
-    "@eslint/core": ^1.0.0
+    "@eslint/core": ^1.0.1
   peerDependencies:
     eslint: ^8.40 || 9
   peerDependenciesMeta:
     eslint:
       optional: true
-  checksum: b13e61d2f376744cfa4d2698f50ab12c13f92dbadc853211a8f293b282ab31940c0e7090db33b9be95887b7ebafc8c4f8c497ab39bb830ed5559cf21d079b39e
+  checksum: bcaa4c67ca48a775b9131e46d29754ec6d1c7af911884a8a3b9d092e1ac8b07f3011749d93ffc9000751aac5f9f1eec3d51c6989799885bf4778a5141679a9fc
   languageName: node
   linkType: hard
 
@@ -1966,12 +1966,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/core@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@eslint/core@npm:1.0.0"
+"@eslint/core@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@eslint/core@npm:1.0.1"
   dependencies:
     "@types/json-schema": ^7.0.15
-  checksum: 9f32f5c813d4336f94de3ed2f95140d89a842d0b3978254b6f5ddacaa1db5a05cf59d65055040242f91fb5a340638cd3b2bcca875c1b82279a6e63700c80c3cc
+  checksum: e79fe0984a0da922302e5b15ddc2f51ffab0126b5066e79ad475fc044b6c579877bb9055aae1ce2e16837deae86cf3978e2745424c446da062d3897945d51e9e
   languageName: node
   linkType: hard
 
@@ -3133,119 +3133,119 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-clean@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-clean@npm:20.0.2"
+"@react-native-community/cli-clean@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-clean@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-tools": 20.1.0
     execa: ^5.0.0
     fast-glob: ^3.3.2
-  checksum: b15543a60503acb76f86bca40484a76cd5ea43a82a8f433c47d91351570a41bde9cbd2a604ec64921ee001edab1ebdcdcb9fa4931ce7c9453308289588d5d5d7
+    picocolors: ^1.1.1
+  checksum: 697fe513380955b8a0590e23769378044d16d26fed5a71c4655f7ba2796b8653523b9fad0476882c02c73c1d2bc89f84f6459c0f3eba3346dbf7c287dff8a413
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config-android@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-config-android@npm:20.0.2"
+"@react-native-community/cli-config-android@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-config-android@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-tools": 20.1.0
     fast-glob: ^3.3.2
     fast-xml-parser: ^4.4.1
-  checksum: dcd8fbab47397129eeb3e4bf0cf6f061abc2d00fd340c0b258fdcffe3c14511376ba40279eccc4425bd894eac41b6b49f78da5a389b880e5b42c73b0faeb49f4
+    picocolors: ^1.1.1
+  checksum: 71e5e55dc683d8dea944e1c92de821e7371d6d6ac445b9a36f293322545c4e6fdc0cea75f1887993ae424427fe573cbc8ed58fdce04e9ecced004e86ab9fbca2
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config-apple@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-config-apple@npm:20.0.2"
+"@react-native-community/cli-config-apple@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-config-apple@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-tools": 20.1.0
     execa: ^5.0.0
     fast-glob: ^3.3.2
-  checksum: c89dbfba51b51c7c636253f31fc09d590ffad63e2d7df2a8a2b01f1878f6f8b7fc5cae5384b1fad403f49aa9f9a1e0afabefc68ecace0daddb82fc44d02ecd7a
+    picocolors: ^1.1.1
+  checksum: 4dc9bd588ddb297b32dfb97df344da53d5734606eeb99747d1058908688dca9acbbfcced406b375eda2663c49277aa762c500a497eb2700b4caeb85c58f6fe87
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-config@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-config@npm:20.0.2"
+"@react-native-community/cli-config@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-config@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-tools": 20.1.0
     cosmiconfig: ^9.0.0
     deepmerge: ^4.3.0
     fast-glob: ^3.3.2
     joi: ^17.2.1
-  checksum: dd34f76ab3d89cd76bb951efcde974aead30e4b4f2b9d05b369e3ffff372f9e2a6d5806fa7bd5af2ae49b4f8c681020f588d87056eafa45426775e227ce93b97
+    picocolors: ^1.1.1
+  checksum: ff904fd5d160c675ce641f6fe1d2d43c5a7d451d63481051945d7c2e9c5ab4e189de324f443c19af96c1bc8f8cd5642675a5645ce6948c1c3a05fc80b7d1b470
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-doctor@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-doctor@npm:20.0.2"
+"@react-native-community/cli-doctor@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-doctor@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-config": 20.0.2
-    "@react-native-community/cli-platform-android": 20.0.2
-    "@react-native-community/cli-platform-apple": 20.0.2
-    "@react-native-community/cli-platform-ios": 20.0.2
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-config": 20.1.0
+    "@react-native-community/cli-platform-android": 20.1.0
+    "@react-native-community/cli-platform-apple": 20.1.0
+    "@react-native-community/cli-platform-ios": 20.1.0
+    "@react-native-community/cli-tools": 20.1.0
     command-exists: ^1.2.8
     deepmerge: ^4.3.0
     envinfo: ^7.13.0
     execa: ^5.0.0
     node-stream-zip: ^1.9.1
     ora: ^5.4.1
+    picocolors: ^1.1.1
     semver: ^7.5.2
     wcwidth: ^1.0.1
     yaml: ^2.2.1
-  checksum: 118c17abc23bfbe893932dfad9a27ebdefa2a8ef636963b23c2a11bd182568d2857360290b2eb530fef5c683597b7558a8545dba4aa7c536795a6cae18cc1c59
+  checksum: fd2cd1892cb5ff4c1111cdf684225827b5975d7251fa23bd8df7b8611d288c8c33cd192268c6345bce6639927d63d3a6594baf667de49e64510f1fb1cf9e6c43
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-android@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-platform-android@npm:20.0.2"
+"@react-native-community/cli-platform-android@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-platform-android@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-config-android": 20.0.2
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-config-android": 20.1.0
+    "@react-native-community/cli-tools": 20.1.0
     execa: ^5.0.0
     logkitty: ^0.7.1
-  checksum: 9ae54aa536d953764643bd86db3bae2e2dc0289b658369ad4a40ef825516983e0f0acbf5cec754e52dbfc28e7c2396572d062c59da7989a5c37b80866fb44f9e
+    picocolors: ^1.1.1
+  checksum: 200974fc1425ee66482e547e875fb91d911dad11321dc897361da223c4b41828d1a04d5239b9f628db46f0e205c35a502548ff856d44b780e1f3072d102e43da
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-apple@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-platform-apple@npm:20.0.2"
+"@react-native-community/cli-platform-apple@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-platform-apple@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-config-apple": 20.0.2
-    "@react-native-community/cli-tools": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-config-apple": 20.1.0
+    "@react-native-community/cli-tools": 20.1.0
     execa: ^5.0.0
     fast-xml-parser: ^4.4.1
-  checksum: c77f887ea0b1ed6c1eed5781ce962bded57b8a02e52630bf3cf7b49f671b0956a27c58aafd989037c29e579403dee6bc37326fffb5faecdde85e5f51349fc594
+    picocolors: ^1.1.1
+  checksum: 63c8ce8c215c74d4517408d108568d5400d639437dc5d5bbca305bbf052f3a43334fb1bc035a524714fa2be682eb8fbe8fd95201cb122fcff55ca1bd8953daa4
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-platform-ios@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-platform-ios@npm:20.0.2"
+"@react-native-community/cli-platform-ios@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-platform-ios@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-platform-apple": 20.0.2
-  checksum: a0290feadc079981429143e9829a3030a768593927e0c2bcf546f52c8c22a53a49ea5f9ae9484f7eb390e01a46d7b0d7d9dc3374268d07237c808e6e7e3c50b3
+    "@react-native-community/cli-platform-apple": 20.1.0
+  checksum: da425c68bb20ade47f6283eba247d210206ddd651c9f80191c1b6e92ee5978a35b69df7a96c323dad9a0cf4dce7236ab84f34d9a6c51aa1d776d61de48f657eb
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-server-api@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-server-api@npm:20.0.2"
+"@react-native-community/cli-server-api@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-server-api@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-tools": 20.0.2
+    "@react-native-community/cli-tools": 20.1.0
     body-parser: ^1.20.3
     compression: ^1.7.1
     connect: ^3.6.5
@@ -3255,59 +3255,59 @@ __metadata:
     pretty-format: ^29.7.0
     serve-static: ^1.13.1
     ws: ^6.2.3
-  checksum: d8b5493157cc474d5c2e0c939204828c61d1a39163aee5914d87d9a98e059230a1aec2ed6eb98b53464060bf5e228d5363f3d4c9b4e807ba8d0fb2d1f4f705bb
+  checksum: 8c9923aaf40879bc2827fa6f89f8394b9ee25b3e8864b4eba0ddf0c285ea9426f953b2227509fde2b5ece512a2a39a89e835d30071b841764aeac8176bfa86f7
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-tools@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-tools@npm:20.0.2"
+"@react-native-community/cli-tools@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-tools@npm:20.1.0"
   dependencies:
     "@vscode/sudo-prompt": ^9.0.0
     appdirsjs: ^1.2.4
-    chalk: ^4.1.2
     execa: ^5.0.0
     find-up: ^5.0.0
     launch-editor: ^2.9.1
     mime: ^2.4.1
     ora: ^5.4.1
+    picocolors: ^1.1.1
     prompts: ^2.4.2
     semver: ^7.5.2
-  checksum: cc6d765e1778b982ee173b757a9e30f47173c185484321d4909ecf0dcf6441b7eb4a8d7ede44f1b3e8d3052ce2b97247ea4f2171eb523a5289f795220f7d6a4c
+  checksum: b856b7a0403511c6110a50185abc73efc88399cc76510a01035a1002b581cbebed2b0bd47ccde6c9887479da75a80a38b0c29c8a805ade7039f03d08fa3fca54
   languageName: node
   linkType: hard
 
-"@react-native-community/cli-types@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli-types@npm:20.0.2"
+"@react-native-community/cli-types@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli-types@npm:20.1.0"
   dependencies:
     joi: ^17.2.1
-  checksum: b4e708fe759ef995b99bdbe89f0e83a00cba680c01a119d317f445528e8321d89a842e0641ad2a08f4c3793ddb9e02b0045d2e82da66d279cb21ee42961ba9ce
+  checksum: 1ae86701a98ac21d0e67f2fcce3859e44c2315c55076aaf82cf80ebf19e91fe95f177208803fddd562f6578549f6ee816356406b5ce106fa0a4e7d30f5aafcdc
   languageName: node
   linkType: hard
 
-"@react-native-community/cli@npm:20.0.2":
-  version: 20.0.2
-  resolution: "@react-native-community/cli@npm:20.0.2"
+"@react-native-community/cli@npm:20.1.0":
+  version: 20.1.0
+  resolution: "@react-native-community/cli@npm:20.1.0"
   dependencies:
-    "@react-native-community/cli-clean": 20.0.2
-    "@react-native-community/cli-config": 20.0.2
-    "@react-native-community/cli-doctor": 20.0.2
-    "@react-native-community/cli-server-api": 20.0.2
-    "@react-native-community/cli-tools": 20.0.2
-    "@react-native-community/cli-types": 20.0.2
-    chalk: ^4.1.2
+    "@react-native-community/cli-clean": 20.1.0
+    "@react-native-community/cli-config": 20.1.0
+    "@react-native-community/cli-doctor": 20.1.0
+    "@react-native-community/cli-server-api": 20.1.0
+    "@react-native-community/cli-tools": 20.1.0
+    "@react-native-community/cli-types": 20.1.0
     commander: ^9.4.1
     deepmerge: ^4.3.0
     execa: ^5.0.0
     find-up: ^5.0.0
     fs-extra: ^8.1.0
     graceful-fs: ^4.1.3
+    picocolors: ^1.1.1
     prompts: ^2.4.2
     semver: ^7.5.2
   bin:
     rnc-cli: build/bin.js
-  checksum: 8113edf8f07de03c7666c5f995c975e6f6fd8dce151b3aaf901b814e4eb0fab97569535f7080d984ed476bb9b944ab0d4e4c95d46656caf915eb5c941b9ac07f
+  checksum: c6e8c3873885a60389b859123a42669c7698c33de4a94aaaa680a67fd0ba67944346bcfc87c7066e39fdbb015834db85446f188aa5ee1ff804da3fad41d130ca
   languageName: node
   linkType: hard
 
@@ -4230,12 +4230,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.2.7":
-  version: 19.2.7
-  resolution: "@types/react@npm:19.2.7"
+"@types/react@npm:19.2.8":
+  version: 19.2.8
+  resolution: "@types/react@npm:19.2.8"
   dependencies:
     csstype: ^3.2.2
-  checksum: b1f4c9a45862ea392b9ead060a5b5730b4c41b21fde097db35e639a8a0978460468d8da87f47226230bd4681d6de48ffee695595540084a8a849dde027c66a46
+  checksum: 9cff78fd1e5856eaae867a432a7de5a8d2b6a672f7a3d39a716e3fcf1432bcf17e09886102095d48ddd1b3189b2120344bc0f6ca24b5cb74d8722edf4403dbd2
   languageName: node
   linkType: hard
 
@@ -4354,10 +4354,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/types@npm:8.46.4, @typescript-eslint/types@npm:^8.46.0, @typescript-eslint/types@npm:^8.46.4":
+"@typescript-eslint/types@npm:8.46.4, @typescript-eslint/types@npm:^8.46.4":
   version: 8.46.4
   resolution: "@typescript-eslint/types@npm:8.46.4"
   checksum: 561f76b77542c00cdf54cc5fdabd1fc405274b78586af1078691e836baa8402b758d0c7c62874ca0417d3afd32e01656a412c96b345106ca9ee6f9bbb527a36e
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/types@npm:^8.52.0":
+  version: 8.52.0
+  resolution: "@typescript-eslint/types@npm:8.52.0"
+  checksum: 3bf4058a46ea2bb31dc8a828916cac63719f0dab33d5351e43012e6ad9c47c815856a3b4858d9fb0403d1baac6409cead73f64b7391521f11f20e52444af2961
   languageName: node
   linkType: hard
 
@@ -6914,18 +6921,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:61.5.0":
-  version: 61.5.0
-  resolution: "eslint-plugin-jsdoc@npm:61.5.0"
+"eslint-plugin-jsdoc@npm:62.0.0":
+  version: 62.0.0
+  resolution: "eslint-plugin-jsdoc@npm:62.0.0"
   dependencies:
-    "@es-joy/jsdoccomment": ~0.76.0
+    "@es-joy/jsdoccomment": ~0.79.0
     "@es-joy/resolve.exports": 1.2.0
     are-docs-informative: ^0.0.2
     comment-parser: 1.4.1
     debug: ^4.4.3
     escape-string-regexp: ^4.0.0
-    espree: ^10.4.0
-    esquery: ^1.6.0
+    espree: ^11.0.0
+    esquery: ^1.7.0
     html-entities: ^2.6.0
     object-deep-merge: ^2.0.0
     parse-imports-exports: ^0.2.4
@@ -6934,7 +6941,7 @@ __metadata:
     to-valid-identifier: ^1.0.0
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 6eda79ad7e5f49a2a1bdb302f2ba7aaaccc6f6e1726c3212c06ee59c728c4de36e4dac54558a6ff51d203fe6d80052dfdbc82e4527c55717309eff2cf84e70d2
+  checksum: bcaab17347da0a65ec75921f64e0dbe7f17891ab8c4af0b50e7c19f08aa4b6284fbe263576d2a2a2e9127ae96f1f1f83c2744ed026d6a79d0fe84ded32ed2923
   languageName: node
   linkType: hard
 
@@ -7084,6 +7091,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-visitor-keys@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "eslint-visitor-keys@npm:5.0.0"
+  checksum: 12446a76524024f9decd12ae7bb7de7bfb4b052d82c6a14180eb712962ada24168e8341a67421bcf99ada4a93b4eb46198e9ecf7c59010df8fb32a9d4475e071
+  languageName: node
+  linkType: hard
+
 "eslint@npm:9.39.2":
   version: 9.39.2
   resolution: "eslint@npm:9.39.2"
@@ -7144,6 +7158,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"espree@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "espree@npm:11.0.0"
+  dependencies:
+    acorn: ^8.15.0
+    acorn-jsx: ^5.3.2
+    eslint-visitor-keys: ^5.0.0
+  checksum: 70b22ebeca7c667c3f3d49c142a542b851e4dbefa600fe2329ccc831e8f3694f79e79c0f31f4ad3156f1963eae14e6927c906db56d804a2c5b84ed07f3c80131
+  languageName: node
+  linkType: hard
+
 "esprima@npm:^4.0.0":
   version: 4.0.1
   resolution: "esprima@npm:4.0.1"
@@ -7154,12 +7179,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esquery@npm:^1.5.0, esquery@npm:^1.6.0":
+"esquery@npm:^1.5.0":
   version: 1.6.0
   resolution: "esquery@npm:1.6.0"
   dependencies:
     estraverse: ^5.1.0
   checksum: 08ec4fe446d9ab27186da274d979558557fbdbbd10968fa9758552482720c54152a5640e08b9009e5a30706b66aba510692054d4129d32d0e12e05bbc0b96fb2
+  languageName: node
+  linkType: hard
+
+"esquery@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "esquery@npm:1.7.0"
+  dependencies:
+    estraverse: ^5.1.0
+  checksum: 3239792b68cf39fe18966d0ca01549bb15556734f0144308fd213739b0f153671ae916013fce0bca032044a4dbcda98b43c1c667f20c20a54dec3597ac0d7c27
   languageName: node
   linkType: hard
 
@@ -9780,10 +9814,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdoc-type-pratt-parser@npm:~6.10.0":
-  version: 6.10.0
-  resolution: "jsdoc-type-pratt-parser@npm:6.10.0"
-  checksum: 4cca75bb47f6d3bd72b1f6c965149c992577066c59c086c9ac8229407fb7150adb0a804991a072682b009c1967d8e7eac9abb3fc178e63f150ce83ca10c8ba2d
+"jsdoc-type-pratt-parser@npm:~7.0.0":
+  version: 7.0.0
+  resolution: "jsdoc-type-pratt-parser@npm:7.0.0"
+  checksum: 06ddc13984a2a37ea0f931a809ba880659870bd039e57ec568dd04ab54738fad7cca8eda7ad262fdbfca81b3ff7af658f876d0b8fe66df31c3f3001f5930e619
   languageName: node
   linkType: hard
 
@@ -12585,12 +12619,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.70.0":
-  version: 7.70.0
-  resolution: "react-hook-form@npm:7.70.0"
+"react-hook-form@npm:7.71.0":
+  version: 7.71.0
+  resolution: "react-hook-form@npm:7.71.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: cfa4b275bf24f3290ad50c9c3d93cb7397854b41647e03350ece8fc82eecbfe51019a1248a00dab99f7beae802d419ff71112d78607e34b08f210d53a51a0793
+  checksum: 26528d06ff1007ebc05cd0564700d29a802b116e31df0d35dbd378767dc94302b9b3e3b36eb1eeddc5b4de65bfdd52b6617620fba76b0ded0efb59ce75cfd3ab
   languageName: node
   linkType: hard
 
@@ -12681,19 +12715,19 @@ __metadata:
     "@babel/core": 7.28.5
     "@babel/preset-env": 7.28.5
     "@babel/runtime": 7.28.4
-    "@react-native-community/cli": 20.0.2
-    "@react-native-community/cli-platform-android": 20.0.2
-    "@react-native-community/cli-platform-ios": 20.0.2
+    "@react-native-community/cli": 20.1.0
+    "@react-native-community/cli-platform-android": 20.1.0
+    "@react-native-community/cli-platform-ios": 20.1.0
     "@react-native/babel-preset": 0.83.1
     "@react-native/metro-config": 0.83.1
     "@react-native/typescript-config": 0.83.1
     "@react-navigation/native": 7.1.26
     "@react-navigation/native-stack": 7.9.0
     "@react-navigation/stack": 7.6.13
-    "@types/react": 19.2.7
+    "@types/react": 19.2.8
     babel-plugin-module-resolver: 5.0.2
     react: 19.2.3
-    react-hook-form: 7.70.0
+    react-hook-form: 7.71.0
     react-native: 0.83.1
     react-native-builder-bob: 0.40.17
     react-native-clusterer: 5.0.2
@@ -12713,9 +12747,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-google-maps-plus@workspace:."
   dependencies:
-    "@commitlint/cli": 20.3.0
-    "@commitlint/config-conventional": 20.3.0
-    "@eslint/compat": 2.0.0
+    "@commitlint/cli": 20.3.1
+    "@commitlint/config-conventional": 20.3.1
+    "@eslint/compat": 2.0.1
     "@eslint/eslintrc": 3.3.3
     "@eslint/js": 9.39.2
     "@expo/config-plugins": 54.0.4
@@ -12726,14 +12760,14 @@ __metadata:
     "@semantic-release/git": 10.0.1
     "@semantic-release/npm": 13.1.3
     "@types/jest": 30.0.0
-    "@types/react": 19.2.7
+    "@types/react": 19.2.8
     conventional-changelog-conventionalcommits: 9.1.0
     del-cli: 7.0.0
     eslint: 9.39.2
     eslint-config-prettier: 10.1.8
     eslint-import-resolver-typescript: 4.4.4
     eslint-plugin-import: 2.32.0
-    eslint-plugin-jsdoc: 61.5.0
+    eslint-plugin-jsdoc: 62.0.0
     eslint-plugin-prettier: 5.5.4
     eslint-plugin-tsdoc: 0.5.0
     eslint-plugin-unused-imports: 4.3.0
@@ -12746,7 +12780,7 @@ __metadata:
     react-native-builder-bob: 0.40.17
     react-native-nitro-modules: 0.32.0
     semantic-release: 25.0.2
-    typedoc: 0.28.15
+    typedoc: 0.28.16
     typescript: 5.9.3
   peerDependencies:
     expo: "*"
@@ -14595,9 +14629,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:0.28.15":
-  version: 0.28.15
-  resolution: "typedoc@npm:0.28.15"
+"typedoc@npm:0.28.16":
+  version: 0.28.16
+  resolution: "typedoc@npm:0.28.16"
   dependencies:
     "@gerrit0/mini-shiki": ^3.17.0
     lunr: ^2.3.9
@@ -14608,7 +14642,7 @@ __metadata:
     typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x
   bin:
     typedoc: bin/typedoc
-  checksum: 986e7e21c4efc1987578cabc4190bc95a31da214b1712ced0ada3908593e1f3fcdf67cfe5a6fea1798d26ba7a6acedcd251638631252b9e2b2200cc87978128c
+  checksum: 210a6ccb63ceca349c0ec0be02ab3d64015d2af556deaf1e82808e6123dfb6e1385304972300ee3ac806ddb6a9df352b7cdb25ea9ea022797167933316a0d695
   languageName: node
   linkType: hard
 
