@@ -56,6 +56,9 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** Enables indoor maps. */
   indoorEnabled?: boolean;
 
+  /** Enables transit layer. */
+  transitEnabled?: boolean;
+
   /**
    * JSON map style string.
    * Must be a Google Maps StyleSpec JSON.

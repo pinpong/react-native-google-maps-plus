@@ -20,6 +20,7 @@ export type RNBasicMapConfig = {
   buildingEnabled?: boolean;
   trafficEnabled?: boolean;
   indoorEnabled?: boolean;
+  transitEnabled?: boolean;
   customMapStyle?: string;
   userInterfaceStyle?: RNUserInterfaceStyle;
   mapZoomConfig?: RNMapZoomConfig;
