@@ -132,6 +132,7 @@ GMSIndoorDisplayDelegate {
     ({ self.buildingEnabled = self.buildingEnabled })()
     ({ self.trafficEnabled = self.trafficEnabled })()
     ({ self.indoorEnabled = self.indoorEnabled })()
+    ({ self.transitEnabled = self.transitEnabled })()
     ({ self.customMapStyle = self.customMapStyle })()
     ({ self.mapType = self.mapType })()
     ({ self.userInterfaceStyle = self.userInterfaceStyle })()
@@ -243,6 +244,14 @@ GMSIndoorDisplayDelegate {
         self.mapView?.isIndoorEnabled = self.indoorEnabled ?? false
         self.mapView?.indoorDisplay.delegate =
           self.indoorEnabled == true ? self : nil
+      }
+    }
+  }
+
+  var transitEnabled: Bool? {
+    didSet {
+      onMain {
+        self.mapView?.isTransitEnabled = self.transitEnabled ?? false
       }
     }
   }
@@ -772,6 +781,7 @@ GMSIndoorDisplayDelegate {
       self.mapView?.clear()
       self.mapView?.isTrafficEnabled = false
       self.mapView?.isIndoorEnabled = false
+      self.mapView?.isTransitEnabled = false
       self.mapView?.isMyLocationEnabled = false
       self.mapView?.cameraTargetBounds = nil
       self.mapView?.layer.removeAllAnimations()

@@ -90,6 +90,13 @@ class RNGoogleMapsPlusView(
       view.indoorEnabled = value
     }
 
+  override var transitEnabled: Boolean? = null
+    set(value) {
+      if (field == value) return
+      field = value
+      view.transitEnabled = value
+    }
+
   override var customMapStyle: String? = null
     set(value) {
       if (field == value) return

@@ -70,6 +70,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.indoorEnabled = indoorEnabled }
   }
 
+  var transitEnabled: Bool? {
+    didSet { impl.transitEnabled = transitEnabled }
+  }
+
   var customMapStyle: String? {
     didSet {
       if let value = customMapStyle {
