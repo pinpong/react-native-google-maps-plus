@@ -38,7 +38,7 @@ PODS:
   - FBLazyVector (0.83.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - Google-Maps-iOS-Utils (6.1.3):
+  - Google-Maps-iOS-Utils (7.0.0):
     - GoogleMaps (~> 10.0)
   - GoogleMaps (10.7.0):
     - GoogleMaps/Maps (= 10.7.0)
@@ -2638,7 +2638,7 @@ PODS:
     - fast_float
     - fmt
     - glog
-    - Google-Maps-iOS-Utils (= 6.1.3)
+    - Google-Maps-iOS-Utils (= 7.0.0)
     - GoogleMaps (= 10.7.0)
     - hermes-engine
     - NitroModules
@@ -3189,7 +3189,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 309703e71d3f2f1ed7dc7889d58309c9d77a95a4
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  Google-Maps-iOS-Utils: bed22fa703c919259b3901449434d60d994fae20
+  Google-Maps-iOS-Utils: cbaa0660586302c8d4149b43910a4973494ed64c
   GoogleMaps: 5db81729b4f6defd40820d46b49a350273ec1d28
   hermes-engine: ff3a9fe253825c0e37c52df65dd0c483ded41ece
   NitroModules: 5ab248c0c4bc0a440414c0a8509dbad55cc7da6c
@@ -3264,7 +3264,7 @@ SPEC CHECKSUMS:
   ReactCodegen: d663254bf59e57e5ed7c65638bd45f358a373bba
   ReactCommon: 15e1e727fa34f760beb7dd52928687fda8edf8dc
   RNGestureHandler: c6327cf6e2bd384dc90351ccfff0da8142d62f54
-  RNGoogleMapsPlus: 003ed3bc88e32400b908ac44ea94cab96dde9049
+  RNGoogleMapsPlus: b871e689be34a1a2ae40178bc1a4e67dcf54cd6f
   RNReanimated: fbcb7fd8da5b0b088401542c58fb5d266388f1cf
   RNScreens: d6413aeb1878cdafd3c721e2c5218faf5d5d3b13
   RNWorklets: 69f7239afaf3a156f7f9549eeb0ae8d02adc095f
