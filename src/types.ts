@@ -24,7 +24,10 @@ export type RNInitialProps = {
    */
   liteMode?: boolean;
 
-  /** Initial camera configuration. */
+  /**
+   * Initial camera configuration.
+   * See {@link RNCameraUpdate}.
+   */
   camera?: RNCameraUpdate;
 
   /** Background color while tiles load. */
@@ -50,7 +53,7 @@ export type RNMapUiSettings = {
    */
   mapToolbarEnabled?: boolean;
 
-  /**  Enables the "My Location" button. */
+  /** Enables the "My Location" button. */
   myLocationButtonEnabled?: boolean;
 
   /** Enables rotation gestures. */
@@ -114,16 +117,25 @@ export type RNLatLng = {
 
 /** Geographic bounds. */
 export type RNLatLngBounds = {
-  /** Southwest corner. */
+  /** Southwest corner.
+   *
+   * See {@link RNLatLng}.
+   */
   southwest: RNLatLng;
 
-  /** Northeast corner. */
+  /** Northeast corner.
+   *
+   * See {@link RNLatLng}.
+   */
   northeast: RNLatLng;
 };
 
 /** Snapshot configuration. */
 export type RNSnapshotOptions = {
-  /** Output size. */
+  /** Output size.
+   *
+   * See {@link RNSize}.
+   */
   size?: RNSize;
 
   /** Image format. */
@@ -182,7 +194,10 @@ export type RNUserInterfaceStyle = 'light' | 'dark' | 'system';
 
 /** Camera definition. */
 export type RNCamera = {
-  /** Camera target coordinate. */
+  /** Camera target coordinate.
+   *
+   * See {@link RNLatLng}.
+   */
   center: RNLatLng;
 
   /** Zoom level. */
@@ -197,7 +212,10 @@ export type RNCamera = {
 
 /** Partial camera update. */
 export type RNCameraUpdate = {
-  /** Camera target coordinate. */
+  /** Camera target coordinate.
+   *
+   * See {@link RNLatLng}.
+   */
   center?: RNLatLng;
 
   /** Zoom level. */
@@ -212,19 +230,34 @@ export type RNCameraUpdate = {
 
 /** Visible region. */
 export type RNRegion = {
-  /** Near-left corner. */
+  /** Near-left corner.
+   *
+   * See {@link RNLatLng}.
+   */
   nearLeft: RNLatLng;
 
-  /** Near-right corner. */
+  /** Near-right corner.
+   *
+   * See {@link RNLatLng}.
+   */
   nearRight: RNLatLng;
 
-  /** Far-left corner. */
+  /** Far-left corner.
+   *
+   * See {@link RNLatLng}.
+   */
   farLeft: RNLatLng;
 
-  /** Far-right corner. */
+  /** Far-right corner.
+   *
+   * See {@link RNLatLng}.
+   */
   farRight: RNLatLng;
 
-  /** Bounding box. */
+  /** Bounding box.
+   *
+   * See {@link RNLatLngBounds}.
+   */
   latLngBounds: RNLatLngBounds;
 };
 
@@ -274,12 +307,17 @@ export type RNMarker = {
   /** Z-index used for rendering order. */
   zIndex?: number;
 
-  /** Marker coordinate. */
+  /** Marker coordinate.
+   *
+   * See {@link RNLatLng}.
+   */
   coordinate: RNLatLng;
 
   /**
    * Anchor point relative to the marker icon.
    * (0,0) = top-left, (1,1) = bottom-right.
+   *
+   * See {@link RNPosition}.
    */
   anchor?: RNPosition;
 
@@ -304,6 +342,8 @@ export type RNMarker = {
   /**
    * Info window anchor relative to the marker.
    * (0,0) = top-left, (1,1) = bottom-right.
+   *
+   * See {@link RNPosition}.
    */
   infoWindowAnchor?: RNPosition;
 
@@ -357,7 +397,10 @@ export type RNPolygon = {
   /** Enables polygon press events. */
   pressable?: boolean;
 
-  /** Polygon vertices. */
+  /** Polygon vertices.
+   *
+   * See {@link RNLatLng}[].
+   */
   coordinates: RNLatLng[];
 
   /** Fill color. */
@@ -376,7 +419,10 @@ export type RNPolygon = {
    */
   strokeWidth?: number;
 
-  /** Polygon holes. */
+  /** Polygon holes.
+   *
+   * See {@link RNPolygonHole}.
+   */
   holes?: RNPolygonHole[];
 
   /** Draws geodesic edges. */
@@ -385,7 +431,10 @@ export type RNPolygon = {
 
 /** Polygon hole definition. */
 export type RNPolygonHole = {
-  /** Hole vertices. */
+  /** Hole vertices.
+   *
+   * See {@link RNLatLng}[].
+   */
   coordinates: RNLatLng[];
 };
 
@@ -400,7 +449,10 @@ export type RNPolyline = {
   /** Enables polyline press events. */
   pressable?: boolean;
 
-  /** Polyline vertices. */
+  /** Polyline vertices.
+   *
+   * See {@link RNLatLng}[].
+   */
   coordinates: RNLatLng[];
 
   /** Line cap style. */
@@ -437,7 +489,10 @@ export type RNCircle = {
   /** Z-index used for rendering order. */
   zIndex?: number;
 
-  /** Circle center. */
+  /** Circle center.
+   *
+   * See {@link RNLatLng}.
+   */
   center: RNLatLng;
 
   /** Radius in meters. */
@@ -471,7 +526,10 @@ export type RNHeatmap = {
   /** Z-index used for rendering order. */
   zIndex?: number;
 
-  /** Weighted heatmap points. */
+  /** Weighted heatmap points.
+   *
+   * See {@link RNHeatmapPoint}.
+   */
   weightedData: RNHeatmapPoint[];
 
   /** Radius used for each point. */
@@ -480,7 +538,10 @@ export type RNHeatmap = {
   /** Overall heatmap opacity. */
   opacity?: number;
 
-  /** Custom gradient configuration. */
+  /** Gradient configuration.
+   *
+   * See {@link RNHeatmapGradient}.
+   */
   gradient?: RNHeatmapGradient;
 };
 
@@ -546,7 +607,10 @@ export type RNIndoorBuilding = {
   /** Index of the default level. */
   defaultLevelIndex?: number;
 
-  /** Available indoor levels. */
+  /** Available indoor levels.
+   *
+   * See {@link RNIndoorLevel}.
+   */
   levels: RNIndoorLevel[];
 
   /** Indicates whether the building is underground. */
@@ -570,16 +634,27 @@ export type RNIndoorLevel = {
 
 /** Location configuration. */
 export type RNLocationConfig = {
-  /** Android-specific location configuration. */
+  /**
+   * Android-specific location configuration.
+   *
+   * See {@link RNAndroidLocationConfig}.
+   */
   android?: RNAndroidLocationConfig;
 
-  /** iOS-specific location configuration. */
+  /**
+   * iOS-specific location configuration.
+   *
+   * See {@link RNIOSLocationConfig}.
+   */
   ios?: RNIOSLocationConfig;
 };
 
 /** Android location configuration. */
 export type RNAndroidLocationConfig = {
-  /** Requested location priority. */
+  /**
+   * Requested location priority.
+   * See {@link RNAndroidLocationPriority}.
+   */
   priority?: RNAndroidLocationPriority;
 
   /** Desired update interval in milliseconds. */
@@ -603,13 +678,19 @@ export enum RNAndroidLocationPriority {
 
 /** iOS location configuration. */
 export type RNIOSLocationConfig = {
-  /** Desired accuracy level. */
+  /**
+   * Desired accuracy level.
+   * See {@link RNIOSLocationAccuracy}.
+   */
   desiredAccuracy?: RNIOSLocationAccuracy;
 
   /** Minimum distance in meters before a new update is delivered. */
   distanceFilterMeters?: number;
 
-  /** Activity type used to optimize location updates. */
+  /**
+   * Activity type used to optimize location updates.
+   * See {@link RNIOSLocationActivityType}.
+   */
   activityType?: RNIOSLocationActivityType;
 };
 
@@ -641,10 +722,18 @@ export enum RNIOSLocationActivityType {
 
 /** Combined location permission result. */
 export type RNLocationPermissionResult = {
-  /** Android permission result. */
+  /**
+   * Android permission result.
+   *
+   * See {@link RNAndroidLocationPermissionResult}.
+   */
   android?: RNAndroidLocationPermissionResult;
 
-  /** iOS permission result. */
+  /**
+   * iOS permission result.
+   *
+   * See {@link RNIOSPermissionResult}.
+   */
   ios?: RNIOSPermissionResult;
 };
 
@@ -668,7 +757,11 @@ export enum RNIOSPermissionResult {
 
 /** Location object. */
 export type RNLocation = {
-  /** Center coordinate. */
+  /**
+   * Center coordinate.
+   *
+   * See {@link RNLatLng}.
+   */
   center: RNLatLng;
 
   /** Altitude in meters. */
@@ -686,10 +779,18 @@ export type RNLocation = {
   /** Timestamp in milliseconds since Unix epoch. */
   time: number;
 
-  /** Android-only fields. */
+  /**
+   * Android-only location fields.
+   *
+   * See {@link RNLocationAndroid}.
+   */
   android?: RNLocationAndroid;
 
-  /** iOS-only fields. */
+  /**
+   * iOS-only location fields.
+   *
+   * See {@link RNLocationIOS}.
+   */
   ios?: RNLocationIOS;
 };
 

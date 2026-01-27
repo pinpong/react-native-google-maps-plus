@@ -328,6 +328,7 @@ export const RNBasicMapConfigValidator = object({
   buildingEnabled: optional(boolean()),
   trafficEnabled: optional(boolean()),
   indoorEnabled: optional(boolean()),
+  transitEnabled: optional(boolean()),
   customMapStyle: optional(string()),
   userInterfaceStyle: optional(RNUserInterfaceStyleValidator),
   mapZoomConfig: optional(RNMapZoomConfigValidator),

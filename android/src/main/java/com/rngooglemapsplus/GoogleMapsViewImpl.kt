@@ -236,6 +236,7 @@ class GoogleMapsViewImpl(
     buildingEnabled = buildingEnabled
     trafficEnabled = trafficEnabled
     indoorEnabled = indoorEnabled
+    transitEnabled = transitEnabled
     customMapStyle = customMapStyle
     mapType = mapType
     userInterfaceStyle = userInterfaceStyle
@@ -330,6 +331,12 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       onUi { googleMap?.isIndoorEnabled = value ?: false }
+    }
+
+  var transitEnabled: Boolean? = null
+    set(value) {
+      field = value
+      onUi { googleMap?.isTransitEnabled = value ?: false }
     }
 
   var customMapStyle: MapStyleOptions? = null
@@ -834,6 +841,7 @@ class GoogleMapsViewImpl(
         setInfoWindowAdapter(null)
         isTrafficEnabled = false
         isIndoorEnabled = false
+        isTransitEnabled = false
         myLocationEnabled = false
         setLocationSource(null)
         setLatLngBoundsForCameraTarget(null)

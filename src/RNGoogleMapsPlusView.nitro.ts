@@ -38,7 +38,10 @@ import type {
  * Platform differences remain unless explicitly aligned.
  */
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
+  /** Initial map configuration. See {@link RNInitialProps}. */
   initialProps?: RNInitialProps;
+
+  /** UI and gesture settings. See {@link RNMapUiSettings}. */
   uiSettings?: RNMapUiSettings;
 
   /** Enables "My Location" blue dot. */
@@ -52,6 +55,9 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 
   /** Enables indoor maps. */
   indoorEnabled?: boolean;
+
+  /** Enables transit layer. */
+  transitEnabled?: boolean;
 
   /**
    * JSON map style string.

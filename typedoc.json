@@ -24,5 +24,12 @@
     "external": true,
     "protected": true,
     "private": true
-  }
+  },
+  "externalSymbolLinkMappings": {
+    "react-native-nitro-modules": {
+      "HybridObject": "#",
+      "other": "#"
+    }
+  },
+  "highlightLanguages": ["ts", "tsx", "js", "json", "bash", "ruby"]
 }

@@ -10,21 +10,27 @@ import com.rngooglemapsplus.RNLocationErrorCode
 
 fun Throwable.toLocationErrorCode(context: Context): RNLocationErrorCode {
   return when (this) {
-    is SecurityException -> RNLocationErrorCode.PERMISSION_DENIED
+    is SecurityException -> {
+      RNLocationErrorCode.PERMISSION_DENIED
+    }
 
-    is ApiException ->
+    is ApiException -> {
       when (statusCode) {
-        CommonStatusCodes.NETWORK_ERROR ->
+        CommonStatusCodes.NETWORK_ERROR -> {
           RNLocationErrorCode.POSITION_UNAVAILABLE
+        }
 
         LocationSettingsStatusCodes.RESOLUTION_REQUIRED,
         LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE,
-        ->
+        -> {
           RNLocationErrorCode.SETTINGS_NOT_SATISFIED
+        }
 
-        else ->
+        else -> {
           RNLocationErrorCode.INTERNAL_ERROR
+        }
       }
+    }
 
     else -> {
       if (message?.contains("GoogleApi", ignoreCase = true) == true) {

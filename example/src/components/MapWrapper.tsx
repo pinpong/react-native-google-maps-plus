@@ -105,6 +105,7 @@ export default function MapWrapper(props: Props) {
         myLocationEnabled={props.myLocationEnabled ?? true}
         trafficEnabled={props.trafficEnabled ?? false}
         indoorEnabled={props.indoorEnabled ?? false}
+        transitEnabled={props.transitEnabled ?? false}
         style={[styles.map, props.style]}
         userInterfaceStyle={
           props.userInterfaceStyle ??

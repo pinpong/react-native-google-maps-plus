@@ -48,6 +48,7 @@ export default function BasicMapScreen() {
     buildingEnabled: undefined,
     trafficEnabled: undefined,
     indoorEnabled: undefined,
+    transitEnabled: undefined,
     customMapStyle: undefined,
     mapZoomConfig: { min: 0, max: 20 },
     mapPadding: { top: 0, left: 0, bottom: layout.bottom + 70, right: 0 },

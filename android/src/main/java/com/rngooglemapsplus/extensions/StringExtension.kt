@@ -23,16 +23,28 @@ private fun parseCssColor(input: String): Int {
 private fun normalizeHexColor(hex: String): String {
   val h = hex.removePrefix("#")
   return when (h.length) {
-    3 ->
+    3 -> {
       "#FF" +
         h
           .map { "$it$it" }
           .joinToString("")
+    }
 
-    4 -> "#" + h[0] + h[0] + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]
-    6 -> "#FF$h"
-    8 -> "#$h"
-    else -> "#$h"
+    4 -> {
+      "#" + h[0] + h[0] + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]
+    }
+
+    6 -> {
+      "#FF$h"
+    }
+
+    8 -> {
+      "#$h"
+    }
+
+    else -> {
+      "#$h"
+    }
   }
 }
 

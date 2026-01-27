@@ -58,8 +58,14 @@ class MapLifecycleEventObserver(
 
   private fun invokeEvent(event: Lifecycle.Event) {
     when (event) {
-      Lifecycle.Event.ON_CREATE -> mapView?.onCreate(Bundle())
-      Lifecycle.Event.ON_START -> mapView?.onStart()
+      Lifecycle.Event.ON_CREATE -> {
+        mapView?.onCreate(Bundle())
+      }
+
+      Lifecycle.Event.ON_START -> {
+        mapView?.onStart()
+      }
+
       Lifecycle.Event.ON_RESUME -> {
         locationHandler.start()
         mapView?.onResume()
@@ -70,8 +76,14 @@ class MapLifecycleEventObserver(
         locationHandler.stop()
       }
 
-      Lifecycle.Event.ON_STOP -> mapView?.onStop()
-      Lifecycle.Event.ON_DESTROY -> mapView?.onDestroy()
+      Lifecycle.Event.ON_STOP -> {
+        mapView?.onStop()
+      }
+
+      Lifecycle.Event.ON_DESTROY -> {
+        mapView?.onDestroy()
+      }
+
       Lifecycle.Event.ON_ANY -> {}
     }
     currentState = event.targetState
