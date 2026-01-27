@@ -150,7 +150,7 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         when {
-          prev == null ->
+          prev == null -> {
             markerBuilder.buildIconAsync(next) { icon ->
               view.addMarker(
                 id,
@@ -161,11 +161,13 @@ class RNGoogleMapsPlusView(
                 ),
               )
             }
+          }
 
-          !prev.markerEquals(next) ->
+          !prev.markerEquals(next) -> {
             view.updateMarker(id) { marker ->
               markerBuilder.update(prev, next, marker)
             }
+          }
         }
       }
     }
@@ -183,13 +185,15 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         when {
-          prev == null ->
+          prev == null -> {
             view.addPolyline(id, polylineBuilder.build(next))
+          }
 
-          !prev.polylineEquals(next) ->
+          !prev.polylineEquals(next) -> {
             view.updatePolyline(id) { polyline ->
               polylineBuilder.update(prev, next, polyline)
             }
+          }
         }
       }
     }
@@ -208,13 +212,15 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         when {
-          prev == null ->
+          prev == null -> {
             view.addPolygon(id, polygonBuilder.build(next))
+          }
 
-          !prev.polygonEquals(next) ->
+          !prev.polygonEquals(next) -> {
             view.updatePolygon(id) { polygon ->
               polygonBuilder.update(prev, next, polygon)
             }
+          }
         }
       }
     }
@@ -233,13 +239,15 @@ class RNGoogleMapsPlusView(
       nextById.forEach { (id, next) ->
         val prev = prevById[id]
         when {
-          prev == null ->
+          prev == null -> {
             view.addCircle(id, circleBuilder.build(next))
+          }
 
-          !prev.circleEquals(next) ->
+          !prev.circleEquals(next) -> {
             view.updateCircle(id) { circle ->
               circleBuilder.update(prev, next, circle)
             }
+          }
         }
       }
     }

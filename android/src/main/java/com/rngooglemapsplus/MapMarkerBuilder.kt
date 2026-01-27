@@ -116,7 +116,9 @@ class MapMarkerBuilder(
                 result
               }
 
-              else -> null
+              else -> {
+                null
+              }
             }
           }.onFailure {
             mapsLog("external svg resolve failed")
