@@ -1,3 +1,32 @@
+## [1.11.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.2...v1.11.0) (2026-01-27)
+
+### ✨ Features
+
+* transit layer support ([5db65ea](https://github.com/pinpong/react-native-google-maps-plus/commit/5db65ea45868da66203604a0ce230f4577ffe48b))
+
+### 🐛 Bug Fixes
+
+* **podspec:** correct source_files patterns ([ffb01cb](https://github.com/pinpong/react-native-google-maps-plus/commit/ffb01cb0ecaef21593eadb176b3b1cce9ad65d4c))
+
+### 📚 Documentation
+
+* fix warning ([417fd45](https://github.com/pinpong/react-native-google-maps-plus/commit/417fd454182a7499841f889366c6a2e11ca777f4))
+* **types:** improve type documentation links ([1683bfb](https://github.com/pinpong/react-native-google-maps-plus/commit/1683bfb69271c5998681cb786c825d555676004a))
+
+### 🛠️ Other changes
+
+* **android:** update android-maps-utils ([986c008](https://github.com/pinpong/react-native-google-maps-plus/commit/986c0083ba29d9414e655429d0683f0bb9770a03))
+* **android:** update maps sdk ([e85acce](https://github.com/pinpong/react-native-google-maps-plus/commit/e85acce1e38fa8d7653741cffea52faec2c9ebc3))
+* apply ktlint formatting ([b8f6850](https://github.com/pinpong/react-native-google-maps-plus/commit/b8f6850cb8f8fc06e465f1fd4c0f72b537735085))
+* **example:** transit layer support ([b7ea377](https://github.com/pinpong/react-native-google-maps-plus/commit/b7ea377a1af4094c966d79a638b398e5d524e915))
+* **ios:** update maps sdk ([63ea155](https://github.com/pinpong/react-native-google-maps-plus/commit/63ea1555b2312e3a72703d9d36d5429c249b066d))
+* merge dev into main ([c6d58b7](https://github.com/pinpong/react-native-google-maps-plus/commit/c6d58b734de0278588261fac61512007ffbc7757))
+* merge dev into main ([0ebfd30](https://github.com/pinpong/react-native-google-maps-plus/commit/0ebfd30d41a5a879862c2aa58f1013a4895b6bb9))
+* update dependencies ([f06ae6f](https://github.com/pinpong/react-native-google-maps-plus/commit/f06ae6f6e29e0630407a57963bd4d9c47ac65592))
+* update dependencies ([1ebc567](https://github.com/pinpong/react-native-google-maps-plus/commit/1ebc56741658c9241783c48b98b7bdb2aeff6c1c))
+* update README.md ([dc1f75f](https://github.com/pinpong/react-native-google-maps-plus/commit/dc1f75f293e8e7bebde13b2c6d6a5bb1e5cbba45))
+* update to react-native 0.83.1 ([94f7978](https://github.com/pinpong/react-native-google-maps-plus/commit/94f79782b6fe812521d334bc81d3b8b19ec57263))
+
 ## [1.10.2](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.1...v1.10.2) (2025-12-03)
 
 ### 🐛 Bug Fixes
