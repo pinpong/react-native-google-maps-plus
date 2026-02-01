@@ -813,6 +813,7 @@ class GoogleMapsViewImpl(
       if (destroyed) return@onUi
       destroyed = true
       lifecycleObserver?.toDestroyedState()
+      lifecycleObserver = null
       markerBuilder.cancelAllJobs()
       clearMarkers()
       clearPolylines()
