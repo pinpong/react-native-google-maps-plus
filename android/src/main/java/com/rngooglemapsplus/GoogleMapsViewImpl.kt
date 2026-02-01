@@ -10,7 +10,9 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Size
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -180,6 +182,30 @@ class GoogleMapsViewImpl(
           }
         }
     }
+
+  private fun disallowParentTouchEventIntercept(disallowIntercept: Boolean): Boolean {
+    val parent = this.parent as? ViewGroup
+    if (parent != null) {
+        parent.requestDisallowInterceptTouchEvent(disallowIntercept)
+        return true
+    }
+    return false
+  }
+
+  override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    when (ev.actionMasked) {
+        MotionEvent.ACTION_DOWN -> {
+            disallowParentTouchEventIntercept(
+                googleMap?.uiSettings?.isScrollGesturesEnabled ?: false
+            )
+        }
+        MotionEvent.ACTION_UP -> {
+            disallowParentTouchEventIntercept(false)
+        }
+    }
+    super.dispatchTouchEvent(ev)
+    return true
+  }
 
   override fun onCameraMoveStarted(reason: Int) =
     onUi {
