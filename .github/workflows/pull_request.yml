@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
@@ -110,10 +110,10 @@ jobs:
           JAVA_OPTS: '-XX:MaxHeapSize=6g'
         run: yarn build:android
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: [lint, test, docs]
     env:
-      XCODE_VERSION: '26.0.1'
+      XCODE_VERSION: '26.2'
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
