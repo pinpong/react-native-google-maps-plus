@@ -8,6 +8,7 @@
   "source": "src/index",
   "react-native": "src/index",
   "scripts": {
+    "commitlint": "commitlint",
     "typecheck:lib": "tsc --noEmit -p tsconfig.json",
     "typecheck:example": "tsc --noEmit -p example/tsconfig.json",
     "typecheck": "yarn typecheck:lib && yarn typecheck:example",

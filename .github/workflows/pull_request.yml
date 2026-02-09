@@ -8,8 +8,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Lint commit messages
+        run: |
+          yarn commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
   lint:
     runs-on: macos-26
+    needs: [commitlint]
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
