@@ -3,6 +3,8 @@ import SVGKit
 import UIKit
 
 final class MapMarkerBuilder {
+  private let mapErrorHandler: MapErrorHandler
+
   private let iconCache: NSCache<NSNumber, UIImage> = {
     let c = NSCache<NSNumber, UIImage>()
     c.countLimit = 256
@@ -10,7 +12,8 @@ final class MapMarkerBuilder {
   }()
   private var tasks: [String: Task<Void, Never>] = [:]
 
-  init() {
+  init(mapErrorHandler: MapErrorHandler) {
+    self.mapErrorHandler = mapErrorHandler
     warmupSVGKit()
   }
 
@@ -225,14 +228,14 @@ final class MapMarkerBuilder {
     let h = CGFloat(iconSvg.height)
 
     if w <= 0 || h <= 0 {
-      mapsLog("markerId=\(markerTag.id) icon: invalid svg size")
+      mapErrorHandler.report(RNMapErrorCode.invalidArgument, "markerId=\(markerTag.id) icon: invalid svg size")
       return createFallbackImageView()
     }
 
     guard let data = iconSvg.svgString.data(using: .utf8),
           let svgImg = SVGKImage(data: data)
     else {
-      mapsLog("markerId=\(markerTag.id) infoWindow: svg utf8 decode failed")
+      mapErrorHandler.report(RNMapErrorCode.invalidArgument, "markerId=\(markerTag.id) infoWindow: svg utf8 decode failed")
       return createFallbackImageView()
     }
 
@@ -241,9 +244,7 @@ final class MapMarkerBuilder {
     svgImg.size = size
 
     guard let finalImage = SVGKExporterUIImage.export(asUIImage: svgImg) else {
-      mapsLog(
-        "markerId=\(markerTag.id) infoWindow: svg export to UIImage failed"
-      )
+      mapErrorHandler.report(RNMapErrorCode.markerIconBuildFailed, "markerId=\(markerTag.id) infoWindow: svg export to UIImage failed")
       svgImg.clear()
       return createFallbackImageView()
     }
@@ -294,14 +295,14 @@ final class MapMarkerBuilder {
     let h = CGFloat(iconSvg.height)
 
     if w <= 0 || h <= 0 {
-      mapsLog("markerId=\(markerId) icon: invalid svg size")
+      mapErrorHandler.report(RNMapErrorCode.invalidArgument, "markerId=\(markerId) icon: invalid svg size")
       return (createFallbackUIImage(), true)
     }
 
     guard
       let data = iconSvg.svgString.data(using: .utf8)
     else {
-      mapsLog("markerId=\(markerId) icon: svg utf8 decode failed")
+      mapErrorHandler.report(RNMapErrorCode.invalidArgument, "markerId=\(markerId) icon: svg utf8 decode failed")
       return (createFallbackUIImage(), true)
     }
 
@@ -311,7 +312,7 @@ final class MapMarkerBuilder {
       guard !Task.isCancelled else { return nil }
 
       guard let svgImg = SVGKImage(data: data) else {
-        mapsLog("markerId=\(markerId) icon: SVGKImage init failed")
+        mapErrorHandler.report(RNMapErrorCode.markerIconBuildFailed, "markerId=\(markerId) icon: SVGKImage init failed")
         return (createFallbackUIImage(), true)
       }
 
@@ -330,6 +331,7 @@ final class MapMarkerBuilder {
       if let uiImage = uiImage {
         return (uiImage, false)
       } else {
+        mapErrorHandler.report(.markerIconBuildFailed, "markerId=\(markerId) icon: svg export to UIImage failed")
         return (createFallbackUIImage(), true)
       }
     }

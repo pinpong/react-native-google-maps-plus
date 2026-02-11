@@ -101,8 +101,8 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** Location subsystem config. See {@link RNLocationConfig}. */
   locationConfig?: RNLocationConfig;
 
-  /** Map SDK error. */
-  onMapError?: (error: RNMapErrorCode) => void;
+  /** Map errors. */
+  onMapError?: (error: RNMapErrorCode, msg: string) => void;
 
   /** Native map instance created. */
   onMapReady?: (ready: boolean) => void;

@@ -31,7 +31,11 @@ export function useMapCallbacks(
 
   const onMapError = useNitroCallback(
     props.onMapError,
-    useCallback((e: RNMapErrorCode) => console.log('Map error:', e), [])
+    useCallback(
+      (e: RNMapErrorCode, message: string) =>
+        console.log('Map error:', RNMapErrorCode[e], message),
+      []
+    )
   );
 
   const onMapReady = useNitroCallback(
