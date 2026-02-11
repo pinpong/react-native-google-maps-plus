@@ -754,7 +754,7 @@ class GoogleMapsViewImpl(
       kmlLayersById[id] = layer
       layer.addLayerToMap()
     } catch (_: Exception) {
-      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kml layer parse failed: id=$id", null)
+      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kml layer parse failed: id=$id")
     }
   }
 
