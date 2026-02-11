@@ -20,16 +20,3 @@ inline fun <T> onUiSync(crossinline block: () -> T): T {
   }
   return runBlocking { result.await() }
 }
-
-private const val MAPS_LOG_TAG = "react-native-google-maps-plus"
-
-fun mapsLog(msg: String) {
-  android.util.Log.w(MAPS_LOG_TAG, msg)
-}
-
-fun mapsLog(
-  msg: String,
-  t: Throwable,
-) {
-  android.util.Log.w(MAPS_LOG_TAG, msg, t)
-}

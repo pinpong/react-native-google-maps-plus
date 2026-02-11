@@ -24,20 +24,22 @@ import com.rngooglemapsplus.extensions.toSize
 class RNGoogleMapsPlusView(
   val context: ThemedReactContext,
 ) : HybridRNGoogleMapsPlusViewSpec() {
+  private val mapErrorHandler = MapErrorHandler()
+
   private var currentCustomMapStyle: String? = null
   private var permissionHandler = PermissionHandler(context)
   private var locationHandler = LocationHandler(context)
   private var playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MapMarkerBuilder(context)
+  private val markerBuilder = MapMarkerBuilder(context, mapErrorHandler)
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
   private val heatmapBuilder = MapHeatmapBuilder()
-  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
+  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder(mapErrorHandler)
 
   override val view =
-    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder)
+    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder, mapErrorHandler)
 
   override var initialProps: RNInitialProps? = null
     set(value) {
@@ -303,9 +305,10 @@ class RNGoogleMapsPlusView(
       view.locationConfig = value
     }
 
-  override var onMapError: ((RNMapErrorCode) -> Unit)? = null
+  override var onMapError: ((RNMapErrorCode, String) -> Unit)? = null
     set(cb) {
-      view.onMapError = cb
+      field = cb
+      mapErrorHandler.callback = cb
     }
 
   override var onMapReady: ((Boolean) -> Unit)? = null

@@ -6,7 +6,8 @@ extension UIImage {
     format: String = "png",
     imageFormat: ImageFormat = .png,
     quality: CGFloat = 1.0,
-    resultIsFile: Bool = false
+    resultIsFile: Bool = false,
+    mapErrorHandler: MapErrorHandler
   ) -> String? {
     var imageToEncode = self
 
@@ -35,7 +36,7 @@ extension UIImage {
         try imageData.write(to: fileURL)
         return fileURL.path
       } catch {
-        mapsLog("snapshot write failed", error)
+        mapErrorHandler.report(RNMapErrorCode.snapshotExportFailed, "snapshot write failed", error)
         return nil
       }
     } else {

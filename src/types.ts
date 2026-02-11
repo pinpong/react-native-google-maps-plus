@@ -868,24 +868,42 @@ export enum RNLocationErrorCode {
 
 /** Error codes related to Google Play Services Maps integration. */
 export enum RNMapErrorCode {
-  /** Google Play Services are missing on the device. */
+  /** Play Services not installed (Android). */
   PLAY_SERVICES_MISSING = 0,
 
-  /** Google Play Services are present but invalid. */
+  /** Play Services invalid or corrupted (Android). */
   PLAY_SERVICES_INVALID = 1,
 
-  /** Google Play Services are disabled on the device. */
+  /** Play Services disabled (Android). */
   PLAY_SERVICES_DISABLED = 2,
 
-  /** Google Play Services are installed, but outdated. */
+  /** Play Services version too old (Android). */
   PLAY_SERVICES_OUTDATED = 3,
 
-  /** A newer version of Google Play Services is available. */
+  /** Play Services update available (Android). */
   PLAY_SERVICE_UPDATE_AVAILABLE = 4,
 
-  /** Google Play Services are currently updating. */
+  /** Play Services currently updating (Android). */
   PLAY_SERVICE_UPDATING = 5,
 
-  /** Unknown error. */
+  /** Unknown Play Services error (Android). */
   UNKNOWN = 6,
+
+  /** Snapshot encoding or file write failed. */
+  SNAPSHOT_EXPORT_FAILED = 7,
+
+  /** Marker icon rendering failed. */
+  MARKER_ICON_BUILD_FAILED = 8,
+
+  /** Tile overlay load or parse failed. */
+  TILE_OVERLAY_FAILED = 9,
+
+  /** Invalid input provided to native layer. */
+  INVALID_ARGUMENT = 10,
+
+  /** Unexpected internal native exception. */
+  INTERNAL_EXCEPTION = 11,
+
+  /** KML layer failed to load or parse. */
+  KML_LAYER_FAILED = 12,
 }
