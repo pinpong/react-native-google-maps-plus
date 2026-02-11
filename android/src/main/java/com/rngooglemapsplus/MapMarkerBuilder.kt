@@ -43,6 +43,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class MapMarkerBuilder(
   val context: ThemedReactContext,
+  private val mapErrorHandler: MapErrorHandler,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   private val iconCache =
@@ -121,7 +122,7 @@ class MapMarkerBuilder(
               }
             }
           }.onFailure {
-            mapsLog("external svg resolve failed")
+            mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "external svg resolve failed", null)
           }.getOrNull()
         }
 
@@ -145,7 +146,7 @@ class MapMarkerBuilder(
               try {
                 return Typeface.createFromAsset(assetManager, path)
               } catch (_: Throwable) {
-                mapsLog("font resolve failed: $path")
+                mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "font resolve failed: $path", null)
               }
             }
 
@@ -292,14 +293,14 @@ class MapMarkerBuilder(
             onReady(desc)
           }
         } catch (_: OutOfMemoryError) {
-          mapsLog("markerId=${m.id} buildIconAsync out of memory")
+          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync out of memory", null)
           clearIconCache()
           withContext(Dispatchers.Main) {
             ensureActive()
             onReady(createFallbackDescriptor())
           }
         } catch (_: Throwable) {
-          mapsLog("markerId=${m.id} buildIconAsync failed")
+          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", null)
           withContext(Dispatchers.Main) {
             ensureActive()
             onReady(createFallbackDescriptor())
@@ -343,7 +344,7 @@ class MapMarkerBuilder(
         .toInt()
 
     if (wPx <= 0 || hPx <= 0) {
-      mapsLog("markerId=${markerTag.id} invalid svg size")
+      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} invalid svg size", null)
       return ImageView(context)
     }
 
@@ -365,7 +366,7 @@ class MapMarkerBuilder(
       val drawable = PictureDrawable(svg.renderToPicture())
       svgView.setImageDrawable(drawable)
     } catch (_: Exception) {
-      mapsLog("markerId=${markerTag.id} infoWindow: svg render failed")
+      mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed", null)
       return ImageView(context)
     }
 
@@ -403,7 +404,7 @@ class MapMarkerBuilder(
         .toInt()
 
     if (wPx <= 0 || hPx <= 0) {
-      mapsLog("markerId=$markerId invalid svg size")
+      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId invalid svg size", null)
       return RenderBitmapResult(createFallbackBitmap(), true)
     }
 
@@ -416,10 +417,10 @@ class MapMarkerBuilder(
             documentHeight = hPx.toFloat()
           }
         } catch (_: SVGParseException) {
-          mapsLog("markerId=$markerId icon: svg parse failed")
+          mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: svg parse failed", null)
           return RenderBitmapResult(createFallbackBitmap(), true)
         } catch (_: IllegalArgumentException) {
-          mapsLog("markerId=$markerId icon: svg invalid")
+          mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: svg invalid", null)
           return RenderBitmapResult(createFallbackBitmap(), true)
         }
 

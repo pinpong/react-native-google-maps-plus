@@ -5,10 +5,11 @@ import NitroModules
 
 final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
+  private let mapErrorHandler: MapErrorHandler
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
+  private let markerBuilder: MapMarkerBuilder
 
-  private let markerBuilder = MapMarkerBuilder()
   private let polylineBuilder = MapPolylineBuilder()
   private let polygonBuilder = MapPolygonBuilder()
   private let circleBuilder = MapCircleBuilder()
@@ -24,7 +25,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   override init() {
     self.permissionHandler = PermissionHandler()
     self.locationHandler = LocationHandler()
+    self.mapErrorHandler = MapErrorHandler()
+    self.markerBuilder = MapMarkerBuilder(mapErrorHandler: mapErrorHandler)
     self.impl = GoogleMapsViewImpl(
+      mapErrorHandler: mapErrorHandler,
       locationHandler: locationHandler,
       markerBuilder: markerBuilder
     )
@@ -298,8 +302,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  var onMapError: ((RNMapErrorCode) -> Void)? {
-    didSet { impl.onMapError = onMapError }
+  var onMapError: ((RNMapErrorCode, String) -> Void)? {
+    didSet { mapErrorHandler.callback = onMapError }
   }
   var onMapReady: ((Bool) -> Void)? {
     didSet { impl.onMapReady = onMapReady }

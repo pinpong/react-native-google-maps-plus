@@ -7,6 +7,7 @@ import UIKit
 final class GoogleMapsViewImpl: UIView, GMSMapViewDelegate,
 GMSIndoorDisplayDelegate {
 
+  private let mapErrorHandler: MapErrorHandler
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
   private var mapView: GMSMapView?
@@ -35,9 +36,11 @@ GMSIndoorDisplayDelegate {
 
   init(
     frame: CGRect = .zero,
+    mapErrorHandler: MapErrorHandler,
     locationHandler: LocationHandler,
     markerBuilder: MapMarkerBuilder
   ) {
+    self.mapErrorHandler = mapErrorHandler
     self.locationHandler = locationHandler
     self.markerBuilder = markerBuilder
     super.init(frame: frame)
@@ -468,7 +471,8 @@ GMSIndoorDisplayDelegate {
         format: format,
         imageFormat: imageFormat,
         quality: quality,
-        resultIsFile: resultIsFile
+        resultIsFile: resultIsFile,
+        mapErrorHandler: self.mapErrorHandler
       ) {
         promise.resolve(withResult: result)
       } else {

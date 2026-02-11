@@ -61,6 +61,7 @@ class GoogleMapsViewImpl(
   val locationHandler: LocationHandler,
   val playServiceHandler: PlayServicesHandler,
   val markerBuilder: MapMarkerBuilder,
+  val mapErrorHandler: MapErrorHandler,
 ) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
@@ -135,7 +136,7 @@ class GoogleMapsViewImpl(
       val result = playServiceHandler.playServicesAvailability()
       val errorCode = result.toRNMapErrorCodeOrNull()
       if (errorCode != null) {
-        onMapError?.invoke(errorCode)
+        mapErrorHandler.report(errorCode, "play services unavailable")
         if (errorCode == RNMapErrorCode.PLAY_SERVICES_MISSING ||
           errorCode == RNMapErrorCode.PLAY_SERVICES_INVALID
         ) {
@@ -396,7 +397,6 @@ class GoogleMapsViewImpl(
       )
     }
 
-  var onMapError: ((RNMapErrorCode) -> Unit)? = null
   var onMapReady: ((Boolean) -> Unit)? = null
   var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
@@ -505,7 +505,7 @@ class GoogleMapsViewImpl(
     onUi {
       googleMap?.snapshot { bitmap ->
         bitmap
-          ?.encode(context, size, format, compressFormat, quality, resultIsFile)
+          ?.encode(context, size, format, compressFormat, quality, resultIsFile, mapErrorHandler)
           ?.let(promise::resolve) ?: promise.resolve(null)
       }
     }
@@ -754,7 +754,7 @@ class GoogleMapsViewImpl(
       kmlLayersById[id] = layer
       layer.addLayerToMap()
     } catch (_: Exception) {
-      mapsLog("kml layer parse failed: id=$id")
+      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kml layer parse failed: id=$id", null)
     }
   }
 

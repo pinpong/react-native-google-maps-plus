@@ -4,7 +4,9 @@ import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.android.gms.maps.model.UrlTileProvider
 import java.net.URL
 
-class MapUrlTileOverlayBuilder {
+class MapUrlTileOverlayBuilder(
+  private val mapErrorHandler: MapErrorHandler,
+) {
   fun build(t: RNUrlTileOverlay): TileOverlayOptions {
     val provider =
       object : UrlTileProvider(
@@ -25,7 +27,7 @@ class MapUrlTileOverlayBuilder {
           return try {
             URL(url)
           } catch (e: Exception) {
-            mapsLog("tile url invalid: $url", e)
+            mapErrorHandler.report(RNMapErrorCode.TILE_OVERLAY_FAILED, "tile url invalid: $url", e)
             null
           }
         }

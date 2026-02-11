@@ -5,7 +5,8 @@ import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Size
 import androidx.core.graphics.scale
-import com.rngooglemapsplus.mapsLog
+import com.rngooglemapsplus.MapErrorHandler
+import com.rngooglemapsplus.RNMapErrorCode
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -17,6 +18,7 @@ fun Bitmap.encode(
   compressFormat: Bitmap.CompressFormat,
   quality: Double,
   asFile: Boolean,
+  mapErrorHandler: MapErrorHandler,
 ): String? =
   try {
     targetSize?.let { scale(it.width, it.height) }
@@ -32,6 +34,6 @@ fun Bitmap.encode(
       "data:image/$format;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
   } catch (e: Exception) {
-    mapsLog("snapshot export failed", e)
+    mapErrorHandler.report(RNMapErrorCode.SNAPSHOT_EXPORT_FAILED, "snapshot export failed", e)
     null
   }
