@@ -5,11 +5,11 @@
  *  - Replaces 'com.margelo.nitro.rngooglemapsplus' -> 'com.rngooglemapsplus'
  *  - Replaces 'com/margelo/nitro/rngooglemapsplus' -> 'com/rngooglemapsplus'
  *  - Removes 'margelo/nitro/' in RNGoogleMapsPlusOnLoad.cpp
- *  - Inserts `prepareToRecycleView()`
+ *  - Inserts `onDropViewInstance()`
  *  nitrogen/generated/android/kotlin/com/margelo/nitro/rngooglemapsplus/views/HybridRNGoogleMapsPlusViewManager.kt
  *
  * iOS
- *  - Inserts `+ (BOOL)shouldBeRecycled`
+ *  - Inserts `+ (void)dealloc`
  *  nitrogen/generated/ios/c++/views/HybridRNGoogleMapsPlusViewComponent.mm
  */
 import { readFile, readdir, writeFile } from 'node:fs/promises';
@@ -70,33 +70,19 @@ const REPLACEMENTS = [
 const __filename = fileURLToPath(import.meta.url);
 const filename = basename(__filename);
 
-const ANDROID_VIEW_MANAGER_METHODS =
-  /override fun onDropViewInstance\(view: View\)\s*\{\s*super\.onDropViewInstance\(view\)\s*views\.remove\(view\)\s*\}/m;
+const PATCH_MARKER = `  // added by ${filename}`;
 
-const ANDROID_VIEW_MANAGER_METHODS_NEW = `
+const ON_DROP_VIEW_INSTANCE_ANDROID = `
+${PATCH_MARKER}
   override fun onDropViewInstance(view: View) {
+    val hybridView = view.getTag(associated_hybrid_view_tag) as? RNGoogleMapsPlusView
+    hybridView?.dispose()
+    view.setTag(associated_hybrid_view_tag, null)
     super.onDropViewInstance(view)
-    views.remove(view)
-  /// added by ${filename}
-    if (view is GoogleMapsViewImpl) {
-      view.destroyInternal()
-    }
-  }
+  }`;
 
-  /// added by ${filename}
-  override fun prepareToRecycleView(reactContext: ThemedReactContext, view: View): View? {
-    return null
-  }
-`;
-
-const RECYCLE_METHOD_IOS = `
-/// added by ${filename}
-+ (BOOL)shouldBeRecycled
-{
-  return NO;
-}
-
-/// added by ${filename}
+const DEALLOC_METHOD_IOS = `
+${PATCH_MARKER}
 - (void)dealloc {
   if (_hybridView) {
     RNGoogleMapsPlus::HybridRNGoogleMapsPlusViewSpec_cxx& swiftPart = _hybridView->getSwiftPart();
@@ -118,28 +104,32 @@ async function processFile(filePath) {
   }
 
   if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_MANAGER)) {
-    if (ANDROID_VIEW_MANAGER_METHODS.test(updated)) {
+    if (!updated.includes(PATCH_MARKER)) {
+      const pattern = /(override\s+fun\s+createViewInstance[\s\S]*?\})/m;
+
+      if (!pattern.test(updated)) {
+        throw new Error(
+          `Pattern for "createViewInstance" not found in ${filePath}`
+        );
+      }
+
       updated = updated.replace(
-        ANDROID_VIEW_MANAGER_METHODS,
-        ANDROID_VIEW_MANAGER_METHODS_NEW
-      );
-    } else {
-      throw new Error(
-        `Pattern for HybridRNGoogleMapsPlusViewManager not found in ${filePath}`
+        pattern,
+        `$1\n${ON_DROP_VIEW_INSTANCE_ANDROID}`
       );
     }
   }
 
   if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_COMPONENT_IOS)) {
-    if (!/\+\s*\(BOOL\)\s*shouldBeRecycled/.test(updated)) {
-      const pattern =
-        /(- \(instancetype\)\s*init\s*\{(?:[^{}]|\{[^{}]*\})*\})/m;
+    if (!updated.includes(PATCH_MARKER)) {
+      const initPattern =
+        /(-\s*\(instancetype\)\s*init[\s\S]*?return\s+self;\s*\})/m;
 
-      if (pattern.test(updated)) {
-        updated = updated.replace(pattern, `$1\n${RECYCLE_METHOD_IOS}`);
-      } else {
+      if (!initPattern.test(updated)) {
         throw new Error(`Pattern for "init" not found in ${filePath}`);
       }
+
+      updated = updated.replace(initPattern, `$1\n${DEALLOC_METHOD_IOS}`);
     }
   }
 

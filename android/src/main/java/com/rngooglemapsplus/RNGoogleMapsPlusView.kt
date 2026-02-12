@@ -41,6 +41,11 @@ class RNGoogleMapsPlusView(
   override val view =
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder, mapErrorHandler)
 
+  override fun dispose() {
+    view.destroyInternal()
+    super.dispose()
+  }
+
   override var initialProps: RNInitialProps? = null
     set(value) {
       if (field == value) return
