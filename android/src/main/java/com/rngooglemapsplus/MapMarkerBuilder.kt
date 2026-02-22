@@ -302,7 +302,7 @@ class MapMarkerBuilder(
         } catch (_: CancellationException) {
           withContext(Dispatchers.Main) {
             ensureActive()
-            onReady(createFallbackDescriptor)
+            onReady(createFallbackDescriptor())
           }
         } catch (t: Throwable) {
           mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", t)
