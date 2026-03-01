@@ -24,8 +24,8 @@ Pod::Spec.new do |s|
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
 
-  s.dependency 'GoogleMaps', '10.8.0'
-  s.dependency 'Google-Maps-iOS-Utils', '7.0.0'
+  s.dependency 'GoogleMaps', '10.10.0'
+  s.dependency 'Google-Maps-iOS-Utils', '7.1.0'
   s.dependency 'SVGKit', '3.0.0'
 
   load 'nitrogen/generated/ios/RNGoogleMapsPlus+autolinking.rb'
