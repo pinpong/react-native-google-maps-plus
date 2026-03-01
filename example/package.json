@@ -16,11 +16,11 @@
     "@react-navigation/stack": "7.8.2",
     "react": "19.2.3",
     "react-hook-form": "7.71.2",
-    "react-native": "0.83.1",
+    "react-native": "0.84.1",
     "react-native-clusterer": "5.0.2",
     "react-native-gesture-handler": "2.30.0",
     "react-native-google-maps-plus": "workspace:*",
-    "react-native-nitro-modules": "0.33.9",
+    "react-native-nitro-modules": "0.34.1",
     "react-native-reanimated": "4.2.2",
     "react-native-safe-area-context": "5.7.0",
     "react-native-screens": "4.24.0",
@@ -28,21 +28,21 @@
     "superstruct": "2.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.28.5",
-    "@babel/preset-env": "7.28.5",
-    "@babel/runtime": "7.28.4",
+    "@babel/core": "7.29.0",
+    "@babel/preset-env": "7.29.0",
+    "@babel/runtime": "7.28.6",
     "@react-native-community/cli": "20.1.2",
     "@react-native-community/cli-platform-android": "20.1.2",
     "@react-native-community/cli-platform-ios": "20.1.2",
-    "@react-native/babel-preset": "0.83.1",
-    "@react-native/metro-config": "0.83.1",
-    "@react-native/typescript-config": "0.83.1",
-    "@types/react": "19.2.8",
+    "@react-native/babel-preset": "0.84.1",
+    "@react-native/metro-config": "0.84.1",
+    "@react-native/typescript-config": "0.84.1",
+    "@types/react": "19.2.14",
     "babel-plugin-module-resolver": "5.0.2",
     "react-native-builder-bob": "0.40.18",
     "react-native-monorepo-config": "0.3.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">= 22.11.0"
   }
 }
