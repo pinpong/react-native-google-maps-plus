@@ -2,7 +2,8 @@ name: Prepare dev branch for next release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
@@ -11,7 +12,7 @@ jobs:
   update-pods:
     name: Update Podfile.lock after release
     runs-on: macos-latest
-    if: contains(join(github.event.commits.*.message, ' '), 'release')
+    if: ${{ !contains(github.ref_name, '-') }}
     env:
       XCODE_VERSION: latest-stable
 
@@ -21,6 +22,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: main
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -41,14 +43,14 @@ jobs:
             exit 0
           fi
 
-          git commit -m "chore(example): update Podfile.lock after release [skip ci]"
-          git push
+          git commit -m "chore(example): update Podfile.lock after release"
+          git push origin main
 
   sync-dev:
     name: Merge main into dev
     runs-on: ubuntu-latest
     needs: update-pods
-    if: contains(join(github.event.commits.*.message, ' '), 'release')
+    if: ${{ !contains(github.ref_name, '-') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
