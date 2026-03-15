@@ -34,7 +34,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     )
   }
 
-  func dispose() {
+  func onDropView() {
     impl.deinitInternal()
   }
 
