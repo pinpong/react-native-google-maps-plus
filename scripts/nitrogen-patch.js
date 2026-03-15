@@ -5,18 +5,11 @@
  *  - Replaces 'com.margelo.nitro.rngooglemapsplus' -> 'com.rngooglemapsplus'
  *  - Replaces 'com/margelo/nitro/rngooglemapsplus' -> 'com/rngooglemapsplus'
  *  - Removes 'margelo/nitro/' in RNGoogleMapsPlusOnLoad.cpp
- *  - Inserts `onDropViewInstance()`
- *  nitrogen/generated/android/kotlin/com/margelo/nitro/rngooglemapsplus/views/HybridRNGoogleMapsPlusViewManager.kt
- *
  * iOS
- *  - Inserts `+ (void)dealloc`
- *  nitrogen/generated/ios/c++/views/HybridRNGoogleMapsPlusViewComponent.mm
  */
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import { basename } from 'path';
-import { fileURLToPath } from 'url';
 
 const ROOT_ANDROID = path.join(
   process.cwd(),
@@ -24,7 +17,7 @@ const ROOT_ANDROID = path.join(
   'generated',
   'android'
 );
-const ROOT_IOS = path.join(process.cwd(), 'nitrogen', 'generated', 'ios');
+
 const SRC_JSON_DIR = path.join(
   process.cwd(),
   'nitrogen',
@@ -32,6 +25,7 @@ const SRC_JSON_DIR = path.join(
   'shared',
   'json'
 );
+
 const DEST_JSON_DIR = path.join(
   process.cwd(),
   'lib',
@@ -46,16 +40,6 @@ const ANDROID_ONLOAD_FILE = path.join(
   'RNGoogleMapsPlusOnLoad.cpp'
 );
 
-const HYBRID_VIEW_MANAGER = path.join(
-  ROOT_ANDROID,
-  'kotlin/com/margelo/nitro/rngooglemapsplus/views/HybridRNGoogleMapsPlusViewManager.kt'
-);
-
-const HYBRID_VIEW_COMPONENT_IOS = path.join(
-  ROOT_IOS,
-  'c++/views/HybridRNGoogleMapsPlusViewComponent.mm'
-);
-
 const REPLACEMENTS = [
   {
     regex: /com\.margelo\.nitro\.rngooglemapsplus/g,
@@ -67,30 +51,6 @@ const REPLACEMENTS = [
   },
 ];
 
-const __filename = fileURLToPath(import.meta.url);
-const filename = basename(__filename);
-
-const PATCH_MARKER = `  // added by ${filename}`;
-
-const ON_DROP_VIEW_INSTANCE_ANDROID = `
-${PATCH_MARKER}
-  override fun onDropViewInstance(view: View) {
-    val hybridView = view.getTag(associated_hybrid_view_tag) as? RNGoogleMapsPlusView
-    hybridView?.dispose()
-    view.setTag(associated_hybrid_view_tag, null)
-    super.onDropViewInstance(view)
-  }`;
-
-const DEALLOC_METHOD_IOS = `
-${PATCH_MARKER}
-- (void)dealloc {
-  if (_hybridView) {
-    RNGoogleMapsPlus::HybridRNGoogleMapsPlusViewSpec_cxx& swiftPart = _hybridView->getSwiftPart();
-    swiftPart.dispose();
-    _hybridView.reset();
-  }
-}`;
-
 async function processFile(filePath) {
   let content = await readFile(filePath, 'utf8');
   let updated = content;
@@ -101,36 +61,6 @@ async function processFile(filePath) {
 
   if (path.resolve(filePath) === path.resolve(ANDROID_ONLOAD_FILE)) {
     updated = updated.replace(/margelo\/nitro\//g, '');
-  }
-
-  if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_MANAGER)) {
-    if (!updated.includes(PATCH_MARKER)) {
-      const pattern = /(override\s+fun\s+createViewInstance[\s\S]*?\})/m;
-
-      if (!pattern.test(updated)) {
-        throw new Error(
-          `Pattern for "createViewInstance" not found in ${filePath}`
-        );
-      }
-
-      updated = updated.replace(
-        pattern,
-        `$1\n${ON_DROP_VIEW_INSTANCE_ANDROID}`
-      );
-    }
-  }
-
-  if (path.resolve(filePath) === path.resolve(HYBRID_VIEW_COMPONENT_IOS)) {
-    if (!updated.includes(PATCH_MARKER)) {
-      const initPattern =
-        /(-\s*\(instancetype\)\s*init[\s\S]*?return\s+self;\s*\})/m;
-
-      if (!initPattern.test(updated)) {
-        throw new Error(`Pattern for "init" not found in ${filePath}`);
-      }
-
-      updated = updated.replace(initPattern, `$1\n${DEALLOC_METHOD_IOS}`);
-    }
   }
 
   if (updated !== content) {
@@ -172,7 +102,6 @@ async function copyJsonFiles() {
   try {
     await copyJsonFiles();
     await start(ROOT_ANDROID);
-    await start(ROOT_IOS);
     console.log('All Nitrogen files patched successfully.');
   } catch (err) {
     console.error('Error while processing files:', err);
