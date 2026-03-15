@@ -16,12 +16,24 @@
   ],
   "autolinking": {
     "RNGoogleMapsPlusView": {
-      "swift": "RNGoogleMapsPlusView",
-      "kotlin": "RNGoogleMapsPlusView"
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "RNGoogleMapsPlusView"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "RNGoogleMapsPlusView"
+      }
     },
     "RNGoogleMapsPlusModule": {
-      "swift": "RNGoogleMapsPlusModule",
-      "kotlin": "RNGoogleMapsPlusModule"
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "RNGoogleMapsPlusModule"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "RNGoogleMapsPlusModule"
+      }
     }
   },
   "ignorePaths": ["**/node_modules"]

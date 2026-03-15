@@ -35,7 +35,7 @@ PODS:
   - hermes-engine (250829098.0.9):
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
-  - NitroModules (0.35.0):
+  - NitroModules (0.35.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2418,7 +2418,7 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: cbaa0660586302c8d4149b43910a4973494ed64c
   GoogleMaps: 133ba5beb4979592001a6cd0125a502243439ff9
   hermes-engine: 0f49a842b975f3720533f9a7d353cd9e0f578f75
-  NitroModules: b7fbb99c94da87b162f6e661d7cfa8ad014f7b7d
+  NitroModules: 3ccfac829344db72859f6ec0d07f58cfe39f4cd1
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
