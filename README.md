@@ -4,7 +4,7 @@
 [![Dev Release](https://img.shields.io/npm/v/react-native-google-maps-plus/dev.svg?label=dev%20release&color=orange)](https://www.npmjs.com/package/react-native-google-maps-plus)
 [![Build](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml/badge.svg)](https://github.com/pinpong/react-native-google-maps-plus/actions/workflows/release.yml)
 [![API Docs](https://img.shields.io/static/v1?label=typedoc&message=docs&color=informational)](https://pinpong.github.io/react-native-google-maps-plus)
-![React Native](https://img.shields.io/badge/react--native-%3E%3D0.81.0-61dafb.svg?logo=react)
+![React Native](https://img.shields.io/badge/react--native-%3E%3D0.82.0-61dafb.svg?logo=react)
 
 React Native wrapper for Android & iOS Google Maps SDK.
 
