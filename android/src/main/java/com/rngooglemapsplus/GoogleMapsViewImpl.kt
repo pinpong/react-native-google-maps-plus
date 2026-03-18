@@ -57,11 +57,11 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
-  val reactContext: ThemedReactContext,
-  val locationHandler: LocationHandler,
-  val playServiceHandler: PlayServicesHandler,
-  val markerBuilder: MapMarkerBuilder,
-  val mapErrorHandler: MapErrorHandler,
+  private val reactContext: ThemedReactContext,
+  private val locationHandler: LocationHandler,
+  private val playServiceHandler: PlayServicesHandler,
+  private val markerBuilder: MapMarkerBuilder,
+  private val mapErrorHandler: MapErrorHandler,
 ) : FrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
@@ -96,7 +96,7 @@ class GoogleMapsViewImpl(
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
   private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
   private val pendingKmlLayers = mutableListOf<Pair<String, String>>()
-  private val pendingUrlTilesOverlays = mutableListOf<Pair<String, TileOverlayOptions>>()
+  private val pendingUrlTileOverlays = mutableListOf<Pair<String, TileOverlayOptions>>()
 
   private val markersById = mutableMapOf<String, Marker>()
   private val polylinesById = mutableMapOf<String, Polyline>()
@@ -268,9 +268,9 @@ class GoogleMapsViewImpl(
       pendingKmlLayers.forEach { (id, str) -> addKmlLayerInternal(id, str) }
       pendingKmlLayers.clear()
     }
-    if (pendingUrlTilesOverlays.isNotEmpty()) {
-      pendingUrlTilesOverlays.forEach { (id, opts) -> addUrlTileOverlayInternal(id, opts) }
-      pendingUrlTilesOverlays.clear()
+    if (pendingUrlTileOverlays.isNotEmpty()) {
+      pendingUrlTileOverlays.forEach { (id, opts) -> addUrlTileOverlayInternal(id, opts) }
+      pendingUrlTileOverlays.clear()
     }
   }
 
@@ -775,7 +775,7 @@ class GoogleMapsViewImpl(
     opts: TileOverlayOptions,
   ) = onUi {
     if (googleMap == null) {
-      pendingUrlTilesOverlays.add(id to opts)
+      pendingUrlTileOverlays.add(id to opts)
       return@onUi
     }
     urlTileOverlaysById.remove(id)?.remove()
@@ -805,7 +805,7 @@ class GoogleMapsViewImpl(
         it.remove()
       }
       urlTileOverlaysById.clear()
-      pendingUrlTilesOverlays.clear()
+      pendingUrlTileOverlays.clear()
     }
 
   fun destroyInternal() =

@@ -68,7 +68,7 @@ class LocationHandler(
       val activity = context.currentActivity ?: run { return@onUi }
 
       val lr =
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
           LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10_000L).build()
         } else {
           @Suppress("DEPRECATION")
