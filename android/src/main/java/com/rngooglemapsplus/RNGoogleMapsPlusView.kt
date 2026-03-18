@@ -22,7 +22,7 @@ import com.rngooglemapsplus.extensions.toSize
 
 @DoNotStrip
 class RNGoogleMapsPlusView(
-  val context: ThemedReactContext,
+  private val context: ThemedReactContext,
 ) : HybridRNGoogleMapsPlusViewSpec() {
   private val mapErrorHandler = MapErrorHandler()
 
