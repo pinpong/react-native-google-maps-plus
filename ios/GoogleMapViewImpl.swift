@@ -322,7 +322,6 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  var onMapError: ((RNMapErrorCode) -> Void)?
   var onMapReady: ((Bool) -> Void)?
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
