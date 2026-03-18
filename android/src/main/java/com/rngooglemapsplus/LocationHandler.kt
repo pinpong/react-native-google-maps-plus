@@ -27,7 +27,7 @@ private const val INTERVAL_DEFAULT = 600000L
 private const val MIN_UPDATE_INTERVAL = 3600000L
 
 class LocationHandler(
-  val context: ReactContext,
+  private val context: ReactContext,
 ) : LocationSource {
   private val fusedLocationClientProviderClient: FusedLocationProviderClient =
     LocationServices.getFusedLocationProviderClient(context)

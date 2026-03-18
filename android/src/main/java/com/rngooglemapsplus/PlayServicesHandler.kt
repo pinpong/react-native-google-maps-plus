@@ -5,7 +5,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 
 class PlayServicesHandler(
-  val context: ReactContext,
+  private val context: ReactContext,
 ) {
   fun playServicesAvailability(): Int {
     val availability = GoogleApiAvailability.getInstance()

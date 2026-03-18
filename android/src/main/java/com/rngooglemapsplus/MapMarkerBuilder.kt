@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.cancellation.CancellationException
 
 class MapMarkerBuilder(
-  val context: ThemedReactContext,
+  private val context: ThemedReactContext,
   private val mapErrorHandler: MapErrorHandler,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
