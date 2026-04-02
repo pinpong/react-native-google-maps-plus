@@ -35,7 +35,7 @@ PODS:
   - hermes-engine (250829098.0.9):
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
-  - NitroModules (0.35.1):
+  - NitroModules (0.35.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1909,7 +1909,7 @@ PODS:
     - React-utils (= 0.84.1)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.84.1)
-  - RNGestureHandler (2.30.0):
+  - RNGestureHandler (2.30.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1959,7 +1959,7 @@ PODS:
     - ReactNativeDependencies
     - SVGKit (= 3.0.0)
     - Yoga
-  - RNReanimated (4.2.2):
+  - RNReanimated (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1981,10 +1981,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated (= 4.2.2)
+    - RNReanimated/apple (= 4.3.0)
+    - RNReanimated/common (= 4.3.0)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated (4.2.2):
+  - RNReanimated/apple (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2006,10 +2007,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated/apple (= 4.2.2)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated/apple (4.2.2):
+  - RNReanimated/common (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2080,7 +2080,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.7.4):
+  - RNWorklets (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2102,9 +2102,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets (= 0.7.4)
+    - RNWorklets/apple (= 0.8.1)
+    - RNWorklets/common (= 0.8.1)
     - Yoga
-  - RNWorklets/worklets (0.7.4):
+  - RNWorklets/apple (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2126,9 +2127,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets/apple (= 0.7.4)
     - Yoga
-  - RNWorklets/worklets/apple (0.7.4):
+  - RNWorklets/common (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2418,7 +2418,7 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: cbaa0660586302c8d4149b43910a4973494ed64c
   GoogleMaps: 133ba5beb4979592001a6cd0125a502243439ff9
   hermes-engine: 0f49a842b975f3720533f9a7d353cd9e0f578f75
-  NitroModules: 3ccfac829344db72859f6ec0d07f58cfe39f4cd1
+  NitroModules: e9f827e79b3fac2d24e13d0e2c18e8d2848049e2
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2490,11 +2490,11 @@ SPEC CHECKSUMS:
   ReactCodegen: 66522f37c7e4861aec1f6a574dee83917fad4397
   ReactCommon: 07572bf9e687c8a52fbe4a3641e9e3a1a477c78e
   ReactNativeDependencies: 17eb7fdb307db0b58324c7104907d5b0a2ff82e9
-  RNGestureHandler: d9e942967ed2a9a555c41591c4ee9dfeabee1f01
+  RNGestureHandler: 2d9fbac3450b0317d1d599a1db9c5f230221370e
   RNGoogleMapsPlus: d664aacf5e1805ee943d82ead06da58b2c77a8fd
-  RNReanimated: e8365b1438aba0119ea2656b56e70b9a1708b930
+  RNReanimated: 46aa0432d0a44ce978333713d1db0cbe706d5c41
   RNScreens: ca829379d20b0d1ff41a0b87bc37bdc50276cef5
-  RNWorklets: 30f9a363d681c776a5f9d74f6d21a6d1bb7bfe80
+  RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
   SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
   Yoga: 846fbe6f595136be802ad81d05688ff748839764
 
