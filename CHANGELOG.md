@@ -1,3 +1,38 @@
+## [1.12.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.11.0...v1.12.0) (2026-04-03)
+
+### ✨ Features
+
+* improve error reporting ([84c72f2](https://github.com/pinpong/react-native-google-maps-plus/commit/84c72f24139920dc4baabfa96bf34512fdd15786))
+
+### 🐛 Bug Fixes
+
+* **android:** error log ([1506498](https://github.com/pinpong/react-native-google-maps-plus/commit/15064988067a5237d8d46e4c339ce9d0536b50fb))
+* **android:** file extension ([114907b](https://github.com/pinpong/react-native-google-maps-plus/commit/114907b682dfd0e8de45ed669a0d1130a0eb0960))
+* **android:** invoke createFallbackDescriptor instead of passing function reference ([87ecdbb](https://github.com/pinpong/react-native-google-maps-plus/commit/87ecdbb4dca774d02edeacb87760adf26b55ef68))
+* **ios:** file extension ([5bded1e](https://github.com/pinpong/react-native-google-maps-plus/commit/5bded1edbaf0c336a6d9fef4e0e734665861118e))
+* update to nitro v0.35.0 ([1427a4e](https://github.com/pinpong/react-native-google-maps-plus/commit/1427a4eab2ce403326703ce04eebefe67f815ce6))
+* update to nitro v0.35.1 ([ca6b7a2](https://github.com/pinpong/react-native-google-maps-plus/commit/ca6b7a2c1da67c931a1b76ef798ee197d2f279b8))
+
+### 🔄 Code Refactors
+
+* remove redundant null param ([3e2caa9](https://github.com/pinpong/react-native-google-maps-plus/commit/3e2caa9e3bbd965d97bf557bc5e28300a39e9842))
+
+### 🛠️ Other changes
+
+* bump minimum React Native version to 0.82 ([d26386f](https://github.com/pinpong/react-native-google-maps-plus/commit/d26386f9fc7596486ad5ea2cb79f05c88e2ae293))
+* bump node from 22.11.0 to 22.16.0 ([e85fcd2](https://github.com/pinpong/react-native-google-maps-plus/commit/e85fcd2efed2f013dd846eda713192cee907626c))
+* **ci:** update next release workflow ([efb3d5e](https://github.com/pinpong/react-native-google-maps-plus/commit/efb3d5e72496b2788bc213fdb34f74c62c262b6c))
+* **example:** update Podfile.lock ([04f1544](https://github.com/pinpong/react-native-google-maps-plus/commit/04f1544bc5f0248367e77d9b5f61298d4502ed43))
+* **ios:** update maps sdk ([a6bc8a2](https://github.com/pinpong/react-native-google-maps-plus/commit/a6bc8a213338165fc9d87f33fcd2188acdc9d09f))
+* **ios:** update maps sdk ([7578416](https://github.com/pinpong/react-native-google-maps-plus/commit/7578416dfed8b44b581134362c621d1ca3c0cb4d))
+* minor code quality improvements ([c054338](https://github.com/pinpong/react-native-google-maps-plus/commit/c054338b5aa271bd8fd41d331bbddb5ae6b48c78))
+* minor code quality improvements ([a04bbc8](https://github.com/pinpong/react-native-google-maps-plus/commit/a04bbc86fe631e16b1ddc73181e22cf2e7ad2784))
+* update dependencies ([0d64c20](https://github.com/pinpong/react-native-google-maps-plus/commit/0d64c2032308e9232f178a8627edeb32ea72e7ff))
+* update dependencies and pin all versions ([52e7529](https://github.com/pinpong/react-native-google-maps-plus/commit/52e75291186b31f31df5875348b45920377042c3))
+* update to latest Nitro Modules version ([f87ae59](https://github.com/pinpong/react-native-google-maps-plus/commit/f87ae59e5920c2d8a33ec12caed27b352dfe9f17))
+* updated deps ([d13a969](https://github.com/pinpong/react-native-google-maps-plus/commit/d13a969a9b59dcc0cbb5e6255e7f09be2b79a620))
+* upgrade dependencies and React Native to 0.84 ([ac3c834](https://github.com/pinpong/react-native-google-maps-plus/commit/ac3c8342fc9e95d6ccbe2cff8c37e0f63ef46a74))
+
 ## [1.11.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.10.2...v1.11.0) (2026-01-27)
 
 ### ✨ Features
