@@ -21,5 +21,8 @@ jobs:
           echo "Closing PR from invalid source branch: ${{ github.event.pull_request.head.ref }}"
 
           gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
             --body "This PR targets **main**, but it was created from **${{ github.event.pull_request.head.ref }}**. Only PRs from **dev** are allowed."
-          gh pr close ${{ github.event.pull_request.number }}
+
+          gh pr close ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }}
