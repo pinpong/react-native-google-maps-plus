@@ -1,10 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@src/*": ["src/*"],
-      "react-native-google-maps-plus": ["../src"]
+      "@src/*": ["./src/*"],
+      "react-native-google-maps-plus": ["./../src"]
     }
   },
   "include": ["src", "../src"]

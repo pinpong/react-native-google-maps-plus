@@ -81,7 +81,7 @@
     "@commitlint/config-conventional": "20.5.0",
     "@eslint/compat": "2.0.5",
     "@eslint/eslintrc": "3.3.5",
-    "@eslint/js": "9.39.4",
+    "@eslint/js": "10.0.1",
     "@expo/config-plugins": "55.0.8",
     "@react-native/babel-preset": "0.85.0",
     "@react-native/eslint-config": "0.85.0",
@@ -111,7 +111,7 @@
     "react-native-nitro-modules": "0.35.4",
     "semantic-release": "25.0.3",
     "typedoc": "0.28.18",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   },
   "peerDependencies": {
     "expo": "*",
