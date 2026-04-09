@@ -24,12 +24,12 @@ export function animateSpiral(
   opts = { rotations: 10, startRadius: 0.0001, endRadius: 0.002 }
 ) {
   const { rotations, startRadius, endRadius } = opts;
-  const start = performance.now();
+  const start = Date.now();
 
   const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
 
-  const loop = (now: number) => {
-    const t = Math.min((now - start) / duration, 1);
+  const loop = () => {
+    const t = Math.min((Date.now() - start) / duration, 1);
     const e = ease(t);
 
     const r = startRadius + (endRadius - startRadius) * e;
