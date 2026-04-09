@@ -6,23 +6,26 @@ on:
     types: [opened, reopened, synchronize]
 
 permissions:
-  pull-requests: write
   contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
-  close:
-    if: ${{ github.event.pull_request.head.ref != 'dev' }}
+  validate-pr-source:
+    if: ${{ github.event.pull_request.head.ref != 'dev' || github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Close PR
+      - name: Comment and close PR
         run: |
-          echo "Closing PR from invalid source branch: ${{ github.event.pull_request.head.ref }}"
+          HEAD_REF="${{ github.event.pull_request.head.ref }}"
+          HEAD_REPO="${{ github.event.pull_request.head.repo.full_name }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
 
-          gh pr comment ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} \
-            --body "This PR targets **main**, but it was created from **${{ github.event.pull_request.head.ref }}**. Only PRs from **dev** are allowed."
+          echo "Closing PR #$PR_NUMBER from invalid source: $HEAD_REPO / $HEAD_REF"
 
-          gh pr close ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }}
+          gh pr comment "$PR_NUMBER" \
+            --body "This PR targets **main**, but only PRs from **dev** in this repository are allowed. Detected source: **$HEAD_REPO:$HEAD_REF**."
+
+          gh pr close "$PR_NUMBER"
