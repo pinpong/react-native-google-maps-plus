@@ -92,6 +92,8 @@ example/android/secrets.properties
 # Kotlin
 android/.kotlin/
 android/.kotlinc/
+example/android/.kotlin/
+example/android/.kotlinc/
 
 tsconfig.tsbuildinfo
 expoConfig/build
