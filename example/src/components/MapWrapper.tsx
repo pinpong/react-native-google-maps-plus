@@ -97,7 +97,7 @@ export default function MapWrapper(props: Props) {
   const mapCallbacks = useMapCallbacks(props, props.mapRef, setMapLoaded);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, props.style]}>
       <GoogleMapsView
         {...rest}
         initialProps={props.initialProps ?? initialProps}
@@ -106,7 +106,7 @@ export default function MapWrapper(props: Props) {
         trafficEnabled={props.trafficEnabled ?? false}
         indoorEnabled={props.indoorEnabled ?? false}
         transitEnabled={props.transitEnabled ?? false}
-        style={[styles.map, props.style]}
+        style={styles.map}
         userInterfaceStyle={
           props.userInterfaceStyle ??
           (theme.theme === 'dark' ? 'dark' : 'light')
@@ -134,11 +134,8 @@ const getThemedStyles = (theme: AppTheme) =>
       backgroundColor: theme.bgPrimary,
     },
     map: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
+      height: '100%',
+      width: '100%',
     },
     loadingOverlay: {
       ...StyleSheet.absoluteFill,

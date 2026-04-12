@@ -18,6 +18,7 @@ import type {
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
+  { name: 'ScrollView', title: 'Map in ScrollView' },
   { name: 'Markers', title: 'Markers' },
   { name: 'SvgMarkers', title: 'SVG Markers' },
   { name: 'Polygons', title: 'Polygons' },
