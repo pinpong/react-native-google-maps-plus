@@ -391,7 +391,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       let cam = camera.toGMSCameraPosition(current: self.impl.currentCamera)
       self.impl.setCamera(
         camera: cam,
-        animated: animated ?? true,
+        animated: animated ?? false,
         durationMs: durationMs ?? 3000
       )
     }
@@ -406,7 +406,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     impl.setCameraToCoordinates(
       coordinates: coordinates,
       padding: padding ?? RNMapPadding(0, 0, 0, 0),
-      animated: animated ?? true,
+      animated: animated ?? false,
       durationMs: durationMs ?? 3000
     )
   }
