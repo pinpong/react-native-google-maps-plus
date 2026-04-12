@@ -3423,9 +3423,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/stack@npm:7.8.9":
-  version: 7.8.9
-  resolution: "@react-navigation/stack@npm:7.8.9"
+"@react-navigation/stack@npm:7.8.10":
+  version: 7.8.10
+  resolution: "@react-navigation/stack@npm:7.8.10"
   dependencies:
     "@react-navigation/elements": "npm:^2.9.14"
     color: "npm:^4.2.3"
@@ -3437,7 +3437,7 @@ __metadata:
     react-native-gesture-handler: ">= 2.0.0"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: 10/4de0473fcd85d484ca216a351736fedcc3ce05d611d881442a2d275230f6ff1300dbde9e5be89224ed2a4fc9886052178d6f67fa5489fc6c7521b9a9bc165157
+  checksum: 10/81862b64b277a7ebae54a9d54a6e005503b6c7dcfa6231995704d25b65e7055019884b835c181d371dc0a2929c7f1bbc901dfc84585c6867f4319dd1da920ca8
   languageName: node
   linkType: hard
 
@@ -11682,12 +11682,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.8.1":
-  version: 3.8.1
-  resolution: "prettier@npm:3.8.1"
+"prettier@npm:3.8.2":
+  version: 3.8.2
+  resolution: "prettier@npm:3.8.2"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10/3da1cf8c1ef9bea828aa618553696c312e951f810bee368f6887109b203f18ee869fe88f66e65f9cf60b7cb1f2eae859892c860a300c062ff8ec69c381fc8dbd
+  checksum: 10/fd784175bc600c07eb2c44d7ec4ee7133f95f26492adad61b6a15c06f438b858181faf096ab74163d7f49500ad80cff4479c6abb084e161a2e85a9df5974ecd1
   languageName: node
   linkType: hard
 
@@ -12007,9 +12007,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:2.31.0":
-  version: 2.31.0
-  resolution: "react-native-gesture-handler@npm:2.31.0"
+"react-native-gesture-handler@npm:2.31.1":
+  version: 2.31.1
+  resolution: "react-native-gesture-handler@npm:2.31.1"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     "@types/react-test-renderer": "npm:^19.1.0"
@@ -12018,7 +12018,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10/96975ecc617e7080cb38eba7d803abd329a64b2fe8d92e85061e715f4001bd8ca18bc6bd9eaf19e6d2496a0d8eca8c79f818d030e338cba18c7b97ae192f0bec
+  checksum: 10/0f02d989fddae1a59f3595b8039da04e8332206e0e8f7e05548b1ab2e57b6efa1b37d634ac8e5cc85b1844363a78f2f1400ace26164319b2140e994b0e779ea3
   languageName: node
   linkType: hard
 
@@ -12037,7 +12037,7 @@ __metadata:
     "@react-native/typescript-config": "npm:0.85.0"
     "@react-navigation/native": "npm:7.2.2"
     "@react-navigation/native-stack": "npm:7.14.10"
-    "@react-navigation/stack": "npm:7.8.9"
+    "@react-navigation/stack": "npm:7.8.10"
     "@types/react": "npm:19.2.14"
     babel-plugin-module-resolver: "npm:5.0.3"
     react: "npm:19.2.3"
@@ -12045,7 +12045,7 @@ __metadata:
     react-native: "npm:0.85.0"
     react-native-builder-bob: "npm:0.41.0"
     react-native-clusterer: "npm:5.0.2"
-    react-native-gesture-handler: "npm:2.31.0"
+    react-native-gesture-handler: "npm:2.31.1"
     react-native-google-maps-plus: "workspace:*"
     react-native-monorepo-config: "npm:0.3.3"
     react-native-nitro-modules: "npm:0.35.4"
@@ -12088,7 +12088,7 @@ __metadata:
     jest: "npm:30.3.0"
     lefthook: "npm:2.1.5"
     nitrogen: "npm:0.35.4"
-    prettier: "npm:3.8.1"
+    prettier: "npm:3.8.2"
     react: "npm:19.2.3"
     react-native: "npm:0.85.0"
     react-native-builder-bob: "npm:0.41.0"
