@@ -451,7 +451,7 @@ class RNGoogleMapsPlusView(
     val current = view.currentCamera
     view.setCamera(
       camera.toCameraPosition(current),
-      animated == true,
+      animated ?: false,
       durationMs?.toInt() ?: 3000,
     )
   }
@@ -465,7 +465,7 @@ class RNGoogleMapsPlusView(
     view.setCameraToCoordinates(
       coordinates,
       padding = padding ?: RNMapPadding(0.0, 0.0, 0.0, 0.0),
-      animated == true,
+      animated ?: false,
       durationMs?.toInt() ?: 3000,
     )
   }
