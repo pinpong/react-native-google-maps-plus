@@ -10,6 +10,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Size
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
@@ -106,6 +107,7 @@ class GoogleMapsViewImpl(
   private val kmlLayersById = mutableMapOf<String, KmlLayer>()
   private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
 
+  private var parentTouchInterceptDisallowed = false
   private var cameraMoveReason = -1
 
   val componentCallbacks =
@@ -122,6 +124,54 @@ class GoogleMapsViewImpl(
         markerBuilder.cancelAllJobs()
       }
     }
+
+  private fun setParentTouchInterceptDisallowed(blocked: Boolean) {
+    if (parentTouchInterceptDisallowed == blocked) return
+    parentTouchInterceptDisallowed = blocked
+    var p = parent
+    while (p != null) {
+      p.requestDisallowInterceptTouchEvent(blocked)
+      p = p.parent
+    }
+  }
+
+  override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    if (googleMapsOptions.liteMode == true) return super.dispatchTouchEvent(ev)
+
+    val panEnabled = uiSettings?.scrollEnabled == true
+    val zoomEnabled = uiSettings?.zoomGesturesEnabled == true
+    val rotateEnabled = uiSettings?.rotateEnabled == true
+    val tiltEnabled = uiSettings?.tiltEnabled == true
+
+    val multiTouchEnabled = zoomEnabled || rotateEnabled || tiltEnabled
+    val anyMapGestureEnabled = panEnabled || multiTouchEnabled
+    if (!anyMapGestureEnabled) return super.dispatchTouchEvent(ev)
+
+    when (ev.actionMasked) {
+      MotionEvent.ACTION_DOWN,
+      MotionEvent.ACTION_MOVE,
+      MotionEvent.ACTION_POINTER_DOWN,
+      -> {
+        val pointers = ev.pointerCount
+        val shouldBlockParent = pointers >= (if (panEnabled) 1 else 2)
+        setParentTouchInterceptDisallowed(shouldBlockParent)
+      }
+
+      MotionEvent.ACTION_POINTER_UP -> {
+        val pointers = ev.pointerCount - 1
+        val shouldBlockParent = pointers >= (if (panEnabled) 1 else 2)
+        setParentTouchInterceptDisallowed(shouldBlockParent)
+      }
+
+      MotionEvent.ACTION_UP,
+      MotionEvent.ACTION_CANCEL,
+      -> {
+        setParentTouchInterceptDisallowed(false)
+      }
+    }
+
+    return super.dispatchTouchEvent(ev)
+  }
 
   init {
     MapsInitializer.initialize(reactContext)
@@ -876,6 +926,7 @@ class GoogleMapsViewImpl(
   }
 
   override fun onDetachedFromWindow() {
+    setParentTouchInterceptDisallowed(false)
     lifecycleObserver?.let { lifecycle?.removeObserver(it) }
     lifecycle = null
     super.onDetachedFromWindow()

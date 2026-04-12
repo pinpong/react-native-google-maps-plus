@@ -26,6 +26,7 @@ import LocationScreen from '@src/screens/LocationScreen';
 import MarkersScreen from '@src/screens/MarkersScreen';
 import PolygonsScreen from '@src/screens/PolygonsScreen';
 import PolylinesScreen from '@src/screens/PolylinesScreen';
+import ScrollViewScreen from '@src/screens/ScrollViewScreen';
 import SnapshotTestScreen from '@src/screens/SnaptshotTestScreen';
 import StressTestScreen from '@src/screens/StressTestScreen';
 import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
@@ -69,6 +70,11 @@ export default function App() {
             name="BasicMap"
             component={BasicMapScreen}
             options={{ title: 'Basic Map' }}
+          />
+          <Stack.Screen
+            name="ScrollView"
+            component={ScrollViewScreen}
+            options={{ title: 'Map in ScrollView' }}
           />
           <Stack.Screen
             name="Markers"
