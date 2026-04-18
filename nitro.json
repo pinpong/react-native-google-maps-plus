@@ -12,6 +12,10 @@
     {
       "name": "RNGoogleMapsPlusView",
       "platforms": ["ios", "android"]
+    },
+    {
+      "name": "RNGoogleMapsPlusStreetView",
+      "platforms": ["ios", "android"]
     }
   ],
   "autolinking": {
@@ -23,6 +27,16 @@
       "android": {
         "language": "kotlin",
         "implementationClassName": "RNGoogleMapsPlusView"
+      }
+    },
+    "RNGoogleMapsPlusStreetView": {
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "RNGoogleMapsPlusStreetView"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "RNGoogleMapsPlusStreetView"
       }
     },
     "RNGoogleMapsPlusModule": {

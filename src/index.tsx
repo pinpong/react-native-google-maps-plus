@@ -70,8 +70,7 @@
  *   Android: AndroidSVG
  *
  *
- * # Usage Example
- *
+ * @example Map View
  * ```tsx
  * <GoogleMapsView
  *   style={{ flex: 1 }}
@@ -84,12 +83,31 @@
  * />
  * ```
  *
+ * @example Street View
+ * ```tsx
+ * <GoogleMapsStreetView
+ *   style={{ flex: 1 }}
+ *   initialProps={{
+ *     position: { latitude: 37.8090233, longitude: -122.4742005 },
+ *     camera: { bearing: 315, tilt: 0, zoom: 0 },
+ *   }}
+ * />
+ * ```
+ *
  * Check out the example app in the [example directory](https://github.com/pinpong/react-native-google-maps-plus/tree/main/example).
  */
 
-import { GoogleMapsModule, GoogleMapsView } from './GoogleMapsPlus';
+import {
+  GoogleMapsModule,
+  GoogleMapsView,
+  GoogleMapsStreetView,
+} from './GoogleMapsPlus';
 
 import type { RNGoogleMapsPlusModule } from './RNGoogleMapsPlusModule.nitro';
+import type {
+  RNGoogleMapsPlusStreetViewMethods,
+  RNGoogleMapsPlusStreetViewProps,
+} from './RNGoogleMapsPlusStreetView.nitro';
 import type {
   RNGoogleMapsPlusViewMethods,
   RNGoogleMapsPlusViewProps,
@@ -100,7 +118,9 @@ export * from './types';
 export type {
   RNGoogleMapsPlusViewMethods,
   RNGoogleMapsPlusViewProps,
+  RNGoogleMapsPlusStreetViewMethods,
+  RNGoogleMapsPlusStreetViewProps,
   RNGoogleMapsPlusModule,
 };
 
-export { GoogleMapsView, GoogleMapsModule };
+export { GoogleMapsView, GoogleMapsStreetView, GoogleMapsModule };

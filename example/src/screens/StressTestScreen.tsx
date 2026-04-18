@@ -65,7 +65,7 @@ export default function StressTestScreen() {
 
   return (
     <MapWrapper mapRef={mapRef} markers={markers}>
-      <ControlPanel mapRef={mapRef} buttons={buttons} />
+      <ControlPanel viewRef={mapRef} buttons={buttons} />
     </MapWrapper>
   );
 }

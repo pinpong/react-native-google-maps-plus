@@ -27,9 +27,9 @@ class RNGoogleMapsPlusView(
   private val mapErrorHandler = MapErrorHandler()
 
   private var currentCustomMapStyle: String? = null
-  private var permissionHandler = PermissionHandler(context)
-  private var locationHandler = LocationHandler(context)
-  private var playServiceHandler = PlayServicesHandler(context)
+  private val permissionHandler = PermissionHandler(context)
+  private val locationHandler = LocationHandler(context)
+  private val playServiceHandler = PlayServicesHandler(context)
 
   private val markerBuilder = MapMarkerBuilder(context, mapErrorHandler)
   private val polylineBuilder = MapPolylineBuilder()

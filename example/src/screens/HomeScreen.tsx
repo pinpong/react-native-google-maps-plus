@@ -34,6 +34,7 @@ const screens = [
   { name: 'Snapshot', title: 'Snapshot Test' },
   { name: 'Clustering', title: 'Clustering' },
   { name: 'Stress', title: 'Stress Test' },
+  { name: 'StreetView', title: 'Street View' },
   { name: 'Module', title: 'Module Test' },
 ];
 

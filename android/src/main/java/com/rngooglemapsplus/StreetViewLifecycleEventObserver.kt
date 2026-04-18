@@ -1,0 +1,87 @@
+package com.rngooglemapsplus
+
+import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import com.google.android.gms.maps.StreetViewPanoramaView
+
+class StreetViewLifecycleEventObserver(
+  private val streetViewPanoramaView: StreetViewPanoramaView?,
+  private val locationHandler: LocationHandler,
+) : LifecycleEventObserver {
+  private var currentState: Lifecycle.State = Lifecycle.State.INITIALIZED
+
+  override fun onStateChanged(
+    source: LifecycleOwner,
+    event: Lifecycle.Event,
+  ) {
+    when (event) {
+      Lifecycle.Event.ON_DESTROY -> toCreatedState()
+      else -> toState(event.targetState)
+    }
+  }
+
+  fun toCreatedState() {
+    if (currentState > Lifecycle.State.CREATED) {
+      toState(Lifecycle.State.CREATED)
+    }
+  }
+
+  fun toDestroyedState() {
+    if (currentState > Lifecycle.State.INITIALIZED) {
+      toState(Lifecycle.State.DESTROYED)
+    }
+  }
+
+  private fun toState(state: Lifecycle.State) {
+    if (currentState == Lifecycle.State.DESTROYED) return
+    while (currentState != state) {
+      when {
+        currentState < state -> upFromCurrentState()
+        currentState > state -> downFromCurrentState()
+      }
+    }
+  }
+
+  private fun downFromCurrentState() {
+    Lifecycle.Event.downFrom(currentState)?.also { invokeEvent(it) }
+  }
+
+  private fun upFromCurrentState() {
+    Lifecycle.Event.upFrom(currentState)?.also { invokeEvent(it) }
+  }
+
+  private fun invokeEvent(event: Lifecycle.Event) {
+    when (event) {
+      Lifecycle.Event.ON_CREATE -> {
+        streetViewPanoramaView?.onCreate(Bundle())
+      }
+
+      Lifecycle.Event.ON_START -> {
+        streetViewPanoramaView?.onStart()
+      }
+
+      Lifecycle.Event.ON_RESUME -> {
+        locationHandler.start()
+        streetViewPanoramaView?.onResume()
+      }
+
+      Lifecycle.Event.ON_PAUSE -> {
+        streetViewPanoramaView?.onPause()
+        locationHandler.stop()
+      }
+
+      Lifecycle.Event.ON_STOP -> {
+        streetViewPanoramaView?.onStop()
+      }
+
+      Lifecycle.Event.ON_DESTROY -> {
+        streetViewPanoramaView?.onDestroy()
+      }
+
+      Lifecycle.Event.ON_ANY -> {}
+    }
+    currentState = event.targetState
+  }
+}

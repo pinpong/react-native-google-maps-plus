@@ -77,7 +77,7 @@ export default function CameraTestScreen() {
 
   return (
     <MapWrapper mapRef={mapRef}>
-      <ControlPanel mapRef={mapRef} buttons={buttons} />
+      <ControlPanel viewRef={mapRef} buttons={buttons} />
     </MapWrapper>
   );
 }

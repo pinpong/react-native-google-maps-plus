@@ -20,6 +20,7 @@ export type RootStackParamList = {
   Snapshot: undefined;
   Clustering: undefined;
   Stress: undefined;
+  StreetView: undefined;
   Module: undefined;
 };
 

@@ -337,6 +337,37 @@ export const RNBasicMapConfigValidator = object({
   locationConfig: optional(RNLocationConfigValidator),
 });
 
+export const RNStreetViewCameraValidator = object({
+  bearing: optional(number()),
+  tilt: optional(number()),
+  zoom: optional(number()),
+});
+
+export const RNStreetViewSourceValidator = unionWithValues(
+  'default',
+  'outdoor'
+);
+
+export const RNStreetViewUiSettingsValidator = object({
+  streetNamesEnabled: optional(boolean()),
+  userNavigationEnabled: optional(boolean()),
+  panningGesturesEnabled: optional(boolean()),
+  zoomGesturesEnabled: optional(boolean()),
+});
+
+export const RNStreetViewConfigValidator = object({
+  initialProps: optional(
+    object({
+      panoramaId: optional(string()),
+      position: optional(RNLatLngValidator),
+      radius: optional(number()),
+      source: optional(RNStreetViewSourceValidator),
+      camera: optional(RNStreetViewCameraValidator),
+    })
+  ),
+  uiSettings: optional(RNStreetViewUiSettingsValidator),
+});
+
 const schema: any = (RNBasicMapConfigValidator as any).schema;
 
 if (schema.mapType?.type === 'union' && !schema.mapType._schema) {

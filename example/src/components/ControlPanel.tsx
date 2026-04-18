@@ -25,16 +25,19 @@ import { useAppTheme } from '@src/hooks/useAppTheme';
 import type { AppTheme } from '@src/theme';
 import type { RootNavigationProp } from '@src/types/navigation';
 
-import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
+import type {
+  GoogleMapsStreetViewRef,
+  GoogleMapsViewRef,
+} from 'react-native-google-maps-plus';
 
 export type ButtonItem = { title: string; onPress: () => void };
 
 type Props = {
-  mapRef: React.RefObject<GoogleMapsViewRef | null>;
+  viewRef: React.RefObject<GoogleMapsViewRef | GoogleMapsStreetViewRef | null>;
   buttons: ButtonItem[];
 };
 
-export default function ControlPanel({ mapRef, buttons }: Props) {
+export default function ControlPanel({ viewRef, buttons }: Props) {
   const theme = useAppTheme();
   const navigation = useNavigation<RootNavigationProp>();
   const progress = useSharedValue(0);
@@ -57,28 +60,28 @@ export default function ControlPanel({ mapRef, buttons }: Props) {
       {
         title: 'Request location permission',
         onPress: async () => {
-          const res = await mapRef.current?.requestLocationPermission();
+          const res = await viewRef?.current?.requestLocationPermission();
           console.log('Permission result', res);
         },
       },
       {
         title: 'Show location dialog',
-        onPress: () => console.log(mapRef.current?.showLocationDialog()),
+        onPress: () => viewRef?.current?.showLocationDialog(),
       },
       {
         title: 'Open location settings',
-        onPress: () => console.log(mapRef.current?.openLocationSettings()),
+        onPress: () => viewRef?.current?.openLocationSettings(),
       },
       {
         title: 'Check Google Play Services',
         onPress: () =>
           console.log(
             'Google Play Services result',
-            mapRef.current?.isGooglePlayServicesAvailable()
+            viewRef?.current?.isGooglePlayServicesAvailable()
           ),
       },
     ],
-    [buttons, mapRef, navigation]
+    [buttons, viewRef, navigation]
   );
 
   const buttonHeight = 52;

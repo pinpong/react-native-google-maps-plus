@@ -65,7 +65,7 @@ export default function BasicMapScreen() {
     <>
       {init && (
         <MapWrapper mapRef={mapRef} {...mapConfig}>
-          <ControlPanel mapRef={mapRef} buttons={[]} />
+          <ControlPanel viewRef={mapRef} buttons={[]} />
         </MapWrapper>
       )}
       <MapConfigDialog<RNBasicMapConfig>

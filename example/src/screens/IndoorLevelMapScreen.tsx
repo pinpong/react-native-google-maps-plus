@@ -22,7 +22,7 @@ export default function IndoorLevelMapScreen() {
       indoorEnabled={true}
       buildingEnabled={true}
     >
-      <ControlPanel mapRef={mapRef} buttons={[]} />
+      <ControlPanel viewRef={mapRef} buttons={[]} />
     </MapWrapper>
   );
 }

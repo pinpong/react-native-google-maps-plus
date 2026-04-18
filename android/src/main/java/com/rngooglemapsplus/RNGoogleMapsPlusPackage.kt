@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfoProvider
 import com.facebook.react.uimanager.ViewManager
 import com.rngooglemapsplus.RNGoogleMapsPlusPackage.AppContextHolder.context
+import com.rngooglemapsplus.views.HybridRNGoogleMapsPlusStreetViewManager
 import com.rngooglemapsplus.views.HybridRNGoogleMapsPlusViewManager
 
 class RNGoogleMapsPlusPackage : BaseReactPackage() {
@@ -20,6 +21,7 @@ class RNGoogleMapsPlusPackage : BaseReactPackage() {
     context = reactContext
     return listOf(
       HybridRNGoogleMapsPlusViewManager(),
+      HybridRNGoogleMapsPlusStreetViewManager(),
     )
   }
 

@@ -3,7 +3,7 @@ import type { HybridObject } from 'react-native-nitro-modules';
 
 /**
  * Platform utilities for react-native-google-maps-plus.
- * Provides system-level operations unrelated to a specific map instance.
+ * Provides system operations unrelated to a specific map instance.
  */
 export interface RNGoogleMapsPlusModule extends HybridObject<{
   ios: 'swift';
@@ -14,18 +14,26 @@ export interface RNGoogleMapsPlusModule extends HybridObject<{
 
   /**
    * Opens the OS location settings.
+   *
    * iOS: opens the app settings.
    * Android: opens system location settings.
    */
   openLocationSettings(): void;
 
-  /** Requests runtime location permission. */
+  /**
+   * Requests runtime location permission.
+   *
+   * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
+   */
   requestLocationPermission(): Promise<RNLocationPermissionResult>;
 
   /**
    * Checks Google Play Services availability.
-   * iOS: always returns false.
+   *
+   * iOS: always returns `false`.
    * Android: performs a real system check.
+   *
+   * @returns `true` if Google Play Services are available, otherwise `false`.
    */
   isGooglePlayServicesAvailable(): boolean;
 }
