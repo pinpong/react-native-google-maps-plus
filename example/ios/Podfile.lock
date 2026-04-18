@@ -23,9 +23,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - CocoaLumberjack (3.9.0):
-    - CocoaLumberjack/Core (= 3.9.0)
-  - CocoaLumberjack/Core (3.9.0)
+  - CocoaLumberjack (3.9.1):
+    - CocoaLumberjack/Core (= 3.9.1)
+  - CocoaLumberjack/Core (3.9.1)
   - FBLazyVector (0.85.0)
   - Google-Maps-iOS-Utils (7.0.0):
     - GoogleMaps (~> 10.0)
@@ -1871,7 +1871,7 @@ PODS:
     - React-utils (= 0.85.0)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.85.0)
-  - RNGestureHandler (2.31.0):
+  - RNGestureHandler (2.31.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1894,7 +1894,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNGoogleMapsPlus (1.12.0):
+  - RNGoogleMapsPlus (1.12.1):
     - Google-Maps-iOS-Utils (= 7.0.0)
     - GoogleMaps (= 10.12.0)
     - hermes-engine
@@ -2375,7 +2375,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Clusterer: 2dca6fca9351098c261b447a66cc0d936a81f899
-  CocoaLumberjack: 5644158777912b7de7469fa881f8a3f259c2512a
+  CocoaLumberjack: e4ba3b414dfca8c1916c6303d37f63b3a95134c6
   FBLazyVector: c00c20551d40126351a6783c47ce75f5b374851b
   Google-Maps-iOS-Utils: cbaa0660586302c8d4149b43910a4973494ed64c
   GoogleMaps: 52bbc0302f08e6d8bafb818c331b36f75875bc10
@@ -2452,8 +2452,8 @@ SPEC CHECKSUMS:
   ReactCodegen: d9ba64702c846111b3eeb157ea2e15aa5bb2ea55
   ReactCommon: fe2a3af8975e63efa60f95fca8c34dc85deee360
   ReactNativeDependencies: 14c6834d269d317465c4d938cc4148c9c5f3d549
-  RNGestureHandler: 1b60f6df2006437b33cc9071b6b485300263697f
-  RNGoogleMapsPlus: 329ddfbf25bb99f30bcd19a26c5ad868f3ffe24a
+  RNGestureHandler: 0d9f93773e381105773bc6c47646abbcf60faab5
+  RNGoogleMapsPlus: 650c938c19615272bfb4af9e8ae38ddfb5adf32e
   RNReanimated: 121c52535a4276e09b9235e067811b222a681760
   RNScreens: c58f17578c73435d8c00998cac0d89ad8105263c
   RNWorklets: dd3b2cb0750090d78d85cd3b3ec0fdbeab5ce118
