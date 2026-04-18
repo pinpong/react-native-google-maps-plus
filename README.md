@@ -6,7 +6,7 @@
 [![API Docs](https://img.shields.io/static/v1?label=typedoc&message=docs&color=informational)](https://pinpong.github.io/react-native-google-maps-plus)
 ![React Native](https://img.shields.io/badge/react--native-%3E%3D0.82.0-61dafb.svg?logo=react)
 
-React Native wrapper for Android & iOS Google Maps SDK with Street View support.
+React Native wrapper for Android & iOS Google Maps SDK with Street View support
 
 ## Documentation
 
