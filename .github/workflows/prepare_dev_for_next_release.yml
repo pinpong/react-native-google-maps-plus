@@ -47,21 +47,27 @@ jobs:
           git push origin main
 
   sync-dev:
-    name: Merge main into dev
+    name: Sync dev with main
     runs-on: ubuntu-latest
     needs: update-pods
+    if: ${{ always() && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && startsWith(github.event.workflow_run.head_commit.message, 'release:') }}
+
     steps:
-      - name: Checkout
+      - name: Checkout dev
         uses: actions/checkout@v5.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: dev
 
-      - name: Fetch all branches
-        run: git fetch --all
-
-      - name: Fast-forward dev with main
+      - name: Reset dev to main
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main dev
+
           git checkout dev
-          git merge origin/main --ff-only
-          git push origin dev
+          git reset --hard origin/main
+
+          git push --force-with-lease origin dev
