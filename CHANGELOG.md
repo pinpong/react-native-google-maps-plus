@@ -1,3 +1,23 @@
+## [1.12.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.12.0...v1.12.1) (2026-04-18)
+
+### 🐛 Bug Fixes
+
+* **android:** handle touch interception for maps nested in ScrollView ([9b94667](https://github.com/pinpong/react-native-google-maps-plus/commit/9b94667615fd8cab48bf1c4ac5ba10bbefff2d38)), closes [#100](https://github.com/pinpong/react-native-google-maps-plus/issues/100)
+* default animated prop to false in setCamera ([33338a2](https://github.com/pinpong/react-native-google-maps-plus/commit/33338a25f2aa0c96efc7d1282ef942dd7c9c0b08))
+
+### 🛠️ Other changes
+
+* add node types to expoConfig tsconfig ([685dcb5](https://github.com/pinpong/react-native-google-maps-plus/commit/685dcb5f0939729380115ddf6014dba45aee2e89))
+* add SECURITY.md ([dee09c6](https://github.com/pinpong/react-native-google-maps-plus/commit/dee09c6db8289f1faaa04a5285ffa4317cb6e51c))
+* **ci:** update ios google maps sdk ([97e1ad7](https://github.com/pinpong/react-native-google-maps-plus/commit/97e1ad746125facad00eba7d5f41c1854a06bd0e))
+* **ci:** update pr source validation ([d0ab6ad](https://github.com/pinpong/react-native-google-maps-plus/commit/d0ab6ad65904f5a4b344dff499643a9b57e9b6b7))
+* **ci:** update prepare for next release ([5ad414d](https://github.com/pinpong/react-native-google-maps-plus/commit/5ad414d4f86d3c54ef46aa76d5ed8f6ed7a0ac94))
+* migrate to typescript v6 ([0007e0c](https://github.com/pinpong/react-native-google-maps-plus/commit/0007e0c45911c6b8b2fd9e0ed31d38954e0190bb))
+* update dependencies ([cb1bdfb](https://github.com/pinpong/react-native-google-maps-plus/commit/cb1bdfb920b06f94cea88cd9c29c509d3ba69518))
+* update gitignore ([2a31c75](https://github.com/pinpong/react-native-google-maps-plus/commit/2a31c75c67ef03d9d4cea87263e306918a457713))
+* update yarn to v4 ([0119462](https://github.com/pinpong/react-native-google-maps-plus/commit/0119462c3a31fb9f61b966810f6d0fa2163275ac))
+* upgrade dependencies and React Native to 0.85 ([a907b6d](https://github.com/pinpong/react-native-google-maps-plus/commit/a907b6d40b33cb7b9aa5feb5e739d8bd9ebaa166))
+
 ## [1.12.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.11.0...v1.12.0) (2026-04-03)
 
 ### ✨ Features
