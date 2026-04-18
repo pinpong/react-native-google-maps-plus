@@ -199,6 +199,7 @@ class GoogleMapsViewImpl(
           lifecycleObserver = MapLifecycleEventObserver(it, locationHandler)
           super.addView(it)
           it.getMapAsync { map ->
+            if (destroyed) return@getMapAsync
             googleMap = map
             googleMap?.setLocationSource(locationHandler)
             googleMap?.setOnMapLoadedCallback {

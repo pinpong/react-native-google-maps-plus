@@ -27,7 +27,7 @@ export default function CustomStyleScreen() {
 
   return (
     <MapWrapper mapRef={mapRef} customMapStyle={customMapStyle}>
-      <ControlPanel mapRef={mapRef} buttons={buttons} />
+      <ControlPanel viewRef={mapRef} buttons={buttons} />
     </MapWrapper>
   );
 }

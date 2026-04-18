@@ -28,6 +28,7 @@ import PolygonsScreen from '@src/screens/PolygonsScreen';
 import PolylinesScreen from '@src/screens/PolylinesScreen';
 import ScrollViewScreen from '@src/screens/ScrollViewScreen';
 import SnapshotTestScreen from '@src/screens/SnaptshotTestScreen';
+import StreetViewScreen from '@src/screens/StreetViewScreen';
 import StressTestScreen from '@src/screens/StressTestScreen';
 import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
 import UrlTileOverlayScreen from '@src/screens/UrlTileOverlayScreen';
@@ -150,6 +151,11 @@ export default function App() {
             name="Stress"
             component={StressTestScreen}
             options={{ title: 'Stress test' }}
+          />
+          <Stack.Screen
+            name="StreetView"
+            component={StreetViewScreen}
+            options={{ title: 'Street View' }}
           />
           <Stack.Screen
             name="Module"

@@ -41,7 +41,7 @@ export default function LocationScreen() {
         myLocationEnabled
         locationConfig={locationConfig}
       >
-        <ControlPanel mapRef={mapRef} buttons={[]} />
+        <ControlPanel viewRef={mapRef} buttons={[]} />
       </MapWrapper>
 
       <MapConfigDialog<RNLocationConfig>

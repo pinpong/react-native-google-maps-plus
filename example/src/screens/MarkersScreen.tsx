@@ -113,7 +113,7 @@ export default function MarkersScreen() {
         markers={markers ? markers : []}
         onMarkerPress={handleMarkerPress}
       >
-        <ControlPanel mapRef={mapRef} buttons={buttons} />
+        <ControlPanel viewRef={mapRef} buttons={buttons} />
       </MapWrapper>
       <MapConfigDialog<RNMarker>
         visible={dialogVisible}

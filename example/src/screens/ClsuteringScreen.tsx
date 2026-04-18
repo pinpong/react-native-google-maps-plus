@@ -120,7 +120,7 @@ export default function ClusteringScreen() {
       onMapLoaded={handleMapLoaded}
       onCameraChange={handleCameraChange}
     >
-      <ControlPanel mapRef={mapRef} buttons={[]} />
+      <ControlPanel viewRef={mapRef} buttons={[]} />
     </MapWrapper>
   );
 }
