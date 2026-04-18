@@ -2453,7 +2453,7 @@ SPEC CHECKSUMS:
   ReactCommon: fe2a3af8975e63efa60f95fca8c34dc85deee360
   ReactNativeDependencies: 14c6834d269d317465c4d938cc4148c9c5f3d549
   RNGestureHandler: 0d9f93773e381105773bc6c47646abbcf60faab5
-  RNGoogleMapsPlus: 650c938c19615272bfb4af9e8ae38ddfb5adf32e
+  RNGoogleMapsPlus: d7ef16186554fd5e5aacdaa8fd4a41953b530417
   RNReanimated: 121c52535a4276e09b9235e067811b222a681760
   RNScreens: c58f17578c73435d8c00998cac0d89ad8105263c
   RNWorklets: dd3b2cb0750090d78d85cd3b3ec0fdbeab5ce118

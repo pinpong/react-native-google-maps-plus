@@ -44,19 +44,34 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** UI and gesture settings. See {@link RNMapUiSettings}. */
   uiSettings?: RNMapUiSettings;
 
-  /** Enables "My Location" blue dot. */
+  /**
+   * Enables "My Location" blue dot.
+   * @defaultValue `false`
+   */
   myLocationEnabled?: boolean;
 
-  /** Enables 3D buildings. */
+  /**
+   * Enables 3D buildings.
+   * @defaultValue `true`
+   */
   buildingEnabled?: boolean;
 
-  /** Enables traffic layer. */
+  /**
+   * Enables traffic layer.
+   * @defaultValue `false`
+   */
   trafficEnabled?: boolean;
 
-  /** Enables indoor maps. */
+  /**
+   * Enables indoor maps.
+   * @defaultValue `true`
+   */
   indoorEnabled?: boolean;
 
-  /** Enables transit layer. */
+  /**
+   * Enables transit layer.
+   * @defaultValue `false`
+   */
   transitEnabled?: boolean;
 
   /**
@@ -74,7 +89,11 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** Map padding. See {@link RNMapPadding}. */
   mapPadding?: RNMapPadding;
 
-  /** Base map type. See {@link RNMapType}. */
+  /**
+   * Base map type.
+   * @defaultValue `'normal'`
+   * See {@link RNMapType}.
+   */
   mapType?: RNMapType;
 
   /** Markers. See {@link RNMarker}. */
@@ -194,13 +213,31 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
  * Direct calls into native Google Maps SDK.
  */
 export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
+  /**
+   * Shows the info window for a marker.
+   *
+   * @param id - Marker identifier.
+   */
   showMarkerInfoWindow(id: string): void;
+
+  /**
+   * Hides the info window for a marker.
+   *
+   * @param id - Marker identifier.
+   */
   hideMarkerInfoWindow(id: string): void;
 
   /**
    * Sets the camera.
+   *
    * iOS: adds an explicit animation phase for parity.
    * Android: uses native timing.
+   *
+   * @param camera - Target camera update. See {@link RNCameraUpdate}.
+   * @param animated - Whether to animate.
+   * @defaultValue `false`
+   * @param durationMs - Animation duration in milliseconds.
+   * @defaultValue `1000`
    */
   setCamera(
     camera: RNCameraUpdate,
@@ -210,8 +247,16 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
 
   /**
    * Fits the camera to the given coordinates.
+   *
    * iOS: adds an explicit animation phase for parity.
    * Android: uses native timing.
+   *
+   * @param coordinates - Coordinates the camera should fit.
+   * @param padding - Padding around the fitted area. See {@link RNMapPadding}.
+   * @param animated - Whether to animate.
+   * @defaultValue `false`
+   * @param durationMs - Animation duration in milliseconds.
+   * @defaultValue `1000`
    */
   setCameraToCoordinates(
     coordinates: RNLatLng[],
@@ -220,13 +265,27 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
     durationMs?: number
   ): void;
 
-  /** Restricts camera target bounds. */
+  /**
+   * Restricts the camera target bounds.
+   * Pass `undefined` to clear the restriction.
+   *
+   * @param bounds - Bounds to restrict the camera target to. See {@link RNLatLngBounds}.
+   */
   setCameraBounds(bounds?: RNLatLngBounds): void;
 
   /**
-   * Animates camera to bounds.
+   * Animates the camera to fit the given bounds.
+   *
    * iOS: adds an explicit animation phase for parity.
    * Android: uses native timing.
+   *
+   * @param bounds - Target bounds the camera should fit. See {@link RNLatLngBounds}.
+   * @param padding - Padding in logical units.
+   * @defaultValue `0`
+   * @param durationMs - Animation duration in milliseconds.
+   * @defaultValue `1000`
+   * @param lockBounds - Restricts the camera to these bounds after animating.
+   * @defaultValue `false`
    */
   animateToBounds(
     bounds: RNLatLngBounds,
@@ -235,26 +294,36 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
     lockBounds?: boolean
   ): void;
 
-  /** Snapshot of current frame. */
+  /**
+   * Captures a snapshot of the current map frame.
+   *
+   * @param options - Snapshot output configuration. See {@link RNSnapshotOptions}.
+   * @returns Base64 string or file URI, depending on {@link RNSnapshotOptions.resultType}.
+   */
   snapshot(options: RNSnapshotOptions): Promise<string | undefined>;
 
-  /** Native location-settings dialog. */
+  /** Shows a native system dialog prompting the user to enable location services. */
   showLocationDialog(): void;
 
   /**
    * Opens the OS location settings.
+   *
    * iOS: opens the app settings.
    * Android: opens system location settings.
    */
   openLocationSettings(): void;
 
-  /** Requests runtime location permission. */
+  /**
+   * Requests runtime location permission.
+   * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
+   */
   requestLocationPermission(): Promise<RNLocationPermissionResult>;
 
   /**
    * Checks Google Play Services availability.
-   * iOS: always returns false.
+   * iOS: always returns `false`.
    * Android: performs a real system check.
+   * @returns `true` if Google Play Services are available, otherwise `false`.
    */
   isGooglePlayServicesAvailable(): boolean;
 }

@@ -64,7 +64,7 @@ export default function SnapshotTestScreen() {
 
   return (
     <MapWrapper mapRef={mapRef}>
-      <ControlPanel mapRef={mapRef} buttons={buttons} />
+      <ControlPanel viewRef={mapRef} buttons={buttons} />
 
       <Modal visible={visible} transparent animationType="fade">
         <View style={styles.backdrop}>

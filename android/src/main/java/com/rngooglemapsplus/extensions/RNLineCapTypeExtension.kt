@@ -10,5 +10,6 @@ fun RNLineCapType?.toMapLineCap(): Cap =
   when (this) {
     RNLineCapType.ROUND -> RoundCap()
     RNLineCapType.SQUARE -> SquareCap()
-    else -> ButtCap()
+    RNLineCapType.BUTT -> ButtCap()
+    null -> ButtCap()
   }

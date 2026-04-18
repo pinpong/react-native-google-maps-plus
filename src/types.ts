@@ -5,11 +5,16 @@
  * Behavior follows the underlying SDKs unless explicitly documented otherwise.
  */
 
+import type { RNGoogleMapsPlusStreetViewMethods } from './RNGoogleMapsPlusStreetView.nitro';
 import type { RNGoogleMapsPlusViewMethods } from './RNGoogleMapsPlusView.nitro';
 import type { HybridView } from 'react-native-nitro-modules';
 
 /** Reference to the native Google Maps view. */
 export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
+
+/** Reference to the native Google Maps Street View. */
+export type GoogleMapsStreetViewRef =
+  HybridView<RNGoogleMapsPlusStreetViewMethods>;
 
 /** Initial map configuration. */
 export type RNInitialProps = {
@@ -21,6 +26,7 @@ export type RNInitialProps = {
    *
    * Android: supported.
    * iOS: not supported.
+   * @defaultValue `false`
    */
   liteMode?: boolean;
 
@@ -36,13 +42,22 @@ export type RNInitialProps = {
 
 /** UI and gesture settings. */
 export type RNMapUiSettings = {
-  /** Enables or disables all gestures. */
+  /**
+   * Enables or disables all gestures.
+   * @defaultValue `true`
+   */
   allGesturesEnabled?: boolean;
 
-  /** Shows the compass. */
+  /**
+   * Shows the compass.
+   * @defaultValue `true`
+   */
   compassEnabled?: boolean;
 
-  /** Enables the indoor level picker. */
+  /**
+   * Enables the indoor level picker.
+   * @defaultValue `true`
+   */
   indoorLevelPickerEnabled?: boolean;
 
   /**
@@ -50,22 +65,38 @@ export type RNMapUiSettings = {
    *
    * Android: supported.
    * iOS: not supported.
+   * @defaultValue `true`
    */
   mapToolbarEnabled?: boolean;
 
-  /** Enables the "My Location" button. */
+  /**
+   * Enables the "My Location" button.
+   * @defaultValue `true`
+   */
   myLocationButtonEnabled?: boolean;
 
-  /** Enables rotation gestures. */
+  /**
+   * Enables rotation gestures.
+   * @defaultValue `true`
+   */
   rotateEnabled?: boolean;
 
-  /** Enables scroll gestures. */
+  /**
+   * Enables scroll gestures.
+   * @defaultValue `true`
+   */
   scrollEnabled?: boolean;
 
-  /** Enables scroll during rotate/zoom gestures. */
+  /**
+   * Enables scroll during rotate/zoom gestures.
+   * @defaultValue `true`
+   */
   scrollDuringRotateOrZoomEnabled?: boolean;
 
-  /** Enables tilt gestures. */
+  /**
+   * Enables tilt gestures.
+   * @defaultValue `true`
+   */
   tiltEnabled?: boolean;
 
   /**
@@ -73,35 +104,31 @@ export type RNMapUiSettings = {
    *
    * Android: supported.
    * iOS: not supported.
+   * @defaultValue `true`
    */
   zoomControlsEnabled?: boolean;
 
-  /** Enables pinch zoom gestures. */
+  /**
+   * Enables pinch zoom gestures.
+   * @defaultValue `true`
+   */
   zoomGesturesEnabled?: boolean;
 
   /**
    * Consumes the press event.
-   *
-   * When enabled:
-   * - Native map UI does NOT execute its default behavior.
-   * - Only the JS callback is triggered.
-   *
-   * When disabled:
-   * - JS callback is triggered.
-   * - Native default behavior runs (e.g. camera move, info window, selection).
+   * @remarks
+   * When enabled: native map UI does not execute its default behavior; only the JS callback fires.
+   * When disabled: JS callback fires and native behavior runs (camera move, info window, selection).
+   * @defaultValue `false`
    */
   consumeOnMarkerPress?: boolean;
 
   /**
    * Consumes the My-Location-button press event.
-   *
-   * When enabled:
-   * - Native map does NOT perform its default camera move.
-   * - Only the JS callback is triggered.
-   *
-   * When disabled:
-   * - JS callback is triggered.
-   * - Native behavior runs (camera animates to user location).
+   * @remarks
+   * When enabled: native map UI does not execute its default behavior; only the JS callback fires.
+   * When disabled: JS callback fires and native behavior runs (camera animates to user location).
+   * @defaultValue `false`
    */
   consumeOnMyLocationButtonPress?: boolean;
 };
@@ -132,19 +159,21 @@ export type RNLatLngBounds = {
 
 /** Snapshot configuration. */
 export type RNSnapshotOptions = {
-  /** Output size.
+  /**
+   * Output size.
+   * @defaultValue Uses the full view size.
    *
    * See {@link RNSize}.
    */
   size?: RNSize;
 
-  /** Image format. */
+  /** Image format. See {@link RNSnapshotFormat}. */
   format: RNSnapshotFormat;
 
   /** Image quality (0–100). */
   quality: number;
 
-  /** Result return type. */
+  /** Result return type. See {@link RNSnapshotResultType}. */
   resultType: RNSnapshotResultType;
 };
 
@@ -212,19 +241,29 @@ export type RNCamera = {
 
 /** Partial camera update. */
 export type RNCameraUpdate = {
-  /** Camera target coordinate.
-   *
+  /**
+   * Camera target coordinate.
+   * @defaultValue Current center.
    * See {@link RNLatLng}.
    */
   center?: RNLatLng;
 
-  /** Zoom level. */
+  /**
+   * Zoom level.
+   * @defaultValue Current zoom.
+   */
   zoom?: number;
 
-  /** Bearing in degrees. */
+  /**
+   * Bearing in degrees.
+   * @defaultValue Current bearing.
+   */
   bearing?: number;
 
-  /** Tilt angle in degrees. */
+  /**
+   * Tilt angle in degrees.
+   * @defaultValue Current tilt.
+   */
   tilt?: number;
 };
 
@@ -272,10 +311,16 @@ export type RNPosition = {
 
 /** Zoom configuration. */
 export type RNMapZoomConfig = {
-  /** Minimum zoom level. */
+  /**
+   * Minimum zoom level.
+   * @defaultValue SDK minimum, usually around `2`.
+   */
   min?: number;
 
-  /** Maximum zoom level. */
+  /**
+   * Maximum zoom level.
+   * @defaultValue SDK maximum, usually around `21`.
+   */
   max?: number;
 };
 
@@ -304,7 +349,10 @@ export type RNMarker = {
   /** Unique marker identifier. */
   id: string;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
   /** Marker coordinate.
@@ -316,6 +364,7 @@ export type RNMarker = {
   /**
    * Anchor point relative to the marker icon.
    * (0,0) = top-left, (1,1) = bottom-right.
+   * @defaultValue `(0.5, 1.0)` = bottom-center
    *
    * See {@link RNPosition}.
    */
@@ -327,30 +376,43 @@ export type RNMarker = {
   /** Marker snippet / subtitle. */
   snippet?: string;
 
-  /** Icon opacity in the range [0, 1]. */
+  /**
+   * Icon opacity in the range [0, 1].
+   * @defaultValue `1.0`
+   */
   opacity?: number;
 
-  /** Draws the marker flat against the map. */
+  /**
+   * Draws the marker flat against the map.
+   * @defaultValue `false`
+   */
   flat?: boolean;
 
-  /** Enables marker dragging. */
+  /**
+   * Enables marker dragging.
+   * @defaultValue `false`
+   */
   draggable?: boolean;
 
-  /** Rotation angle in degrees. */
+  /**
+   * Rotation angle in degrees.
+   * @defaultValue `0`
+   */
   rotation?: number;
 
   /**
    * Info window anchor relative to the marker.
    * (0,0) = top-left, (1,1) = bottom-right.
+   * @defaultValue `(0.5, 0.0)` = top-center
    *
    * See {@link RNPosition}.
    */
   infoWindowAnchor?: RNPosition;
 
-  /** Marker icon rendered from an SVG string. */
+  /** Marker icon rendered from an SVG string. See {@link RNMarkerSvg}. */
   iconSvg?: RNMarkerSvg;
 
-  /** Info window content rendered from an SVG string. */
+  /** Info window content rendered from an SVG string. See {@link RNMarkerSvg}. */
   infoWindowIconSvg?: RNMarkerSvg;
 };
 
@@ -391,10 +453,16 @@ export type RNPolygon = {
   /** Unique polygon identifier. */
   id: string;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
-  /** Enables polygon press events. */
+  /**
+   * Enables polygon press events.
+   * @defaultValue `false`
+   */
   pressable?: boolean;
 
   /** Polygon vertices.
@@ -425,7 +493,10 @@ export type RNPolygon = {
    */
   holes?: RNPolygonHole[];
 
-  /** Draws geodesic edges. */
+  /**
+   * Draws geodesic edges.
+   * @defaultValue `false`
+   */
   geodesic?: boolean;
 };
 
@@ -443,10 +514,16 @@ export type RNPolyline = {
   /** Unique polyline identifier. */
   id: string;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
-  /** Enables polyline press events. */
+  /**
+   * Enables polyline press events.
+   * @defaultValue `false`
+   */
   pressable?: boolean;
 
   /** Polyline vertices.
@@ -455,13 +532,24 @@ export type RNPolyline = {
    */
   coordinates: RNLatLng[];
 
-  /** Line cap style. */
+  /**
+   * Line cap style.
+   * @defaultValue `'butt'`
+   * See {@link RNLineCapType}.
+   */
   lineCap?: RNLineCapType;
 
-  /** Line join style. */
+  /**
+   * Line join style.
+   * @defaultValue `'miter'`
+   * See {@link RNLineJoinType}.
+   */
   lineJoin?: RNLineJoinType;
 
-  /** Draws a geodesic path. */
+  /**
+   * Draws a geodesic path.
+   * @defaultValue `false`
+   */
   geodesic?: boolean;
 
   /** Line color. */
@@ -483,10 +571,16 @@ export type RNCircle = {
   /** Unique circle identifier. */
   id: string;
 
-  /** Enables circle press events. */
+  /**
+   * Enables circle press events.
+   * @defaultValue `false`
+   */
   pressable?: boolean;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
   /** Circle center.
@@ -520,10 +614,16 @@ export type RNHeatmap = {
   /** Unique heatmap identifier. */
   id: string;
 
-  /** Enables heatmap press events. */
+  /**
+   * Enables heatmap press events.
+   * @defaultValue `false`
+   */
   pressable?: boolean;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
   /** Weighted heatmap points.
@@ -532,10 +632,16 @@ export type RNHeatmap = {
    */
   weightedData: RNHeatmapPoint[];
 
-  /** Radius used for each point. */
+  /**
+   * Radius used for each point.
+   * @defaultValue `20`
+   */
   radius?: number;
 
-  /** Overall heatmap opacity. */
+  /**
+   * Overall heatmap opacity.
+   * @defaultValue `0.7`
+   */
   opacity?: number;
 
   /** Gradient configuration.
@@ -583,7 +689,10 @@ export type RNUrlTileOverlay = {
   /** Unique tile overlay identifier. */
   id: string;
 
-  /** Z-index used for rendering order. */
+  /**
+   * Z-index used for rendering order.
+   * @defaultValue `0`
+   */
   zIndex?: number;
 
   /** URL template for tiles. */
@@ -592,10 +701,16 @@ export type RNUrlTileOverlay = {
   /** Tile size in pixels. */
   tileSize: number;
 
-  /** Overlay opacity in the range [0, 1]. */
+  /**
+   * Overlay opacity in the range [0, 1].
+   * @defaultValue `1.0`
+   */
   opacity?: number;
 
-  /** Enables fade-in animation when tiles load. */
+  /**
+   * Enables fade-in animation when tiles load.
+   * @defaultValue `true`
+   */
   fadeIn?: boolean;
 };
 
@@ -653,14 +768,21 @@ export type RNLocationConfig = {
 export type RNAndroidLocationConfig = {
   /**
    * Requested location priority.
+   * @defaultValue `PRIORITY_HIGH_ACCURACY`.
    * See {@link RNAndroidLocationPriority}.
    */
   priority?: RNAndroidLocationPriority;
 
-  /** Desired update interval in milliseconds. */
+  /**
+   * Desired update interval in milliseconds.
+   * @defaultValue `5000`
+   */
   interval?: number;
 
-  /** Minimum update interval in milliseconds. */
+  /**
+   * Minimum update interval in milliseconds.
+   * @defaultValue `0`
+   */
   minUpdateInterval?: number;
 };
 
@@ -680,15 +802,20 @@ export enum RNAndroidLocationPriority {
 export type RNIOSLocationConfig = {
   /**
    * Desired accuracy level.
+   * @defaultValue `ACCURACY_BEST`
    * See {@link RNIOSLocationAccuracy}.
    */
   desiredAccuracy?: RNIOSLocationAccuracy;
 
-  /** Minimum distance in meters before a new update is delivered. */
+  /**
+   * Minimum distance in meters before a new update is delivered.
+   * @defaultValue `0` (no filter)
+   */
   distanceFilterMeters?: number;
 
   /**
    * Activity type used to optimize location updates.
+   * @defaultValue `OTHER`
    * See {@link RNIOSLocationActivityType}.
    */
   activityType?: RNIOSLocationActivityType;
@@ -845,6 +972,122 @@ export type RNLocationIOS = {
   timestamp?: number;
 };
 
+/** UI and gesture settings for Street View. */
+export type RNStreetViewUiSettings = {
+  /**
+   * Show street name overlays.
+   * @defaultValue `true`
+   */
+  streetNamesEnabled?: boolean;
+
+  /**
+   * Allow navigating between panoramas by tapping arrows.
+   * @defaultValue `true`
+   */
+  userNavigationEnabled?: boolean;
+
+  /**
+   * Allow panning (rotating) the panorama.
+   * @defaultValue `true`
+   */
+  panningGesturesEnabled?: boolean;
+
+  /**
+   * Allow zooming in/out.
+   * @defaultValue `true`
+   */
+  zoomGesturesEnabled?: boolean;
+};
+
+/** Street View panorama source filter. */
+export type RNStreetViewSource = 'default' | 'outdoor';
+
+/** Initial Street View configuration. Set once before the view mounts. */
+export type RNStreetViewInitialProps = {
+  /**
+   * Load a specific panorama by ID.
+   * Takes priority over position when set.
+   */
+  panoramaId?: string;
+
+  /** Initial panorama position. Ignored when panoramaId is set.
+   * See {@link RNLatLng}.
+   */
+  position?: RNLatLng;
+
+  /**
+   * Search radius in meters around position.
+   * @defaultValue `50`
+   */
+  radius?: number;
+
+  /**
+   * Restricts panoramas to the given source.
+   * @defaultValue `'default'`
+   * See {@link RNStreetViewSource}.
+   */
+  source?: RNStreetViewSource;
+
+  /** Initial camera orientation. Applied once at mount time.
+   * See {@link RNStreetViewCamera}.
+   */
+  camera?: RNStreetViewCamera;
+};
+
+/** Street View tap/long-press orientation on the panorama sphere. */
+export type RNStreetViewOrientation = {
+  /** Compass heading in degrees (0–360). */
+  bearing: number;
+  /** Vertical angle in degrees (−90 up, +90 down). */
+  tilt: number;
+};
+
+/** Link to an adjacent panorama. */
+export type RNStreetViewPanoramaLink = {
+  /** Direction to the linked panorama in degrees (0–360). */
+  bearing: number;
+  /** Panorama ID of the linked panorama. */
+  panoramaId: string;
+};
+
+/** Full location info delivered by onPanoramaChange. */
+export type RNStreetViewPanoramaLocation = {
+  /** Geographic coordinate of the panorama.
+   * See {@link RNLatLng}.
+   */
+  position: RNLatLng;
+  /** Panorama ID. */
+  panoramaId: string;
+  /** Links to adjacent panoramas.
+   * See {@link RNStreetViewPanoramaLink}.
+   */
+  links: RNStreetViewPanoramaLink[];
+};
+
+/** Street View point of view. */
+export type RNStreetViewCamera = {
+  /**
+   * Compass heading in degrees (0–360).
+   * 0 = north, 90 = east, 180 = south, 270 = west.
+   * @defaultValue Current bearing., or `0` if no camera is set
+   */
+  bearing?: number;
+
+  /**
+   * Tilt angle in degrees.
+   * 0 = horizontal, positive = up, negative = down.
+   * Clamped to -90..90 by the SDK.
+   * @defaultValue Current tilt., or `0` if no camera is set
+   */
+  tilt?: number;
+
+  /**
+   * Zoom level. 0 = default field of view.
+   * @defaultValue Current zoom., or `0` if no camera is set
+   */
+  zoom?: number;
+};
+
 /** Location error codes. */
 export enum RNLocationErrorCode {
   /** Location permission was denied by the user. */
@@ -906,4 +1149,7 @@ export enum RNMapErrorCode {
 
   /** KML layer failed to load or parse. */
   KML_LAYER_FAILED = 12,
+
+  /** Street View panorama not found at the given position or ID. */
+  PANORAMA_NOT_FOUND = 13,
 }
