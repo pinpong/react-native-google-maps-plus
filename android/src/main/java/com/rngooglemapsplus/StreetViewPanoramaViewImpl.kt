@@ -1,6 +1,7 @@
 package com.rngooglemapsplus
 
-import android.widget.FrameLayout
+import android.content.ComponentCallbacks2
+import android.content.res.Configuration
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.facebook.react.uimanager.ThemedReactContext
@@ -22,11 +23,12 @@ class StreetViewPanoramaViewImpl(
   private val locationHandler: LocationHandler,
   private val playServiceHandler: PlayServicesHandler,
   private val mapErrorHandler: MapErrorHandler,
-) : FrameLayout(reactContext),
+) : GestureAwareFrameLayout(reactContext),
   OnStreetViewPanoramaChangeListenerNullSafe,
   StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener,
-  StreetViewPanorama.OnStreetViewPanoramaClickListener {
-  private var lifecycleObserver: StreetViewLifecycleEventObserver? = null
+  StreetViewPanorama.OnStreetViewPanoramaClickListener,
+  ComponentCallbacks2 {
+  private var lifecycleObserver: ViewLifecycleEventObserver? = null
   private var lifecycle: Lifecycle? = null
 
   private var streetViewInitialized = false
@@ -37,6 +39,7 @@ class StreetViewPanoramaViewImpl(
 
   init {
     MapsInitializer.initialize(reactContext)
+    reactContext.registerComponentCallbacks(this)
   }
 
   fun initStreetView() =
@@ -57,7 +60,16 @@ class StreetViewPanoramaViewImpl(
 
       streetViewPanoramaView =
         StreetViewPanoramaView(reactContext, streetViewPanoramaOptions).also {
-          lifecycleObserver = StreetViewLifecycleEventObserver(it, locationHandler)
+          lifecycleObserver =
+            ViewLifecycleEventObserver(
+              locationHandler = locationHandler,
+              onCreateView = it::onCreate,
+              onStartView = it::onStart,
+              onResumeView = it::onResume,
+              onPauseView = it::onPause,
+              onStopView = it::onStop,
+              onDestroyView = it::onDestroy,
+            )
           super.addView(it)
           it.getStreetViewPanoramaAsync { panorama ->
             if (destroyed) return@getStreetViewPanoramaAsync
@@ -132,7 +144,8 @@ class StreetViewPanoramaViewImpl(
     uiSettings = uiSettings
   }
 
-  val currentCamera: StreetViewPanoramaCamera? get() = streetViewPanorama?.panoramaCamera
+  val currentCamera: StreetViewPanoramaCamera?
+    get() = onUiSync { streetViewPanorama?.panoramaCamera }
 
   var streetViewPanoramaOptions: StreetViewPanoramaOptions = StreetViewPanoramaOptions()
 
@@ -197,6 +210,7 @@ class StreetViewPanoramaViewImpl(
       streetViewPanoramaView?.removeAllViews()
       streetViewPanoramaView = null
       super.removeAllViews()
+      reactContext.unregisterComponentCallbacks(this)
     }
 
   override fun requestLayout() {
@@ -220,8 +234,22 @@ class StreetViewPanoramaViewImpl(
   }
 
   override fun onDetachedFromWindow() {
+    setParentTouchInterceptDisallowed(false)
     lifecycleObserver?.let { lifecycle?.removeObserver(it) }
     lifecycle = null
     super.onDetachedFromWindow()
+  }
+
+  override val panGestureEnabled get() = uiSettings?.panningGesturesEnabled == true
+  override val multiTouchGestureEnabled get() = uiSettings?.zoomGesturesEnabled == true
+
+  override fun onConfigurationChanged(newConfig: Configuration) {}
+
+  override fun onLowMemory() {
+    streetViewPanoramaView?.onLowMemory()
+  }
+
+  override fun onTrimMemory(level: Int) {
+    streetViewPanoramaView?.onLowMemory()
   }
 }
