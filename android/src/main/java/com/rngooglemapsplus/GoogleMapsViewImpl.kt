@@ -214,6 +214,7 @@ class GoogleMapsViewImpl(
               googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
               googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
               googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
+              googleMap?.setOnIndoorStateChangeListener(this@GoogleMapsViewImpl)
               googleMap?.setOnInfoWindowClickListener(this@GoogleMapsViewImpl)
               googleMap?.setOnInfoWindowCloseListener(this@GoogleMapsViewImpl)
               googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
