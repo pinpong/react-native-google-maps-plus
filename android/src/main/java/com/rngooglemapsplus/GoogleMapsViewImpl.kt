@@ -10,9 +10,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Size
-import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -63,7 +61,7 @@ class GoogleMapsViewImpl(
   private val playServiceHandler: PlayServicesHandler,
   private val markerBuilder: MapMarkerBuilder,
   private val mapErrorHandler: MapErrorHandler,
-) : FrameLayout(reactContext),
+) : GestureAwareFrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
   GoogleMap.OnCameraMoveListener,
   GoogleMap.OnCameraIdleListener,
@@ -81,8 +79,10 @@ class GoogleMapsViewImpl(
   GoogleMap.OnInfoWindowLongClickListener,
   GoogleMap.OnMyLocationClickListener,
   GoogleMap.OnMyLocationButtonClickListener,
-  GoogleMap.InfoWindowAdapter {
-  private var lifecycleObserver: MapLifecycleEventObserver? = null
+  GoogleMap.OnMapLoadedCallback,
+  GoogleMap.InfoWindowAdapter,
+  ComponentCallbacks2 {
+  private var lifecycleObserver: ViewLifecycleEventObserver? = null
   private var lifecycle: Lifecycle? = null
 
   private var mapViewInitialized = false
@@ -107,75 +107,11 @@ class GoogleMapsViewImpl(
   private val kmlLayersById = mutableMapOf<String, KmlLayer>()
   private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
 
-  private var parentTouchInterceptDisallowed = false
   private var cameraMoveReason = -1
-
-  val componentCallbacks =
-    object : ComponentCallbacks2 {
-      override fun onConfigurationChanged(newConfig: Configuration) {}
-
-      override fun onLowMemory() {
-        mapView?.onLowMemory()
-        markerBuilder.clearIconCache()
-      }
-
-      override fun onTrimMemory(level: Int) {
-        mapView?.onLowMemory()
-        markerBuilder.cancelAllJobs()
-      }
-    }
-
-  private fun setParentTouchInterceptDisallowed(blocked: Boolean) {
-    if (parentTouchInterceptDisallowed == blocked) return
-    parentTouchInterceptDisallowed = blocked
-    var p = parent
-    while (p != null) {
-      p.requestDisallowInterceptTouchEvent(blocked)
-      p = p.parent
-    }
-  }
-
-  override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-    if (googleMapsOptions.liteMode == true) return super.dispatchTouchEvent(ev)
-
-    val panEnabled = uiSettings?.scrollEnabled == true
-    val zoomEnabled = uiSettings?.zoomGesturesEnabled == true
-    val rotateEnabled = uiSettings?.rotateEnabled == true
-    val tiltEnabled = uiSettings?.tiltEnabled == true
-
-    val multiTouchEnabled = zoomEnabled || rotateEnabled || tiltEnabled
-    val anyMapGestureEnabled = panEnabled || multiTouchEnabled
-    if (!anyMapGestureEnabled) return super.dispatchTouchEvent(ev)
-
-    when (ev.actionMasked) {
-      MotionEvent.ACTION_DOWN,
-      MotionEvent.ACTION_MOVE,
-      MotionEvent.ACTION_POINTER_DOWN,
-      -> {
-        val pointers = ev.pointerCount
-        val shouldBlockParent = pointers >= (if (panEnabled) 1 else 2)
-        setParentTouchInterceptDisallowed(shouldBlockParent)
-      }
-
-      MotionEvent.ACTION_POINTER_UP -> {
-        val pointers = ev.pointerCount - 1
-        val shouldBlockParent = pointers >= (if (panEnabled) 1 else 2)
-        setParentTouchInterceptDisallowed(shouldBlockParent)
-      }
-
-      MotionEvent.ACTION_UP,
-      MotionEvent.ACTION_CANCEL,
-      -> {
-        setParentTouchInterceptDisallowed(false)
-      }
-    }
-
-    return super.dispatchTouchEvent(ev)
-  }
 
   init {
     MapsInitializer.initialize(reactContext)
-    reactContext.registerComponentCallbacks(componentCallbacks)
+    reactContext.registerComponentCallbacks(this)
   }
 
   fun initMapView() =
@@ -196,42 +132,56 @@ class GoogleMapsViewImpl(
 
       mapView =
         MapView(reactContext, googleMapsOptions).also {
-          lifecycleObserver = MapLifecycleEventObserver(it, locationHandler)
+          lifecycleObserver =
+            ViewLifecycleEventObserver(
+              locationHandler = locationHandler,
+              onCreateView = it::onCreate,
+              onStartView = it::onStart,
+              onResumeView = it::onResume,
+              onPauseView = it::onPause,
+              onStopView = it::onStop,
+              onDestroyView = it::onDestroy,
+            )
           super.addView(it)
           it.getMapAsync { map ->
             if (destroyed) return@getMapAsync
             googleMap = map
             googleMap?.setLocationSource(locationHandler)
-            googleMap?.setOnMapLoadedCallback {
-              googleMap?.setOnCameraMoveStartedListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnCameraIdleListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMarkerClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnPolylineClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnIndoorStateChangeListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnInfoWindowClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnInfoWindowCloseListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
-              googleMap?.setInfoWindowAdapter(this@GoogleMapsViewImpl)
-              mapViewLoaded = true
-              onMapLoaded?.invoke(
-                map.projection.visibleRegion.toRnRegion(),
-                map.cameraPosition.toRnCamera(),
-              )
-            }
+            googleMap?.setOnMapLoadedCallback(this@GoogleMapsViewImpl)
             applyProps()
             initLocationCallbacks()
             onMapReady?.invoke(true)
           }
         }
+    }
+
+  override fun onMapLoaded() =
+    onUi {
+      googleMap?.setOnCameraMoveStartedListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnCameraMoveListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnCameraIdleListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMarkerClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnPolylineClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnPolygonClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnCircleClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMapClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMapLongClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnPoiClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnIndoorStateChangeListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMarkerDragListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnInfoWindowClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnInfoWindowCloseListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnInfoWindowLongClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMyLocationClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setOnMyLocationButtonClickListener(this@GoogleMapsViewImpl)
+      googleMap?.setInfoWindowAdapter(this@GoogleMapsViewImpl)
+      mapViewLoaded = true
+      googleMap?.let { map ->
+        onMapLoaded?.invoke(
+          map.projection.visibleRegion.toRnRegion(),
+          map.cameraPosition.toRnCamera(),
+        )
+      }
     }
 
   override fun onCameraMoveStarted(reason: Int) =
@@ -875,6 +825,7 @@ class GoogleMapsViewImpl(
       clearKmlLayer()
       clearUrlTileOverlays()
       googleMap?.apply {
+        setOnMapLoadedCallback(null)
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
         setOnCameraIdleListener(null)
@@ -903,7 +854,7 @@ class GoogleMapsViewImpl(
       mapView?.removeAllViews()
       mapView = null
       super.removeAllViews()
-      reactContext.unregisterComponentCallbacks(componentCallbacks)
+      reactContext.unregisterComponentCallbacks(this)
     }
 
   override fun requestLayout() {
@@ -932,6 +883,26 @@ class GoogleMapsViewImpl(
     lifecycleObserver?.let { lifecycle?.removeObserver(it) }
     lifecycle = null
     super.onDetachedFromWindow()
+  }
+
+  override val gesturesSupported get() = googleMapsOptions.liteMode != true
+  override val panGestureEnabled get() = uiSettings?.scrollEnabled == true
+  override val multiTouchGestureEnabled
+    get() =
+      (uiSettings?.zoomGesturesEnabled == true) ||
+        (uiSettings?.rotateEnabled == true) ||
+        (uiSettings?.tiltEnabled == true)
+
+  override fun onConfigurationChanged(newConfig: Configuration) {}
+
+  override fun onLowMemory() {
+    mapView?.onLowMemory()
+    markerBuilder.clearIconCache()
+  }
+
+  override fun onTrimMemory(level: Int) {
+    mapView?.onLowMemory()
+    markerBuilder.cancelAllJobs()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {

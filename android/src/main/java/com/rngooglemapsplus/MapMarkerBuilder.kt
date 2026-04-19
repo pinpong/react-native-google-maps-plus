@@ -398,7 +398,7 @@ class MapMarkerBuilder(
   private suspend fun renderBitmap(
     iconSvg: RNMarkerSvg,
     markerId: String,
-  ): RenderBitmapResult? {
+  ): RenderBitmapResult {
     val wPx =
       iconSvg.width
         .dpToPx()

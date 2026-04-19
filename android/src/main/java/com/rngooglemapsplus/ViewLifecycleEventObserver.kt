@@ -4,11 +4,15 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.gms.maps.StreetViewPanoramaView
 
-class StreetViewLifecycleEventObserver(
-  private val streetViewPanoramaView: StreetViewPanoramaView?,
+class ViewLifecycleEventObserver(
   private val locationHandler: LocationHandler,
+  private val onCreateView: (Bundle) -> Unit,
+  private val onStartView: () -> Unit,
+  private val onResumeView: () -> Unit,
+  private val onPauseView: () -> Unit,
+  private val onStopView: () -> Unit,
+  private val onDestroyView: () -> Unit,
 ) : LifecycleEventObserver {
   private var currentState: Lifecycle.State = Lifecycle.State.INITIALIZED
 
@@ -17,7 +21,10 @@ class StreetViewLifecycleEventObserver(
     event: Lifecycle.Event,
   ) {
     when (event) {
+      // Host destroy does not necessarily mean the RN view is dropped.
+      // The actual MapView destroy is driven explicitly from view cleanup.
       Lifecycle.Event.ON_DESTROY -> toCreatedState()
+
       else -> toState(event.targetState)
     }
   }
@@ -55,29 +62,29 @@ class StreetViewLifecycleEventObserver(
   private fun invokeEvent(event: Lifecycle.Event) {
     when (event) {
       Lifecycle.Event.ON_CREATE -> {
-        streetViewPanoramaView?.onCreate(Bundle())
+        onCreateView(Bundle())
       }
 
       Lifecycle.Event.ON_START -> {
-        streetViewPanoramaView?.onStart()
+        onStartView()
       }
 
       Lifecycle.Event.ON_RESUME -> {
         locationHandler.start()
-        streetViewPanoramaView?.onResume()
+        onResumeView()
       }
 
       Lifecycle.Event.ON_PAUSE -> {
-        streetViewPanoramaView?.onPause()
+        onPauseView()
         locationHandler.stop()
       }
 
       Lifecycle.Event.ON_STOP -> {
-        streetViewPanoramaView?.onStop()
+        onStopView()
       }
 
       Lifecycle.Event.ON_DESTROY -> {
-        streetViewPanoramaView?.onDestroy()
+        onDestroyView()
       }
 
       Lifecycle.Event.ON_ANY -> {}

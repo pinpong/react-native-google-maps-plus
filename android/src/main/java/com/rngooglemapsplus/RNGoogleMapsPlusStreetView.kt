@@ -3,9 +3,7 @@ package com.rngooglemapsplus
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.StreetViewPanoramaOptions
-import com.google.android.gms.maps.model.StreetViewSource
 import com.margelo.nitro.core.Promise
-import com.rngooglemapsplus.PermissionHandler
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toStreetViewPanoramaCamera
 import com.rngooglemapsplus.extensions.toStreetViewSource
@@ -91,7 +89,6 @@ class RNGoogleMapsPlusStreetView(
 
   override var onPanoramaError: ((RNMapErrorCode, String) -> Unit)? = null
     set(cb) {
-      field = cb
       mapErrorHandler.callback = cb
     }
 
