@@ -87,7 +87,6 @@ extension UIColor {
     let x = c * (1 - Swift.abs((h / 60).truncatingRemainder(dividingBy: 2) - 1))
     let m = l - c / 2
 
-    // swiftlint:disable:next large_tuple
     let (r1, g1, b1): (Double, Double, Double)
     switch h {
     case 0 ..< 60: (r1, g1, b1) = (c, x, 0)
