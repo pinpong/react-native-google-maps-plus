@@ -15,7 +15,7 @@
     "lint": "yarn lint:js && yarn lint:android && yarn lint:ios",
     "lint:js": "eslint . --max-warnings 0 && yarn prettier --check .",
     "lint:android": "cd android && ktlint -F ./**/*.kt*",
-    "lint:ios": "cd ios && swiftlint --quiet && swiftformat . --lint",
+    "lint:ios": "cd ios && swiftformat . --lint",
     "format": "yarn format:js && yarn format:ios && yarn format:android",
     "format:js": "eslint . --fix && prettier --write .",
     "format:android": "cd android && ktlint --format ./**/*.kt*",

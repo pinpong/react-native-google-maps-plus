@@ -4,16 +4,16 @@ import GoogleMaps
 import NitroModules
 
 final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
-  
+
   private let mapErrorHandler: MapErrorHandler
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
   private let impl: StreetViewPanoramaViewImpl
-  
+
   var view: UIView {
     return impl
   }
-  
+
   override init() {
     self.permissionHandler = PermissionHandler()
     self.locationHandler = LocationHandler()
@@ -23,18 +23,19 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
       locationHandler: locationHandler
     )
   }
-  
+
   func onDropView() {
     impl.deinitInternal()
   }
-  
+
   var initialProps: RNStreetViewInitialProps? {
     didSet { impl.streetViewInitialProps = initialProps }
   }
-  
+
   var uiSettings: RNStreetViewUiSettings? {
     didSet { impl.uiSettings = uiSettings }
   }
+
   var onPanoramaReady: ((Bool) -> Void)? {
     didSet { impl.onPanoramaReady = onPanoramaReady }
   }
@@ -56,14 +57,14 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
   var onPanoramaError: ((RNMapErrorCode, String) -> Void)? {
     didSet { mapErrorHandler.callback = onPanoramaError }
   }
-  
+
   func setCamera(camera: RNStreetViewCamera, animated: Bool?, durationMs: Double?) {
     onMain {
       let cam = camera.toGMSPanoramaCamera(current: self.impl.currentCamera)
       self.impl.setCamera(cam, animated: animated ?? false, durationMs: durationMs ?? 1000)
     }
   }
-  
+
   func setPosition(position: RNLatLng, radius: Double?, source: RNStreetViewSource?) {
     impl.setPosition(
       position.toCLLocationCoordinate2D(),
@@ -71,23 +72,23 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
       source: source?.toGMSPanoramaSource ?? .default
     )
   }
-  
+
   func setPositionById(panoramaId: String) {
     impl.setPositionById(panoramaId)
   }
-  
+
   func showLocationDialog() {
     locationHandler.showLocationDialog()
   }
-  
+
   func openLocationSettings() {
     locationHandler.openLocationSettings()
   }
-  
+
   func requestLocationPermission() -> NitroModules.Promise<RNLocationPermissionResult> {
     return permissionHandler.requestLocationPermission()
   }
-  
+
   func isGooglePlayServicesAvailable() -> Bool {
     return false
   }

@@ -16,7 +16,7 @@
 --wrap-return-type never
 --disable wrapMultilineStatementBraces
 
---rules indent,braces,spaceInsideParens,spaceInsideBraces,spaceAroundOperators
+--rules indent,braces,spaceInsideParens,spaceInsideBraces,spaceAroundOperators,consecutiveSpaces,trailingSpace
 
---trim-whitespace nonblank-lines
+--trim-whitespace always
 --linebreaks lf

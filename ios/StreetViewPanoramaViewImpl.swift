@@ -4,13 +4,13 @@ import NitroModules
 import UIKit
 
 final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
-  
+
   private let mapErrorHandler: MapErrorHandler
   private let locationHandler: LocationHandler
   private var panoramaView: GMSPanoramaView?
   private var panoramaViewInitialized = false
   private var deInitialized = false
-  
+
   init(
     frame: CGRect = .zero,
     mapErrorHandler: MapErrorHandler,
@@ -20,10 +20,10 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
     self.locationHandler = locationHandler
     super.init(frame: frame)
   }
-  
+
   private var lifecycleAttached = false
   private var lifecycleTasks = [Task<Void, Never>]()
-  
+
   private func attachLifecycleObservers() {
     if lifecycleAttached { return }
     lifecycleAttached = true
@@ -46,23 +46,23 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       }
     )
   }
-  
+
   private func detachLifecycleObservers() {
     if !lifecycleAttached { return }
     lifecycleAttached = false
     lifecycleTasks.forEach { $0.cancel() }
     lifecycleTasks.removeAll()
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   func initPanoramaView() {
     onMain {
       if self.panoramaViewInitialized { return }
       self.panoramaViewInitialized = true
-      
+
       let props = self.streetViewInitialProps
       if let position = props?.position {
         let coordinate = position.toCLLocationCoordinate2D()
@@ -75,42 +75,42 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       } else {
         self.panoramaView = GMSPanoramaView(frame: self.bounds)
       }
-      
+
       props?.panoramaId.map { self.panoramaView?.move(toPanoramaID: $0) }
       props?.camera.map { self.panoramaView?.camera = $0.toGMSPanoramaCamera() }
-      
+
       self.panoramaView?.delegate = self
       self.panoramaView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       self.panoramaView.map { self.addSubview($0) }
-      
+
       self.applyProps()
       self.initLocationCallbacks()
       self.onPanoramaReady?(true)
     }
   }
-  
+
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
       onMain { [weak self] in
         self?.onLocationUpdate?(loc.toRnLocation())
       }
     }
-    
+
     locationHandler.onError = { [weak self] error in
       onMain { [weak self] in
         self?.onLocationError?(error)
       }
     }
   }
-  
+
   private func applyProps() {
     ({ self.uiSettings = self.uiSettings })()
   }
-  
+
   var currentCamera: GMSPanoramaCamera? { panoramaView?.camera }
-  
+
   var streetViewInitialProps: RNStreetViewInitialProps?
-  
+
   var uiSettings: RNStreetViewUiSettings? {
     didSet {
       onMain {
@@ -121,14 +121,14 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       }
     }
   }
-  
+
   var onPanoramaReady: ((Bool) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((RNLocationErrorCode) -> Void)?
   var onPanoramaChange: ((RNStreetViewPanoramaLocation) -> Void)?
   var onCameraChange: ((RNStreetViewCamera) -> Void)?
   var onPanoramaPress: ((RNStreetViewOrientation) -> Void)?
-  
+
   func setCamera(_ camera: GMSPanoramaCamera, animated: Bool, durationMs: Double) {
     onMain {
       if animated {
@@ -140,7 +140,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       }
     }
   }
-  
+
   func setPosition(_ coordinate: CLLocationCoordinate2D, radius: UInt?, source: GMSPanoramaSource) {
     onMain {
       if let radius {
@@ -150,13 +150,13 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       }
     }
   }
-  
+
   func setPositionById(_ panoramaId: String) {
     onMain {
       self.panoramaView?.move(toPanoramaID: panoramaId)
     }
   }
-  
+
   func deinitInternal() {
     guard !deInitialized else { return }
     deInitialized = true
@@ -167,17 +167,17 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       self.panoramaView = nil
     }
   }
-  
+
   private func appDidBecomeActive() {
     if window != nil {
       locationHandler.start()
     }
   }
-  
+
   private func appDidEnterBackground() {
     locationHandler.stop()
   }
-  
+
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
@@ -189,11 +189,11 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       detachLifecycleObservers()
     }
   }
-  
+
   deinit {
     deinitInternal()
   }
-  
+
   func panoramaView(_ panoramaView: GMSPanoramaView, didMoveTo panorama: GMSPanorama?) {
     onMain {
       guard let panorama else { return }
@@ -209,15 +209,15 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       )
     }
   }
-  
+
   func panoramaView(_ panoramaView: GMSPanoramaView, error: Error, onMoveNearCoordinate coordinate: CLLocationCoordinate2D) {
     mapErrorHandler.report(.panoramaNotFound, error.localizedDescription, error)
   }
-  
+
   func panoramaView(_ panoramaView: GMSPanoramaView, error: Error, onMoveToPanoramaID panoramaID: String) {
     mapErrorHandler.report(.panoramaNotFound, error.localizedDescription, error)
   }
-  
+
   func panoramaView(_ panoramaView: GMSPanoramaView, didMove camera: GMSPanoramaCamera) {
     onMain {
       self.onCameraChange?(
@@ -229,7 +229,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       )
     }
   }
-  
+
   func panoramaView(_ panoramaView: GMSPanoramaView, didTap point: CGPoint) {
     onMain {
       let orientation = panoramaView.orientation(for: point)
