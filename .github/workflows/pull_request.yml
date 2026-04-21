@@ -37,10 +37,10 @@ jobs:
       - name: Generate nitrogen code
         run: yarn nitrogen
 
-      - name: Install ktlint & swiftlint
+      - name: Install ktlint & swiftformat
         run: |
           brew install ktlint
-          brew install swiftlint
+          brew install swiftformat
 
       - name: Lint files
         run: yarn lint
