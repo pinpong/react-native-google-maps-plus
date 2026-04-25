@@ -101,7 +101,7 @@ class RNGoogleMapsPlusStreetView(
     view.setPanoramaCamera(
       camera.toStreetViewPanoramaCamera(current),
       animated ?: false,
-      durationMs?.toInt() ?: 1000,
+      durationMs?.toInt() ?: 3000,
     )
   }
 
