@@ -61,7 +61,7 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
   func setCamera(camera: RNStreetViewCamera, animated: Bool?, durationMs: Double?) {
     onMain {
       let cam = camera.toGMSPanoramaCamera(current: self.impl.currentCamera)
-      self.impl.setCamera(cam, animated: animated ?? false, durationMs: durationMs ?? 1000)
+      self.impl.setCamera(cam, animated: animated ?? false, durationMs: durationMs ?? 3000)
     }
   }
 

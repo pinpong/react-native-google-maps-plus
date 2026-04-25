@@ -69,7 +69,7 @@ export interface RNGoogleMapsPlusStreetViewMethods extends HybridViewMethods {
    * @param animated - Whether to animate.
    * @defaultValue `false`
    * @param durationMs - Animation duration in milliseconds.
-   * @defaultValue `1000`
+   * @defaultValue `3000`
    */
   setCamera(
     camera: RNStreetViewCamera,

@@ -52,7 +52,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 
   /**
    * Enables 3D buildings.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   buildingEnabled?: boolean;
 
@@ -64,7 +64,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
 
   /**
    * Enables indoor maps.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   indoorEnabled?: boolean;
 
@@ -237,7 +237,7 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    * @param animated - Whether to animate.
    * @defaultValue `false`
    * @param durationMs - Animation duration in milliseconds.
-   * @defaultValue `1000`
+   * @defaultValue `3000`
    */
   setCamera(
     camera: RNCameraUpdate,
@@ -256,7 +256,7 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    * @param animated - Whether to animate.
    * @defaultValue `false`
    * @param durationMs - Animation duration in milliseconds.
-   * @defaultValue `1000`
+   * @defaultValue `3000`
    */
   setCameraToCoordinates(
     coordinates: RNLatLng[],
@@ -283,7 +283,7 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    * @param padding - Padding in logical units.
    * @defaultValue `0`
    * @param durationMs - Animation duration in milliseconds.
-   * @defaultValue `1000`
+   * @defaultValue `3000`
    * @param lockBounds - Restricts the camera to these bounds after animating.
    * @defaultValue `false`
    */

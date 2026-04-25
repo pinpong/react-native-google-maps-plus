@@ -50,13 +50,13 @@ export type RNMapUiSettings = {
 
   /**
    * Shows the compass.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   compassEnabled?: boolean;
 
   /**
    * Enables the indoor level picker.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   indoorLevelPickerEnabled?: boolean;
 
@@ -65,13 +65,13 @@ export type RNMapUiSettings = {
    *
    * Android: supported.
    * iOS: not supported.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   mapToolbarEnabled?: boolean;
 
   /**
    * Enables the "My Location" button.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   myLocationButtonEnabled?: boolean;
 
@@ -104,7 +104,7 @@ export type RNMapUiSettings = {
    *
    * Android: supported.
    * iOS: not supported.
-   * @defaultValue `true`
+   * @defaultValue `false`
    */
   zoomControlsEnabled?: boolean;
 
