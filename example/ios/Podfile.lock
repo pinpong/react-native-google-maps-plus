@@ -1894,7 +1894,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNGoogleMapsPlus (1.12.1):
+  - RNGoogleMapsPlus (1.13.0):
     - Google-Maps-iOS-Utils (= 7.0.0)
     - GoogleMaps (= 10.12.0)
     - hermes-engine
@@ -2453,7 +2453,7 @@ SPEC CHECKSUMS:
   ReactCommon: a804bb8d1dcf3ecdec3a77eb8bba19b7863bbbdb
   ReactNativeDependencies: 21b2d290beea6065aec537704fce69988d423700
   RNGestureHandler: 0d9f93773e381105773bc6c47646abbcf60faab5
-  RNGoogleMapsPlus: 897f50e8471c20e18f0c76554440bd4bf73e8984
+  RNGoogleMapsPlus: a05513f0626ecdc20b637f9128c8fa73cfce683c
   RNReanimated: 121c52535a4276e09b9235e067811b222a681760
   RNScreens: c58f17578c73435d8c00998cac0d89ad8105263c
   RNWorklets: dd3b2cb0750090d78d85cd3b3ec0fdbeab5ce118
