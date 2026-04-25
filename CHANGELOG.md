@@ -1,3 +1,28 @@
+## [1.13.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.12.1...v1.13.0) (2026-04-25)
+
+### ✨ Features
+
+* add StreetViewPanorama view ([f036125](https://github.com/pinpong/react-native-google-maps-plus/commit/f036125582d6d963a204da10cb2858b50a90d3f2))
+
+### 🐛 Bug Fixes
+
+* align map animation defaults ([5e0826e](https://github.com/pinpong/react-native-google-maps-plus/commit/5e0826e48eeba0de466f40bd247dced850a2080e))
+* **android:** add missing indoorStateChangeListener ([7424ee5](https://github.com/pinpong/react-native-google-maps-plus/commit/7424ee5f713c56518af5632e6b5d2faf52e70635))
+* forward lockBounds to animateToBounds ([ea2ec0a](https://github.com/pinpong/react-native-google-maps-plus/commit/ea2ec0a870457a4044aa51843988889670ecddb5))
+
+### 🔄 Code Refactors
+
+* **android:** unify view lifecycle, gesture handling and map listeners ([74d9acd](https://github.com/pinpong/react-native-google-maps-plus/commit/74d9acdc72e9420454d659c84bf9f21365c1ee56))
+
+### 🛠️ Other changes
+
+* add defaultSemverRangePrefix ([60fdcaf](https://github.com/pinpong/react-native-google-maps-plus/commit/60fdcafaa19ee31b71825166a80b916fce31241e))
+* **ios:** remove swiftlint ([27bb00e](https://github.com/pinpong/react-native-google-maps-plus/commit/27bb00e83bbe93960fb60024c293dcf61a6e15e1))
+* update package description ([72b6d34](https://github.com/pinpong/react-native-google-maps-plus/commit/72b6d3429b750ee44e4831c91c230a98b41cf52e))
+* update pods ([9aceae0](https://github.com/pinpong/react-native-google-maps-plus/commit/9aceae0bb70dd2e664533592d46f5e3ecdc5218d))
+* update pods ([c94f720](https://github.com/pinpong/react-native-google-maps-plus/commit/c94f720fe60bda7f224bff191d769e4b767d148d))
+* updated dependencies ([b7c8419](https://github.com/pinpong/react-native-google-maps-plus/commit/b7c84194eaf0d0d527e5ed7b5e6049c5f1b1c807))
+
 ## [1.12.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.12.0...v1.12.1) (2026-04-18)
 
 ### 🐛 Bug Fixes
