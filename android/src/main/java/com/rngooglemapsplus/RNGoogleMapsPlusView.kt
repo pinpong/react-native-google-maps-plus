@@ -486,7 +486,7 @@ class RNGoogleMapsPlusView(
       bounds.toLatLngBounds(),
       padding = padding?.toInt() ?: 0,
       durationMs?.toInt() ?: 3000,
-      lockBounds = false,
+      lockBounds = lockBounds ?: false,
     )
   }
 

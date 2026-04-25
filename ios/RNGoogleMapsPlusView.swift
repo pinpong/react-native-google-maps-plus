@@ -425,7 +425,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       bounds.toCoordinateBounds(),
       padding: padding ?? 0,
       durationMs: durationMs ?? 3000,
-      lockBounds: false
+      lockBounds: lockBounds ?? false
     )
   }
 
