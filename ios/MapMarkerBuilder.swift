@@ -159,7 +159,7 @@ final class MapMarkerBuilder {
     _ m: RNMarker,
     onReady: @escaping (UIImage?) -> Void
   ) {
-    tasks[m.id]?.cancel()
+    cancelIconTask(m.id)
 
     guard let iconSvg = m.iconSvg else {
       onReady(nil)
@@ -176,9 +176,6 @@ final class MapMarkerBuilder {
 
     let task = Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
-      defer {
-        Task { @MainActor in self.tasks.removeValue(forKey: m.id) }
-      }
 
       let renderResult = self.renderUIImage(iconSvg, m.id, scale)
       guard !Task.isCancelled else { return }
@@ -186,6 +183,7 @@ final class MapMarkerBuilder {
       guard let renderResult = renderResult else {
         await MainActor.run {
           guard !Task.isCancelled else { return }
+          self.tasks.removeValue(forKey: m.id)
           onReady(self.createFallbackUIImage())
         }
         return
@@ -197,11 +195,16 @@ final class MapMarkerBuilder {
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
+        self.tasks.removeValue(forKey: m.id)
         onReady(renderResult.image)
       }
     }
 
     tasks[m.id] = task
+  }
+
+  func hasIconTask(_ id: String) -> Bool {
+    tasks[id] != nil
   }
 
   func cancelIconTask(_ id: String) {
@@ -310,6 +313,9 @@ final class MapMarkerBuilder {
 
     return autoreleasepool { () -> (image: UIImage, isFallback: Bool)? in
       guard !Task.isCancelled else { return nil }
+
+      CATransaction.begin()
+      defer { CATransaction.commit() }
 
       guard let svgImg = SVGKImage(data: data) else {
         mapErrorHandler.report(RNMapErrorCode.markerIconBuildFailed, "markerId=\(markerId) icon: SVGKImage init failed")

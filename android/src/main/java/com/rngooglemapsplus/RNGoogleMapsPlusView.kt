@@ -170,8 +170,18 @@ class RNGoogleMapsPlusView(
           }
 
           !prev.markerEquals(next) -> {
-            view.updateMarker(id) { marker ->
-              markerBuilder.update(prev, next, marker)
+            if (markerBuilder.hasIconJob(id)) {
+              markerBuilder.buildIconAsync(next) { icon ->
+                view.addMarker(
+                  id,
+                  markerBuilder.build(next, icon),
+                  MarkerTag(id = id, iconSvg = next.infoWindowIconSvg),
+                )
+              }
+            } else {
+              view.updateMarker(id) { marker ->
+                markerBuilder.update(prev, next, marker)
+              }
             }
           }
         }

@@ -127,9 +127,17 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.markerEquals(next) {
-            self.impl.updateMarker(id: id) { [weak self] m in
-              guard let self else { return }
-              self.markerBuilder.update(prev, next, m)
+            if self.markerBuilder.hasIconTask(id) {
+              self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+                guard let self else { return }
+                let marker = self.markerBuilder.build(next, icon: icon)
+                self.impl.addMarker(id: id, marker: marker)
+              }
+            } else {
+              self.impl.updateMarker(id: id) { [weak self] m in
+                guard let self else { return }
+                self.markerBuilder.update(prev, next, m)
+              }
             }
           }
         } else {
