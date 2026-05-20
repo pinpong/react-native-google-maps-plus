@@ -80,7 +80,7 @@
     "provenance": true
   },
   "devDependencies": {
-    "@commitlint/cli": "20.5.0",
+    "@commitlint/cli": "20.5.2",
     "@commitlint/config-conventional": "20.5.0",
     "@eslint/compat": "2.0.5",
     "@eslint/eslintrc": "3.3.5",
@@ -106,12 +106,12 @@
     "eslint-plugin-unused-imports": "4.4.1",
     "jest": "30.3.0",
     "lefthook": "2.1.6",
-    "nitrogen": "0.35.4",
+    "nitrogen": "0.35.6",
     "prettier": "3.8.3",
     "react": "19.2.3",
     "react-native": "0.85.2",
     "react-native-builder-bob": "0.41.0",
-    "react-native-nitro-modules": "0.35.4",
+    "react-native-nitro-modules": "0.35.6",
     "semantic-release": "25.0.3",
     "typedoc": "0.28.19",
     "typescript": "6.0.3"

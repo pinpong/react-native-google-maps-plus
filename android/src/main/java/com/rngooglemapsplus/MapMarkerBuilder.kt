@@ -256,7 +256,7 @@ class MapMarkerBuilder(
     m: RNMarker,
     onReady: (BitmapDescriptor?) -> Unit,
   ) {
-    jobsById[m.id]?.cancel()
+    cancelIconJob(m.id)
 
     m.iconSvg ?: return onReady(null)
 
@@ -275,6 +275,7 @@ class MapMarkerBuilder(
           if (renderResult?.bitmap == null) {
             withContext(Dispatchers.Main) {
               ensureActive()
+              jobsById.remove(m.id)
               onReady(createFallbackDescriptor())
             }
             return@launch
@@ -290,6 +291,7 @@ class MapMarkerBuilder(
 
           withContext(Dispatchers.Main) {
             ensureActive()
+            jobsById.remove(m.id)
             onReady(desc)
           }
         } catch (e: OutOfMemoryError) {
@@ -297,26 +299,25 @@ class MapMarkerBuilder(
           clearIconCache()
           withContext(Dispatchers.Main) {
             ensureActive()
+            jobsById.remove(m.id)
             onReady(createFallbackDescriptor())
           }
         } catch (_: CancellationException) {
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            onReady(createFallbackDescriptor())
-          }
+          // cancelled
         } catch (t: Throwable) {
           mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", t)
           withContext(Dispatchers.Main) {
             ensureActive()
+            jobsById.remove(m.id)
             onReady(createFallbackDescriptor())
           }
-        } finally {
-          jobsById.remove(m.id)
         }
       }
 
     jobsById[m.id] = job
   }
+
+  fun hasIconJob(id: String): Boolean = jobsById.containsKey(id)
 
   fun cancelIconJob(id: String) {
     jobsById[id]?.cancel()
