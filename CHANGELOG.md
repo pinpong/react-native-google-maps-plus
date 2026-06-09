@@ -1,3 +1,16 @@
+## [1.13.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.13.0...v1.13.1) (2026-06-09)
+
+### 🐛 Bug Fixes
+
+* **markers:** cancel stale icon jobs and guard pending marker updates ([aa3ec84](https://github.com/pinpong/react-native-google-maps-plus/commit/aa3ec84c726940a1239909ad7f3f95165f4636d0))
+
+### 🛠️ Other changes
+
+* dependencies ([adae07f](https://github.com/pinpong/react-native-google-maps-plus/commit/adae07f1a7e6a265c9a701b155b0e04212c4b4cb))
+* **example:** update Podfile.lock after release ([3ead649](https://github.com/pinpong/react-native-google-maps-plus/commit/3ead6491b79fb68fc3b7f5409a0b814b8e369557))
+* updated dependencies ([fcbe51a](https://github.com/pinpong/react-native-google-maps-plus/commit/fcbe51aee67123b1762d18f5a8e787882191c123))
+* updated dependencies ([2debc7d](https://github.com/pinpong/react-native-google-maps-plus/commit/2debc7dae7735c39dbc9346cf7610b6280acbac2))
+
 ## [1.13.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.12.1...v1.13.0) (2026-04-25)
 
 ### ✨ Features
