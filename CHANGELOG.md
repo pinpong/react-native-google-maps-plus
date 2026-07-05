@@ -1,3 +1,13 @@
+## [1.14.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.13.1...v1.14.0) (2026-07-05)
+
+### ✨ Features
+
+* support React Native 0.86 ([58f9d5f](https://github.com/pinpong/react-native-google-maps-plus/commit/58f9d5f74ee1ce77f25d102b975e92d91645ea05))
+
+### 🛠️ Other changes
+
+* update dependencies ([81750e0](https://github.com/pinpong/react-native-google-maps-plus/commit/81750e0fc6a39cb4567d10eb1b17642d4bc5d894))
+
 ## [1.13.1](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.13.0...v1.13.1) (2026-06-09)
 
 ### 🐛 Bug Fixes
