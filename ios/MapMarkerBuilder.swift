@@ -54,46 +54,24 @@ final class MapMarkerBuilder {
     onMain {
       withCATransaction(disableActions: true) {
 
-        var tracksViewChanges = false
         var tracksInfoWindowChanges = false
 
         if !prev.coordinateEquals(next) {
           m.position = next.coordinate.toCLLocationCoordinate2D()
         }
 
-        if !prev.markerStyleEquals(next) {
-          self.buildIconAsync(next) { img in
-            tracksViewChanges = true
-            m.icon = img
+        if !prev.anchorEquals(next) {
+          m.groundAnchor = CGPoint(
+            x: next.anchor?.x ?? 0.5,
+            y: next.anchor?.y ?? 1
+          )
+        }
 
-            if !prev.anchorEquals(next) {
-              m.groundAnchor = CGPoint(
-                x: next.anchor?.x ?? 0.5,
-                y: next.anchor?.y ?? 1
-              )
-            }
-
-            if !prev.infoWindowAnchorEquals(next) {
-              m.infoWindowAnchor = CGPoint(
-                x: next.infoWindowAnchor?.x ?? 0.5,
-                y: next.infoWindowAnchor?.y ?? 0
-              )
-            }
-          }
-        } else {
-          if !prev.anchorEquals(next) {
-            m.groundAnchor = CGPoint(
-              x: next.anchor?.x ?? 0.5,
-              y: next.anchor?.y ?? 1
-            )
-          }
-
-          if !prev.infoWindowAnchorEquals(next) {
-            m.infoWindowAnchor = CGPoint(
-              x: next.infoWindowAnchor?.x ?? 0.5,
-              y: next.infoWindowAnchor?.y ?? 0
-            )
-          }
+        if !prev.infoWindowAnchorEquals(next) {
+          m.infoWindowAnchor = CGPoint(
+            x: next.infoWindowAnchor?.x ?? 0.5,
+            y: next.infoWindowAnchor?.y ?? 0
+          )
         }
 
         if prev.title != next.title {
@@ -135,22 +113,21 @@ final class MapMarkerBuilder {
           )
         }
 
-        if tracksViewChanges {
-          m.tracksViewChanges = tracksViewChanges
-        }
         if tracksInfoWindowChanges {
           m.tracksInfoWindowChanges = tracksInfoWindowChanges
         }
 
-        if tracksViewChanges || tracksInfoWindowChanges {
-          if tracksViewChanges {
-            m.tracksViewChanges = false
-          }
-
-          if tracksInfoWindowChanges {
-            m.tracksInfoWindowChanges = false
-          }
+        if tracksInfoWindowChanges {
+          m.tracksInfoWindowChanges = false
         }
+      }
+    }
+  }
+
+  func updateIcon(_ marker: GMSMarker, icon: UIImage?) {
+    onMain {
+      withCATransaction(disableActions: true) {
+        marker.icon = icon
       }
     }
   }

@@ -9,6 +9,8 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
   private let markerBuilder: MapMarkerBuilder
+  private let markerBuildTokenLock = NSLock()
+  private var markerBuildTokens: [String: MarkerBuildToken] = [:]
 
   private let polylineBuilder = MapPolylineBuilder()
   private let polygonBuilder = MapPolygonBuilder()
@@ -32,6 +34,26 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       locationHandler: locationHandler,
       markerBuilder: markerBuilder
     )
+  }
+
+  private func nextMarkerBuildToken(_ id: String) -> MarkerBuildToken {
+    markerBuildTokenLock.lock()
+    defer { markerBuildTokenLock.unlock() }
+    let token = MarkerBuildToken()
+    markerBuildTokens[id] = token
+    return token
+  }
+
+  private func invalidateMarkerBuild(_ id: String) {
+    markerBuildTokenLock.lock()
+    defer { markerBuildTokenLock.unlock() }
+    markerBuildTokens.removeValue(forKey: id)
+  }
+
+  private func isCurrentMarkerBuild(_ id: String, _ token: MarkerBuildToken) -> Bool {
+    markerBuildTokenLock.lock()
+    defer { markerBuildTokenLock.unlock() }
+    return markerBuildTokens[id] === token
   }
 
   func onDropView() {
@@ -120,6 +142,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       let removed = Set(prevById.keys).subtracting(nextById.keys)
 
       removed.forEach {
+        self.invalidateMarkerBuild($0)
         self.impl.removeMarker(id: $0)
         self.markerBuilder.cancelIconTask($0)
       }
@@ -128,8 +151,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         if let prev = prevById[id] {
           if !prev.markerEquals(next) {
             if self.markerBuilder.hasIconTask(id) {
+              let buildToken = self.nextMarkerBuildToken(id)
               self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-                guard let self else { return }
+                guard let self, self.isCurrentMarkerBuild(id, buildToken) else { return }
                 let marker = self.markerBuilder.build(next, icon: icon)
                 self.impl.addMarker(id: id, marker: marker)
               }
@@ -138,11 +162,23 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
                 guard let self else { return }
                 self.markerBuilder.update(prev, next, m)
               }
+
+              if !prev.markerStyleEquals(next) {
+                let buildToken = self.nextMarkerBuildToken(id)
+                self.markerBuilder.buildIconAsync(next) { [weak self] icon in
+                  guard let self else { return }
+                  self.impl.updateMarker(id: id) { marker in
+                    guard self.isCurrentMarkerBuild(id, buildToken) else { return }
+                    self.markerBuilder.updateIcon(marker, icon: icon)
+                  }
+                }
+              }
             }
           }
         } else {
+          let buildToken = self.nextMarkerBuildToken(id)
           self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-            guard let self else { return }
+            guard let self, self.isCurrentMarkerBuild(id, buildToken) else { return }
             let marker = self.markerBuilder.build(next, icon: icon)
             self.impl.addMarker(id: id, marker: marker)
           }

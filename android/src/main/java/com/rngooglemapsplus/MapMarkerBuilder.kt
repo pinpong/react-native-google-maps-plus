@@ -24,7 +24,6 @@ import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
-import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
@@ -188,35 +187,17 @@ class MapMarkerBuilder(
       marker.position = next.coordinate.toLatLng()
     }
 
-    if (!prev.markerStyleEquals(next)) {
-      buildIconAsync(next) { icon ->
-        marker.setIcon(icon)
-        if (!prev.anchorEquals(next)) {
-          marker.setAnchor(
-            (next.anchor?.x ?: 0.5f).toFloat(),
-            (next.anchor?.y ?: 1.0f).toFloat(),
-          )
-        }
-        if (!prev.infoWindowAnchorEquals(next)) {
-          marker.setInfoWindowAnchor(
-            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-          )
-        }
-      }
-    } else {
-      if (!prev.anchorEquals(next)) {
-        marker.setAnchor(
-          (next.anchor?.x ?: 0.5f).toFloat(),
-          (next.anchor?.y ?: 1.0f).toFloat(),
-        )
-      }
-      if (!prev.infoWindowAnchorEquals(next)) {
-        marker.setInfoWindowAnchor(
-          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-        )
-      }
+    if (!prev.anchorEquals(next)) {
+      marker.setAnchor(
+        (next.anchor?.x ?: 0.5f).toFloat(),
+        (next.anchor?.y ?: 1.0f).toFloat(),
+      )
+    }
+    if (!prev.infoWindowAnchorEquals(next)) {
+      marker.setInfoWindowAnchor(
+        (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+        (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+      )
     }
 
     if (prev.title != next.title) {
@@ -250,6 +231,13 @@ class MapMarkerBuilder(
     if (!prev.markerInfoWindowStyleEquals(next)) {
       marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
     }
+  }
+
+  fun updateIcon(
+    marker: Marker,
+    icon: BitmapDescriptor?,
+  ) = onUi {
+    marker.setIcon(icon)
   }
 
   fun buildIconAsync(

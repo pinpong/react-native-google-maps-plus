@@ -9,6 +9,7 @@ import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
 import com.rngooglemapsplus.extensions.isFileResult
 import com.rngooglemapsplus.extensions.markerEquals
+import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.polygonEquals
 import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
@@ -32,6 +33,7 @@ class RNGoogleMapsPlusView(
   private val playServiceHandler = PlayServicesHandler(context)
 
   private val markerBuilder = MapMarkerBuilder(context, mapErrorHandler)
+  private val markerBuildTokens = java.util.concurrent.ConcurrentHashMap<String, Any>()
   private val polylineBuilder = MapPolylineBuilder()
   private val polygonBuilder = MapPolygonBuilder()
   private val circleBuilder = MapCircleBuilder()
@@ -149,6 +151,7 @@ class RNGoogleMapsPlusView(
       field = value
 
       (prevById.keys - nextById.keys).forEach { id ->
+        invalidateMarkerBuild(id)
         markerBuilder.cancelIconJob(id)
         view.removeMarker(id)
       }
@@ -157,7 +160,9 @@ class RNGoogleMapsPlusView(
         val prev = prevById[id]
         when {
           prev == null -> {
+            val buildToken = nextMarkerBuildToken(id)
             markerBuilder.buildIconAsync(next) { icon ->
+              if (!isCurrentMarkerBuild(id, buildToken)) return@buildIconAsync
               view.addMarker(
                 id,
                 markerBuilder.build(next, icon),
@@ -171,7 +176,9 @@ class RNGoogleMapsPlusView(
 
           !prev.markerEquals(next) -> {
             if (markerBuilder.hasIconJob(id)) {
+              val buildToken = nextMarkerBuildToken(id)
               markerBuilder.buildIconAsync(next) { icon ->
+                if (!isCurrentMarkerBuild(id, buildToken)) return@buildIconAsync
                 view.addMarker(
                   id,
                   markerBuilder.build(next, icon),
@@ -182,11 +189,33 @@ class RNGoogleMapsPlusView(
               view.updateMarker(id) { marker ->
                 markerBuilder.update(prev, next, marker)
               }
+
+              if (!prev.markerStyleEquals(next)) {
+                val buildToken = nextMarkerBuildToken(id)
+                markerBuilder.buildIconAsync(next) { icon ->
+                  view.updateMarker(id) { marker ->
+                    if (isCurrentMarkerBuild(id, buildToken)) {
+                      markerBuilder.updateIcon(marker, icon)
+                    }
+                  }
+                }
+              }
             }
           }
         }
       }
     }
+
+  private fun nextMarkerBuildToken(id: String): Any = Any().also { markerBuildTokens[id] = it }
+
+  private fun invalidateMarkerBuild(id: String) {
+    markerBuildTokens.remove(id)
+  }
+
+  private fun isCurrentMarkerBuild(
+    id: String,
+    token: Any,
+  ): Boolean = markerBuildTokens[id] === token
 
   override var polylines: Array<RNPolyline>? = null
     set(value) {
