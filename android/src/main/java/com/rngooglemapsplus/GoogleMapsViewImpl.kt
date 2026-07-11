@@ -8,7 +8,9 @@ import android.annotation.SuppressLint
 import android.content.ComponentCallbacks2
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Point
 import android.location.Location
+import android.os.SystemClock
 import android.util.Size
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -54,6 +56,9 @@ import idTag
 import tagData
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
+import kotlin.math.roundToInt
+
+private const val MARKER_TOUCH_MAX_AGE_MS = 500L
 
 class GoogleMapsViewImpl(
   private val reactContext: ThemedReactContext,
@@ -906,10 +911,47 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
+    val shouldTreatAsMapPress = !isTouchInsideMarkerBitmap(marker)
+
     onUi {
-      onMarkerPress?.invoke(marker.idTag)
+      if (shouldTreatAsMapPress) {
+        dispatchLastTouchAsMapPress()
+      } else {
+        onMarkerPress?.invoke(marker.idTag)
+      }
     }
-    return uiSettings?.consumeOnMarkerPress ?: false
+
+    return shouldTreatAsMapPress || (uiSettings?.consumeOnMarkerPress ?: false)
+  }
+
+  private fun isTouchInsideMarkerBitmap(marker: Marker): Boolean {
+    val touch = lastCompletedTouch ?: return true
+    if (SystemClock.uptimeMillis() - touch.eventTimeMs > MARKER_TOUCH_MAX_AGE_MS) return true
+
+    val markerTag = marker.tagData
+    val width = markerTag.markerIconWidth?.dpToPx() ?: return true
+    val height = markerTag.markerIconHeight?.dpToPx() ?: return true
+    val map = googleMap ?: return true
+    val markerPoint = map.projection.toScreenLocation(marker.position)
+    val markerX = markerPoint.x + (mapView?.left ?: 0)
+    val markerY = markerPoint.y + (mapView?.top ?: 0)
+    val left = markerX - width * markerTag.markerAnchorX
+    val top = markerY - height * markerTag.markerAnchorY
+
+    return touch.x >= left && touch.x <= left + width && touch.y >= top && touch.y <= top + height
+  }
+
+  private fun dispatchLastTouchAsMapPress() {
+    val touch = lastCompletedTouch ?: return
+    val map = googleMap ?: return
+    val point =
+      Point(
+        (touch.x - (mapView?.left ?: 0)).roundToInt(),
+        (touch.y - (mapView?.top ?: 0)).roundToInt(),
+      )
+    val coordinates = map.projection.fromScreenLocation(point)
+
+    onMapPress?.invoke(coordinates.toRnLatLng())
   }
 
   override fun onPolylineClick(polyline: Polyline) =

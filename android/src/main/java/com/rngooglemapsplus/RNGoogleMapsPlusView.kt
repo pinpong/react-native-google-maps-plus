@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import MarkerTag
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
@@ -18,6 +17,7 @@ import com.rngooglemapsplus.extensions.toFileExtension
 import com.rngooglemapsplus.extensions.toGoogleMapType
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
+import com.rngooglemapsplus.extensions.toMarkerTag
 import com.rngooglemapsplus.extensions.toSize
 
 @DoNotStrip
@@ -161,10 +161,7 @@ class RNGoogleMapsPlusView(
               view.addMarker(
                 id,
                 markerBuilder.build(next, icon),
-                MarkerTag(
-                  id = id,
-                  iconSvg = next.infoWindowIconSvg,
-                ),
+                next.toMarkerTag(),
               )
             }
           }
@@ -175,7 +172,7 @@ class RNGoogleMapsPlusView(
                 view.addMarker(
                   id,
                   markerBuilder.build(next, icon),
-                  MarkerTag(id = id, iconSvg = next.infoWindowIconSvg),
+                  next.toMarkerTag(),
                 )
               }
             } else {

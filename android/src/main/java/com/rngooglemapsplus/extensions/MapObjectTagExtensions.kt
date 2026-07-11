@@ -12,6 +12,10 @@ sealed class MapObjectTag(
 data class MarkerTag(
   override val id: String,
   val iconSvg: RNMarkerSvg? = null,
+  val markerIconWidth: Double? = null,
+  val markerIconHeight: Double? = null,
+  val markerAnchorX: Double = 0.5,
+  val markerAnchorY: Double = 1.0,
 ) : MapObjectTag(id)
 
 data class PolylineTag(

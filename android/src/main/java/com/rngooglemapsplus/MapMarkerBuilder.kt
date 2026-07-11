@@ -23,10 +23,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
-import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.markerStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toMarkerTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -247,9 +247,7 @@ class MapMarkerBuilder(
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
 
-    if (!prev.markerInfoWindowStyleEquals(next)) {
-      marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
-    }
+    marker.tag = next.toMarkerTag()
   }
 
   fun buildIconAsync(
