@@ -27,6 +27,7 @@ import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -244,26 +245,29 @@ class MapMarkerBuilder(
     m: RNMarker,
     onReady: (BitmapDescriptor?) -> Unit,
   ) {
-    cancelIconJob(m.id)
-
-    m.iconSvg ?: return onReady(null)
+    val iconSvg = m.iconSvg
+    if (iconSvg == null) {
+      completeIconBuild(m.id, null, onReady)
+      return
+    }
 
     val key = m.styleHash()
     iconCache.get(key)?.let { cached ->
-      onReady(cached)
+      completeIconBuild(m.id, cached, onReady)
       return
     }
 
     val job =
-      scope.launch {
+      scope.launch(start = CoroutineStart.LAZY) {
+        val currentJob = checkNotNull(currentCoroutineContext()[Job])
+
         try {
           ensureActive()
-          val renderResult = renderBitmap(m.iconSvg, m.id)
+          val renderResult = renderBitmap(iconSvg, m.id)
 
           if (renderResult?.bitmap == null) {
             withContext(Dispatchers.Main) {
               ensureActive()
-              jobsById.remove(m.id)
               onReady(createFallbackDescriptor())
             }
             return@launch
@@ -279,7 +283,6 @@ class MapMarkerBuilder(
 
           withContext(Dispatchers.Main) {
             ensureActive()
-            jobsById.remove(m.id)
             onReady(desc)
           }
         } catch (e: OutOfMemoryError) {
@@ -287,7 +290,6 @@ class MapMarkerBuilder(
           clearIconCache()
           withContext(Dispatchers.Main) {
             ensureActive()
-            jobsById.remove(m.id)
             onReady(createFallbackDescriptor())
           }
         } catch (_: CancellationException) {
@@ -296,28 +298,50 @@ class MapMarkerBuilder(
           mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", t)
           withContext(Dispatchers.Main) {
             ensureActive()
-            jobsById.remove(m.id)
             onReady(createFallbackDescriptor())
           }
+        } finally {
+          jobsById.remove(m.id, currentJob)
         }
       }
 
-    jobsById[m.id] = job
+    jobsById.put(m.id, job)?.cancel()
+    job.start()
+  }
+
+  private fun completeIconBuild(
+    id: String,
+    icon: BitmapDescriptor?,
+    onReady: (BitmapDescriptor?) -> Unit,
+  ) {
+    val activeJob = Job()
+    jobsById.put(id, activeJob)?.cancel()
+
+    onUi {
+      try {
+        if (jobsById[id] === activeJob && activeJob.isActive) {
+          onReady(icon)
+        }
+      } finally {
+        jobsById.remove(id, activeJob)
+        activeJob.complete()
+      }
+    }
   }
 
   fun hasIconJob(id: String): Boolean = jobsById.containsKey(id)
 
   fun cancelIconJob(id: String) {
-    jobsById[id]?.cancel()
-    jobsById.remove(id)
+    jobsById.remove(id)?.cancel()
   }
 
   fun cancelAllJobs() {
-    val ids = jobsById.keys.toList()
-    ids.forEach { id ->
-      jobsById[id]?.cancel()
+    val activeJobs = jobsById.entries.map { it.key to it.value }
+    activeJobs.forEach { (id, job) ->
+      if (jobsById.remove(id, job)) {
+        job.cancel()
+      }
     }
-    jobsById.clear()
     clearIconCache()
   }
 

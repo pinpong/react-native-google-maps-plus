@@ -10,7 +10,8 @@ final class MapMarkerBuilder {
     c.countLimit = 256
     return c
   }()
-  private var tasks: [String: Task<Void, Never>] = [:]
+  private let tasksLock = NSLock()
+  private var tasks: [String: MarkerBuildToken] = [:]
 
   init(mapErrorHandler: MapErrorHandler) {
     self.mapErrorHandler = mapErrorHandler
@@ -136,23 +137,38 @@ final class MapMarkerBuilder {
     _ m: RNMarker,
     onReady: @escaping (UIImage?) -> Void
   ) {
-    cancelIconTask(m.id)
+    let activeTask = MarkerBuildToken()
+    setActiveTask(activeTask, id: m.id)
 
     guard let iconSvg = m.iconSvg else {
-      onReady(nil)
+      onMain { [weak self] in
+        self?.finishIconBuild(
+          m.id,
+          activeTask: activeTask,
+          icon: nil,
+          onReady: onReady
+        )
+      }
       return
     }
 
     let key = m.styleHash()
     if let cached = iconCache.object(forKey: key) {
-      onReady(cached)
+      onMain { [weak self] in
+        self?.finishIconBuild(
+          m.id,
+          activeTask: activeTask,
+          icon: cached,
+          onReady: onReady
+        )
+      }
       return
     }
 
     let scale = UIScreen.main.scale
 
-    let task = Task(priority: .userInitiated) { [weak self] in
-      guard let self else { return }
+    let task = Task(priority: .userInitiated) { [weak self, weak activeTask] in
+      guard let self, let activeTask else { return }
 
       let renderResult = self.renderUIImage(iconSvg, m.id, scale)
       guard !Task.isCancelled else { return }
@@ -160,8 +176,12 @@ final class MapMarkerBuilder {
       guard let renderResult = renderResult else {
         await MainActor.run {
           guard !Task.isCancelled else { return }
-          self.tasks.removeValue(forKey: m.id)
-          onReady(self.createFallbackUIImage())
+          self.finishIconBuild(
+            m.id,
+            activeTask: activeTask,
+            icon: self.createFallbackUIImage(),
+            onReady: onReady
+          )
         }
         return
       }
@@ -172,31 +192,70 @@ final class MapMarkerBuilder {
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
-        self.tasks.removeValue(forKey: m.id)
-        onReady(renderResult.image)
+        self.finishIconBuild(
+          m.id,
+          activeTask: activeTask,
+          icon: renderResult.image,
+          onReady: onReady
+        )
       }
     }
+    activeTask.setTask(task)
+  }
 
-    tasks[m.id] = task
+  private func finishIconBuild(
+    _ id: String,
+    activeTask: MarkerBuildToken,
+    icon: UIImage?,
+    onReady: @escaping (UIImage?) -> Void
+  ) {
+    guard isActiveTask(activeTask, id: id) else { return }
+    onReady(icon)
+    removeActiveTask(activeTask, id: id)
   }
 
   func hasIconTask(_ id: String) -> Bool {
-    tasks[id] != nil
+    tasksLock.lock()
+    defer { tasksLock.unlock() }
+    return tasks[id] != nil
   }
 
   func cancelIconTask(_ id: String) {
-    tasks[id]?.cancel()
-    tasks.removeValue(forKey: id)
+    tasksLock.lock()
+    let activeTask = tasks.removeValue(forKey: id)
+    tasksLock.unlock()
+    activeTask?.cancel()
   }
 
   func cancelAllIconTasks() {
-    let ids = Array(tasks.keys)
-    for id in ids {
-      tasks[id]?.cancel()
-    }
+    tasksLock.lock()
+    let activeTasks = Array(tasks.values)
     tasks.removeAll()
+    tasksLock.unlock()
+    activeTasks.forEach { $0.cancel() }
     iconCache.removeAllObjects()
     CATransaction.flush()
+  }
+
+  private func setActiveTask(_ activeTask: MarkerBuildToken, id: String) {
+    tasksLock.lock()
+    let previousTask = tasks.updateValue(activeTask, forKey: id)
+    tasksLock.unlock()
+    previousTask?.cancel()
+  }
+
+  private func isActiveTask(_ activeTask: MarkerBuildToken, id: String) -> Bool {
+    tasksLock.lock()
+    defer { tasksLock.unlock() }
+    return tasks[id] === activeTask
+  }
+
+  private func removeActiveTask(_ activeTask: MarkerBuildToken, id: String) {
+    tasksLock.lock()
+    if tasks[id] === activeTask {
+      tasks.removeValue(forKey: id)
+    }
+    tasksLock.unlock()
   }
 
   func buildInfoWindow(markerTag: MarkerTag) -> UIImageView? {
