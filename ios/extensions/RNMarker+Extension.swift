@@ -44,9 +44,14 @@ extension RNMarker {
   }
 
   func infoWindowContentEquals(_ b: RNMarker) -> Bool {
+    let usesCustomInfoWindow = infoWindowIconSvg != nil
+    let bUsesCustomInfoWindow = b.infoWindowIconSvg != nil
+
+    if usesCustomInfoWindow != bUsesCustomInfoWindow { return false }
+    if usesCustomInfoWindow { return markerInfoWindowStyleEquals(b) }
     if title != b.title { return false }
     if snippet != b.snippet { return false }
-    return markerInfoWindowStyleEquals(b)
+    return true
   }
 
   func markerStyleEquals(_ b: RNMarker) -> Bool {
