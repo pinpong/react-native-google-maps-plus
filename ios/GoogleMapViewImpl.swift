@@ -25,6 +25,7 @@ GMSIndoorDisplayDelegate {
     [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
 
   private var markersById: [String: GMSMarker] = [:]
+  private var markerRefreshingInfoWindow: GMSMarker?
   private var polylinesById: [String: GMSPolyline] = [:]
   private var polygonsById: [String: GMSPolygon] = [:]
   private var circlesById: [String: GMSCircle] = [:]
@@ -503,19 +504,36 @@ GMSIndoorDisplayDelegate {
   func updateMarker(
     id: String,
     refreshInfoWindow: Bool,
+    recreateInfoWindow: Bool,
     block: @escaping (GMSMarker) -> Void
   ) {
     onMain {
       self.markersById[id].map {
+        let hadInfoWindowContent = self.hasInfoWindowContent($0)
         block($0)
         if refreshInfoWindow,
            let mapView = self.mapView,
            mapView.selectedMarker == $0 {
-          mapView.selectedMarker = nil
-          mapView.selectedMarker = $0
+          if !self.hasInfoWindowContent($0) {
+            mapView.selectedMarker = nil
+          } else if recreateInfoWindow || !hadInfoWindowContent {
+            self.markerRefreshingInfoWindow = $0
+            mapView.selectedMarker = nil
+            self.markerRefreshingInfoWindow = nil
+            mapView.selectedMarker = $0
+          } else {
+            $0.tracksInfoWindowChanges = true
+            $0.tracksInfoWindowChanges = false
+          }
         }
       }
     }
+  }
+
+  private func hasInfoWindowContent(_ marker: GMSMarker) -> Bool {
+    if marker.tagData.iconSvg != nil { return true }
+    if !(marker.title?.isEmpty ?? true) { return true }
+    return !(marker.snippet?.isEmpty ?? true)
   }
 
   func removeMarker(id: String) {
@@ -995,6 +1013,10 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
     onMain {
+      if self.markerRefreshingInfoWindow === marker {
+        return
+      }
+
       self.onInfoWindowClose?(marker.idTag)
     }
   }

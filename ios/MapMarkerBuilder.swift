@@ -55,7 +55,6 @@ final class MapMarkerBuilder {
       withCATransaction(disableActions: true) {
 
         var tracksViewChanges = false
-        var tracksInfoWindowChanges = false
 
         if !prev.coordinateEquals(next) {
           m.position = next.coordinate.toCLLocationCoordinate2D()
@@ -97,12 +96,10 @@ final class MapMarkerBuilder {
         }
 
         if prev.title != next.title {
-          tracksInfoWindowChanges = true
           m.title = next.title
         }
 
         if prev.snippet != next.snippet {
-          tracksInfoWindowChanges = true
           m.snippet = next.snippet
         }
 
@@ -137,19 +134,7 @@ final class MapMarkerBuilder {
 
         if tracksViewChanges {
           m.tracksViewChanges = tracksViewChanges
-        }
-        if tracksInfoWindowChanges {
-          m.tracksInfoWindowChanges = tracksInfoWindowChanges
-        }
-
-        if tracksViewChanges || tracksInfoWindowChanges {
-          if tracksViewChanges {
-            m.tracksViewChanges = false
-          }
-
-          if tracksInfoWindowChanges {
-            m.tracksInfoWindowChanges = false
-          }
+          m.tracksViewChanges = false
         }
       }
     }
