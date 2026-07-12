@@ -545,11 +545,12 @@ class GoogleMapsViewImpl(
 
   fun updateMarker(
     id: String,
+    refreshInfoWindow: Boolean,
     block: (Marker) -> Unit,
   ) = onUi {
     val marker = markersById[id] ?: return@onUi
     block(marker)
-    if (marker.isInfoWindowShown) {
+    if (refreshInfoWindow && marker.isInfoWindowShown) {
       marker.hideInfoWindow()
       marker.showInfoWindow()
     }

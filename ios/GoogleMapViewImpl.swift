@@ -500,11 +500,17 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
+  func updateMarker(
+    id: String,
+    refreshInfoWindow: Bool,
+    block: @escaping (GMSMarker) -> Void
+  ) {
     onMain {
       self.markersById[id].map {
         block($0)
-        if let mapView = self.mapView, mapView.selectedMarker == $0 {
+        if refreshInfoWindow,
+           let mapView = self.mapView,
+           mapView.selectedMarker == $0 {
           mapView.selectedMarker = nil
           mapView.selectedMarker = $0
         }

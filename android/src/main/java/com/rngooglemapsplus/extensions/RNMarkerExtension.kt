@@ -46,6 +46,12 @@ fun RNMarker.markerInfoWindowStyleEquals(b: RNMarker): Boolean {
   return true
 }
 
+fun RNMarker.infoWindowContentEquals(b: RNMarker): Boolean {
+  if (title != b.title) return false
+  if (snippet != b.snippet) return false
+  return markerInfoWindowStyleEquals(b)
+}
+
 fun RNMarker.markerStyleEquals(b: RNMarker): Boolean {
   if (iconSvg?.width != b.iconSvg?.width) return false
   if (iconSvg?.height != b.iconSvg?.height) return false

@@ -7,6 +7,7 @@ import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.circleEquals
+import com.rngooglemapsplus.extensions.infoWindowContentEquals
 import com.rngooglemapsplus.extensions.isFileResult
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.polygonEquals
@@ -179,7 +180,10 @@ class RNGoogleMapsPlusView(
                 )
               }
             } else {
-              view.updateMarker(id) { marker ->
+              view.updateMarker(
+                id,
+                refreshInfoWindow = !prev.infoWindowContentEquals(next),
+              ) { marker ->
                 markerBuilder.update(prev, next, marker)
               }
             }

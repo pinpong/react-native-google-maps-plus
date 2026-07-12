@@ -134,7 +134,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
                 self.impl.addMarker(id: id, marker: marker)
               }
             } else {
-              self.impl.updateMarker(id: id) { [weak self] m in
+              self.impl.updateMarker(
+                id: id,
+                refreshInfoWindow: !prev.infoWindowContentEquals(next)
+              ) { [weak self] m in
                 guard let self else { return }
                 self.markerBuilder.update(prev, next, m)
               }
