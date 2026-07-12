@@ -117,6 +117,15 @@ export default function MarkersScreen() {
     openMarkerIdRef.current = null;
   }, []);
 
+  const handleMarkerSave = useCallback((marker: RNMarker) => {
+    const openMarkerId = openMarkerIdRef.current;
+    if (openMarkerId !== null) {
+      mapRef.current?.hideMarkerInfoWindow(openMarkerId);
+    }
+    openMarkerIdRef.current = null;
+    setMarkers([marker]);
+  }, []);
+
   return (
     <>
       <MapWrapper
@@ -134,7 +143,7 @@ export default function MarkersScreen() {
         initialData={markers ? markers[0]! : makeMarker(1)}
         validator={RNMarkerValidator}
         onClose={() => setDialogVisible(false)}
-        onSave={(c) => setMarkers([c])}
+        onSave={handleMarkerSave}
       />
     </>
   );
