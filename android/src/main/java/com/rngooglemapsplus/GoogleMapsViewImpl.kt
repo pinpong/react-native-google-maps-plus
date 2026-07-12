@@ -56,7 +56,9 @@ import idTag
 import tagData
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 private const val MARKER_TOUCH_MAX_AGE_MS = 500L
 
@@ -927,6 +929,8 @@ class GoogleMapsViewImpl(
   private fun isTouchInsideMarkerBitmap(marker: Marker): Boolean {
     val touch = lastCompletedTouch ?: return true
     if (SystemClock.uptimeMillis() - touch.eventTimeMs > MARKER_TOUCH_MAX_AGE_MS) return true
+    // Flat markers are perspective-transformed with the map, so a screen-space rectangle is unsafe.
+    if (marker.isFlat) return true
 
     val markerTag = marker.tagData
     val hitbox = markerTag.markerIconHitbox ?: return true
@@ -936,10 +940,20 @@ class GoogleMapsViewImpl(
     val markerPoint = map.projection.toScreenLocation(marker.position)
     val markerX = markerPoint.x + (mapView?.left ?: 0)
     val markerY = markerPoint.y + (mapView?.top ?: 0)
-    val left = markerX - width * markerTag.markerAnchorX
-    val top = markerY - height * markerTag.markerAnchorY
+    val touchX = touch.x - markerX
+    val touchY = touch.y - markerY
+    val rotationRadians = Math.toRadians(marker.rotation.toDouble())
+    val rotationCos = cos(rotationRadians)
+    val rotationSin = sin(rotationRadians)
+    val localTouchX = rotationCos * touchX + rotationSin * touchY
+    val localTouchY = -rotationSin * touchX + rotationCos * touchY
+    val left = -width * markerTag.markerAnchorX
+    val top = -height * markerTag.markerAnchorY
 
-    return touch.x >= left && touch.x <= left + width && touch.y >= top && touch.y <= top + height
+    return localTouchX >= left &&
+      localTouchX <= left + width &&
+      localTouchY >= top &&
+      localTouchY <= top + height
   }
 
   private fun dispatchLastTouchAsMapPress() {
