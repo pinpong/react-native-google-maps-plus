@@ -551,8 +551,16 @@ class GoogleMapsViewImpl(
     val marker = markersById[id] ?: return@onUi
     block(marker)
     if (refreshInfoWindow && marker.isInfoWindowShown) {
-      marker.hideInfoWindow()
-      marker.showInfoWindow()
+      val hasInfoWindowContent =
+        marker.tagData.iconSvg != null ||
+          !marker.title.isNullOrEmpty() ||
+          !marker.snippet.isNullOrEmpty()
+
+      if (hasInfoWindowContent) {
+        marker.showInfoWindow()
+      } else {
+        marker.hideInfoWindow()
+      }
     }
   }
 
