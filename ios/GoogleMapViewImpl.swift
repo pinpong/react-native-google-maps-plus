@@ -15,7 +15,7 @@ GMSIndoorDisplayDelegate {
   private var mapViewLoaded = false
   private var deInitialized = false
 
-  private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
+  private var pendingMarkers: [String: (marker: RNMarker, icon: UIImage?)] = [:]
   private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
   private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
   private var pendingCircles: [(id: String, circle: GMSCircle)] = []
@@ -143,7 +143,12 @@ GMSIndoorDisplayDelegate {
     ({ self.locationConfig = self.locationConfig })()
 
     if !pendingMarkers.isEmpty {
-      pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
+      pendingMarkers.forEach { id, pending in
+        addMarkerInternal(
+          id: id,
+          marker: markerBuilder.build(pending.marker, icon: pending.icon)
+        )
+      }
       pendingMarkers.removeAll()
     }
     if !pendingPolylines.isEmpty {
@@ -482,14 +487,39 @@ GMSIndoorDisplayDelegate {
     return promise
   }
 
-  func addMarker(id: String, marker: GMSMarker) {
+  func completeMarkerBuild(
+    _ marker: RNMarker,
+    icon: UIImage?,
+    isCurrent: @escaping () -> Bool
+  ) {
     onMain {
-      if self.mapView == nil {
-        self.pendingMarkers.append((id, marker))
+      guard isCurrent() else { return }
+
+      let id = marker.id
+      let pending = self.pendingMarkers.removeValue(forKey: id)
+      let latestMarker = pending?.marker ?? marker
+
+      if let currentMarker = self.markersById[id] {
+        self.markerBuilder.updateIcon(currentMarker, icon: icon)
         return
       }
-      self.markersById.removeValue(forKey: id).map { $0.map = nil }
-      self.addMarkerInternal(id: id, marker: marker)
+
+      if self.mapView == nil {
+        self.pendingMarkers[id] = (marker: latestMarker, icon: icon)
+        return
+      }
+
+      self.addMarkerInternal(
+        id: id,
+        marker: self.markerBuilder.build(latestMarker, icon: icon)
+      )
+    }
+  }
+
+  func updatePendingMarker(id: String, marker: RNMarker) {
+    onMain {
+      guard let pending = self.pendingMarkers[id] else { return }
+      self.pendingMarkers[id] = (marker: marker, icon: pending.icon)
     }
   }
 
@@ -514,6 +544,7 @@ GMSIndoorDisplayDelegate {
 
   func removeMarker(id: String) {
     onMain {
+      self.pendingMarkers.removeValue(forKey: id)
       self.markersById.removeValue(forKey: id).map {
         $0.icon = nil
         $0.map = nil

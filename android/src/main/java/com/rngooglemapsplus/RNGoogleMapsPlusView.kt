@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import MarkerTag
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
@@ -44,6 +43,7 @@ class RNGoogleMapsPlusView(
     GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder, mapErrorHandler)
 
   override fun onDropView() {
+    markerBuildTokens.clear()
     view.destroyInternal()
   }
 
@@ -162,42 +162,25 @@ class RNGoogleMapsPlusView(
           prev == null -> {
             val buildToken = nextMarkerBuildToken(id)
             markerBuilder.buildIconAsync(next) { icon ->
-              if (!isCurrentMarkerBuild(id, buildToken)) return@buildIconAsync
-              view.addMarker(
-                id,
-                markerBuilder.build(next, icon),
-                MarkerTag(
-                  id = id,
-                  iconSvg = next.infoWindowIconSvg,
-                ),
-              )
+              view.completeMarkerBuild(next, icon) {
+                isCurrentMarkerBuild(id, buildToken)
+              }
             }
           }
 
           !prev.markerEquals(next) -> {
-            if (markerBuilder.hasIconJob(id)) {
+            val hasIconJob = markerBuilder.hasIconJob(id)
+
+            view.updateMarker(id) { marker ->
+              markerBuilder.update(prev, next, marker)
+            }
+            view.updatePendingMarker(id, next)
+
+            if (hasIconJob || !prev.markerStyleEquals(next)) {
               val buildToken = nextMarkerBuildToken(id)
               markerBuilder.buildIconAsync(next) { icon ->
-                if (!isCurrentMarkerBuild(id, buildToken)) return@buildIconAsync
-                view.addMarker(
-                  id,
-                  markerBuilder.build(next, icon),
-                  MarkerTag(id = id, iconSvg = next.infoWindowIconSvg),
-                )
-              }
-            } else {
-              view.updateMarker(id) { marker ->
-                markerBuilder.update(prev, next, marker)
-              }
-
-              if (!prev.markerStyleEquals(next)) {
-                val buildToken = nextMarkerBuildToken(id)
-                markerBuilder.buildIconAsync(next) { icon ->
-                  view.updateMarker(id) { marker ->
-                    if (isCurrentMarkerBuild(id, buildToken)) {
-                      markerBuilder.updateIcon(marker, icon)
-                    }
-                  }
+                view.completeMarkerBuild(next, icon) {
+                  isCurrentMarkerBuild(id, buildToken)
                 }
               }
             }

@@ -20,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
@@ -91,7 +92,7 @@ class GoogleMapsViewImpl(
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
 
-  private val pendingMarkers = mutableListOf<Triple<String, MarkerOptions, MarkerTag>>()
+  private val pendingMarkers = linkedMapOf<String, PendingMarker>()
   private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
   private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
   private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
@@ -247,7 +248,13 @@ class GoogleMapsViewImpl(
     locationConfig = locationConfig
 
     if (pendingMarkers.isNotEmpty()) {
-      pendingMarkers.forEach { (id, opts, markerTag) -> addMarkerInternal(id, opts, markerTag) }
+      pendingMarkers.forEach { (id, pending) ->
+        addMarkerInternal(
+          id,
+          markerBuilder.build(pending.marker, pending.icon),
+          MarkerTag(id = id, iconSvg = pending.marker.infoWindowIconSvg),
+        )
+      }
       pendingMarkers.clear()
     }
     if (pendingPolylines.isNotEmpty()) {
@@ -514,18 +521,41 @@ class GoogleMapsViewImpl(
     return promise
   }
 
-  fun addMarker(
-    id: String,
-    opts: MarkerOptions,
-    markerTag: MarkerTag,
+  fun completeMarkerBuild(
+    marker: RNMarker,
+    icon: BitmapDescriptor?,
+    isCurrent: () -> Boolean,
   ) = onUi {
-    if (googleMap == null) {
-      pendingMarkers.add(Triple(id, opts, markerTag))
+    if (!isCurrent()) return@onUi
+
+    val id = marker.id
+    val pending = pendingMarkers.remove(id)
+    val latestMarker = pending?.marker ?: marker
+    val currentMarker = markersById[id]
+
+    if (currentMarker != null) {
+      markerBuilder.updateIcon(currentMarker, icon)
       return@onUi
     }
 
-    markersById.remove(id)?.remove()
-    addMarkerInternal(id, opts, markerTag)
+    if (googleMap == null) {
+      pendingMarkers[id] = PendingMarker(marker = latestMarker, icon = icon)
+      return@onUi
+    }
+
+    addMarkerInternal(
+      id,
+      markerBuilder.build(latestMarker, icon),
+      MarkerTag(id = id, iconSvg = latestMarker.infoWindowIconSvg),
+    )
+  }
+
+  fun updatePendingMarker(
+    id: String,
+    marker: RNMarker,
+  ) = onUi {
+    val pending = pendingMarkers[id] ?: return@onUi
+    pendingMarkers[id] = pending.copy(marker = marker)
   }
 
   private fun addMarkerInternal(
@@ -557,6 +587,7 @@ class GoogleMapsViewImpl(
 
   fun removeMarker(id: String) =
     onUi {
+      pendingMarkers.remove(id)
       markersById.remove(id)?.remove()
     }
 

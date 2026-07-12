@@ -57,6 +57,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   }
 
   func onDropView() {
+    markerBuildTokenLock.lock()
+    markerBuildTokens.removeAll()
+    markerBuildTokenLock.unlock()
     impl.deinitInternal()
   }
 
@@ -150,27 +153,20 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       for (id, next) in nextById {
         if let prev = prevById[id] {
           if !prev.markerEquals(next) {
-            if self.markerBuilder.hasIconTask(id) {
+            let hasIconTask = self.markerBuilder.hasIconTask(id)
+
+            self.impl.updateMarker(id: id) { [weak self] m in
+              guard let self else { return }
+              self.markerBuilder.update(prev, next, m)
+            }
+            self.impl.updatePendingMarker(id: id, marker: next)
+
+            if hasIconTask || !prev.markerStyleEquals(next) {
               let buildToken = self.nextMarkerBuildToken(id)
               self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-                guard let self, self.isCurrentMarkerBuild(id, buildToken) else { return }
-                let marker = self.markerBuilder.build(next, icon: icon)
-                self.impl.addMarker(id: id, marker: marker)
-              }
-            } else {
-              self.impl.updateMarker(id: id) { [weak self] m in
                 guard let self else { return }
-                self.markerBuilder.update(prev, next, m)
-              }
-
-              if !prev.markerStyleEquals(next) {
-                let buildToken = self.nextMarkerBuildToken(id)
-                self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-                  guard let self else { return }
-                  self.impl.updateMarker(id: id) { marker in
-                    guard self.isCurrentMarkerBuild(id, buildToken) else { return }
-                    self.markerBuilder.updateIcon(marker, icon: icon)
-                  }
+                self.impl.completeMarkerBuild(next, icon: icon) {
+                  self.isCurrentMarkerBuild(id, buildToken)
                 }
               }
             }
@@ -178,9 +174,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
         } else {
           let buildToken = self.nextMarkerBuildToken(id)
           self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-            guard let self, self.isCurrentMarkerBuild(id, buildToken) else { return }
-            let marker = self.markerBuilder.build(next, icon: icon)
-            self.impl.addMarker(id: id, marker: marker)
+            guard let self else { return }
+            self.impl.completeMarkerBuild(next, icon: icon) {
+              self.isCurrentMarkerBuild(id, buildToken)
+            }
           }
         }
       }
