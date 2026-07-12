@@ -929,8 +929,9 @@ class GoogleMapsViewImpl(
     if (SystemClock.uptimeMillis() - touch.eventTimeMs > MARKER_TOUCH_MAX_AGE_MS) return true
 
     val markerTag = marker.tagData
-    val width = markerTag.markerIconWidth?.dpToPx() ?: return true
-    val height = markerTag.markerIconHeight?.dpToPx() ?: return true
+    val hitbox = markerTag.markerIconHitbox ?: return true
+    val width = hitbox.widthPx
+    val height = hitbox.heightPx
     val map = googleMap ?: return true
     val markerPoint = map.projection.toScreenLocation(marker.position)
     val markerX = markerPoint.x + (mapView?.left ?: 0)

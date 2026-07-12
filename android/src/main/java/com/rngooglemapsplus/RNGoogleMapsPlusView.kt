@@ -157,22 +157,22 @@ class RNGoogleMapsPlusView(
         val prev = prevById[id]
         when {
           prev == null -> {
-            markerBuilder.buildIconAsync(next) { icon ->
+            markerBuilder.buildIconAsync(next) { icon, hitbox ->
               view.addMarker(
                 id,
                 markerBuilder.build(next, icon),
-                next.toMarkerTag(),
+                next.toMarkerTag(hitbox),
               )
             }
           }
 
           !prev.markerEquals(next) -> {
             if (markerBuilder.hasIconJob(id)) {
-              markerBuilder.buildIconAsync(next) { icon ->
+              markerBuilder.buildIconAsync(next) { icon, hitbox ->
                 view.addMarker(
                   id,
                   markerBuilder.build(next, icon),
-                  next.toMarkerTag(),
+                  next.toMarkerTag(hitbox),
                 )
               }
             } else {
