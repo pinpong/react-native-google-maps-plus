@@ -52,6 +52,7 @@ export default function MarkersScreen() {
   const [markers, setMarkers] = useState<RNMarker[] | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(true);
   const animatingRef = useRef(false);
+  const openMarkerIdRef = useRef<string | null>(null);
   const uiSettings: RNMapUiSettings = useMemo(
     () => ({
       allGesturesEnabled: true,
@@ -102,7 +103,18 @@ export default function MarkersScreen() {
   );
 
   const handleMarkerPress = useCallback((id: string) => {
+    if (openMarkerIdRef.current === id) {
+      mapRef.current?.hideMarkerInfoWindow(id);
+      openMarkerIdRef.current = null;
+      return;
+    }
+
     mapRef.current?.showMarkerInfoWindow(id);
+    openMarkerIdRef.current = id;
+  }, []);
+
+  const handleMapPress = useCallback(() => {
+    openMarkerIdRef.current = null;
   }, []);
 
   return (
@@ -112,6 +124,7 @@ export default function MarkersScreen() {
         uiSettings={uiSettings}
         markers={markers ? markers : []}
         onMarkerPress={handleMarkerPress}
+        onMapPress={handleMapPress}
       >
         <ControlPanel viewRef={mapRef} buttons={buttons} />
       </MapWrapper>
