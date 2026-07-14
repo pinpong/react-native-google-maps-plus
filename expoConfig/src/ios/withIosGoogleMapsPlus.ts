@@ -40,19 +40,24 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
       }).contents;
     }
 
-    const podFilePatch = `
-  require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
-  apply_svgkit_patch(installer)
-  `;
+    // Resolve svgkit_patch.rb via Node at pod-install time (mirrors how the RN/Expo Podfile
+    // resolves its own scripts). Robust to monorepos where node_modules is hoisted to a workspace
+    // root — the old hardcoded '../node_modules/...' path only resolved for non-hoisted layouts.
+    const podFilePatch = `  require File.join(File.dirname(\`node --print "require.resolve('react-native-google-maps-plus/package.json')"\`), 'scripts', 'svgkit_patch')\n  apply_svgkit_patch(installer)`;
 
     if (src.includes('post_install do |installer|')) {
-      src = src.replace(
-        /post_install do \|installer\|([\s\S]*?)end/,
-        (match, inner) => {
-          if (inner.includes('SVGKit Patch')) return match; // idempotent
-          return `post_install do |installer|${inner}\n${podFilePatch}\nend`;
-        }
-      );
+      // Anchor on the post_install line via mergeContents instead of a non-greedy
+      // /post_install ... ([\s\S]*?) end/ regex. The old regex stopped at the FIRST `end`, so when
+      // another config plugin had already injected post_install content with a nested `if ... end`
+      // block, apply_svgkit_patch was placed inside that block and never applied.
+      src = mergeContents({
+        tag: 'react-native-google-maps-svgkit-patch',
+        src,
+        newSrc: podFilePatch,
+        anchor: /post_install do \|installer\|/,
+        offset: 1,
+        comment: '#',
+      }).contents;
     } else {
       src += `\npost_install do |installer|\n${podFilePatch}\nend\n`;
     }
