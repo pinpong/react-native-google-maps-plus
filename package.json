@@ -10,8 +10,9 @@
   "scripts": {
     "commitlint": "commitlint",
     "typecheck:lib": "tsc --noEmit -p tsconfig.json",
+    "typecheck:tests": "tsc --noEmit -p __tests__/tsconfig.json",
     "typecheck:example": "tsc --noEmit -p example/tsconfig.json",
-    "typecheck": "yarn typecheck:lib && yarn typecheck:example",
+    "typecheck": "yarn typecheck:lib && yarn typecheck:tests && yarn typecheck:example",
     "lint": "yarn lint:js && yarn lint:android && yarn lint:ios",
     "lint:js": "eslint . --max-warnings 0 && yarn prettier --check .",
     "lint:android": "cd android && ktlint -F ./**/*.kt*",
