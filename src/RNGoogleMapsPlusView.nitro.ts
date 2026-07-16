@@ -228,6 +228,17 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
   hideMarkerInfoWindow(id: string): void;
 
   /**
+   * Clears the rendered marker icon cache.
+   *
+   * Already-rendered markers keep their current icon and are NOT re-rendered.
+   * Renders that are already running continue and repopulate the emptied cache on completion.
+   * The cache only affects future renders: the next time a marker's icon is
+   * requested with a style hash that is no longer cached, it is rendered from
+   * source instead of served from cache. Use to reclaim memory.
+   */
+  clearMarkerIconCache(): void;
+
+  /**
    * Sets the camera.
    *
    * iOS: adds an explicit animation phase for parity.

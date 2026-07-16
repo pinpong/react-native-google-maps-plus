@@ -405,6 +405,10 @@ class RNGoogleMapsPlusView(
     view.hideMarkerInfoWindow(id)
   }
 
+  override fun clearMarkerIconCache() {
+    view.clearMarkerIconCache()
+  }
+
   override fun setCamera(
     camera: RNCameraUpdate,
     animated: Boolean?,

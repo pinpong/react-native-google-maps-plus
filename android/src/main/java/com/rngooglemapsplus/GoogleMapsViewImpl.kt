@@ -384,6 +384,8 @@ class GoogleMapsViewImpl(
 
   fun hideMarkerInfoWindow(id: String) = markerManager.hideInfoWindow(id)
 
+  fun clearMarkerIconCache() = markerManager.clearIconCache()
+
   fun setCamera(
     cameraPosition: CameraPosition,
     animated: Boolean,

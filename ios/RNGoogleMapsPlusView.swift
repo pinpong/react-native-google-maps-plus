@@ -355,6 +355,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     impl.hideMarkerInfoWindow(id: id)
   }
 
+  func clearMarkerIconCache() {
+    impl.clearMarkerIconCache()
+  }
+
   func setCamera(camera: RNCameraUpdate, animated: Bool?, durationMs: Double?) {
     onMain {
       let cam = camera.toGMSCameraPosition(current: self.impl.currentCamera)

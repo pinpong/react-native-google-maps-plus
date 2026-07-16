@@ -317,6 +317,10 @@ GMSIndoorDisplayDelegate {
     markerManager.hideInfoWindow(id: id)
   }
 
+  func clearMarkerIconCache() {
+    markerManager.clearIconCache()
+  }
+
   func setCamera(camera: GMSCameraPosition, animated: Bool, durationMs: Double) {
     onMain {
       if animated {
