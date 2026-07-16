@@ -673,6 +673,7 @@ class GoogleMapsViewImpl(
 
   override fun onInfoWindowClose(marker: Marker) =
     onUi {
+      if (markerManager.consumeInfoWindowRefresh(marker.idTag)) return@onUi
       onInfoWindowClose?.invoke(marker.idTag)
     }
 

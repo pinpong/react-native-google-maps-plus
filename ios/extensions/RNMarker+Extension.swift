@@ -43,6 +43,19 @@ extension RNMarker {
     return true
   }
 
+  func infoWindowContentEquals(_ b: RNMarker) -> Bool {
+    let hasInfoWindowIcon = infoWindowIconSvg != nil
+    if hasInfoWindowIcon != (b.infoWindowIconSvg != nil) { return false }
+    if hasInfoWindowIcon { return markerInfoWindowStyleEquals(b) }
+    if title != b.title { return false }
+    if snippet != b.snippet { return false }
+    return true
+  }
+
+  func infoWindowIsEmpty() -> Bool {
+    infoWindowIconSvg == nil && title == nil && snippet == nil
+  }
+
   func markerStyleEquals(_ b: RNMarker) -> Bool {
     if iconSvg?.width != b.iconSvg?.width { return false }
     if iconSvg?.height != b.iconSvg?.height { return false }

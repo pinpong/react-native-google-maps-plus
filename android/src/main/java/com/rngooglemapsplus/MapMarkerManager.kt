@@ -7,6 +7,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.Marker
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
+import com.rngooglemapsplus.extensions.infoWindowContentEquals
+import com.rngooglemapsplus.extensions.infoWindowIsEmpty
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.styleHash
 import kotlinx.coroutines.Job
@@ -31,6 +33,7 @@ class MapMarkerManager(
   private val markerStates = mutableMapOf<String, MarkerState>()
   private var iconGeneration = 0L
   private var destroyed = false
+  private var refreshingInfoWindowId: String? = null
 
   fun attachMap(map: GoogleMap) =
     onUi {
@@ -69,9 +72,12 @@ class MapMarkerManager(
 
       state.marker?.let { marker ->
         markerBuilder.update(prev, next, marker, deferAnchors)
-        if (marker.isInfoWindowShown) {
-          marker.hideInfoWindow()
-          marker.showInfoWindow()
+        if (marker.isInfoWindowShown && !prev.infoWindowContentEquals(next)) {
+          if (next.infoWindowIsEmpty()) {
+            marker.hideInfoWindow()
+          } else {
+            reshowInfoWindow(marker, next.id)
+          }
         }
       }
 
@@ -85,13 +91,33 @@ class MapMarkerManager(
 
   fun showInfoWindow(id: String) =
     onUi {
-      markerStates[id]?.marker?.showInfoWindow()
+      val marker = markerStates[id]?.marker ?: return@onUi
+      if (marker.isInfoWindowShown) {
+        reshowInfoWindow(marker, id)
+      } else {
+        marker.showInfoWindow()
+      }
     }
 
   fun hideInfoWindow(id: String) =
     onUi {
       markerStates[id]?.marker?.hideInfoWindow()
     }
+
+  fun consumeInfoWindowRefresh(id: String): Boolean {
+    if (refreshingInfoWindowId != id) return false
+    refreshingInfoWindowId = null
+    return true
+  }
+
+  private fun reshowInfoWindow(
+    marker: Marker,
+    id: String,
+  ) {
+    refreshingInfoWindowId = id
+    marker.showInfoWindow()
+    refreshingInfoWindowId = null
+  }
 
   fun infoWindowView(markerTag: MarkerTag): ImageView? = markerBuilder.buildInfoWindow(markerTag)
 

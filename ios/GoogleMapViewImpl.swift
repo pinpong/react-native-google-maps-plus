@@ -741,6 +741,7 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
     onMain {
+      if self.markerManager.consumeInfoWindowRefresh(marker.idTag) { return }
       self.onInfoWindowClose?(marker.idTag)
     }
   }

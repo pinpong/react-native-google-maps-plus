@@ -23,6 +23,7 @@ final class MapMarkerManager {
   private var markerStates: [String: MarkerState] = [:]
   private var iconGeneration: UInt64 = 0
   private var destroyed = false
+  private var refreshingInfoWindowId: String?
 
   init(builder: MapMarkerBuilder) {
     self.markerBuilder = builder
@@ -67,9 +68,16 @@ final class MapMarkerManager {
 
       state.marker.map { marker in
         self.markerBuilder.update(prev, next, marker, deferAnchors: deferAnchors)
-        if let mapView = self.mapView, mapView.selectedMarker == marker {
+        guard let mapView = self.mapView, mapView.selectedMarker == marker,
+              !prev.infoWindowContentEquals(next) else { return }
+
+        if next.infoWindowIsEmpty() {
           mapView.selectedMarker = nil
-          mapView.selectedMarker = marker
+        } else if prev.infoWindowIconSvg != nil || next.infoWindowIconSvg != nil {
+          self.reshowInfoWindow(marker, id: next.id)
+        } else {
+          marker.tracksInfoWindowChanges = true
+          marker.tracksInfoWindowChanges = false
         }
       }
 
@@ -85,9 +93,13 @@ final class MapMarkerManager {
 
   func showInfoWindow(id: String) {
     onMain {
-      guard let marker = self.markerStates[id]?.marker else { return }
-      self.mapView?.selectedMarker = nil
-      self.mapView?.selectedMarker = marker
+      guard let mapView = self.mapView,
+            let marker = self.markerStates[id]?.marker else { return }
+      if mapView.selectedMarker == marker {
+        self.reshowInfoWindow(marker, id: id)
+      } else {
+        mapView.selectedMarker = marker
+      }
     }
   }
 
@@ -98,6 +110,19 @@ final class MapMarkerManager {
         self.mapView?.selectedMarker = nil
       }
     }
+  }
+
+  func consumeInfoWindowRefresh(_ id: String) -> Bool {
+    guard refreshingInfoWindowId == id else { return false }
+    refreshingInfoWindowId = nil
+    return true
+  }
+
+  private func reshowInfoWindow(_ marker: GMSMarker, id: String) {
+    refreshingInfoWindowId = id
+    self.mapView?.selectedMarker = nil
+    self.mapView?.selectedMarker = marker
+    refreshingInfoWindowId = nil
   }
 
   func infoWindowView(markerTag: MarkerTag) -> UIImageView? {
