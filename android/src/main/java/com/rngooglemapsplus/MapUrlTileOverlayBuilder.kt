@@ -1,5 +1,6 @@
 package com.rngooglemapsplus
 
+import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.android.gms.maps.model.UrlTileProvider
 import java.net.URL
@@ -39,5 +40,23 @@ class MapUrlTileOverlayBuilder(
     t.zIndex?.let { opts.zIndex(it.toFloat()) }
     t.opacity?.let { opts.transparency(1f - it.toFloat()) }
     return opts
+  }
+
+  fun update(
+    prev: RNUrlTileOverlay,
+    next: RNUrlTileOverlay,
+    overlay: TileOverlay,
+  ) = onUi {
+    if (prev.zIndex != next.zIndex) {
+      overlay.zIndex = next.zIndex?.toFloat() ?: 0f
+    }
+
+    if (prev.opacity != next.opacity) {
+      overlay.transparency = next.opacity?.let { 1f - it.toFloat() } ?: 0f
+    }
+
+    if (prev.fadeIn != next.fadeIn) {
+      overlay.fadeIn = next.fadeIn ?: true
+    }
   }
 }

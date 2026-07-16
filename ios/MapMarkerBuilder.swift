@@ -10,7 +10,6 @@ final class MapMarkerBuilder {
     c.countLimit = 256
     return c
   }()
-  private var tasks: [String: Task<Void, Never>] = [:]
 
   init(mapErrorHandler: MapErrorHandler) {
     self.mapErrorHandler = mapErrorHandler
@@ -50,59 +49,33 @@ final class MapMarkerBuilder {
     return marker
   }
 
-  func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker) {
+  func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker, deferAnchors: Bool = false) {
     onMain {
       withCATransaction(disableActions: true) {
-
-        var tracksViewChanges = false
-        var tracksInfoWindowChanges = false
 
         if !prev.coordinateEquals(next) {
           m.position = next.coordinate.toCLLocationCoordinate2D()
         }
 
-        if !prev.markerStyleEquals(next) {
-          self.buildIconAsync(next) { img in
-            tracksViewChanges = true
-            m.icon = img
+        if !deferAnchors, !prev.anchorEquals(next) {
+          m.groundAnchor = CGPoint(
+            x: next.anchor?.x ?? 0.5,
+            y: next.anchor?.y ?? 1
+          )
+        }
 
-            if !prev.anchorEquals(next) {
-              m.groundAnchor = CGPoint(
-                x: next.anchor?.x ?? 0.5,
-                y: next.anchor?.y ?? 1
-              )
-            }
-
-            if !prev.infoWindowAnchorEquals(next) {
-              m.infoWindowAnchor = CGPoint(
-                x: next.infoWindowAnchor?.x ?? 0.5,
-                y: next.infoWindowAnchor?.y ?? 0
-              )
-            }
-          }
-        } else {
-          if !prev.anchorEquals(next) {
-            m.groundAnchor = CGPoint(
-              x: next.anchor?.x ?? 0.5,
-              y: next.anchor?.y ?? 1
-            )
-          }
-
-          if !prev.infoWindowAnchorEquals(next) {
-            m.infoWindowAnchor = CGPoint(
-              x: next.infoWindowAnchor?.x ?? 0.5,
-              y: next.infoWindowAnchor?.y ?? 0
-            )
-          }
+        if !deferAnchors, !prev.infoWindowAnchorEquals(next) {
+          m.infoWindowAnchor = CGPoint(
+            x: next.infoWindowAnchor?.x ?? 0.5,
+            y: next.infoWindowAnchor?.y ?? 0
+          )
         }
 
         if prev.title != next.title {
-          tracksInfoWindowChanges = true
           m.title = next.title
         }
 
         if prev.snippet != next.snippet {
-          tracksInfoWindowChanges = true
           m.snippet = next.snippet
         }
 
@@ -134,92 +107,60 @@ final class MapMarkerBuilder {
             iconSvg: next.infoWindowIconSvg
           )
         }
-
-        if tracksViewChanges {
-          m.tracksViewChanges = tracksViewChanges
-        }
-        if tracksInfoWindowChanges {
-          m.tracksInfoWindowChanges = tracksInfoWindowChanges
-        }
-
-        if tracksViewChanges || tracksInfoWindowChanges {
-          if tracksViewChanges {
-            m.tracksViewChanges = false
-          }
-
-          if tracksInfoWindowChanges {
-            m.tracksInfoWindowChanges = false
-          }
-        }
       }
     }
   }
 
-  func buildIconAsync(
-    _ m: RNMarker,
-    onReady: @escaping (UIImage?) -> Void
-  ) {
-    cancelIconTask(m.id)
+  func applyAnchors(_ m: RNMarker, _ marker: GMSMarker) {
+    marker.groundAnchor = CGPoint(
+      x: m.anchor?.x ?? 0.5,
+      y: m.anchor?.y ?? 1
+    )
+    marker.infoWindowAnchor = CGPoint(
+      x: m.infoWindowAnchor?.x ?? 0.5,
+      y: m.infoWindowAnchor?.y ?? 0
+    )
+  }
 
-    guard let iconSvg = m.iconSvg else {
-      onReady(nil)
-      return
-    }
+  func cachedIcon(styleHash: NSNumber) -> UIImage? {
+    iconCache.object(forKey: styleHash)
+  }
 
-    let key = m.styleHash()
-    if let cached = iconCache.object(forKey: key) {
-      onReady(cached)
-      return
-    }
+  func clearIconCache() {
+    iconCache.removeAllObjects()
+  }
 
+  func renderIcon(
+    markerId: String,
+    iconSvg: RNMarkerSvg,
+    styleHash: NSNumber,
+    onReady: @escaping (UIImage) -> Void
+  ) -> Task<Void, Never> {
     let scale = UIScreen.main.scale
 
-    let task = Task(priority: .userInitiated) { [weak self] in
+    return Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
 
-      let renderResult = self.renderUIImage(iconSvg, m.id, scale)
+      let renderResult = self.renderUIImage(iconSvg, markerId, scale)
       guard !Task.isCancelled else { return }
 
       guard let renderResult = renderResult else {
         await MainActor.run {
           guard !Task.isCancelled else { return }
-          self.tasks.removeValue(forKey: m.id)
           onReady(self.createFallbackUIImage())
         }
         return
       }
 
       if !renderResult.isFallback {
-        self.iconCache.setObject(renderResult.image, forKey: key)
+        self.iconCache.setObject(renderResult.image, forKey: styleHash)
       }
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
-        self.tasks.removeValue(forKey: m.id)
         onReady(renderResult.image)
       }
     }
-
-    tasks[m.id] = task
-  }
-
-  func hasIconTask(_ id: String) -> Bool {
-    tasks[id] != nil
-  }
-
-  func cancelIconTask(_ id: String) {
-    tasks[id]?.cancel()
-    tasks.removeValue(forKey: id)
-  }
-
-  func cancelAllIconTasks() {
-    let ids = Array(tasks.keys)
-    for id in ids {
-      tasks[id]?.cancel()
-    }
-    tasks.removeAll()
-    iconCache.removeAllObjects()
-    CATransaction.flush()
   }
 
   func buildInfoWindow(markerTag: MarkerTag) -> UIImageView? {

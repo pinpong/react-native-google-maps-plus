@@ -1,9 +1,5 @@
 package com.rngooglemapsplus
 
-import CircleTag
-import MarkerTag
-import PolygonTag
-import PolylineTag
 import android.annotation.SuppressLint
 import android.content.ComponentCallbacks2
 import android.content.res.Configuration
@@ -22,22 +18,15 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.IndoorBuilding
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.gms.maps.model.Polygon
-import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.gms.maps.model.TileOverlay
-import com.google.android.gms.maps.model.TileOverlayOptions
-import com.google.maps.android.data.kml.KmlLayer
 import com.margelo.nitro.core.Promise
 import com.rngooglemapsplus.extensions.encode
 import com.rngooglemapsplus.extensions.toGooglePriority
@@ -52,14 +41,11 @@ import com.rngooglemapsplus.extensions.toRnLocation
 import com.rngooglemapsplus.extensions.toRnRegion
 import idTag
 import tagData
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
 
 class GoogleMapsViewImpl(
   private val reactContext: ThemedReactContext,
   private val locationHandler: LocationHandler,
   private val playServiceHandler: PlayServicesHandler,
-  private val markerBuilder: MapMarkerBuilder,
   private val mapErrorHandler: MapErrorHandler,
 ) : GestureAwareFrameLayout(reactContext),
   GoogleMap.OnCameraMoveStartedListener,
@@ -91,21 +77,13 @@ class GoogleMapsViewImpl(
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
 
-  private val pendingMarkers = mutableListOf<Triple<String, MarkerOptions, MarkerTag>>()
-  private val pendingPolylines = mutableListOf<Pair<String, PolylineOptions>>()
-  private val pendingPolygons = mutableListOf<Pair<String, PolygonOptions>>()
-  private val pendingCircles = mutableListOf<Pair<String, CircleOptions>>()
-  private val pendingHeatmaps = mutableListOf<Pair<String, TileOverlayOptions>>()
-  private val pendingKmlLayers = mutableListOf<Pair<String, String>>()
-  private val pendingUrlTileOverlays = mutableListOf<Pair<String, TileOverlayOptions>>()
-
-  private val markersById = mutableMapOf<String, Marker>()
-  private val polylinesById = mutableMapOf<String, Polyline>()
-  private val polygonsById = mutableMapOf<String, Polygon>()
-  private val circlesById = mutableMapOf<String, Circle>()
-  private val heatmapsById = mutableMapOf<String, TileOverlay>()
-  private val kmlLayersById = mutableMapOf<String, KmlLayer>()
-  private val urlTileOverlaysById = mutableMapOf<String, TileOverlay>()
+  private val markerManager = MapMarkerManager(MapMarkerBuilder(reactContext, mapErrorHandler))
+  private val polylineManager = MapPolylineManager(MapPolylineBuilder())
+  private val polygonManager = MapPolygonManager(MapPolygonBuilder())
+  private val circleManager = MapCircleManager(MapCircleBuilder())
+  private val heatmapManager = MapHeatmapManager(MapHeatmapBuilder())
+  private val urlTileOverlayManager = MapUrlTileOverlayManager(MapUrlTileOverlayBuilder(mapErrorHandler))
+  private val kmlLayerManager = MapKmlLayerManager(reactContext, mapErrorHandler)
 
   private var cameraMoveReason = -1
 
@@ -148,6 +126,13 @@ class GoogleMapsViewImpl(
             googleMap = map
             googleMap?.setLocationSource(locationHandler)
             googleMap?.setOnMapLoadedCallback(this@GoogleMapsViewImpl)
+            markerManager.attachMap(map)
+            polylineManager.attachMap(map)
+            polygonManager.attachMap(map)
+            circleManager.attachMap(map)
+            heatmapManager.attachMap(map)
+            kmlLayerManager.attachMap(map)
+            urlTileOverlayManager.attachMap(map)
             applyProps()
             initLocationCallbacks()
             onMapReady?.invoke(true)
@@ -245,35 +230,6 @@ class GoogleMapsViewImpl(
     userInterfaceStyle = userInterfaceStyle
     mapZoomConfig = mapZoomConfig
     locationConfig = locationConfig
-
-    if (pendingMarkers.isNotEmpty()) {
-      pendingMarkers.forEach { (id, opts, markerTag) -> addMarkerInternal(id, opts, markerTag) }
-      pendingMarkers.clear()
-    }
-    if (pendingPolylines.isNotEmpty()) {
-      pendingPolylines.forEach { (id, opts) -> addPolylineInternal(id, opts) }
-      pendingPolylines.clear()
-    }
-    if (pendingPolygons.isNotEmpty()) {
-      pendingPolygons.forEach { (id, opts) -> addPolygonInternal(id, opts) }
-      pendingPolygons.clear()
-    }
-    if (pendingCircles.isNotEmpty()) {
-      pendingCircles.forEach { (id, opts) -> addCircleInternal(id, opts) }
-      pendingCircles.clear()
-    }
-    if (pendingHeatmaps.isNotEmpty()) {
-      pendingHeatmaps.forEach { (id, opts) -> addHeatmapInternal(id, opts) }
-      pendingHeatmaps.clear()
-    }
-    if (pendingKmlLayers.isNotEmpty()) {
-      pendingKmlLayers.forEach { (id, str) -> addKmlLayerInternal(id, str) }
-      pendingKmlLayers.clear()
-    }
-    if (pendingUrlTileOverlays.isNotEmpty()) {
-      pendingUrlTileOverlays.forEach { (id, opts) -> addUrlTileOverlayInternal(id, opts) }
-      pendingUrlTileOverlays.clear()
-    }
   }
 
   val currentCamera: CameraPosition?
@@ -353,10 +309,10 @@ class GoogleMapsViewImpl(
       field = value
       onUi {
         try {
-          // / not supported when liteMode enabled on latest renderer
+          // not supported when liteMode enabled on latest renderer
           googleMap?.mapColorScheme = value ?: MapColorScheme.FOLLOW_SYSTEM
         } catch (_: UnsupportedOperationException) {
-          // / ignore
+          // ignore
         }
       }
     }
@@ -424,17 +380,9 @@ class GoogleMapsViewImpl(
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
 
-  fun showMarkerInfoWindow(id: String) =
-    onUi {
-      val marker = markersById[id] ?: return@onUi
-      marker.showInfoWindow()
-    }
+  fun showMarkerInfoWindow(id: String) = markerManager.showInfoWindow(id)
 
-  fun hideMarkerInfoWindow(id: String) =
-    onUi {
-      val marker = markersById[id] ?: return@onUi
-      marker.hideInfoWindow()
-    }
+  fun hideMarkerInfoWindow(id: String) = markerManager.hideInfoWindow(id)
 
   fun setCamera(
     cameraPosition: CameraPosition,
@@ -514,301 +462,47 @@ class GoogleMapsViewImpl(
     return promise
   }
 
-  fun addMarker(
-    id: String,
-    opts: MarkerOptions,
-    markerTag: MarkerTag,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingMarkers.add(Triple(id, opts, markerTag))
-      return@onUi
-    }
+  fun addMarker(marker: RNMarker) = markerManager.add(marker)
 
-    markersById.remove(id)?.remove()
-    addMarkerInternal(id, opts, markerTag)
-  }
+  fun updateMarker(marker: RNMarker) = markerManager.update(marker)
 
-  private fun addMarkerInternal(
-    id: String,
-    opts: MarkerOptions,
-    markerTag: MarkerTag,
-  ) = onUi {
-    val marker =
-      googleMap?.addMarker(opts)?.apply {
-        tag = markerTag
-      }
+  fun removeMarker(id: String) = markerManager.remove(id)
 
-    if (marker != null) {
-      markersById[id] = marker
-    }
-  }
+  fun addPolyline(polyline: RNPolyline) = polylineManager.add(polyline)
 
-  fun updateMarker(
-    id: String,
-    block: (Marker) -> Unit,
-  ) = onUi {
-    val marker = markersById[id] ?: return@onUi
-    block(marker)
-    if (marker.isInfoWindowShown) {
-      marker.hideInfoWindow()
-      marker.showInfoWindow()
-    }
-  }
+  fun updatePolyline(polyline: RNPolyline) = polylineManager.update(polyline)
 
-  fun removeMarker(id: String) =
-    onUi {
-      markersById.remove(id)?.remove()
-    }
+  fun removePolyline(id: String) = polylineManager.remove(id)
 
-  fun clearMarkers() =
-    onUi {
-      markersById.values.forEach { it.remove() }
-      markersById.clear()
-      pendingMarkers.clear()
-    }
+  fun addPolygon(polygon: RNPolygon) = polygonManager.add(polygon)
 
-  fun addPolyline(
-    id: String,
-    opts: PolylineOptions,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingPolylines.add(id to opts)
-      return@onUi
-    }
-    polylinesById.remove(id)?.remove()
-    addPolylineInternal(id, opts)
-  }
+  fun updatePolygon(polygon: RNPolygon) = polygonManager.update(polygon)
 
-  private fun addPolylineInternal(
-    id: String,
-    opts: PolylineOptions,
-  ) = onUi {
-    val pl =
-      googleMap?.addPolyline(opts).also {
-        it?.tag = PolylineTag(id = id)
-      }
-    if (pl != null) polylinesById[id] = pl
-  }
+  fun removePolygon(id: String) = polygonManager.remove(id)
 
-  fun updatePolyline(
-    id: String,
-    block: (Polyline) -> Unit,
-  ) = onUi {
-    val pl = polylinesById[id] ?: return@onUi
-    block(pl)
-  }
+  fun addCircle(circle: RNCircle) = circleManager.add(circle)
 
-  fun removePolyline(id: String) =
-    onUi {
-      polylinesById.remove(id)?.remove()
-    }
+  fun updateCircle(circle: RNCircle) = circleManager.update(circle)
 
-  fun clearPolylines() =
-    onUi {
-      polylinesById.values.forEach { it.remove() }
-      polylinesById.clear()
-      pendingPolylines.clear()
-    }
+  fun removeCircle(id: String) = circleManager.remove(id)
 
-  fun addPolygon(
-    id: String,
-    opts: PolygonOptions,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingPolygons.add(id to opts)
-      return@onUi
-    }
-    polygonsById.remove(id)?.remove()
-    addPolygonInternal(id, opts)
-  }
+  fun addHeatmap(heatmap: RNHeatmap) = heatmapManager.add(heatmap)
 
-  private fun addPolygonInternal(
-    id: String,
-    opts: PolygonOptions,
-  ) = onUi {
-    val polygon =
-      googleMap?.addPolygon(opts).also {
-        it?.tag = PolygonTag(id = id)
-      }
-    if (polygon != null) polygonsById[id] = polygon
-  }
+  fun updateHeatmap(heatmap: RNHeatmap) = heatmapManager.update(heatmap)
 
-  fun updatePolygon(
-    id: String,
-    block: (Polygon) -> Unit,
-  ) = onUi {
-    val polygon = polygonsById[id] ?: return@onUi
-    block(polygon)
-  }
+  fun removeHeatmap(id: String) = heatmapManager.remove(id)
 
-  fun removePolygon(id: String) =
-    onUi {
-      polygonsById.remove(id)?.remove()
-    }
+  fun addKmlLayer(kmlLayer: RNKMLayer) = kmlLayerManager.add(kmlLayer)
 
-  fun clearPolygons() =
-    onUi {
-      polygonsById.values.forEach { it.remove() }
-      polygonsById.clear()
-      pendingPolygons.clear()
-    }
+  fun updateKmlLayer(kmlLayer: RNKMLayer) = kmlLayerManager.update(kmlLayer)
 
-  fun addCircle(
-    id: String,
-    opts: CircleOptions,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingCircles.add(id to opts)
-      return@onUi
-    }
-    circlesById.remove(id)?.remove()
-    addCircleInternal(id, opts)
-  }
+  fun removeKmlLayer(id: String) = kmlLayerManager.remove(id)
 
-  private fun addCircleInternal(
-    id: String,
-    opts: CircleOptions,
-  ) = onUi {
-    val circle =
-      googleMap?.addCircle(opts).also {
-        it?.tag = CircleTag(id = id)
-      }
-    if (circle != null) circlesById[id] = circle
-  }
+  fun addUrlTileOverlay(urlTileOverlay: RNUrlTileOverlay) = urlTileOverlayManager.add(urlTileOverlay)
 
-  fun updateCircle(
-    id: String,
-    block: (Circle) -> Unit,
-  ) = onUi {
-    val circle = circlesById[id] ?: return@onUi
-    block(circle)
-  }
+  fun updateUrlTileOverlay(urlTileOverlay: RNUrlTileOverlay) = urlTileOverlayManager.update(urlTileOverlay)
 
-  fun removeCircle(id: String) =
-    onUi {
-      circlesById.remove(id)?.remove()
-    }
-
-  fun clearCircles() =
-    onUi {
-      circlesById.values.forEach { it.remove() }
-      circlesById.clear()
-      pendingCircles.clear()
-    }
-
-  fun addHeatmap(
-    id: String,
-    opts: TileOverlayOptions,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingHeatmaps.add(id to opts)
-      return@onUi
-    }
-    heatmapsById.remove(id)?.remove()
-    addHeatmapInternal(id, opts)
-  }
-
-  private fun addHeatmapInternal(
-    id: String,
-    opts: TileOverlayOptions,
-  ) = onUi {
-    val overlay = googleMap?.addTileOverlay(opts)
-    if (overlay != null) heatmapsById[id] = overlay
-  }
-
-  fun removeHeatmap(id: String) =
-    onUi {
-      heatmapsById.remove(id)?.let { heatMap ->
-        heatMap.clearTileCache()
-        heatMap.remove()
-      }
-    }
-
-  fun clearHeatmaps() =
-    onUi {
-      heatmapsById.values.forEach {
-        it.clearTileCache()
-        it.remove()
-      }
-      heatmapsById.clear()
-      pendingHeatmaps.clear()
-    }
-
-  fun addKmlLayer(
-    id: String,
-    kmlString: String,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingKmlLayers.add(id to kmlString)
-      return@onUi
-    }
-    kmlLayersById.remove(id)?.removeLayerFromMap()
-    addKmlLayerInternal(id, kmlString)
-  }
-
-  private fun addKmlLayerInternal(
-    id: String,
-    kmlString: String,
-  ) = onUi {
-    try {
-      val inputStream = ByteArrayInputStream(kmlString.toByteArray(StandardCharsets.UTF_8))
-      val layer = KmlLayer(googleMap, inputStream, context)
-      kmlLayersById[id] = layer
-      layer.addLayerToMap()
-    } catch (_: Exception) {
-      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kml layer parse failed: id=$id")
-    }
-  }
-
-  fun removeKmlLayer(id: String) =
-    onUi {
-      kmlLayersById.remove(id)?.removeLayerFromMap()
-    }
-
-  fun clearKmlLayer() =
-    onUi {
-      kmlLayersById.values.forEach { it.removeLayerFromMap() }
-      kmlLayersById.clear()
-      pendingKmlLayers.clear()
-    }
-
-  fun addUrlTileOverlay(
-    id: String,
-    opts: TileOverlayOptions,
-  ) = onUi {
-    if (googleMap == null) {
-      pendingUrlTileOverlays.add(id to opts)
-      return@onUi
-    }
-    urlTileOverlaysById.remove(id)?.remove()
-    addUrlTileOverlayInternal(id, opts)
-  }
-
-  private fun addUrlTileOverlayInternal(
-    id: String,
-    opts: TileOverlayOptions,
-  ) = onUi {
-    val overlay = googleMap?.addTileOverlay(opts)
-    if (overlay != null) urlTileOverlaysById[id] = overlay
-  }
-
-  fun removeUrlTileOverlay(id: String) =
-    onUi {
-      urlTileOverlaysById.remove(id)?.let { urlTileOverlay ->
-        urlTileOverlay.clearTileCache()
-        urlTileOverlay.remove()
-      }
-    }
-
-  fun clearUrlTileOverlays() =
-    onUi {
-      urlTileOverlaysById.values.forEach {
-        it.clearTileCache()
-        it.remove()
-      }
-      urlTileOverlaysById.clear()
-      pendingUrlTileOverlays.clear()
-    }
+  fun removeUrlTileOverlay(id: String) = urlTileOverlayManager.remove(id)
 
   fun destroyInternal() =
     onUi {
@@ -816,14 +510,13 @@ class GoogleMapsViewImpl(
       destroyed = true
       lifecycleObserver?.toDestroyedState()
       lifecycleObserver = null
-      markerBuilder.cancelAllJobs()
-      clearMarkers()
-      clearPolylines()
-      clearPolygons()
-      clearCircles()
-      clearHeatmaps()
-      clearKmlLayer()
-      clearUrlTileOverlays()
+      markerManager.destroy()
+      polylineManager.destroy()
+      polygonManager.destroy()
+      circleManager.destroy()
+      heatmapManager.destroy()
+      urlTileOverlayManager.destroy()
+      kmlLayerManager.destroy()
       googleMap?.apply {
         setOnMapLoadedCallback(null)
         setOnCameraMoveStartedListener(null)
@@ -859,7 +552,7 @@ class GoogleMapsViewImpl(
 
   override fun requestLayout() {
     super.requestLayout()
-    // / setPadding issue
+    // setPadding issue
     post {
       measure(
         MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
@@ -897,12 +590,13 @@ class GoogleMapsViewImpl(
 
   override fun onLowMemory() {
     mapView?.onLowMemory()
-    markerBuilder.clearIconCache()
+    markerManager.clearIconCache()
   }
 
   override fun onTrimMemory(level: Int) {
     mapView?.onLowMemory()
-    markerBuilder.cancelAllJobs()
+    markerManager.cancelAllRenders()
+    markerManager.clearIconCache()
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
@@ -1001,5 +695,5 @@ class GoogleMapsViewImpl(
 
   override fun getInfoContents(marker: Marker): View? = null
 
-  override fun getInfoWindow(marker: Marker): View? = markerBuilder.buildInfoWindow(marker.tagData)
+  override fun getInfoWindow(marker: Marker): View? = markerManager.infoWindowView(marker.tagData)
 }

@@ -24,8 +24,6 @@ import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
-import com.rngooglemapsplus.extensions.markerStyleEquals
-import com.rngooglemapsplus.extensions.styleHash
 import com.rngooglemapsplus.extensions.toLatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +36,6 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.cancellation.CancellationException
 
 class MapMarkerBuilder(
@@ -54,10 +51,8 @@ class MapMarkerBuilder(
       ): Int = 1
     }
 
-  private val jobsById = ConcurrentHashMap<String, Job>()
-
   init {
-    // / TODO: refactor with androidsvg 1.5 release
+    // TODO: refactor with androidsvg 1.5 release
     SVG.registerExternalFileResolver(
       object : SVGExternalFileResolver() {
         override fun resolveImage(filename: String?): Bitmap? {
@@ -183,40 +178,24 @@ class MapMarkerBuilder(
     prev: RNMarker,
     next: RNMarker,
     marker: Marker,
+    deferAnchors: Boolean = false,
   ) = onUi {
     if (!prev.coordinatesEquals(next)) {
       marker.position = next.coordinate.toLatLng()
     }
 
-    if (!prev.markerStyleEquals(next)) {
-      buildIconAsync(next) { icon ->
-        marker.setIcon(icon)
-        if (!prev.anchorEquals(next)) {
-          marker.setAnchor(
-            (next.anchor?.x ?: 0.5f).toFloat(),
-            (next.anchor?.y ?: 1.0f).toFloat(),
-          )
-        }
-        if (!prev.infoWindowAnchorEquals(next)) {
-          marker.setInfoWindowAnchor(
-            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-          )
-        }
-      }
-    } else {
-      if (!prev.anchorEquals(next)) {
-        marker.setAnchor(
-          (next.anchor?.x ?: 0.5f).toFloat(),
-          (next.anchor?.y ?: 1.0f).toFloat(),
-        )
-      }
-      if (!prev.infoWindowAnchorEquals(next)) {
-        marker.setInfoWindowAnchor(
-          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-        )
-      }
+    if (!deferAnchors && !prev.anchorEquals(next)) {
+      marker.setAnchor(
+        (next.anchor?.x ?: 0.5f).toFloat(),
+        (next.anchor?.y ?: 1.0f).toFloat(),
+      )
+    }
+
+    if (!deferAnchors && !prev.infoWindowAnchorEquals(next)) {
+      marker.setInfoWindowAnchor(
+        (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+        (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+      )
     }
 
     if (prev.title != next.title) {
@@ -252,86 +231,62 @@ class MapMarkerBuilder(
     }
   }
 
-  fun buildIconAsync(
+  fun applyAnchors(
     m: RNMarker,
-    onReady: (BitmapDescriptor?) -> Unit,
+    marker: Marker,
   ) {
-    cancelIconJob(m.id)
+    marker.setAnchor(
+      (m.anchor?.x ?: 0.5f).toFloat(),
+      (m.anchor?.y ?: 1.0f).toFloat(),
+    )
+    marker.setInfoWindowAnchor(
+      (m.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+      (m.infoWindowAnchor?.y ?: 0f).toFloat(),
+    )
+  }
 
-    m.iconSvg ?: return onReady(null)
+  fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
 
-    val key = m.styleHash()
-    iconCache.get(key)?.let { cached ->
-      onReady(cached)
-      return
-    }
+  fun renderIcon(
+    markerId: String,
+    iconSvg: RNMarkerSvg,
+    styleHash: Int,
+    onReady: (BitmapDescriptor) -> Unit,
+  ): Job =
+    scope.launch {
+      try {
+        ensureActive()
+        val renderResult = renderBitmap(iconSvg, markerId)
 
-    val job =
-      scope.launch {
-        try {
+        ensureActive()
+        val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+
+        if (!renderResult.isFallback) {
+          iconCache.put(styleHash, desc)
+        }
+        renderResult.bitmap.recycle()
+
+        withContext(Dispatchers.Main) {
           ensureActive()
-          val renderResult = renderBitmap(m.iconSvg, m.id)
-
-          if (renderResult?.bitmap == null) {
-            withContext(Dispatchers.Main) {
-              ensureActive()
-              jobsById.remove(m.id)
-              onReady(createFallbackDescriptor())
-            }
-            return@launch
-          }
-
+          onReady(desc)
+        }
+      } catch (e: OutOfMemoryError) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon out of memory", e)
+        clearIconCache()
+        withContext(Dispatchers.Main) {
           ensureActive()
-          val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
-
-          if (!renderResult.isFallback) {
-            iconCache.put(key, desc)
-          }
-          renderResult.bitmap.recycle()
-
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(desc)
-          }
-        } catch (e: OutOfMemoryError) {
-          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync out of memory", e)
-          clearIconCache()
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(createFallbackDescriptor())
-          }
-        } catch (_: CancellationException) {
-          // cancelled
-        } catch (t: Throwable) {
-          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", t)
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(createFallbackDescriptor())
-          }
+          onReady(createFallbackDescriptor())
+        }
+      } catch (_: CancellationException) {
+        // cancelled
+      } catch (t: Throwable) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon failed", t)
+        withContext(Dispatchers.Main) {
+          ensureActive()
+          onReady(createFallbackDescriptor())
         }
       }
-
-    jobsById[m.id] = job
-  }
-
-  fun hasIconJob(id: String): Boolean = jobsById.containsKey(id)
-
-  fun cancelIconJob(id: String) {
-    jobsById[id]?.cancel()
-    jobsById.remove(id)
-  }
-
-  fun cancelAllJobs() {
-    val ids = jobsById.keys.toList()
-    ids.forEach { id ->
-      jobsById[id]?.cancel()
     }
-    jobsById.clear()
-    clearIconCache()
-  }
 
   fun clearIconCache() {
     iconCache.evictAll()
