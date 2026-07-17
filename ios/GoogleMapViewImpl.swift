@@ -741,6 +741,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
+    markerManager.setTracksInfoWindowChanges(id: marker.idTag, track: false)
     onMain {
       self.onInfoWindowClose?(marker.idTag)
     }

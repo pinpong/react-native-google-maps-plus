@@ -23,6 +23,8 @@ final class MapMarkerManager {
   private var states: [String: MarkerState] = [:]
   private var iconGeneration: UInt64 = 0
   private var destroyed = false
+  private var shownInfoWindowView: UIImageView?
+  private var shownInfoWindowId: String?
 
   init(builder: MapMarkerBuilder) {
     self.builder = builder
@@ -72,11 +74,13 @@ final class MapMarkerManager {
 
         if next.infoWindowIsEmpty() {
           self.hideInfoWindow(id: next.id)
+        } else if let infoWindowView = self.shownInfoWindowView,
+                  self.shownInfoWindowId == next.id,
+                  let updated = self.builder.buildInfoWindow(markerTag: marker.tagData) {
+          infoWindowView.frame = updated.frame
+          infoWindowView.image = updated.image
         } else if prev.infoWindowIconSvg != nil || next.infoWindowIconSvg != nil {
           self.showInfoWindow(id: next.id)
-        } else {
-          marker.tracksInfoWindowChanges = true
-          marker.tracksInfoWindowChanges = false
         }
       }
 
@@ -109,7 +113,19 @@ final class MapMarkerManager {
   }
 
   func infoWindowView(markerTag: MarkerTag) -> UIImageView? {
-    builder.buildInfoWindow(markerTag: markerTag)
+    let view = builder.buildInfoWindow(markerTag: markerTag)
+    shownInfoWindowView = view
+    shownInfoWindowId = view != nil ? markerTag.id : nil
+    setTracksInfoWindowChanges(id: markerTag.id, track: true)
+    return view
+  }
+
+  func setTracksInfoWindowChanges(id: String, track: Bool) {
+    onMain {
+      guard let marker = self.states[id]?.marker,
+            marker.tracksInfoWindowChanges != track else { return }
+      marker.tracksInfoWindowChanges = track
+    }
   }
 
   func clearIconCache() {
@@ -195,6 +211,10 @@ final class MapMarkerManager {
 
   private func removeFromMap(_ state: MarkerState) {
     state.renderTask?.cancel()
+    if shownInfoWindowId == state.current.id {
+      shownInfoWindowView = nil
+      shownInfoWindowId = nil
+    }
     state.marker.map {
       $0.icon = nil
       $0.map = nil
