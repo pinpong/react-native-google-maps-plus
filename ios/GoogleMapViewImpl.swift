@@ -105,16 +105,14 @@ GMSIndoorDisplayDelegate {
 
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
-      onMain { [weak self] in
-        guard let self = self else { return }
-        self.onLocationUpdate?(loc.toRnLocation())
+      onMain {
+        self?.onLocationUpdate?(loc.toRNLocation())
       }
     }
 
     locationHandler.onError = { [weak self] error in
-      onMain { [weak self] in
-        guard let self = self else { return }
-        self.onLocationError?(error)
+      onMain {
+        self?.onLocationError?(error)
       }
     }
   }
@@ -287,7 +285,7 @@ GMSIndoorDisplayDelegate {
   var onMapReady: ((Bool) -> Void)?
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
+  var onLocationError: ((RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
   var onMapLongPress: ((RNLatLng) -> Void)?
   var onPoiPress: ((String, String, RNLatLng) -> Void)?
@@ -560,7 +558,6 @@ GMSIndoorDisplayDelegate {
   }
 
   private func onLowMemory() {
-    markerManager.cancelAllRenders()
     markerManager.clearIconCache()
   }
 
@@ -745,7 +742,6 @@ GMSIndoorDisplayDelegate {
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
     onMain {
-      if self.markerManager.consumeInfoWindowRefresh(marker.idTag) { return }
       self.onInfoWindowClose?(marker.idTag)
     }
   }
@@ -765,7 +761,7 @@ GMSIndoorDisplayDelegate {
   ) {
     onMain {
       self.mapView?.myLocation.map {
-        self.onMyLocationPress?($0.toRnLocation())
+        self.onMyLocationPress?($0.toRNLocation())
       }
     }
   }

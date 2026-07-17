@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import CircleTag
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
 import com.rngooglemapsplus.extensions.circleEquals
@@ -28,7 +27,7 @@ class MapCircleManager(
   fun add(circle: RNCircle) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(circle.id)?.let { removeFromMap(it) }
+      remove(circle.id)
       val state = CircleState(circle)
       states[circle.id] = state
       if (map != null) addToMap(state)

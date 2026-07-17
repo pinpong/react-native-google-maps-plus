@@ -31,7 +31,7 @@ class MapKmlLayerManager(
   fun add(kmlLayer: RNKMLayer) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(kmlLayer.id)?.let { removeFromMap(it) }
+      remove(kmlLayer.id)
       val state = KmlLayerState(kmlLayer)
       states[kmlLayer.id] = state
       if (map != null) addToMap(state)
@@ -58,10 +58,6 @@ class MapKmlLayerManager(
       map = null
     }
 
-  private fun removeFromMap(state: KmlLayerState) {
-    state.layer?.removeLayerFromMap()
-  }
-
   private fun addToMap(state: KmlLayerState) {
     val map = map ?: return
     try {
@@ -69,8 +65,12 @@ class MapKmlLayerManager(
       val layer = KmlLayer(map, inputStream, context)
       state.layer = layer
       layer.addLayerToMap()
-    } catch (_: Exception) {
-      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kml layer parse failed: id=${state.current.id}")
+    } catch (e: Exception) {
+      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kmlLayerId=${state.current.id} parse failed", e)
     }
+  }
+
+  private fun removeFromMap(state: KmlLayerState) {
+    state.layer?.removeLayerFromMap()
   }
 }

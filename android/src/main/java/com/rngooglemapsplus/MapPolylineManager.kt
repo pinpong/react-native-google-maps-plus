@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import PolylineTag
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Polyline
 import com.rngooglemapsplus.extensions.polylineEquals
@@ -28,7 +27,7 @@ class MapPolylineManager(
   fun add(polyline: RNPolyline) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(polyline.id)?.let { removeFromMap(it) }
+      remove(polyline.id)
       val state = PolylineState(polyline)
       states[polyline.id] = state
       if (map != null) addToMap(state)

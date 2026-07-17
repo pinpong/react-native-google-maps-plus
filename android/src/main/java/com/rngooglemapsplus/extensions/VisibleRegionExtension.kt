@@ -3,11 +3,11 @@ package com.rngooglemapsplus.extensions
 import com.google.android.gms.maps.model.VisibleRegion
 import com.rngooglemapsplus.RNRegion
 
-fun VisibleRegion.toRnRegion(): RNRegion =
+fun VisibleRegion.toRNRegion(): RNRegion =
   RNRegion(
-    nearLeft = nearLeft.toRnLatLng(),
-    nearRight = nearRight.toRnLatLng(),
-    farLeft = farLeft.toRnLatLng(),
-    farRight = farRight.toRnLatLng(),
-    latLngBounds = latLngBounds.toRnLatLngBounds(),
+    nearLeft = nearLeft.toRNLatLng(),
+    nearRight = nearRight.toRNLatLng(),
+    farLeft = farLeft.toRNLatLng(),
+    farRight = farRight.toRNLatLng(),
+    latLngBounds = latLngBounds.toRNLatLngBounds(),
   )

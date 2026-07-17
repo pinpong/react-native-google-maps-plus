@@ -31,7 +31,7 @@ final class MapHeatmapManager {
   func add(_ heatmap: RNHeatmap) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: heatmap.id).map { self.removeFromMap($0) }
+      self.remove(id: heatmap.id)
       let state = HeatmapState(current: heatmap)
       self.states[heatmap.id] = state
       if self.mapView != nil {

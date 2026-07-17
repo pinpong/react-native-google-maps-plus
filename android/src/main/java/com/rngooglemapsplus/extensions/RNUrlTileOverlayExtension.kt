@@ -10,3 +10,9 @@ fun RNUrlTileOverlay.urlTileOverlayEquals(b: RNUrlTileOverlay): Boolean {
   if (fadeIn != b.fadeIn) return false
   return true
 }
+
+fun RNUrlTileOverlay.urlTileOverlayNeedsRebuild(b: RNUrlTileOverlay): Boolean {
+  if (url != b.url) return true
+  if (tileSize != b.tileSize) return true
+  return false
+}

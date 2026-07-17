@@ -32,16 +32,15 @@ import com.rngooglemapsplus.extensions.encode
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import com.rngooglemapsplus.extensions.toRNCamera
 import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
+import com.rngooglemapsplus.extensions.toRNLatLng
+import com.rngooglemapsplus.extensions.toRNLocation
 import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
-import com.rngooglemapsplus.extensions.toRnCamera
-import com.rngooglemapsplus.extensions.toRnLatLng
-import com.rngooglemapsplus.extensions.toRnLocation
-import com.rngooglemapsplus.extensions.toRnRegion
-import idTag
-import tagData
+import com.rngooglemapsplus.extensions.toRNRegion
 
+@SuppressLint("ViewConstructor")
 class GoogleMapsViewImpl(
   private val reactContext: ThemedReactContext,
   private val locationHandler: LocationHandler,
@@ -163,8 +162,8 @@ class GoogleMapsViewImpl(
       mapViewLoaded = true
       googleMap?.let { map ->
         onMapLoaded?.invoke(
-          map.projection.visibleRegion.toRnRegion(),
-          map.cameraPosition.toRnCamera(),
+          map.projection.visibleRegion.toRNRegion(),
+          map.cameraPosition.toRNCamera(),
         )
       }
     }
@@ -176,8 +175,8 @@ class GoogleMapsViewImpl(
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       onCameraChangeStart?.invoke(
-        visibleRegion.toRnRegion(),
-        cameraPosition.toRnCamera(),
+        visibleRegion.toRNRegion(),
+        cameraPosition.toRNCamera(),
         GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason,
       )
     }
@@ -189,8 +188,8 @@ class GoogleMapsViewImpl(
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
       onCameraChange?.invoke(
-        visibleRegion.toRnRegion(),
-        cameraPosition.toRnCamera(),
+        visibleRegion.toRNRegion(),
+        cameraPosition.toRNCamera(),
         gesture,
       )
     }
@@ -202,15 +201,15 @@ class GoogleMapsViewImpl(
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
       onCameraChangeComplete?.invoke(
-        visibleRegion.toRnRegion(),
-        cameraPosition.toRnCamera(),
+        visibleRegion.toRNRegion(),
+        cameraPosition.toRNCamera(),
         gesture,
       )
     }
 
   fun initLocationCallbacks() {
     locationHandler.onUpdate = { location ->
-      onUi { onLocationUpdate?.invoke(location.toRnLocation()) }
+      onUi { onLocationUpdate?.invoke(location.toRNLocation()) }
     }
     locationHandler.onError = { error ->
       onUi { onLocationError?.invoke(error) }
@@ -266,7 +265,7 @@ class GoogleMapsViewImpl(
         try {
           googleMap?.isMyLocationEnabled = value ?: false
         } catch (_: SecurityException) {
-          onLocationError?.let { cb -> cb(RNLocationErrorCode.PERMISSION_DENIED) }
+          onLocationError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
         } catch (ex: Exception) {
           val error = ex.toLocationErrorCode(context)
           onLocationError?.invoke(error)
@@ -342,7 +341,7 @@ class GoogleMapsViewImpl(
   var mapType: Int? = null
     set(value) {
       field = value
-      onUi { googleMap?.mapType = value ?: 1 }
+      onUi { googleMap?.mapType = value ?: GoogleMap.MAP_TYPE_NORMAL }
     }
 
   var locationConfig: RNLocationConfig? = null
@@ -590,14 +589,19 @@ class GoogleMapsViewImpl(
 
   override fun onConfigurationChanged(newConfig: Configuration) {}
 
+  @Deprecated(
+    "Deprecated in Java",
+    ReplaceWith("onTrimMemory(level)"),
+  )
   override fun onLowMemory() {
     mapView?.onLowMemory()
     markerManager.clearIconCache()
   }
 
   override fun onTrimMemory(level: Int) {
-    mapView?.onLowMemory()
-    markerManager.cancelAllRenders()
+    if (level != ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+      mapView?.onLowMemory()
+    }
     markerManager.clearIconCache()
   }
 
@@ -625,27 +629,27 @@ class GoogleMapsViewImpl(
 
   override fun onMapClick(coordinates: LatLng) =
     onUi {
-      onMapPress?.invoke(coordinates.toRnLatLng())
+      onMapPress?.invoke(coordinates.toRNLatLng())
     }
 
   override fun onMapLongClick(coordinates: LatLng) =
     onUi {
-      onMapLongPress?.invoke(coordinates.toRnLatLng())
+      onMapLongPress?.invoke(coordinates.toRNLatLng())
     }
 
   override fun onMarkerDragStart(marker: Marker) =
     onUi {
-      onMarkerDragStart?.invoke(marker.idTag, marker.position.toRnLatLng())
+      onMarkerDragStart?.invoke(marker.idTag, marker.position.toRNLatLng())
     }
 
   override fun onMarkerDrag(marker: Marker) =
     onUi {
-      onMarkerDrag?.invoke(marker.idTag, marker.position.toRnLatLng())
+      onMarkerDrag?.invoke(marker.idTag, marker.position.toRNLatLng())
     }
 
   override fun onMarkerDragEnd(marker: Marker) =
     onUi {
-      onMarkerDragEnd?.invoke(marker.idTag, marker.position.toRnLatLng())
+      onMarkerDragEnd?.invoke(marker.idTag, marker.position.toRNLatLng())
     }
 
   override fun onIndoorBuildingFocused() =
@@ -665,7 +669,7 @@ class GoogleMapsViewImpl(
 
   override fun onPoiClick(poi: PointOfInterest) =
     onUi {
-      onPoiPress?.invoke(poi.placeId, poi.name, poi.latLng.toRnLatLng())
+      onPoiPress?.invoke(poi.placeId, poi.name, poi.latLng.toRNLatLng())
     }
 
   override fun onInfoWindowClick(marker: Marker) =
@@ -675,7 +679,6 @@ class GoogleMapsViewImpl(
 
   override fun onInfoWindowClose(marker: Marker) =
     onUi {
-      if (markerManager.consumeInfoWindowRefresh(marker.idTag)) return@onUi
       onInfoWindowClose?.invoke(marker.idTag)
     }
 
@@ -686,7 +689,7 @@ class GoogleMapsViewImpl(
 
   override fun onMyLocationClick(location: Location) =
     onUi {
-      onMyLocationPress?.invoke(location.toRnLocation())
+      onMyLocationPress?.invoke(location.toRNLocation())
     }
 
   override fun onMyLocationButtonClick(): Boolean {

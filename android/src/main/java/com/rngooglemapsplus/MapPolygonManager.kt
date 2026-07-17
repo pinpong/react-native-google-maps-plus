@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import PolygonTag
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Polygon
 import com.rngooglemapsplus.extensions.polygonEquals
@@ -28,7 +27,7 @@ class MapPolygonManager(
   fun add(polygon: RNPolygon) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(polygon.id)?.let { removeFromMap(it) }
+      remove(polygon.id)
       val state = PolygonState(polygon)
       states[polygon.id] = state
       if (map != null) addToMap(state)

@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import MarkerTag
 import android.widget.ImageView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -27,19 +26,18 @@ private class MarkerState(
 }
 
 class MapMarkerManager(
-  private val markerBuilder: MapMarkerBuilder,
+  private val builder: MapMarkerBuilder,
 ) {
   private var map: GoogleMap? = null
-  private val markerStates = mutableMapOf<String, MarkerState>()
+  private val states = mutableMapOf<String, MarkerState>()
   private var iconGeneration = 0L
   private var destroyed = false
-  private var refreshingInfoWindowId: String? = null
 
   fun attachMap(map: GoogleMap) =
     onUi {
       if (destroyed) return@onUi
       this.map = map
-      markerStates.values
+      states.values
         .filter { it.marker == null && it.iconReady && it.renderJob == null }
         .forEach { addToMap(it) }
     }
@@ -47,16 +45,16 @@ class MapMarkerManager(
   fun add(marker: RNMarker) =
     onUi {
       if (destroyed) return@onUi
-      markerStates.remove(marker.id)?.let { removeFromMap(it) }
+      remove(marker.id)
       val state = MarkerState(marker)
-      markerStates[marker.id] = state
+      states[marker.id] = state
       requestIcon(state)
     }
 
   fun update(next: RNMarker) =
     onUi {
       if (destroyed) return@onUi
-      val state = markerStates[next.id] ?: return@onUi
+      val state = states[next.id] ?: return@onUi
       val prev = state.current
       if (prev.markerEquals(next)) return@onUi
       state.current = next
@@ -71,12 +69,12 @@ class MapMarkerManager(
       }
 
       state.marker?.let { marker ->
-        markerBuilder.update(prev, next, marker, deferAnchors)
+        builder.update(prev, next, marker, deferAnchors)
         if (marker.isInfoWindowShown && !prev.infoWindowContentEquals(next)) {
           if (next.infoWindowIsEmpty()) {
-            marker.hideInfoWindow()
+            hideInfoWindow(next.id)
           } else {
-            reshowInfoWindow(marker, next.id)
+            showInfoWindow(next.id)
           }
         }
       }
@@ -86,59 +84,29 @@ class MapMarkerManager(
 
   fun remove(id: String) =
     onUi {
-      markerStates.remove(id)?.let { removeFromMap(it) }
+      states.remove(id)?.let { removeFromMap(it) }
     }
 
   fun showInfoWindow(id: String) =
     onUi {
-      val marker = markerStates[id]?.marker ?: return@onUi
-      if (marker.isInfoWindowShown) {
-        reshowInfoWindow(marker, id)
-      } else {
-        marker.showInfoWindow()
-      }
+      states[id]?.marker?.showInfoWindow()
     }
 
   fun hideInfoWindow(id: String) =
     onUi {
-      markerStates[id]?.marker?.hideInfoWindow()
+      states[id]?.marker?.hideInfoWindow()
     }
 
-  fun consumeInfoWindowRefresh(id: String): Boolean {
-    if (refreshingInfoWindowId != id) return false
-    refreshingInfoWindowId = null
-    return true
-  }
+  fun infoWindowView(markerTag: MarkerTag): ImageView? = builder.buildInfoWindow(markerTag)
 
-  private fun reshowInfoWindow(
-    marker: Marker,
-    id: String,
-  ) {
-    refreshingInfoWindowId = id
-    marker.showInfoWindow()
-    refreshingInfoWindowId = null
-  }
-
-  fun infoWindowView(markerTag: MarkerTag): ImageView? = markerBuilder.buildInfoWindow(markerTag)
-
-  fun clearIconCache() = markerBuilder.clearIconCache()
-
-  fun cancelAllRenders() =
-    onUi {
-      markerStates.values.forEach { state ->
-        if (state.marker == null) return@forEach
-        state.renderJob?.cancel()
-        state.renderJob = null
-        state.renderingStyleHash = null
-      }
-    }
+  fun clearIconCache() = builder.clearIconCache()
 
   fun destroy() =
     onUi {
       destroyed = true
-      markerStates.values.forEach { removeFromMap(it) }
-      markerStates.clear()
-      markerBuilder.clearIconCache()
+      states.values.forEach { removeFromMap(it) }
+      states.clear()
+      builder.clearIconCache()
       map = null
     }
 
@@ -158,7 +126,7 @@ class MapMarkerManager(
     }
 
     val styleHash = state.current.styleHash()
-    markerBuilder.cachedIcon(styleHash)?.let { cached ->
+    builder.cachedIcon(styleHash)?.let { cached ->
       state.renderingStyleHash = null
       applyIcon(id, token, cached)
       return
@@ -166,7 +134,7 @@ class MapMarkerManager(
 
     state.renderingStyleHash = styleHash
     state.renderJob =
-      markerBuilder.renderIcon(id, iconSvg, styleHash) { icon ->
+      builder.renderIcon(id, iconSvg, styleHash) { icon ->
         applyIcon(id, token, icon)
       }
   }
@@ -176,7 +144,7 @@ class MapMarkerManager(
     token: Long,
     icon: BitmapDescriptor?,
   ) {
-    val state = markerStates[id] ?: return
+    val state = states[id] ?: return
     if (state.currentToken != token) return
     state.renderJob = null
     state.renderingStyleHash = null
@@ -187,7 +155,7 @@ class MapMarkerManager(
     if (marker != null) {
       marker.setIcon(icon)
       if (state.anchorsDeferred) {
-        markerBuilder.applyAnchors(state.current, marker)
+        builder.applyAnchors(state.current, marker)
         state.anchorsDeferred = false
       }
       return
@@ -198,13 +166,10 @@ class MapMarkerManager(
   }
 
   private fun addToMap(state: MarkerState) {
-    val marker =
-      map?.addMarker(markerBuilder.build(state.current, state.appliedIcon))?.apply {
+    state.marker =
+      map?.addMarker(builder.build(state.current, state.appliedIcon))?.apply {
         tag = MarkerTag(id = state.current.id, iconSvg = state.current.infoWindowIconSvg)
       }
-    if (marker != null) {
-      state.marker = marker
-    }
     state.appliedIcon = null
     state.anchorsDeferred = false
   }

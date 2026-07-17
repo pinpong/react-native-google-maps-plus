@@ -30,7 +30,7 @@ final class MapCircleManager {
   func add(_ circle: RNCircle) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: circle.id).map { self.removeFromMap($0) }
+      self.remove(id: circle.id)
       let state = CircleState(current: circle)
       self.states[circle.id] = state
       if self.mapView != nil {

@@ -1,5 +1,6 @@
 package com.rngooglemapsplus
 
+import android.annotation.SuppressLint
 import android.content.ComponentCallbacks2
 import android.content.res.Configuration
 import androidx.lifecycle.Lifecycle
@@ -14,10 +15,11 @@ import com.google.android.gms.maps.model.StreetViewPanoramaCamera
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation
 import com.google.android.gms.maps.model.StreetViewPanoramaOrientation
 import com.google.android.gms.maps.model.StreetViewSource
+import com.rngooglemapsplus.extensions.toRNLatLng
+import com.rngooglemapsplus.extensions.toRNLocation
 import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
-import com.rngooglemapsplus.extensions.toRnLatLng
-import com.rngooglemapsplus.extensions.toRnLocation
 
+@SuppressLint("ViewConstructor")
 class StreetViewPanoramaViewImpl(
   private val reactContext: ThemedReactContext,
   private val locationHandler: LocationHandler,
@@ -84,7 +86,7 @@ class StreetViewPanoramaViewImpl(
         }
     }
 
-  override fun onStreetViewPanoramaChangeNullable(location: StreetViewPanoramaLocation?) {
+  override fun onStreetViewPanoramaChangeNullable(location: StreetViewPanoramaLocation?) =
     onUi {
       if (location == null) {
         mapErrorHandler.report(RNMapErrorCode.PANORAMA_NOT_FOUND, "panorama not found")
@@ -99,16 +101,15 @@ class StreetViewPanoramaViewImpl(
             }.toTypedArray()
         onPanoramaChange?.invoke(
           RNStreetViewPanoramaLocation(
-            position = location.position.toRnLatLng(),
+            position = location.position.toRNLatLng(),
             panoramaId = location.panoId,
             links = links,
           ),
         )
       }
     }
-  }
 
-  override fun onStreetViewPanoramaCameraChange(camera: StreetViewPanoramaCamera) {
+  override fun onStreetViewPanoramaCameraChange(camera: StreetViewPanoramaCamera) =
     onUi {
       onCameraChange?.invoke(
         RNStreetViewCamera(
@@ -118,9 +119,8 @@ class StreetViewPanoramaViewImpl(
         ),
       )
     }
-  }
 
-  override fun onStreetViewPanoramaClick(orientation: StreetViewPanoramaOrientation) {
+  override fun onStreetViewPanoramaClick(orientation: StreetViewPanoramaOrientation) =
     onUi {
       onPanoramaPress?.invoke(
         RNStreetViewOrientation(
@@ -129,11 +129,10 @@ class StreetViewPanoramaViewImpl(
         ),
       )
     }
-  }
 
   fun initLocationCallbacks() {
     locationHandler.onUpdate = { location ->
-      onUi { onLocationUpdate?.invoke(location.toRnLocation()) }
+      onUi { onLocationUpdate?.invoke(location.toRNLocation()) }
     }
     locationHandler.onError = { error ->
       onUi { onLocationError?.invoke(error) }
@@ -245,11 +244,17 @@ class StreetViewPanoramaViewImpl(
 
   override fun onConfigurationChanged(newConfig: Configuration) {}
 
+  @Deprecated(
+    "Deprecated in Java",
+    ReplaceWith("onTrimMemory(level)"),
+  )
   override fun onLowMemory() {
     streetViewPanoramaView?.onLowMemory()
   }
 
   override fun onTrimMemory(level: Int) {
-    streetViewPanoramaView?.onLowMemory()
+    if (level != ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+      streetViewPanoramaView?.onLowMemory()
+    }
   }
 }

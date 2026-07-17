@@ -21,7 +21,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   private var currentActivityType: CLActivityType = kCLActivityTypeDefault
 
   var onUpdate: ((CLLocation) -> Void)?
-  var onError: ((_ error: RNLocationErrorCode) -> Void)?
+  var onError: ((RNLocationErrorCode) -> Void)?
 
   override init() {
     super.init()
@@ -71,8 +71,8 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
         UIAlertAction(
           title: openLocationSettingsButton ?? "Open settings",
           style: .default
-        ) { _ in
-          self.openLocationSettings()
+        ) { [weak self] _ in
+          self?.openLocationSettings()
         }
       )
       vc.present(alert, animated: true, completion: nil)

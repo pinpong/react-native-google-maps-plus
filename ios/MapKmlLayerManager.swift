@@ -31,7 +31,7 @@ final class MapKmlLayerManager {
   func add(_ kmlLayer: RNKMLayer) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: kmlLayer.id).map { self.removeFromMap($0) }
+      self.remove(id: kmlLayer.id)
       let state = KmlLayerState(current: kmlLayer)
       self.states[kmlLayer.id] = state
       if self.mapView != nil {
@@ -64,14 +64,10 @@ final class MapKmlLayerManager {
     }
   }
 
-  private func removeFromMap(_ state: KmlLayerState) {
-    state.renderer?.clear()
-  }
-
   private func addToMap(_ state: KmlLayerState) {
     guard let mapView = self.mapView else { return }
     guard let data = state.current.kmlString.data(using: .utf8) else {
-      mapErrorHandler.report(RNMapErrorCode.kmlLayerFailed, "kml layer parse failed: id=\(state.current.id)")
+      self.mapErrorHandler.report(RNMapErrorCode.kmlLayerFailed, "kmlLayerId=\(state.current.id) parse failed")
       return
     }
     let parser = GMUKMLParser(data: data)
@@ -84,5 +80,9 @@ final class MapKmlLayerManager {
     )
     renderer.render()
     state.renderer = renderer
+  }
+
+  private func removeFromMap(_ state: KmlLayerState) {
+    state.renderer?.clear()
   }
 }

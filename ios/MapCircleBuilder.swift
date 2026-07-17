@@ -2,9 +2,10 @@ import GoogleMaps
 
 final class MapCircleBuilder {
   func build(_ c: RNCircle) -> GMSCircle {
-    let circle = GMSCircle()
-    circle.position = c.center.toCLLocationCoordinate2D()
-    circle.radius = c.radius
+    let circle = GMSCircle(
+      position: c.center.toCLLocationCoordinate2D(),
+      radius: c.radius
+    )
     c.fillColor.map { circle.fillColor = $0.toUIColor() }
     c.strokeColor.map { circle.strokeColor = $0.toUIColor() }
     c.strokeWidth.map { circle.strokeWidth = CGFloat($0) }

@@ -34,12 +34,12 @@ class MapUrlTileOverlayBuilder(
         }
       }
 
-    val opts = TileOverlayOptions().tileProvider(provider)
-
-    t.fadeIn?.let { opts.fadeIn(it) }
-    t.zIndex?.let { opts.zIndex(it.toFloat()) }
-    t.opacity?.let { opts.transparency(1f - it.toFloat()) }
-    return opts
+    return TileOverlayOptions().apply {
+      tileProvider(provider)
+      t.opacity?.let { transparency(1f - it.toFloat()) }
+      t.fadeIn?.let { fadeIn(it) }
+      t.zIndex?.let { zIndex(it.toFloat()) }
+    }
   }
 
   fun update(

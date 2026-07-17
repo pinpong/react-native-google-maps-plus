@@ -30,7 +30,7 @@ final class MapPolylineManager {
   func add(_ polyline: RNPolyline) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: polyline.id).map { self.removeFromMap($0) }
+      self.remove(id: polyline.id)
       let state = PolylineState(current: polyline)
       self.states[polyline.id] = state
       if self.mapView != nil {

@@ -30,7 +30,7 @@ final class MapPolygonManager {
   func add(_ polygon: RNPolygon) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: polygon.id).map { self.removeFromMap($0) }
+      self.remove(id: polygon.id)
       let state = PolygonState(current: polygon)
       self.states[polygon.id] = state
       if self.mapView != nil {

@@ -283,7 +283,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)? {
+  var onLocationError: ((RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
   }
   var onMapPress: ((RNLatLng) -> Void)? {

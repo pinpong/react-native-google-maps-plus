@@ -3,6 +3,7 @@ package com.rngooglemapsplus
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.TileOverlay
 import com.rngooglemapsplus.extensions.urlTileOverlayEquals
+import com.rngooglemapsplus.extensions.urlTileOverlayNeedsRebuild
 
 private class UrlTileOverlayState(
   var current: RNUrlTileOverlay,
@@ -27,7 +28,7 @@ class MapUrlTileOverlayManager(
   fun add(urlTileOverlay: RNUrlTileOverlay) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(urlTileOverlay.id)?.let { removeFromMap(it) }
+      remove(urlTileOverlay.id)
       val state = UrlTileOverlayState(urlTileOverlay)
       states[urlTileOverlay.id] = state
       if (map != null) addToMap(state)
@@ -41,7 +42,7 @@ class MapUrlTileOverlayManager(
       if (prev.urlTileOverlayEquals(next)) return@onUi
       state.current = next
       val overlay = state.overlay ?: return@onUi
-      if (prev.url != next.url || prev.tileSize != next.tileSize) {
+      if (prev.urlTileOverlayNeedsRebuild(next)) {
         removeFromMap(state)
         addToMap(state)
       } else {

@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import MarkerTag
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -170,7 +169,7 @@ class MapMarkerBuilder(
       m.draggable?.let { draggable(it) }
       m.rotation?.let { rotation(it.toFloat()) }
       m.infoWindowAnchor?.let { infoWindowAnchor(it.x.toFloat(), it.y.toFloat()) }
-      m.anchor?.let { anchor((m.anchor.x).toFloat(), (m.anchor.y).toFloat()) }
+      m.anchor?.let { anchor(it.x.toFloat(), it.y.toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
 
@@ -295,27 +294,17 @@ class MapMarkerBuilder(
   fun buildInfoWindow(markerTag: MarkerTag): ImageView? {
     val iconSvg = markerTag.iconSvg ?: return null
 
-    val wPx =
-      markerTag.iconSvg.width
-        .dpToPx()
-        .toInt()
-    val hPx =
-      markerTag.iconSvg.height
-        .dpToPx()
-        .toInt()
+    val wPx = iconSvg.width.dpToPx().toInt()
+    val hPx = iconSvg.height.dpToPx().toInt()
 
     if (wPx <= 0 || hPx <= 0) {
       mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} invalid svg size")
-      return ImageView(context)
+      return createFallbackImageView()
     }
 
     val svgView =
       ImageView(context).apply {
-        layoutParams =
-          LinearLayout.LayoutParams(
-            iconSvg.width.dpToPx().toInt(),
-            iconSvg.height.dpToPx().toInt(),
-          )
+        layoutParams = LinearLayout.LayoutParams(wPx, hPx)
       }
 
     try {
@@ -328,11 +317,13 @@ class MapMarkerBuilder(
       svgView.setImageDrawable(drawable)
     } catch (e: Exception) {
       mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed", e)
-      return ImageView(context)
+      return createFallbackImageView()
     }
 
     return svgView
   }
+
+  private fun createFallbackImageView(): ImageView = ImageView(context)
 
   private fun createFallbackBitmap(): Bitmap =
     createBitmap(1, 1, Bitmap.Config.ARGB_8888).apply {
@@ -355,14 +346,8 @@ class MapMarkerBuilder(
     iconSvg: RNMarkerSvg,
     markerId: String,
   ): RenderBitmapResult {
-    val wPx =
-      iconSvg.width
-        .dpToPx()
-        .toInt()
-    val hPx =
-      iconSvg.height
-        .dpToPx()
-        .toInt()
+    val wPx = iconSvg.width.dpToPx().toInt()
+    val hPx = iconSvg.height.dpToPx().toInt()
 
     if (wPx <= 0 || hPx <= 0) {
       mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId invalid svg size")

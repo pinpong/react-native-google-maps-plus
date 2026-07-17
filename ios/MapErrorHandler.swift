@@ -14,8 +14,7 @@ final class MapErrorHandler {
     }
 
     onMain { [weak self] in
-      guard let self else { return }
-      self.callback?(code, msg)
+      self?.callback?(code, msg)
     }
   }
 }

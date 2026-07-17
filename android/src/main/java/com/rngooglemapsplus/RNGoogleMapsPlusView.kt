@@ -21,7 +21,6 @@ class RNGoogleMapsPlusView(
 ) : HybridRNGoogleMapsPlusViewSpec() {
   private val mapErrorHandler = MapErrorHandler()
 
-  private var currentCustomMapStyle: String? = null
   private val permissionHandler = PermissionHandler(context)
   private val locationHandler = LocationHandler(context)
   private val playServiceHandler = PlayServicesHandler(context)
@@ -95,7 +94,6 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      currentCustomMapStyle = value
       value?.let {
         view.customMapStyle = MapStyleOptions(it)
       }

@@ -30,7 +30,7 @@ class MapHeatmapManager(
   fun add(heatmap: RNHeatmap) =
     onUi {
       if (destroyed) return@onUi
-      states.remove(heatmap.id)?.let { removeFromMap(it) }
+      remove(heatmap.id)
       val state = HeatmapState(heatmap)
       states[heatmap.id] = state
       if (map != null) addToMap(state)

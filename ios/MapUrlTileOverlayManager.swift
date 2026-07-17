@@ -30,7 +30,7 @@ final class MapUrlTileOverlayManager {
   func add(_ urlTileOverlay: RNUrlTileOverlay) {
     onMain {
       guard !self.destroyed else { return }
-      self.states.removeValue(forKey: urlTileOverlay.id).map { self.removeFromMap($0) }
+      self.remove(id: urlTileOverlay.id)
       let state = UrlTileOverlayState(current: urlTileOverlay)
       self.states[urlTileOverlay.id] = state
       if self.mapView != nil {
@@ -47,7 +47,7 @@ final class MapUrlTileOverlayManager {
       if prev.urlTileOverlayEquals(next) { return }
       state.current = next
       guard let overlay = state.overlay else { return }
-      if prev.url != next.url || prev.tileSize != next.tileSize {
+      if prev.urlTileOverlayNeedsRebuild(next) {
         self.removeFromMap(state)
         self.addToMap(state)
       } else {

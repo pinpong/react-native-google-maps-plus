@@ -18,22 +18,21 @@ private final class MarkerState {
 }
 
 final class MapMarkerManager {
-  private let markerBuilder: MapMarkerBuilder
+  private let builder: MapMarkerBuilder
   private weak var mapView: GMSMapView?
-  private var markerStates: [String: MarkerState] = [:]
+  private var states: [String: MarkerState] = [:]
   private var iconGeneration: UInt64 = 0
   private var destroyed = false
-  private var refreshingInfoWindowId: String?
 
   init(builder: MapMarkerBuilder) {
-    self.markerBuilder = builder
+    self.builder = builder
   }
 
   func attachMap(_ mapView: GMSMapView) {
     onMain {
       guard !self.destroyed else { return }
       self.mapView = mapView
-      self.markerStates.values
+      self.states.values
         .filter { $0.marker == nil && $0.iconReady && $0.renderTask == nil }
         .forEach { self.addToMap($0) }
     }
@@ -42,9 +41,9 @@ final class MapMarkerManager {
   func add(_ marker: RNMarker) {
     onMain {
       guard !self.destroyed else { return }
-      self.markerStates.removeValue(forKey: marker.id).map { self.removeFromMap($0) }
+      self.remove(id: marker.id)
       let state = MarkerState(current: marker)
-      self.markerStates[marker.id] = state
+      self.states[marker.id] = state
       self.requestIcon(for: state)
     }
   }
@@ -52,7 +51,7 @@ final class MapMarkerManager {
   func update(_ next: RNMarker) {
     onMain {
       guard !self.destroyed else { return }
-      guard let state = self.markerStates[next.id] else { return }
+      guard let state = self.states[next.id] else { return }
       let prev = state.current
       if prev.markerEquals(next) { return }
       state.current = next
@@ -67,14 +66,14 @@ final class MapMarkerManager {
       }
 
       state.marker.map { marker in
-        self.markerBuilder.update(prev, next, marker, deferAnchors: deferAnchors)
+        self.builder.update(prev, next, marker, deferAnchors: deferAnchors)
         guard let mapView = self.mapView, mapView.selectedMarker == marker,
               !prev.infoWindowContentEquals(next) else { return }
 
         if next.infoWindowIsEmpty() {
-          mapView.selectedMarker = nil
+          self.hideInfoWindow(id: next.id)
         } else if prev.infoWindowIconSvg != nil || next.infoWindowIconSvg != nil {
-          self.reshowInfoWindow(marker, id: next.id)
+          self.showInfoWindow(id: next.id)
         } else {
           marker.tracksInfoWindowChanges = true
           marker.tracksInfoWindowChanges = false
@@ -87,70 +86,42 @@ final class MapMarkerManager {
 
   func remove(id: String) {
     onMain {
-      self.markerStates.removeValue(forKey: id).map { self.removeFromMap($0) }
+      self.states.removeValue(forKey: id).map { self.removeFromMap($0) }
     }
   }
 
   func showInfoWindow(id: String) {
     onMain {
       guard let mapView = self.mapView,
-            let marker = self.markerStates[id]?.marker else { return }
-      if mapView.selectedMarker == marker {
-        self.reshowInfoWindow(marker, id: id)
-      } else {
-        mapView.selectedMarker = marker
-      }
+            let marker = self.states[id]?.marker else { return }
+      mapView.selectedMarker = marker
     }
   }
 
   func hideInfoWindow(id: String) {
     onMain {
-      guard let marker = self.markerStates[id]?.marker else { return }
-      if self.mapView?.selectedMarker == marker {
-        self.mapView?.selectedMarker = nil
+      guard let mapView = self.mapView,
+            let marker = self.states[id]?.marker else { return }
+      if mapView.selectedMarker == marker {
+        mapView.selectedMarker = nil
       }
     }
-  }
-
-  func consumeInfoWindowRefresh(_ id: String) -> Bool {
-    guard refreshingInfoWindowId == id else { return false }
-    refreshingInfoWindowId = nil
-    return true
-  }
-
-  private func reshowInfoWindow(_ marker: GMSMarker, id: String) {
-    refreshingInfoWindowId = id
-    self.mapView?.selectedMarker = nil
-    self.mapView?.selectedMarker = marker
-    refreshingInfoWindowId = nil
   }
 
   func infoWindowView(markerTag: MarkerTag) -> UIImageView? {
-    markerBuilder.buildInfoWindow(markerTag: markerTag)
+    builder.buildInfoWindow(markerTag: markerTag)
   }
 
   func clearIconCache() {
-    markerBuilder.clearIconCache()
-  }
-
-  func cancelAllRenders() {
-    onMain {
-      self.markerStates.values.forEach { state in
-        if state.marker == nil { return }
-        state.renderTask?.cancel()
-        state.renderTask = nil
-        state.renderingStyleHash = nil
-      }
-      CATransaction.flush()
-    }
+    builder.clearIconCache()
   }
 
   func destroy() {
     onMain {
       self.destroyed = true
-      self.markerStates.values.forEach { self.removeFromMap($0) }
-      self.markerStates.removeAll()
-      self.markerBuilder.clearIconCache()
+      self.states.values.forEach { self.removeFromMap($0) }
+      self.states.removeAll()
+      self.builder.clearIconCache()
       self.mapView = nil
       CATransaction.flush()
     }
@@ -171,14 +142,14 @@ final class MapMarkerManager {
     }
 
     let styleHash = state.current.styleHash()
-    if let cached = markerBuilder.cachedIcon(styleHash: styleHash) {
+    if let cached = builder.cachedIcon(styleHash: styleHash) {
       state.renderingStyleHash = nil
       applyIcon(id: id, token: token, icon: cached)
       return
     }
 
     state.renderingStyleHash = styleHash
-    state.renderTask = markerBuilder.renderIcon(
+    state.renderTask = builder.renderIcon(
       markerId: id,
       iconSvg: iconSvg,
       styleHash: styleHash
@@ -188,7 +159,7 @@ final class MapMarkerManager {
   }
 
   private func applyIcon(id: String, token: UInt64, icon: UIImage?) {
-    guard let state = markerStates[id] else { return }
+    guard let state = states[id] else { return }
     guard state.currentToken == token else { return }
     state.renderTask = nil
     state.renderingStyleHash = nil
@@ -200,7 +171,7 @@ final class MapMarkerManager {
         marker.tracksViewChanges = true
         marker.icon = icon
         if state.anchorsDeferred {
-          self.markerBuilder.applyAnchors(state.current, marker)
+          self.builder.applyAnchors(state.current, marker)
           state.anchorsDeferred = false
         }
         marker.tracksViewChanges = false
@@ -215,7 +186,7 @@ final class MapMarkerManager {
   }
 
   private func addToMap(_ state: MarkerState) {
-    let marker = markerBuilder.build(state.current, icon: state.appliedIcon)
+    let marker = builder.build(state.current, icon: state.appliedIcon)
     marker.map = mapView
     state.marker = marker
     state.appliedIcon = nil

@@ -50,63 +50,60 @@ final class MapMarkerBuilder {
   }
 
   func update(_ prev: RNMarker, _ next: RNMarker, _ m: GMSMarker, deferAnchors: Bool = false) {
-    onMain {
-      withCATransaction(disableActions: true) {
+    withCATransaction(disableActions: true) {
+      if !prev.coordinatesEquals(next) {
+        m.position = next.coordinate.toCLLocationCoordinate2D()
+      }
 
-        if !prev.coordinateEquals(next) {
-          m.position = next.coordinate.toCLLocationCoordinate2D()
-        }
+      if !deferAnchors, !prev.anchorEquals(next) {
+        m.groundAnchor = CGPoint(
+          x: next.anchor?.x ?? 0.5,
+          y: next.anchor?.y ?? 1
+        )
+      }
 
-        if !deferAnchors, !prev.anchorEquals(next) {
-          m.groundAnchor = CGPoint(
-            x: next.anchor?.x ?? 0.5,
-            y: next.anchor?.y ?? 1
-          )
-        }
+      if !deferAnchors, !prev.infoWindowAnchorEquals(next) {
+        m.infoWindowAnchor = CGPoint(
+          x: next.infoWindowAnchor?.x ?? 0.5,
+          y: next.infoWindowAnchor?.y ?? 0
+        )
+      }
 
-        if !deferAnchors, !prev.infoWindowAnchorEquals(next) {
-          m.infoWindowAnchor = CGPoint(
-            x: next.infoWindowAnchor?.x ?? 0.5,
-            y: next.infoWindowAnchor?.y ?? 0
-          )
-        }
+      if prev.title != next.title {
+        m.title = next.title
+      }
 
-        if prev.title != next.title {
-          m.title = next.title
-        }
+      if prev.snippet != next.snippet {
+        m.snippet = next.snippet
+      }
 
-        if prev.snippet != next.snippet {
-          m.snippet = next.snippet
-        }
+      if prev.opacity != next.opacity {
+        let opacity = Float(next.opacity ?? 1)
+        m.opacity = opacity
+        m.iconView?.alpha = CGFloat(opacity)
+      }
 
-        if prev.opacity != next.opacity {
-          let opacity = Float(next.opacity ?? 1)
-          m.opacity = opacity
-          m.iconView?.alpha = CGFloat(opacity)
-        }
+      if prev.flat != next.flat {
+        m.isFlat = next.flat ?? false
+      }
 
-        if prev.flat != next.flat {
-          m.isFlat = next.flat ?? false
-        }
+      if prev.draggable != next.draggable {
+        m.isDraggable = next.draggable ?? false
+      }
 
-        if prev.draggable != next.draggable {
-          m.isDraggable = next.draggable ?? false
-        }
+      if prev.rotation != next.rotation {
+        m.rotation = next.rotation ?? 0
+      }
 
-        if prev.rotation != next.rotation {
-          m.rotation = next.rotation ?? 0
-        }
+      if prev.zIndex != next.zIndex {
+        m.zIndex = Int32(next.zIndex ?? 0)
+      }
 
-        if prev.zIndex != next.zIndex {
-          m.zIndex = Int32(next.zIndex ?? 0)
-        }
-
-        if !prev.markerInfoWindowStyleEquals(next) {
-          m.tagData = MarkerTag(
-            id: next.id,
-            iconSvg: next.infoWindowIconSvg
-          )
-        }
+      if !prev.markerInfoWindowStyleEquals(next) {
+        m.tagData = MarkerTag(
+          id: next.id,
+          iconSvg: next.infoWindowIconSvg
+        )
       }
     }
   }
@@ -136,15 +133,13 @@ final class MapMarkerBuilder {
     styleHash: NSNumber,
     onReady: @escaping (UIImage) -> Void
   ) -> Task<Void, Never> {
-    let scale = UIScreen.main.scale
-
-    return Task(priority: .userInitiated) { [weak self] in
+    Task(priority: .userInitiated) { [weak self] in
       guard let self else { return }
 
-      let renderResult = self.renderUIImage(iconSvg, markerId, scale)
+      let renderResult = self.renderUIImage(iconSvg, markerId)
       guard !Task.isCancelled else { return }
 
-      guard let renderResult = renderResult else {
+      guard let renderResult else {
         await MainActor.run {
           guard !Task.isCancelled else { return }
           onReady(self.createFallbackUIImage())
@@ -229,8 +224,7 @@ final class MapMarkerBuilder {
 
   private func renderUIImage(
     _ iconSvg: RNMarkerSvg,
-    _ markerId: String,
-    _ scale: CGFloat
+    _ markerId: String
   ) -> (
     image: UIImage, isFallback: Bool
   )? {
@@ -278,7 +272,7 @@ final class MapMarkerBuilder {
       if let uiImage = uiImage {
         return (uiImage, false)
       } else {
-        mapErrorHandler.report(.markerIconBuildFailed, "markerId=\(markerId) icon: svg export to UIImage failed")
+        mapErrorHandler.report(RNMapErrorCode.markerIconBuildFailed, "markerId=\(markerId) icon: svg export to UIImage failed")
         return (createFallbackUIImage(), true)
       }
     }

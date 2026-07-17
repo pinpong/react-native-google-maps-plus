@@ -9,4 +9,10 @@ extension RNUrlTileOverlay {
     if fadeIn != b.fadeIn { return false }
     return true
   }
+
+  func urlTileOverlayNeedsRebuild(_ b: RNUrlTileOverlay) -> Bool {
+    if url != b.url { return true }
+    if tileSize != b.tileSize { return true }
+    return false
+  }
 }

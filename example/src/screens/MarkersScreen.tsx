@@ -6,7 +6,7 @@ import ControlPanel from '@src/components/ControlPanel';
 import MapConfigDialog from '@src/components/MapConfigDialog';
 import MapWrapper from '@src/components/MapWrapper';
 import { useHeaderButton } from '@src/hooks/useHeaderButton';
-import { makeInfoWindowIconSvg, makeMarker } from '@src/utils/mapGenerators';
+import { makeMarker } from '@src/utils/mapGenerators';
 import { RNMarkerValidator } from '@src/utils/validator';
 
 import type { RNMapUiSettings } from 'react-native-google-maps-plus';
@@ -105,23 +105,6 @@ export default function MarkersScreen() {
     mapRef.current?.showMarkerInfoWindow(id);
   }, []);
 
-  const handleMapPress = useCallback(() => {
-    setMarkers((prev) =>
-      prev?.map((m, i) =>
-        i === 0
-          ? {
-              ...m,
-              infoWindowIconSvg: {
-                width: 150,
-                height: 50,
-                svgString: makeInfoWindowIconSvg(150, 50),
-              },
-            }
-          : m
-      )
-    );
-  }, []);
-
   return (
     <>
       <MapWrapper
@@ -129,7 +112,6 @@ export default function MarkersScreen() {
         uiSettings={uiSettings}
         markers={markers ? markers : []}
         onMarkerPress={handleMarkerPress}
-        onInfoWindowPress={handleMapPress}
       >
         <ControlPanel viewRef={mapRef} buttons={buttons} />
       </MapWrapper>
