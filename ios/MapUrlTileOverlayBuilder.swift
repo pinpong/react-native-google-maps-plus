@@ -1,6 +1,6 @@
 import GoogleMaps
 
-class MapUrlTileOverlayBuilder {
+final class MapUrlTileOverlayBuilder {
   func build(_ t: RNUrlTileOverlay) -> GMSURLTileLayer {
 
     let constructor: GMSTileURLConstructor = { (x: UInt, y: UInt, zoom: UInt) in
@@ -19,5 +19,25 @@ class MapUrlTileOverlayBuilder {
     t.fadeIn.map { layer.fadeIn = $0 }
 
     return layer
+  }
+
+  func update(
+    _ prev: RNUrlTileOverlay,
+    _ next: RNUrlTileOverlay,
+    _ layer: GMSURLTileLayer
+  ) {
+    onMain {
+      if prev.zIndex != next.zIndex {
+        layer.zIndex = Int32(next.zIndex ?? 0)
+      }
+
+      if prev.opacity != next.opacity {
+        layer.opacity = Float(next.opacity ?? 1)
+      }
+
+      if prev.fadeIn != next.fadeIn {
+        layer.fadeIn = next.fadeIn ?? true
+      }
+    }
   }
 }

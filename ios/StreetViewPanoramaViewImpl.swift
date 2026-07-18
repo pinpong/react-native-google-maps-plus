@@ -91,13 +91,13 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
 
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
-      onMain { [weak self] in
-        self?.onLocationUpdate?(loc.toRnLocation())
+      onMain {
+        self?.onLocationUpdate?(loc.toRNLocation())
       }
     }
 
     locationHandler.onError = { [weak self] error in
-      onMain { [weak self] in
+      onMain {
         self?.onLocationError?(error)
       }
     }

@@ -1,6 +1,5 @@
 import CoreLocation
 import GoogleMaps
-import GoogleMapsUtils
 import NitroModules
 import UIKit
 
@@ -9,40 +8,32 @@ GMSIndoorDisplayDelegate {
 
   private let mapErrorHandler: MapErrorHandler
   private let locationHandler: LocationHandler
-  private let markerBuilder: MapMarkerBuilder
+  private let markerManager: MapMarkerManager
   private var mapView: GMSMapView?
   private var mapViewInitialized = false
   private var mapViewLoaded = false
   private var deInitialized = false
 
-  private var pendingMarkers: [(id: String, marker: GMSMarker)] = []
-  private var pendingPolylines: [(id: String, polyline: GMSPolyline)] = []
-  private var pendingPolygons: [(id: String, polygon: GMSPolygon)] = []
-  private var pendingCircles: [(id: String, circle: GMSCircle)] = []
-  private var pendingHeatmaps: [(id: String, heatmap: GMUHeatmapTileLayer)] = []
-  private var pendingKmlLayers: [(id: String, kmlString: String)] = []
-  private var pendingUrlTileOverlays:
-    [(id: String, urlTileOverlay: GMSURLTileLayer)] = []
-
-  private var markersById: [String: GMSMarker] = [:]
-  private var polylinesById: [String: GMSPolyline] = [:]
-  private var polygonsById: [String: GMSPolygon] = [:]
-  private var circlesById: [String: GMSCircle] = [:]
-  private var heatmapsById: [String: GMUHeatmapTileLayer] = [:]
-  private var kmlLayerById: [String: GMUGeometryRenderer] = [:]
-  private var urlTileOverlays: [String: GMSURLTileLayer] = [:]
+  private let polylineManager = MapPolylineManager(builder: MapPolylineBuilder())
+  private let polygonManager = MapPolygonManager(builder: MapPolygonBuilder())
+  private let circleManager = MapCircleManager(builder: MapCircleBuilder())
+  private let heatmapManager = MapHeatmapManager(builder: MapHeatmapBuilder())
+  private let urlTileOverlayManager = MapUrlTileOverlayManager(builder: MapUrlTileOverlayBuilder())
+  private let kmlLayerManager: MapKmlLayerManager
 
   private var cameraMoveReasonIsGesture: Bool = false
 
   init(
     frame: CGRect = .zero,
     mapErrorHandler: MapErrorHandler,
-    locationHandler: LocationHandler,
-    markerBuilder: MapMarkerBuilder
+    locationHandler: LocationHandler
   ) {
     self.mapErrorHandler = mapErrorHandler
     self.locationHandler = locationHandler
-    self.markerBuilder = markerBuilder
+    self.markerManager = MapMarkerManager(
+      builder: MapMarkerBuilder(mapErrorHandler: mapErrorHandler)
+    )
+    self.kmlLayerManager = MapKmlLayerManager(mapErrorHandler: mapErrorHandler)
     super.init(frame: frame)
   }
 
@@ -114,16 +105,14 @@ GMSIndoorDisplayDelegate {
 
   private func initLocationCallbacks() {
     locationHandler.onUpdate = { [weak self] loc in
-      onMain { [weak self] in
-        guard let self = self else { return }
-        self.onLocationUpdate?(loc.toRnLocation())
+      onMain {
+        self?.onLocationUpdate?(loc.toRNLocation())
       }
     }
 
     locationHandler.onError = { [weak self] error in
-      onMain { [weak self] in
-        guard let self = self else { return }
-        self.onLocationError?(error)
+      onMain {
+        self?.onLocationError?(error)
       }
     }
   }
@@ -142,43 +131,14 @@ GMSIndoorDisplayDelegate {
     ({ self.mapZoomConfig = self.mapZoomConfig })()
     ({ self.locationConfig = self.locationConfig })()
 
-    if !pendingMarkers.isEmpty {
-      pendingMarkers.forEach { addMarkerInternal(id: $0.id, marker: $0.marker) }
-      pendingMarkers.removeAll()
-    }
-    if !pendingPolylines.isEmpty {
-      pendingPolylines.forEach {
-        addPolylineInternal(id: $0.id, polyline: $0.polyline)
-      }
-      pendingPolylines.removeAll()
-    }
-    if !pendingPolygons.isEmpty {
-      pendingPolygons.forEach {
-        addPolygonInternal(id: $0.id, polygon: $0.polygon)
-      }
-      pendingPolygons.removeAll()
-    }
-    if !pendingCircles.isEmpty {
-      pendingCircles.forEach { addCircleInternal(id: $0.id, circle: $0.circle) }
-      pendingCircles.removeAll()
-    }
-    if !pendingHeatmaps.isEmpty {
-      pendingHeatmaps.forEach {
-        addHeatmapInternal(id: $0.id, heatmap: $0.heatmap)
-      }
-      pendingHeatmaps.removeAll()
-    }
-    if !pendingKmlLayers.isEmpty {
-      pendingKmlLayers.forEach {
-        addKmlLayerInternal(id: $0.id, kmlString: $0.kmlString)
-      }
-      pendingKmlLayers.removeAll()
-    }
-    if !pendingUrlTileOverlays.isEmpty {
-      pendingUrlTileOverlays.forEach {
-        addUrlTileOverlayInternal(id: $0.id, urlTileOverlay: $0.urlTileOverlay)
-      }
-      pendingUrlTileOverlays.removeAll()
+    mapView.map { mapView in
+      markerManager.attachMap(mapView)
+      polylineManager.attachMap(mapView)
+      polygonManager.attachMap(mapView)
+      circleManager.attachMap(mapView)
+      heatmapManager.attachMap(mapView)
+      kmlLayerManager.attachMap(mapView)
+      urlTileOverlayManager.attachMap(mapView)
     }
   }
 
@@ -325,7 +285,7 @@ GMSIndoorDisplayDelegate {
   var onMapReady: ((Bool) -> Void)?
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)?
+  var onLocationError: ((RNLocationErrorCode) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
   var onMapLongPress: ((RNLatLng) -> Void)?
   var onPoiPress: ((String, String, RNLatLng) -> Void)?
@@ -348,20 +308,15 @@ GMSIndoorDisplayDelegate {
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
 
   func showMarkerInfoWindow(id: String) {
-    onMain {
-      guard let marker = self.markersById[id] else { return }
-      self.mapView?.selectedMarker = nil
-      self.mapView?.selectedMarker = marker
-    }
+    markerManager.showInfoWindow(id: id)
   }
 
   func hideMarkerInfoWindow(id: String) {
-    onMain {
-      guard let marker = self.markersById[id] else { return }
-      if self.mapView?.selectedMarker == marker {
-        self.mapView?.selectedMarker = nil
-      }
-    }
+    markerManager.hideInfoWindow(id: id)
+  }
+
+  func clearMarkerIconCache() {
+    markerManager.clearIconCache()
   }
 
   func setCamera(camera: GMSCameraPosition, animated: Bool, durationMs: Double) {
@@ -482,289 +437,88 @@ GMSIndoorDisplayDelegate {
     return promise
   }
 
-  func addMarker(id: String, marker: GMSMarker) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingMarkers.append((id, marker))
-        return
-      }
-      self.markersById.removeValue(forKey: id).map { $0.map = nil }
-      self.addMarkerInternal(id: id, marker: marker)
-    }
+  func addMarker(_ marker: RNMarker) {
+    markerManager.add(marker)
   }
 
-  private func addMarkerInternal(id: String, marker: GMSMarker) {
-    onMain {
-      marker.map = self.mapView
-      self.markersById[id] = marker
-    }
-  }
-
-  func updateMarker(id: String, block: @escaping (GMSMarker) -> Void) {
-    onMain {
-      self.markersById[id].map {
-        block($0)
-        if let mapView = self.mapView, mapView.selectedMarker == $0 {
-          mapView.selectedMarker = nil
-          mapView.selectedMarker = $0
-        }
-      }
-    }
+  func updateMarker(_ marker: RNMarker) {
+    markerManager.update(marker)
   }
 
   func removeMarker(id: String) {
-    onMain {
-      self.markersById.removeValue(forKey: id).map {
-        $0.icon = nil
-        $0.map = nil
-      }
-    }
+    markerManager.remove(id: id)
   }
 
-  func clearMarkers() {
-    onMain {
-      self.markersById.values.forEach { $0.map = nil }
-      self.markersById.removeAll()
-      self.pendingMarkers.removeAll()
-    }
+  func addPolyline(_ polyline: RNPolyline) {
+    polylineManager.add(polyline)
   }
 
-  func addPolyline(id: String, polyline: GMSPolyline) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingPolylines.append((id, polyline))
-        return
-      }
-      self.polylinesById.removeValue(forKey: id).map { $0.map = nil }
-      self.addPolylineInternal(id: id, polyline: polyline)
-    }
-  }
-
-  private func addPolylineInternal(id: String, polyline: GMSPolyline) {
-    onMain {
-      polyline.tagData = PolylineTag(id: id)
-      polyline.map = self.mapView
-      self.polylinesById[id] = polyline
-    }
-  }
-
-  func updatePolyline(id: String, block: @escaping (GMSPolyline) -> Void) {
-    onMain {
-      self.polylinesById[id].map { block($0) }
-    }
+  func updatePolyline(_ polyline: RNPolyline) {
+    polylineManager.update(polyline)
   }
 
   func removePolyline(id: String) {
-    onMain {
-      self.polylinesById.removeValue(forKey: id).map { $0.map = nil }
-    }
+    polylineManager.remove(id: id)
   }
 
-  func clearPolylines() {
-    onMain {
-      self.polylinesById.values.forEach { $0.map = nil }
-      self.polylinesById.removeAll()
-      self.pendingPolylines.removeAll()
-    }
+  func addPolygon(_ polygon: RNPolygon) {
+    polygonManager.add(polygon)
   }
 
-  func addPolygon(id: String, polygon: GMSPolygon) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingPolygons.append((id, polygon))
-        return
-      }
-      self.polygonsById.removeValue(forKey: id).map { $0.map = nil }
-      self.addPolygonInternal(id: id, polygon: polygon)
-    }
-  }
-
-  private func addPolygonInternal(id: String, polygon: GMSPolygon) {
-    onMain {
-      polygon.tagData = PolygonTag(id: id)
-      polygon.map = self.mapView
-      self.polygonsById[id] = polygon
-    }
-  }
-
-  func updatePolygon(id: String, block: @escaping (GMSPolygon) -> Void) {
-    onMain {
-      self.polygonsById[id].map { block($0) }
-    }
+  func updatePolygon(_ polygon: RNPolygon) {
+    polygonManager.update(polygon)
   }
 
   func removePolygon(id: String) {
-    onMain {
-      self.polygonsById.removeValue(forKey: id).map { $0.map = nil }
-    }
+    polygonManager.remove(id: id)
   }
 
-  func clearPolygons() {
-    onMain {
-      self.polygonsById.values.forEach { $0.map = nil }
-      self.polygonsById.removeAll()
-      self.pendingPolygons.removeAll()
-    }
+  func addCircle(_ circle: RNCircle) {
+    circleManager.add(circle)
   }
 
-  func addCircle(id: String, circle: GMSCircle) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingCircles.append((id, circle))
-        return
-      }
-      self.circlesById.removeValue(forKey: id).map { $0.map = nil }
-      self.addCircleInternal(id: id, circle: circle)
-    }
-  }
-
-  private func addCircleInternal(id: String, circle: GMSCircle) {
-    onMain {
-      circle.tagData = CircleTag(id: id)
-      circle.map = self.mapView
-      self.circlesById[id] = circle
-    }
-  }
-
-  func updateCircle(id: String, block: @escaping (GMSCircle) -> Void) {
-    onMain {
-      self.circlesById[id].map { block($0) }
-    }
+  func updateCircle(_ circle: RNCircle) {
+    circleManager.update(circle)
   }
 
   func removeCircle(id: String) {
-    onMain {
-      self.circlesById.removeValue(forKey: id).map { $0.map = nil }
-    }
+    circleManager.remove(id: id)
   }
 
-  func clearCircles() {
-    onMain {
-      self.circlesById.values.forEach { $0.map = nil }
-      self.circlesById.removeAll()
-      self.pendingCircles.removeAll()
-    }
+  func addHeatmap(_ heatmap: RNHeatmap) {
+    heatmapManager.add(heatmap)
   }
 
-  func addHeatmap(id: String, heatmap: GMUHeatmapTileLayer) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingHeatmaps.append((id, heatmap))
-        return
-      }
-      self.heatmapsById.removeValue(forKey: id).map { $0.map = nil }
-      self.addHeatmapInternal(id: id, heatmap: heatmap)
-    }
-  }
-
-  private func addHeatmapInternal(id: String, heatmap: GMUHeatmapTileLayer) {
-    onMain {
-      heatmap.map = self.mapView
-      self.heatmapsById[id] = heatmap
-    }
+  func updateHeatmap(_ heatmap: RNHeatmap) {
+    heatmapManager.update(heatmap)
   }
 
   func removeHeatmap(id: String) {
-    onMain {
-      self.heatmapsById.removeValue(forKey: id).map {
-        $0.clearTileCache()
-        $0.map = nil
-      }
-    }
+    heatmapManager.remove(id: id)
   }
 
-  func clearHeatmaps() {
-    onMain {
-      self.heatmapsById.values.forEach {
-        $0.clearTileCache()
-        $0.map = nil
-      }
-      self.heatmapsById.removeAll()
-      self.pendingHeatmaps.removeAll()
-    }
+  func addKmlLayer(_ kmlLayer: RNKMLayer) {
+    kmlLayerManager.add(kmlLayer)
   }
 
-  func addKmlLayer(id: String, kmlString: String) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingKmlLayers.append((id, kmlString))
-        return
-      }
-      self.kmlLayerById.removeValue(forKey: id).map { $0.clear() }
-      self.addKmlLayerInternal(id: id, kmlString: kmlString)
-    }
-  }
-
-  private func addKmlLayerInternal(id: String, kmlString: String) {
-    onMain {
-      guard let data = kmlString.data(using: .utf8) else { return }
-      let parser = GMUKMLParser(data: data)
-      parser.parse()
-
-      self.mapView.map { mapView in
-        let renderer = GMUGeometryRenderer(
-          map: mapView,
-          geometries: parser.placemarks
-        )
-        renderer.render()
-        self.kmlLayerById[id] = renderer
-      }
-    }
+  func updateKmlLayer(_ kmlLayer: RNKMLayer) {
+    kmlLayerManager.update(kmlLayer)
   }
 
   func removeKmlLayer(id: String) {
-    onMain {
-      self.kmlLayerById.removeValue(forKey: id).map { $0.clear() }
-    }
+    kmlLayerManager.remove(id: id)
   }
 
-  func clearKmlLayers() {
-    onMain {
-      self.kmlLayerById.values.forEach { $0.clear() }
-      self.kmlLayerById.removeAll()
-      self.pendingKmlLayers.removeAll()
-    }
+  func addUrlTileOverlay(_ urlTileOverlay: RNUrlTileOverlay) {
+    urlTileOverlayManager.add(urlTileOverlay)
   }
 
-  func addUrlTileOverlay(id: String, urlTileOverlay: GMSURLTileLayer) {
-    onMain {
-      if self.mapView == nil {
-        self.pendingUrlTileOverlays.append((id, urlTileOverlay))
-        return
-      }
-      self.urlTileOverlays.removeValue(forKey: id).map { $0.map = nil }
-      self.addUrlTileOverlayInternal(id: id, urlTileOverlay: urlTileOverlay)
-    }
-  }
-
-  private func addUrlTileOverlayInternal(
-    id: String,
-    urlTileOverlay: GMSURLTileLayer
-  ) {
-    onMain {
-      urlTileOverlay.map = self.mapView
-      self.urlTileOverlays[id] = urlTileOverlay
-    }
+  func updateUrlTileOverlay(_ urlTileOverlay: RNUrlTileOverlay) {
+    urlTileOverlayManager.update(urlTileOverlay)
   }
 
   func removeUrlTileOverlay(id: String) {
-    onMain {
-      self.urlTileOverlays.removeValue(forKey: id).map {
-        $0.clearTileCache()
-        $0.map = nil
-      }
-    }
-  }
-
-  func clearUrlTileOverlay() {
-    onMain {
-      self.urlTileOverlays.values.forEach {
-        $0.clearTileCache()
-        $0.map = nil
-      }
-      self.urlTileOverlays.removeAll()
-      self.pendingUrlTileOverlays.removeAll()
-    }
+    urlTileOverlayManager.remove(id: id)
   }
 
   func deinitInternal() {
@@ -773,14 +527,13 @@ GMSIndoorDisplayDelegate {
     detachLifecycleObservers()
     onMain {
       self.locationHandler.stop()
-      self.markerBuilder.cancelAllIconTasks()
-      self.clearMarkers()
-      self.clearPolylines()
-      self.clearPolygons()
-      self.clearCircles()
-      self.clearHeatmaps()
-      self.clearKmlLayers()
-      self.clearUrlTileOverlay()
+      self.markerManager.destroy()
+      self.polylineManager.destroy()
+      self.polygonManager.destroy()
+      self.circleManager.destroy()
+      self.heatmapManager.destroy()
+      self.urlTileOverlayManager.destroy()
+      self.kmlLayerManager.destroy()
       self.mapView?.clear()
       self.mapView?.isTrafficEnabled = false
       self.mapView?.isIndoorEnabled = false
@@ -805,7 +558,7 @@ GMSIndoorDisplayDelegate {
   }
 
   private func onLowMemory() {
-    markerBuilder.cancelAllIconTasks()
+    markerManager.clearIconCache()
   }
 
   override func didMoveToWindow() {
@@ -988,6 +741,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, didCloseInfoWindowOf marker: GMSMarker) {
+    markerManager.setTracksInfoWindowChanges(id: marker.idTag, track: false)
     onMain {
       self.onInfoWindowClose?(marker.idTag)
     }
@@ -1008,7 +762,7 @@ GMSIndoorDisplayDelegate {
   ) {
     onMain {
       self.mapView?.myLocation.map {
-        self.onMyLocationPress?($0.toRnLocation())
+        self.onMyLocationPress?($0.toRNLocation())
       }
     }
   }
@@ -1021,7 +775,7 @@ GMSIndoorDisplayDelegate {
   }
 
   func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
-    return markerBuilder.buildInfoWindow(markerTag: marker.tagData)
+    return markerManager.infoWindowView(markerTag: marker.tagData)
   }
 
   func mapView(_ mapView: GMSMapView, markerInfoContents marker: GMSMarker) -> UIView? {

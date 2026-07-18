@@ -1,7 +1,7 @@
 import CoreLocation
 
 extension CLLocation {
-  func toRnLocation() -> RNLocation {
+  func toRNLocation() -> RNLocation {
     return RNLocation(
       center: RNLatLng(
         latitude: coordinate.latitude,

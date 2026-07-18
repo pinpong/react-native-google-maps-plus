@@ -4,7 +4,7 @@ extension RNMarker {
   func markerEquals(_ b: RNMarker) -> Bool {
     if id != b.id { return false }
     if zIndex != b.zIndex { return false }
-    if !coordinateEquals(b) { return false }
+    if !coordinatesEquals(b) { return false }
     if !anchorEquals(b) { return false }
     if title != b.title { return false }
     if snippet != b.snippet { return false }
@@ -18,7 +18,7 @@ extension RNMarker {
     return true
   }
 
-  func coordinateEquals(_ b: RNMarker) -> Bool {
+  func coordinatesEquals(_ b: RNMarker) -> Bool {
     if coordinate.latitude != b.coordinate.latitude { return false }
     if coordinate.longitude != b.coordinate.longitude { return false }
     return true
@@ -41,6 +41,19 @@ extension RNMarker {
     if infoWindowIconSvg?.height != b.infoWindowIconSvg?.height { return false }
     if infoWindowIconSvg?.svgString != b.infoWindowIconSvg?.svgString { return false }
     return true
+  }
+
+  func infoWindowContentEquals(_ b: RNMarker) -> Bool {
+    let hasInfoWindowIcon = infoWindowIconSvg != nil
+    if hasInfoWindowIcon != (b.infoWindowIconSvg != nil) { return false }
+    if hasInfoWindowIcon { return markerInfoWindowStyleEquals(b) }
+    if title != b.title { return false }
+    if snippet != b.snippet { return false }
+    return true
+  }
+
+  func infoWindowIsEmpty() -> Bool {
+    infoWindowIconSvg == nil && title == nil && snippet == nil
   }
 
   func markerStyleEquals(_ b: RNMarker) -> Bool {

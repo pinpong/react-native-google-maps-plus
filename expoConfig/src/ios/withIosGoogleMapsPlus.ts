@@ -14,7 +14,7 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
 ) => {
   config = withInfoPlist(config, (conf) => {
     const apiKey =
-      props.googleMapsIosApiKey ?? process.env.GOOGLE_MAPS_API_KEY_IOS ?? null;
+      props?.googleMapsIosApiKey ?? process.env.GOOGLE_MAPS_API_KEY_IOS ?? null;
 
     if (!apiKey) {
       console.warn(
@@ -40,22 +40,20 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
       }).contents;
     }
 
-    const podFilePatch = `
-  require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
-  apply_svgkit_patch(installer)
-  `;
+    const podFilePatch = `  require File.join(File.dirname(\`node --print "require.resolve('react-native-google-maps-plus/package.json')"\`), 'scripts', 'svgkit_patch')\n  apply_svgkit_patch(installer)`;
 
-    if (src.includes('post_install do |installer|')) {
-      src = src.replace(
-        /post_install do \|installer\|([\s\S]*?)end/,
-        (match, inner) => {
-          if (inner.includes('SVGKit Patch')) return match; // idempotent
-          return `post_install do |installer|${inner}\n${podFilePatch}\nend`;
-        }
-      );
-    } else {
-      src += `\npost_install do |installer|\n${podFilePatch}\nend\n`;
+    if (!src.includes('post_install do |installer|')) {
+      src += `\npost_install do |installer|\nend\n`;
     }
+
+    src = mergeContents({
+      tag: 'react-native-google-maps-svgkit-patch',
+      src,
+      newSrc: podFilePatch,
+      anchor: /post_install do \|installer\|/,
+      offset: 1,
+      comment: '#',
+    }).contents;
 
     conf.modResults.contents = src;
     return conf;

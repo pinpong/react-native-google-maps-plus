@@ -6,7 +6,7 @@ import com.rngooglemapsplus.RNLatLng
 import com.rngooglemapsplus.RNLocation
 import com.rngooglemapsplus.RNLocationAndroid
 
-fun Location.toRnLocation(): RNLocation =
+fun Location.toRNLocation(): RNLocation =
   RNLocation(
     center = RNLatLng(latitude, longitude),
     altitude = altitude,

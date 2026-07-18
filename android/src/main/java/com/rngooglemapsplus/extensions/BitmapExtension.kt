@@ -21,9 +21,10 @@ fun Bitmap.encode(
   mapErrorHandler: MapErrorHandler,
 ): String? =
   try {
-    targetSize?.let { scale(it.width, it.height) }
+    val bitmapToEncode = targetSize?.let { scale(it.width, it.height) } ?: this
     val output = ByteArrayOutputStream()
-    compress(compressFormat, (quality * 100).toInt().coerceIn(0, 100), output)
+    bitmapToEncode.compress(compressFormat, (quality * 100).toInt().coerceIn(0, 100), output)
+    if (bitmapToEncode !== this) bitmapToEncode.recycle()
     val bytes = output.toByteArray()
 
     if (asFile) {

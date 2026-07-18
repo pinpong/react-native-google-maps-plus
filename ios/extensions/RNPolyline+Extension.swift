@@ -3,11 +3,12 @@ import GoogleMaps
 extension RNPolyline {
   func polylineEquals(_ b: RNPolyline) -> Bool {
     if zIndex != b.zIndex { return false }
+    if pressable != b.pressable { return false }
     if width != b.width { return false }
     if lineCap != b.lineCap { return false }
     if lineJoin != b.lineJoin { return false }
-    if color != b.color { return false }
     if geodesic != b.geodesic { return false }
+    if color != b.color { return false }
     if !coordinatesEquals(b) { return false }
 
     return true

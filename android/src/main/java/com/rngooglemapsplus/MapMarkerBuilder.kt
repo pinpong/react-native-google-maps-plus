@@ -1,6 +1,5 @@
 package com.rngooglemapsplus
 
-import MarkerTag
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -39,7 +38,6 @@ import tagData
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.cancellation.CancellationException
 
 class MapMarkerBuilder(
@@ -55,10 +53,8 @@ class MapMarkerBuilder(
       ): Int = 1
     }
 
-  private val jobsById = ConcurrentHashMap<String, Job>()
-
   init {
-    // / TODO: refactor with androidsvg 1.5 release
+    // TODO: refactor with androidsvg 1.5 release
     SVG.registerExternalFileResolver(
       object : SVGExternalFileResolver() {
         override fun resolveImage(filename: String?): Bitmap? {
@@ -176,7 +172,7 @@ class MapMarkerBuilder(
       m.draggable?.let { draggable(it) }
       m.rotation?.let { rotation(it.toFloat()) }
       m.infoWindowAnchor?.let { infoWindowAnchor(it.x.toFloat(), it.y.toFloat()) }
-      m.anchor?.let { anchor((m.anchor.x).toFloat(), (m.anchor.y).toFloat()) }
+      m.anchor?.let { anchor(it.x.toFloat(), it.y.toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
     }
 
@@ -184,6 +180,7 @@ class MapMarkerBuilder(
     prev: RNMarker,
     next: RNMarker,
     marker: Marker,
+    deferAnchors: Boolean = false,
   ) = onUi {
     val currentMarkerTag = marker.tagData
 
@@ -254,11 +251,19 @@ class MapMarkerBuilder(
     }
   }
 
-  fun buildIconAsync(
+  fun applyAnchors(
     m: RNMarker,
     onReady: (BitmapDescriptor?, MarkerIconHitbox?) -> Unit,
   ) {
-    cancelIconJob(m.id)
+    marker.setAnchor(
+      (m.anchor?.x ?: 0.5f).toFloat(),
+      (m.anchor?.y ?: 1.0f).toFloat(),
+    )
+    marker.setInfoWindowAnchor(
+      (m.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+      (m.infoWindowAnchor?.y ?: 0f).toFloat(),
+    )
+  }
 
     val iconSvg = m.iconSvg ?: return onReady(null, null)
     val hitbox =
@@ -273,9 +278,15 @@ class MapMarkerBuilder(
       return
     }
 
-    val job =
-      scope.launch {
-        try {
+        ensureActive()
+        val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+
+        if (!renderResult.isFallback) {
+          iconCache.put(styleHash, desc)
+        }
+        renderResult.bitmap.recycle()
+
+        withContext(Dispatchers.Main) {
           ensureActive()
           val renderResult = renderBitmap(m.iconSvg, m.id)
 
@@ -326,25 +337,7 @@ class MapMarkerBuilder(
           }
         }
       }
-
-    jobsById[m.id] = job
-  }
-
-  fun hasIconJob(id: String): Boolean = jobsById.containsKey(id)
-
-  fun cancelIconJob(id: String) {
-    jobsById[id]?.cancel()
-    jobsById.remove(id)
-  }
-
-  fun cancelAllJobs() {
-    val ids = jobsById.keys.toList()
-    ids.forEach { id ->
-      jobsById[id]?.cancel()
     }
-    jobsById.clear()
-    clearIconCache()
-  }
 
   fun clearIconCache() {
     iconCache.evictAll()
@@ -353,27 +346,17 @@ class MapMarkerBuilder(
   fun buildInfoWindow(markerTag: MarkerTag): ImageView? {
     val iconSvg = markerTag.iconSvg ?: return null
 
-    val wPx =
-      markerTag.iconSvg.width
-        .dpToPx()
-        .toInt()
-    val hPx =
-      markerTag.iconSvg.height
-        .dpToPx()
-        .toInt()
+    val wPx = iconSvg.width.dpToPx().toInt()
+    val hPx = iconSvg.height.dpToPx().toInt()
 
     if (wPx <= 0 || hPx <= 0) {
       mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} invalid svg size")
-      return ImageView(context)
+      return createFallbackImageView()
     }
 
     val svgView =
       ImageView(context).apply {
-        layoutParams =
-          LinearLayout.LayoutParams(
-            iconSvg.width.dpToPx().toInt(),
-            iconSvg.height.dpToPx().toInt(),
-          )
+        layoutParams = LinearLayout.LayoutParams(wPx, hPx)
       }
 
     try {
@@ -386,11 +369,13 @@ class MapMarkerBuilder(
       svgView.setImageDrawable(drawable)
     } catch (e: Exception) {
       mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed", e)
-      return ImageView(context)
+      return createFallbackImageView()
     }
 
     return svgView
   }
+
+  private fun createFallbackImageView(): ImageView = ImageView(context)
 
   private fun createFallbackBitmap(): Bitmap =
     createBitmap(1, 1, Bitmap.Config.ARGB_8888).apply {
@@ -413,14 +398,8 @@ class MapMarkerBuilder(
     iconSvg: RNMarkerSvg,
     markerId: String,
   ): RenderBitmapResult {
-    val wPx =
-      iconSvg.width
-        .dpToPx()
-        .toInt()
-    val hPx =
-      iconSvg.height
-        .dpToPx()
-        .toInt()
+    val wPx = iconSvg.width.dpToPx().toInt()
+    val hPx = iconSvg.height.dpToPx().toInt()
 
     if (wPx <= 0 || hPx <= 0) {
       mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId invalid svg size")

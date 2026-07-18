@@ -17,7 +17,7 @@ const withMapsAndroid: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
     const mainApplication = getMainApplicationOrThrow(manifest);
 
     const apiKey =
-      props.googleMapsAndroidApiKey ??
+      props?.googleMapsAndroidApiKey ??
       process.env.GOOGLE_MAPS_API_KEY_ANDROID ??
       null;
 

@@ -5,11 +5,7 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.margelo.nitro.core.Promise
-import com.rngooglemapsplus.extensions.circleEquals
 import com.rngooglemapsplus.extensions.isFileResult
-import com.rngooglemapsplus.extensions.markerEquals
-import com.rngooglemapsplus.extensions.polygonEquals
-import com.rngooglemapsplus.extensions.polylineEquals
 import com.rngooglemapsplus.extensions.toCameraPosition
 import com.rngooglemapsplus.extensions.toColor
 import com.rngooglemapsplus.extensions.toCompressFormat
@@ -26,20 +22,12 @@ class RNGoogleMapsPlusView(
 ) : HybridRNGoogleMapsPlusViewSpec() {
   private val mapErrorHandler = MapErrorHandler()
 
-  private var currentCustomMapStyle: String? = null
   private val permissionHandler = PermissionHandler(context)
   private val locationHandler = LocationHandler(context)
   private val playServiceHandler = PlayServicesHandler(context)
 
-  private val markerBuilder = MapMarkerBuilder(context, mapErrorHandler)
-  private val polylineBuilder = MapPolylineBuilder()
-  private val polygonBuilder = MapPolygonBuilder()
-  private val circleBuilder = MapCircleBuilder()
-  private val heatmapBuilder = MapHeatmapBuilder()
-  private val urlTileOverlayBuilder = MapUrlTileOverlayBuilder(mapErrorHandler)
-
   override val view =
-    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, markerBuilder, mapErrorHandler)
+    GoogleMapsViewImpl(context, locationHandler, playServiceHandler, mapErrorHandler)
 
   override fun onDropView() {
     view.destroyInternal()
@@ -107,7 +95,6 @@ class RNGoogleMapsPlusView(
     set(value) {
       if (field == value) return
       field = value
-      currentCustomMapStyle = value
       value?.let {
         view.customMapStyle = MapStyleOptions(it)
       }
@@ -149,7 +136,6 @@ class RNGoogleMapsPlusView(
       field = value
 
       (prevById.keys - nextById.keys).forEach { id ->
-        markerBuilder.cancelIconJob(id)
         view.removeMarker(id)
       }
 
@@ -196,17 +182,10 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        val prev = prevById[id]
-        when {
-          prev == null -> {
-            view.addPolyline(id, polylineBuilder.build(next))
-          }
-
-          !prev.polylineEquals(next) -> {
-            view.updatePolyline(id) { polyline ->
-              polylineBuilder.update(prev, next, polyline)
-            }
-          }
+        if (prevById[id] == null) {
+          view.addPolyline(next)
+        } else {
+          view.updatePolyline(next)
         }
       }
     }
@@ -223,17 +202,10 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        val prev = prevById[id]
-        when {
-          prev == null -> {
-            view.addPolygon(id, polygonBuilder.build(next))
-          }
-
-          !prev.polygonEquals(next) -> {
-            view.updatePolygon(id) { polygon ->
-              polygonBuilder.update(prev, next, polygon)
-            }
-          }
+        if (prevById[id] == null) {
+          view.addPolygon(next)
+        } else {
+          view.updatePolygon(next)
         }
       }
     }
@@ -250,17 +222,10 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        val prev = prevById[id]
-        when {
-          prev == null -> {
-            view.addCircle(id, circleBuilder.build(next))
-          }
-
-          !prev.circleEquals(next) -> {
-            view.updateCircle(id) { circle ->
-              circleBuilder.update(prev, next, circle)
-            }
-          }
+        if (prevById[id] == null) {
+          view.addCircle(next)
+        } else {
+          view.updateCircle(next)
         }
       }
     }
@@ -276,7 +241,11 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        view.addHeatmap(id, heatmapBuilder.build(next))
+        if (prevById[id] == null) {
+          view.addHeatmap(next)
+        } else {
+          view.updateHeatmap(next)
+        }
       }
     }
 
@@ -290,7 +259,11 @@ class RNGoogleMapsPlusView(
         view.removeKmlLayer(id)
       }
       nextById.forEach { (id, next) ->
-        view.addKmlLayer(id, next.kmlString)
+        if (prevById[id] == null) {
+          view.addKmlLayer(next)
+        } else {
+          view.updateKmlLayer(next)
+        }
       }
     }
 
@@ -305,7 +278,11 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        view.addUrlTileOverlay(id, urlTileOverlayBuilder.build(next))
+        if (prevById[id] == null) {
+          view.addUrlTileOverlay(next)
+        } else {
+          view.updateUrlTileOverlay(next)
+        }
       }
     }
 
@@ -448,6 +425,10 @@ class RNGoogleMapsPlusView(
 
   override fun hideMarkerInfoWindow(id: String) {
     view.hideMarkerInfoWindow(id)
+  }
+
+  override fun clearMarkerIconCache() {
+    view.clearMarkerIconCache()
   }
 
   override fun setCamera(

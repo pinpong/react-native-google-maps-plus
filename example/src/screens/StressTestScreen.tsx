@@ -59,6 +59,10 @@ export default function StressTestScreen() {
         title: 'Marker -1',
         onPress: () => setMarkers((m) => m.slice(0, Math.max(0, m.length - 1))),
       },
+      {
+        title: 'Clear marker icon cache',
+        onPress: () => mapRef.current?.clearMarkerIconCache(),
+      },
     ],
     [markers, stressTest]
   );

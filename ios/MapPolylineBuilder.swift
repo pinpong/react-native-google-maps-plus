@@ -2,14 +2,7 @@ import GoogleMaps
 
 final class MapPolylineBuilder {
   func build(_ p: RNPolyline) -> GMSPolyline {
-    let path = GMSMutablePath()
-    p.coordinates.forEach {
-      path.add(
-        $0.toCLLocationCoordinate2D()
-      )
-    }
-
-    let pl = GMSPolyline(path: path)
+    let pl = GMSPolyline(path: p.coordinates.toGMSPath())
 
     p.width.map { pl.strokeWidth = CGFloat($0) }
     p.color.map { pl.strokeColor = $0.toUIColor() }

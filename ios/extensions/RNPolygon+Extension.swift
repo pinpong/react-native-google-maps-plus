@@ -28,9 +28,8 @@ extension RNPolygon {
   }
 
   func holesEquals(_ b: RNPolygon) -> Bool {
+    if holes?.count != b.holes?.count { return false }
     if let holes = holes, let bHoles = b.holes {
-      if holes.count != bHoles.count { return false }
-
       for i in holes.indices {
         let ah = holes[i]
         let bh = bHoles[i]

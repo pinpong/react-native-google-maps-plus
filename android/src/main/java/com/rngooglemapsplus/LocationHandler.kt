@@ -65,7 +65,7 @@ class LocationHandler(
 
   fun showLocationDialog() {
     onUi {
-      val activity = context.currentActivity ?: run { return@onUi }
+      val activity = context.currentActivity ?: return@onUi
 
       val lr =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -101,13 +101,12 @@ class LocationHandler(
     }
   }
 
-  fun openLocationSettings() {
-    UiThreadUtil.runOnUiThread {
+  fun openLocationSettings() =
+    onUi {
       val intent =
         Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       context.currentActivity?.startActivity(intent)
     }
-  }
 
   @Suppress("deprecation")
   private fun buildLocationRequest(

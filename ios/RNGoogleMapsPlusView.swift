@@ -8,13 +8,6 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   private let mapErrorHandler: MapErrorHandler
   private let permissionHandler: PermissionHandler
   private let locationHandler: LocationHandler
-  private let markerBuilder: MapMarkerBuilder
-
-  private let polylineBuilder = MapPolylineBuilder()
-  private let polygonBuilder = MapPolygonBuilder()
-  private let circleBuilder = MapCircleBuilder()
-  private let heatmapBuilder = MapHeatmapBuilder()
-  private let urlTileOverlayBuilder = MapUrlTileOverlayBuilder()
 
   private let impl: GoogleMapsViewImpl
 
@@ -26,11 +19,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     self.permissionHandler = PermissionHandler()
     self.locationHandler = LocationHandler()
     self.mapErrorHandler = MapErrorHandler()
-    self.markerBuilder = MapMarkerBuilder(mapErrorHandler: mapErrorHandler)
     self.impl = GoogleMapsViewImpl(
       mapErrorHandler: mapErrorHandler,
-      locationHandler: locationHandler,
-      markerBuilder: markerBuilder
+      locationHandler: locationHandler
     )
   }
 
@@ -118,34 +109,13 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       )
 
       let removed = Set(prevById.keys).subtracting(nextById.keys)
-
-      removed.forEach {
-        self.impl.removeMarker(id: $0)
-        self.markerBuilder.cancelIconTask($0)
-      }
+      removed.forEach { impl.removeMarker(id: $0) }
 
       for (id, next) in nextById {
-        if let prev = prevById[id] {
-          if !prev.markerEquals(next) {
-            if self.markerBuilder.hasIconTask(id) {
-              self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-                guard let self else { return }
-                let marker = self.markerBuilder.build(next, icon: icon)
-                self.impl.addMarker(id: id, marker: marker)
-              }
-            } else {
-              self.impl.updateMarker(id: id) { [weak self] m in
-                guard let self else { return }
-                self.markerBuilder.update(prev, next, m)
-              }
-            }
-          }
+        if prevById[id] == nil {
+          impl.addMarker(next)
         } else {
-          self.markerBuilder.buildIconAsync(next) { [weak self] icon in
-            guard let self else { return }
-            let marker = self.markerBuilder.build(next, icon: icon)
-            self.impl.addMarker(id: id, marker: marker)
-          }
+          impl.updateMarker(next)
         }
       }
     }
@@ -166,18 +136,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removePolyline(id: $0) }
 
       for (id, next) in nextById {
-        if let prev = prevById[id] {
-          if !prev.polylineEquals(next) {
-            impl.updatePolyline(id: id) { [weak self] pl in
-              guard let self else { return }
-              self.polylineBuilder.update(prev, next, pl)
-            }
-          }
+        if prevById[id] == nil {
+          impl.addPolyline(next)
         } else {
-          impl.addPolyline(
-            id: id,
-            polyline: polylineBuilder.build(next)
-          )
+          impl.updatePolyline(next)
         }
       }
     }
@@ -198,15 +160,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removePolygon(id: $0) }
 
       for (id, next) in nextById {
-        if let prev = prevById[id] {
-          if !prev.polygonEquals(next) {
-            impl.updatePolygon(id: id) { [weak self] pg in
-              guard let self else { return }
-              self.polygonBuilder.update(prev, next, pg)
-            }
-          }
+        if prevById[id] == nil {
+          impl.addPolygon(next)
         } else {
-          impl.addPolygon(id: id, polygon: polygonBuilder.build(next))
+          impl.updatePolygon(next)
         }
       }
     }
@@ -227,15 +184,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removeCircle(id: $0) }
 
       for (id, next) in nextById {
-        if let prev = prevById[id] {
-          if !prev.circleEquals(next) {
-            impl.updateCircle(id: id) { [weak self] circle in
-              guard let self else { return }
-              self.circleBuilder.update(prev, next, circle)
-            }
-          }
+        if prevById[id] == nil {
+          impl.addCircle(next)
         } else {
-          impl.addCircle(id: id, circle: circleBuilder.build(next))
+          impl.updateCircle(next)
         }
       }
     }
@@ -256,7 +208,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removeHeatmap(id: $0) }
 
       for (id, next) in nextById {
-        impl.addHeatmap(id: id, heatmap: heatmapBuilder.build(next))
+        if prevById[id] == nil {
+          impl.addHeatmap(next)
+        } else {
+          impl.updateHeatmap(next)
+        }
       }
     }
   }
@@ -276,7 +232,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removeKmlLayer(id: $0) }
 
       for (id, next) in nextById {
-        impl.addKmlLayer(id: id, kmlString: next.kmlString)
+        if prevById[id] == nil {
+          impl.addKmlLayer(next)
+        } else {
+          impl.updateKmlLayer(next)
+        }
       }
     }
   }
@@ -296,10 +256,11 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
       removed.forEach { impl.removeUrlTileOverlay(id: $0) }
 
       for (id, next) in nextById {
-        impl.addUrlTileOverlay(
-          id: id,
-          urlTileOverlay: urlTileOverlayBuilder.build(next)
-        )
+        if prevById[id] == nil {
+          impl.addUrlTileOverlay(next)
+        } else {
+          impl.updateUrlTileOverlay(next)
+        }
       }
     }
   }
@@ -322,7 +283,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onLocationUpdate: ((RNLocation) -> Void)? {
     didSet { impl.onLocationUpdate = onLocationUpdate }
   }
-  var onLocationError: ((_ error: RNLocationErrorCode) -> Void)? {
+  var onLocationError: ((RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
   }
   var onMapPress: ((RNLatLng) -> Void)? {
@@ -392,6 +353,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   func hideMarkerInfoWindow(id: String) {
     impl.hideMarkerInfoWindow(id: id)
+  }
+
+  func clearMarkerIconCache() {
+    impl.clearMarkerIconCache()
   }
 
   func setCamera(camera: RNCameraUpdate, animated: Bool?, durationMs: Double?) {

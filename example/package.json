@@ -11,11 +11,11 @@
     "build:ios": "react-native build-ios --mode Debug --extra-params 'CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO'"
   },
   "dependencies": {
-    "@react-navigation/native": "7.3.5",
-    "@react-navigation/native-stack": "7.17.7",
-    "@react-navigation/stack": "7.10.7",
+    "@react-navigation/native": "7.3.8",
+    "@react-navigation/native-stack": "7.17.10",
+    "@react-navigation/stack": "7.10.11",
     "react": "19.2.7",
-    "react-hook-form": "7.80.0",
+    "react-hook-form": "7.81.0",
     "react-native": "0.86.0",
     "react-native-clusterer": "5.0.2",
     "react-native-gesture-handler": "3.0.2",
@@ -23,8 +23,8 @@
     "react-native-nitro-modules": "0.36.1",
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "5.8.0",
-    "react-native-screens": "4.25.2",
-    "react-native-worklets": "0.10.1",
+    "react-native-screens": "4.26.0",
+    "react-native-worklets": "0.10.2",
     "superstruct": "2.0.2"
   },
   "devDependencies": {

@@ -24,6 +24,6 @@ final class RNGoogleMapsPlusModule: HybridRNGoogleMapsPlusModuleSpec {
 
   func isGooglePlayServicesAvailable() -> Bool {
     /// not supported
-    return true
+    return false
   }
 }
