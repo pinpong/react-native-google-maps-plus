@@ -40,12 +40,7 @@ import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
 import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
-import com.rngooglemapsplus.extensions.toRnCamera
-import com.rngooglemapsplus.extensions.toRnLatLng
-import com.rngooglemapsplus.extensions.toRnLocation
-import com.rngooglemapsplus.extensions.toRnRegion
-import idTag
-import tagData
+import com.rngooglemapsplus.extensions.toRNRegion
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import kotlin.math.cos
@@ -270,6 +265,8 @@ class GoogleMapsViewImpl(
         }
       }
     }
+
+  var enableStrictMarkerPressHitbox = false
 
   @SuppressLint("MissingPermission")
   var myLocationEnabled: Boolean? = null
@@ -620,7 +617,8 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
-    val shouldTreatAsMapPress = !isTouchInsideMarkerBitmap(marker)
+    val shouldTreatAsMapPress =
+      enableStrictMarkerPressHitbox && !isTouchInsideMarkerBitmap(marker)
 
     onUi {
       if (shouldTreatAsMapPress) {
@@ -673,7 +671,7 @@ class GoogleMapsViewImpl(
       )
     val coordinates = map.projection.fromScreenLocation(point)
 
-    onMapPress?.invoke(coordinates.toRnLatLng())
+    onMapPress?.invoke(coordinates.toRNLatLng())
   }
 
   override fun onPolylineClick(polyline: Polyline) =

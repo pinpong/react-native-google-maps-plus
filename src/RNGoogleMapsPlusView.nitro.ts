@@ -45,6 +45,18 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   uiSettings?: RNMapUiSettings;
 
   /**
+   * Android-only. Restricts marker presses to touches within the rendered
+   * marker image.
+   *
+   * On Android, touches reported outside the marker image are emitted as map
+   * presses. On iOS, this prop is ignored and marker hit testing continues to
+   * use the native SDK behavior.
+   *
+   * @defaultValue `false`
+   */
+  enableStrictMarkerPressHitbox?: boolean;
+
+  /**
    * Enables "My Location" blue dot.
    * @defaultValue `false`
    */

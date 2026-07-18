@@ -13,7 +13,6 @@ import com.rngooglemapsplus.extensions.toFileExtension
 import com.rngooglemapsplus.extensions.toGoogleMapType
 import com.rngooglemapsplus.extensions.toLatLngBounds
 import com.rngooglemapsplus.extensions.toMapColorScheme
-import com.rngooglemapsplus.extensions.toMarkerTag
 import com.rngooglemapsplus.extensions.toSize
 
 @DoNotStrip
@@ -54,6 +53,13 @@ class RNGoogleMapsPlusView(
       if (field == value) return
       field = value
       view.uiSettings = value
+    }
+
+  override var enableStrictMarkerPressHitbox: Boolean? = null
+    set(value) {
+      if (field == value) return
+      field = value
+      view.enableStrictMarkerPressHitbox = value ?: false
     }
 
   override var myLocationEnabled: Boolean? = null
@@ -140,33 +146,10 @@ class RNGoogleMapsPlusView(
       }
 
       nextById.forEach { (id, next) ->
-        val prev = prevById[id]
-        when {
-          prev == null -> {
-            markerBuilder.buildIconAsync(next) { icon, hitbox ->
-              view.addMarker(
-                id,
-                markerBuilder.build(next, icon),
-                next.toMarkerTag(hitbox),
-              )
-            }
-          }
-
-          !prev.markerEquals(next) -> {
-            if (markerBuilder.hasIconJob(id)) {
-              markerBuilder.buildIconAsync(next) { icon, hitbox ->
-                view.addMarker(
-                  id,
-                  markerBuilder.build(next, icon),
-                  next.toMarkerTag(hitbox),
-                )
-              }
-            } else {
-              view.updateMarker(id) { marker ->
-                markerBuilder.update(prev, next, marker)
-              }
-            }
-          }
+        if (prevById[id] == null) {
+          view.addMarker(next)
+        } else {
+          view.updateMarker(next)
         }
       }
     }

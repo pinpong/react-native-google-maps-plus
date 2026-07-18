@@ -6,6 +6,7 @@ export type RootStackParamList = {
   BasicMap: undefined;
   ScrollView: undefined;
   Markers: undefined;
+  MarkerHitbox: undefined;
   SvgMarkers: undefined;
   Polygons: undefined;
   Polylines: undefined;

@@ -23,6 +23,7 @@ import HomeScreen from '@src/screens/HomeScreen';
 import IndoorLevelMapScreen from '@src/screens/IndoorLevelMapScreen';
 import KmlLayerScreen from '@src/screens/KmlLayerScreen';
 import LocationScreen from '@src/screens/LocationScreen';
+import MarkerHitboxScreen from '@src/screens/MarkerHitboxScreen';
 import MarkersScreen from '@src/screens/MarkersScreen';
 import PolygonsScreen from '@src/screens/PolygonsScreen';
 import PolylinesScreen from '@src/screens/PolylinesScreen';
@@ -81,6 +82,11 @@ export default function App() {
             name="Markers"
             component={MarkersScreen}
             options={{ title: 'Markers' }}
+          />
+          <Stack.Screen
+            name="MarkerHitbox"
+            component={MarkerHitboxScreen}
+            options={{ title: 'Marker Hitbox (Android)' }}
           />
           <Stack.Screen
             name="SvgMarkers"

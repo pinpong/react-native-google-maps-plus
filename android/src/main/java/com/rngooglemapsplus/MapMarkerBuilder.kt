@@ -22,8 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
-import com.rngooglemapsplus.extensions.markerStyleEquals
-import com.rngooglemapsplus.extensions.styleHash
+import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toMarkerTag
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +33,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import tagData
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
@@ -182,44 +180,22 @@ class MapMarkerBuilder(
     marker: Marker,
     deferAnchors: Boolean = false,
   ) = onUi {
-    val currentMarkerTag = marker.tagData
-
     if (!prev.coordinatesEquals(next)) {
       marker.position = next.coordinate.toLatLng()
     }
 
-    if (!prev.markerStyleEquals(next)) {
-      marker.tag = currentMarkerTag.copy(iconSvg = next.infoWindowIconSvg)
-      buildIconAsync(next) { icon, hitbox ->
-        marker.setIcon(icon)
-        if (!prev.anchorEquals(next)) {
-          marker.setAnchor(
-            (next.anchor?.x ?: 0.5f).toFloat(),
-            (next.anchor?.y ?: 1.0f).toFloat(),
-          )
-        }
-        if (!prev.infoWindowAnchorEquals(next)) {
-          marker.setInfoWindowAnchor(
-            (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-            (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-          )
-        }
-        marker.tag = next.toMarkerTag(hitbox)
-      }
-    } else {
-      if (!prev.anchorEquals(next)) {
-        marker.setAnchor(
-          (next.anchor?.x ?: 0.5f).toFloat(),
-          (next.anchor?.y ?: 1.0f).toFloat(),
-        )
-      }
-      if (!prev.infoWindowAnchorEquals(next)) {
-        marker.setInfoWindowAnchor(
-          (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
-          (next.infoWindowAnchor?.y ?: 0f).toFloat(),
-        )
-      }
-      marker.tag = next.toMarkerTag(currentMarkerTag.markerIconHitbox)
+    if (!deferAnchors && !prev.anchorEquals(next)) {
+      marker.setAnchor(
+        (next.anchor?.x ?: 0.5f).toFloat(),
+        (next.anchor?.y ?: 1.0f).toFloat(),
+      )
+    }
+
+    if (!deferAnchors && !prev.infoWindowAnchorEquals(next)) {
+      marker.setInfoWindowAnchor(
+        (next.infoWindowAnchor?.x ?: 0.5f).toFloat(),
+        (next.infoWindowAnchor?.y ?: 0f).toFloat(),
+      )
     }
 
     if (prev.title != next.title) {
@@ -249,11 +225,18 @@ class MapMarkerBuilder(
     if (prev.zIndex != next.zIndex) {
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
+
+    marker.tag =
+      if (deferAnchors) {
+        marker.tagData.copy(iconSvg = next.infoWindowIconSvg)
+      } else {
+        next.toMarkerTag(marker.tagData.markerIconHitbox)
+      }
   }
 
   fun applyAnchors(
     m: RNMarker,
-    onReady: (BitmapDescriptor?, MarkerIconHitbox?) -> Unit,
+    marker: Marker,
   ) {
     marker.setAnchor(
       (m.anchor?.x ?: 0.5f).toFloat(),
@@ -265,21 +248,33 @@ class MapMarkerBuilder(
     )
   }
 
-    val iconSvg = m.iconSvg ?: return onReady(null, null)
-    val hitbox =
-      MarkerIconHitbox(
-        widthPx = iconSvg.width.dpToPx().toInt(),
-        heightPx = iconSvg.height.dpToPx().toInt(),
-      )
+  fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
 
-    val key = m.styleHash()
-    iconCache.get(key)?.let { cached ->
-      onReady(cached, hitbox)
-      return
-    }
+  fun buildHitbox(iconSvg: RNMarkerSvg): MarkerIconHitbox =
+    MarkerIconHitbox(
+      widthPx = iconSvg.width.dpToPx().toInt(),
+      heightPx = iconSvg.height.dpToPx().toInt(),
+    )
+
+  fun renderIcon(
+    markerId: String,
+    iconSvg: RNMarkerSvg,
+    styleHash: Int,
+    onReady: (BitmapDescriptor, MarkerIconHitbox?) -> Unit,
+  ): Job =
+    scope.launch {
+      try {
+        ensureActive()
+        val renderResult = renderBitmap(iconSvg, markerId)
 
         ensureActive()
         val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+        val hitbox =
+          if (renderResult.isFallback) {
+            null
+          } else {
+            MarkerIconHitbox(renderResult.bitmap.width, renderResult.bitmap.height)
+          }
 
         if (!renderResult.isFallback) {
           iconCache.put(styleHash, desc)
@@ -288,53 +283,22 @@ class MapMarkerBuilder(
 
         withContext(Dispatchers.Main) {
           ensureActive()
-          val renderResult = renderBitmap(m.iconSvg, m.id)
-
-          if (renderResult?.bitmap == null) {
-            withContext(Dispatchers.Main) {
-              ensureActive()
-              jobsById.remove(m.id)
-              onReady(createFallbackDescriptor(), null)
-            }
-            return@launch
-          }
-
+          onReady(desc, hitbox)
+        }
+      } catch (e: OutOfMemoryError) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon out of memory", e)
+        clearIconCache()
+        withContext(Dispatchers.Main) {
           ensureActive()
-          val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
-
-          if (!renderResult.isFallback) {
-            iconCache.put(key, desc)
-          }
-          val renderedHitbox =
-            if (renderResult.isFallback) {
-              null
-            } else {
-              MarkerIconHitbox(renderResult.bitmap.width, renderResult.bitmap.height)
-            }
-          renderResult.bitmap.recycle()
-
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(desc, renderedHitbox)
-          }
-        } catch (e: OutOfMemoryError) {
-          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync out of memory", e)
-          clearIconCache()
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(createFallbackDescriptor(), null)
-          }
-        } catch (_: CancellationException) {
-          // cancelled
-        } catch (t: Throwable) {
-          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${m.id} buildIconAsync failed", t)
-          withContext(Dispatchers.Main) {
-            ensureActive()
-            jobsById.remove(m.id)
-            onReady(createFallbackDescriptor(), null)
-          }
+          onReady(createFallbackDescriptor(), null)
+        }
+      } catch (_: CancellationException) {
+        // cancelled
+      } catch (t: Throwable) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon failed", t)
+        withContext(Dispatchers.Main) {
+          ensureActive()
+          onReady(createFallbackDescriptor(), null)
         }
       }
     }

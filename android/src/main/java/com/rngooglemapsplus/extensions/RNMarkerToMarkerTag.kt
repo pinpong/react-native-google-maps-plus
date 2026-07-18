@@ -1,7 +1,7 @@
 package com.rngooglemapsplus.extensions
 
-import MarkerTag
 import com.rngooglemapsplus.MarkerIconHitbox
+import com.rngooglemapsplus.MarkerTag
 import com.rngooglemapsplus.RNMarker
 
 fun RNMarker.toMarkerTag(markerIconHitbox: MarkerIconHitbox?): MarkerTag =

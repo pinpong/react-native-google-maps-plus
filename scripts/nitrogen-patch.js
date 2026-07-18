@@ -5,6 +5,9 @@
  *  - Replaces 'com.margelo.nitro.rngooglemapsplus' -> 'com.rngooglemapsplus'
  *  - Replaces 'com/margelo/nitro/rngooglemapsplus' -> 'com/rngooglemapsplus'
  *  - Removes 'margelo/nitro/' in RNGoogleMapsPlusOnLoad.cpp
+ * SHARED
+ *  - Treats React Native's null reset value as undefined for the optional
+ *    enableStrictMarkerPressHitbox boolean prop.
  * iOS
  */
 import { readFile, readdir, writeFile } from 'node:fs/promises';
@@ -39,6 +42,23 @@ const ANDROID_ONLOAD_FILE = path.join(
   ROOT_ANDROID,
   'RNGoogleMapsPlusOnLoad.cpp'
 );
+
+const MAP_VIEW_COMPONENT_FILE = path.join(
+  process.cwd(),
+  'nitrogen',
+  'generated',
+  'shared',
+  'c++',
+  'views',
+  'HybridRNGoogleMapsPlusViewComponent.cpp'
+);
+
+const STRICT_HITBOX_FROM_RAW_VALUE =
+  'return CachedProp<std::optional<bool>>::fromRawValue(*runtime, value, sourceProps.enableStrictMarkerPressHitbox);';
+const STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE = `if (value.isNull()) {
+          return CachedProp<std::optional<bool>>::fromRawValue(*runtime, jsi::Value::undefined(), sourceProps.enableStrictMarkerPressHitbox);
+        }
+        ${STRICT_HITBOX_FROM_RAW_VALUE}`;
 
 const REPLACEMENTS = [
   {
@@ -98,10 +118,32 @@ async function copyJsonFiles() {
   }
 }
 
+async function patchStrictHitboxNullReset() {
+  const content = await readFile(MAP_VIEW_COMPONENT_FILE, 'utf8');
+
+  if (content.includes(STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE)) {
+    return;
+  }
+
+  if (!content.includes(STRICT_HITBOX_FROM_RAW_VALUE)) {
+    throw new Error(
+      'Unable to patch enableStrictMarkerPressHitbox null handling in generated view component.'
+    );
+  }
+
+  const updated = content.replace(
+    STRICT_HITBOX_FROM_RAW_VALUE,
+    STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE
+  );
+  await writeFile(MAP_VIEW_COMPONENT_FILE, updated, 'utf8');
+  console.log(`Updated: ${MAP_VIEW_COMPONENT_FILE}`);
+}
+
 (async () => {
   try {
     await copyJsonFiles();
     await start(ROOT_ANDROID);
+    await patchStrictHitboxNullReset();
     console.log('All Nitrogen files patched successfully.');
   } catch (err) {
     console.error('Error while processing files:', err);

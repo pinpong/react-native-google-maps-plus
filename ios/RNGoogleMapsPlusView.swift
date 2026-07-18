@@ -49,6 +49,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     didSet { impl.uiSettings = uiSettings }
   }
 
+  // iOS already relies on the native SDK's marker hit testing.
+  var enableStrictMarkerPressHitbox: Bool?
+
   var myLocationEnabled: Bool? {
     didSet { impl.myLocationEnabled = myLocationEnabled }
   }
