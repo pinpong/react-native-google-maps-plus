@@ -2,6 +2,7 @@ package com.rngooglemapsplus.extensions
 
 import android.location.Location
 import android.os.Build
+import androidx.core.location.LocationCompat
 import com.rngooglemapsplus.RNLatLng
 import com.rngooglemapsplus.RNLocation
 import com.rngooglemapsplus.RNLocationAndroid
@@ -88,11 +89,7 @@ fun Location.toRNLocation(): RNLocation =
               }
             }
           },
-        isMock =
-          when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> isMock
-            else -> isFromMockProvider
-          },
+        isMock = LocationCompat.isMock(this),
       ),
     ios = null,
   )
