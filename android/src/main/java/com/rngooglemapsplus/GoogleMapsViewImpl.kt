@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.ComponentCallbacks2
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Point
 import android.location.Location
+import android.os.SystemClock
 import android.util.Size
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -39,6 +41,13 @@ import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
 import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
 import com.rngooglemapsplus.extensions.toRNRegion
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
+
+private const val MARKER_TOUCH_MAX_AGE_MS = 500L
 
 @SuppressLint("ViewConstructor")
 class GoogleMapsViewImpl(
@@ -256,6 +265,8 @@ class GoogleMapsViewImpl(
         }
       }
     }
+
+  var enableStrictMarkerPressHitbox = false
 
   @SuppressLint("MissingPermission")
   var myLocationEnabled: Boolean? = null
@@ -606,10 +617,61 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
+    val shouldTreatAsMapPress =
+      enableStrictMarkerPressHitbox && !isTouchInsideMarkerBitmap(marker)
+
     onUi {
-      onMarkerPress?.invoke(marker.idTag)
+      if (shouldTreatAsMapPress) {
+        dispatchLastTouchAsMapPress()
+      } else {
+        onMarkerPress?.invoke(marker.idTag)
+      }
     }
-    return uiSettings?.consumeOnMarkerPress ?: false
+
+    return shouldTreatAsMapPress || (uiSettings?.consumeOnMarkerPress ?: false)
+  }
+
+  private fun isTouchInsideMarkerBitmap(marker: Marker): Boolean {
+    val touch = lastCompletedTouch ?: return true
+    if (SystemClock.uptimeMillis() - touch.eventTimeMs > MARKER_TOUCH_MAX_AGE_MS) return true
+    // Flat markers are perspective-transformed with the map, so a screen-space rectangle is unsafe.
+    if (marker.isFlat) return true
+
+    val markerTag = marker.tagData
+    val hitbox = markerTag.markerIconHitbox ?: return true
+    val width = hitbox.widthPx
+    val height = hitbox.heightPx
+    val map = googleMap ?: return true
+    val markerPoint = map.projection.toScreenLocation(marker.position)
+    val markerX = markerPoint.x + (mapView?.left ?: 0)
+    val markerY = markerPoint.y + (mapView?.top ?: 0)
+    val touchX = touch.x - markerX
+    val touchY = touch.y - markerY
+    val rotationRadians = Math.toRadians(marker.rotation.toDouble())
+    val rotationCos = cos(rotationRadians)
+    val rotationSin = sin(rotationRadians)
+    val localTouchX = rotationCos * touchX + rotationSin * touchY
+    val localTouchY = -rotationSin * touchX + rotationCos * touchY
+    val left = -width * markerTag.markerAnchorX
+    val top = -height * markerTag.markerAnchorY
+
+    return localTouchX >= left &&
+      localTouchX <= left + width &&
+      localTouchY >= top &&
+      localTouchY <= top + height
+  }
+
+  private fun dispatchLastTouchAsMapPress() {
+    val touch = lastCompletedTouch ?: return
+    val map = googleMap ?: return
+    val point =
+      Point(
+        (touch.x - (mapView?.left ?: 0)).roundToInt(),
+        (touch.y - (mapView?.top ?: 0)).roundToInt(),
+      )
+    val coordinates = map.projection.fromScreenLocation(point)
+
+    onMapPress?.invoke(coordinates.toRNLatLng())
   }
 
   override fun onPolylineClick(polyline: Polyline) =

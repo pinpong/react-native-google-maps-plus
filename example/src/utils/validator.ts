@@ -324,6 +324,7 @@ export const RNBasicMapConfigValidator = object({
     })
   ),
   uiSettings: optional(RNMapUiSettingsValidator),
+  enableStrictMarkerPressHitbox: optional(boolean()),
   myLocationEnabled: optional(boolean()),
   buildingEnabled: optional(boolean()),
   trafficEnabled: optional(boolean()),

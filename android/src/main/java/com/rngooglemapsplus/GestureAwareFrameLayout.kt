@@ -8,6 +8,8 @@ abstract class GestureAwareFrameLayout(
   context: Context,
 ) : FrameLayout(context) {
   private var parentTouchInterceptDisallowed = false
+  protected var lastCompletedTouch: CompletedTouch? = null
+    private set
 
   protected abstract val panGestureEnabled: Boolean
   protected abstract val multiTouchGestureEnabled: Boolean
@@ -24,6 +26,10 @@ abstract class GestureAwareFrameLayout(
   }
 
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    if (ev.actionMasked == MotionEvent.ACTION_UP) {
+      lastCompletedTouch = CompletedTouch(ev.x, ev.y, ev.eventTime)
+    }
+
     if (!gesturesSupported) return super.dispatchTouchEvent(ev)
 
     val anyGestureEnabled = panGestureEnabled || multiTouchGestureEnabled
@@ -45,9 +51,11 @@ abstract class GestureAwareFrameLayout(
         setParentTouchInterceptDisallowed(shouldBlockParent)
       }
 
-      MotionEvent.ACTION_UP,
-      MotionEvent.ACTION_CANCEL,
-      -> {
+      MotionEvent.ACTION_UP -> {
+        setParentTouchInterceptDisallowed(false)
+      }
+
+      MotionEvent.ACTION_CANCEL -> {
         setParentTouchInterceptDisallowed(false)
       }
     }

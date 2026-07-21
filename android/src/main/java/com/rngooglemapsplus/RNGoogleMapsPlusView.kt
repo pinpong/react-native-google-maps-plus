@@ -55,6 +55,13 @@ class RNGoogleMapsPlusView(
       view.uiSettings = value
     }
 
+  override var enableStrictMarkerPressHitbox: Boolean? = null
+    set(value) {
+      if (field == value) return
+      field = value
+      view.enableStrictMarkerPressHitbox = value ?: false
+    }
+
   override var myLocationEnabled: Boolean? = null
     set(value) {
       if (field == value) return

@@ -10,6 +10,7 @@ import com.rngooglemapsplus.extensions.infoWindowContentEquals
 import com.rngooglemapsplus.extensions.infoWindowIsEmpty
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.styleHash
+import com.rngooglemapsplus.extensions.toMarkerTag
 import kotlinx.coroutines.Job
 
 private class MarkerState(
@@ -18,6 +19,7 @@ private class MarkerState(
   var marker: Marker? = null
   var currentToken: Long = 0L
   var appliedIcon: BitmapDescriptor? = null
+  var appliedHitbox: MarkerIconHitbox? = null
   var iconReady: Boolean = false
   var anchorsDeferred: Boolean = false
   var appliedStyleHash: Int? = null
@@ -70,7 +72,11 @@ class MapMarkerManager(
 
       state.marker?.let { marker ->
         builder.update(prev, next, marker, deferAnchors)
-        if (marker.isInfoWindowShown && !prev.infoWindowContentEquals(next)) {
+        val infoWindowNeedsRefresh =
+          !prev.infoWindowContentEquals(next) ||
+            !prev.infoWindowAnchorEquals(next) ||
+            prev.rotation != next.rotation
+        if (marker.isInfoWindowShown && infoWindowNeedsRefresh) {
           if (next.infoWindowIsEmpty()) {
             hideInfoWindow(next.id)
           } else {
@@ -121,21 +127,21 @@ class MapMarkerManager(
     val iconSvg = state.current.iconSvg
     if (iconSvg == null) {
       state.renderingStyleHash = null
-      applyIcon(id, token, null)
+      applyIcon(id, token, null, null)
       return
     }
 
     val styleHash = state.current.styleHash()
     builder.cachedIcon(styleHash)?.let { cached ->
       state.renderingStyleHash = null
-      applyIcon(id, token, cached)
+      applyIcon(id, token, cached, builder.buildHitbox(iconSvg))
       return
     }
 
     state.renderingStyleHash = styleHash
     state.renderJob =
-      builder.renderIcon(id, iconSvg, styleHash) { icon ->
-        applyIcon(id, token, icon)
+      builder.renderIcon(id, iconSvg, styleHash) { icon, hitbox ->
+        applyIcon(id, token, icon, hitbox)
       }
   }
 
@@ -143,6 +149,7 @@ class MapMarkerManager(
     id: String,
     token: Long,
     icon: BitmapDescriptor?,
+    hitbox: MarkerIconHitbox?,
   ) {
     val state = states[id] ?: return
     if (state.currentToken != token) return
@@ -158,19 +165,22 @@ class MapMarkerManager(
         builder.applyAnchors(state.current, marker)
         state.anchorsDeferred = false
       }
+      marker.tag = state.current.toMarkerTag(hitbox)
       return
     }
 
     state.appliedIcon = icon
+    state.appliedHitbox = hitbox
     if (map != null) addToMap(state)
   }
 
   private fun addToMap(state: MarkerState) {
     state.marker =
       map?.addMarker(builder.build(state.current, state.appliedIcon))?.apply {
-        tag = MarkerTag(id = state.current.id, iconSvg = state.current.infoWindowIconSvg)
+        tag = state.current.toMarkerTag(state.appliedHitbox)
       }
     state.appliedIcon = null
+    state.appliedHitbox = null
     state.anchorsDeferred = false
   }
 

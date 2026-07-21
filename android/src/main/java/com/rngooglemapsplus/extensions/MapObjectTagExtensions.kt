@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.Polyline
+import com.rngooglemapsplus.MarkerIconHitbox
 import com.rngooglemapsplus.RNMarkerSvg
 
 sealed class MapObjectTag(
@@ -14,6 +15,9 @@ sealed class MapObjectTag(
 data class MarkerTag(
   override val id: String,
   val iconSvg: RNMarkerSvg? = null,
+  val markerIconHitbox: MarkerIconHitbox? = null,
+  val markerAnchorX: Double = 0.5,
+  val markerAnchorY: Double = 1.0,
 ) : MapObjectTag(id)
 
 data class PolylineTag(
