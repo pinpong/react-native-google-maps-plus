@@ -215,5 +215,5 @@ export default function SvgMarkersScreen() {
     }))
   );
 
-  return <MapWrapper mapRef={mapRef} markers={markers} />;
+  return <MapWrapper mapRef={mapRef} markers={markers} hideLoadingOnError />;
 }

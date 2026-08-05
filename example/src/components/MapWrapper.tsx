@@ -29,10 +29,11 @@ type Props = ViewProps &
   RNGoogleMapsPlusViewProps & {
     mapRef: React.RefObject<GoogleMapsViewRef | null>;
     children?: React.ReactNode;
+    hideLoadingOnError?: boolean;
   };
 
 export default function MapWrapper(props: Props) {
-  const { children, ...rest } = props;
+  const { children, hideLoadingOnError = false, ...rest } = props;
   const theme = useAppTheme();
   const styles = useMemo(() => getThemedStyles(theme), [theme]);
   const layout = useSafeAreaInsets();
@@ -94,7 +95,12 @@ export default function MapWrapper(props: Props) {
     []
   );
 
-  const mapCallbacks = useMapCallbacks(props, props.mapRef, setMapLoaded);
+  const mapCallbacks = useMapCallbacks(
+    props,
+    props.mapRef,
+    setMapLoaded,
+    hideLoadingOnError
+  );
 
   return (
     <View style={[styles.container, props.style]}>
