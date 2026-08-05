@@ -98,14 +98,12 @@ class GoogleMapsViewImpl(
       val errorCode = result.toRNMapErrorCodeOrNull()
       if (errorCode != null) {
         mapErrorHandler.report(errorCode, "play services unavailable")
-        return@onUi
-      }
-
-      val initializationResult = MapsInitializer.initialize(reactContext)
-      val initializationErrorCode = initializationResult.toRNMapErrorCodeOrNull()
-      if (initializationErrorCode != null) {
-        mapErrorHandler.report(initializationErrorCode, "maps sdk initialization failed")
-        return@onUi
+      } else {
+        val initializationResult = MapsInitializer.initialize(reactContext)
+        val initializationErrorCode = initializationResult.toRNMapErrorCodeOrNull()
+        if (initializationErrorCode != null) {
+          mapErrorHandler.report(initializationErrorCode, "maps sdk initialization failed")
+        }
       }
 
       mapViewInitialized = true
