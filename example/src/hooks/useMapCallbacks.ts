@@ -18,7 +18,8 @@ import { useNitroCallback } from '@src/hooks/useNitroCallback';
 export function useMapCallbacks(
   props: RNGoogleMapsPlusViewProps,
   mapRef: React.RefObject<GoogleMapsViewRef | null>,
-  setMapLoaded: (loaded: boolean) => void
+  setMapLoaded: (loaded: boolean) => void,
+  hideLoadingOnError: boolean
 ) {
   const hybridRef = useNitroCallback(
     useCallback(
@@ -32,9 +33,11 @@ export function useMapCallbacks(
   const onMapError = useNitroCallback(
     props.onMapError,
     useCallback(
-      (e: RNMapErrorCode, message: string) =>
-        console.log('Map error:', RNMapErrorCode[e], message),
-      []
+      (e: RNMapErrorCode, message: string) => {
+        console.log('Map error:', RNMapErrorCode[e], message);
+        if (hideLoadingOnError) setMapLoaded(true);
+      },
+      [hideLoadingOnError, setMapLoaded]
     )
   );
 
