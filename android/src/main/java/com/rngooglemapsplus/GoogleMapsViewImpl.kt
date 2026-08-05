@@ -87,26 +87,28 @@ class GoogleMapsViewImpl(
   private var cameraMoveReason = -1
 
   init {
-    MapsInitializer.initialize(reactContext)
     reactContext.registerComponentCallbacks(this)
   }
 
   fun initMapView() =
     onUi {
       if (mapViewInitialized) return@onUi
-      mapViewInitialized = true
 
       val result = playServiceHandler.playServicesAvailability()
       val errorCode = result.toRNMapErrorCodeOrNull()
       if (errorCode != null) {
         mapErrorHandler.report(errorCode, "play services unavailable")
-        if (errorCode == RNMapErrorCode.PLAY_SERVICES_MISSING ||
-          errorCode == RNMapErrorCode.PLAY_SERVICES_INVALID
-        ) {
-          return@onUi
-        }
+        return@onUi
       }
 
+      val initializationResult = MapsInitializer.initialize(reactContext)
+      val initializationErrorCode = initializationResult.toRNMapErrorCodeOrNull()
+      if (initializationErrorCode != null) {
+        mapErrorHandler.report(initializationErrorCode, "maps sdk initialization failed")
+        return@onUi
+      }
+
+      mapViewInitialized = true
       mapView =
         MapView(reactContext, googleMapsOptions).also {
           lifecycleObserver =
@@ -390,11 +392,12 @@ class GoogleMapsViewImpl(
     animated: Boolean,
     durationMs: Int,
   ) = onUi {
+    val map = googleMap ?: return@onUi
     val update = CameraUpdateFactory.newCameraPosition(cameraPosition)
     if (animated) {
-      googleMap?.animateCamera(update, durationMs, null)
+      map.animateCamera(update, durationMs, null)
     } else {
-      googleMap?.moveCamera(update)
+      map.moveCamera(update)
     }
   }
 
@@ -405,6 +408,7 @@ class GoogleMapsViewImpl(
     durationMs: Int,
   ) = onUi {
     if (coordinates.isEmpty()) return@onUi
+    val map = googleMap ?: return@onUi
 
     val bounds =
       LatLngBounds
@@ -419,9 +423,9 @@ class GoogleMapsViewImpl(
     val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
 
     if (animated) {
-      googleMap?.animateCamera(update, durationMs, null)
+      map.animateCamera(update, durationMs, null)
     } else {
-      googleMap?.moveCamera(update)
+      map.moveCamera(update)
     }
 
     mapPadding = previousMapPadding
@@ -438,11 +442,12 @@ class GoogleMapsViewImpl(
     durationMs: Int,
     lockBounds: Boolean,
   ) = onUi {
+    val map = googleMap ?: return@onUi
     if (lockBounds) {
-      googleMap?.setLatLngBoundsForCameraTarget(bounds)
+      map.setLatLngBoundsForCameraTarget(bounds)
     }
     val update = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-    googleMap?.animateCamera(update, durationMs, null)
+    map.animateCamera(update, durationMs, null)
   }
 
   fun snapshot(

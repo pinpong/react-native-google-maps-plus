@@ -38,8 +38,14 @@ class MapMarkerManager(
       if (destroyed) return@onUi
       this.map = map
       states.values
-        .filter { it.marker == null && it.iconReady && it.renderJob == null }
-        .forEach { addToMap(it) }
+        .filter { it.marker == null && it.renderJob == null }
+        .forEach { state ->
+          if (state.iconReady) {
+            addToMap(state)
+          } else {
+            requestIcon(state)
+          }
+        }
     }
 
   fun add(marker: RNMarker) =
@@ -48,7 +54,7 @@ class MapMarkerManager(
       remove(marker.id)
       val state = MarkerState(marker)
       states[marker.id] = state
-      requestIcon(state)
+      if (map != null) requestIcon(state)
     }
 
   fun update(next: RNMarker) =
@@ -111,6 +117,8 @@ class MapMarkerManager(
     }
 
   private fun requestIcon(state: MarkerState) {
+    if (map == null) return
+
     state.renderJob?.cancel()
     state.renderJob = null
     iconGeneration += 1
