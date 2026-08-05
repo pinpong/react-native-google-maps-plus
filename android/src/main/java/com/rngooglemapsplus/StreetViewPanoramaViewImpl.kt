@@ -40,26 +40,28 @@ class StreetViewPanoramaViewImpl(
   private var streetViewPanorama: StreetViewPanorama? = null
 
   init {
-    MapsInitializer.initialize(reactContext)
     reactContext.registerComponentCallbacks(this)
   }
 
   fun initStreetView() =
     onUi {
       if (streetViewInitialized) return@onUi
-      streetViewInitialized = true
 
       val result = playServiceHandler.playServicesAvailability()
       val errorCode = result.toRNMapErrorCodeOrNull()
       if (errorCode != null) {
         mapErrorHandler.report(errorCode, "play services unavailable")
-        if (errorCode == RNMapErrorCode.PLAY_SERVICES_MISSING ||
-          errorCode == RNMapErrorCode.PLAY_SERVICES_INVALID
-        ) {
-          return@onUi
-        }
+        return@onUi
       }
 
+      val initializationResult = MapsInitializer.initialize(reactContext)
+      val initializationErrorCode = initializationResult.toRNMapErrorCodeOrNull()
+      if (initializationErrorCode != null) {
+        mapErrorHandler.report(initializationErrorCode, "maps sdk initialization failed")
+        return@onUi
+      }
+
+      streetViewInitialized = true
       streetViewPanoramaView =
         StreetViewPanoramaView(reactContext, streetViewPanoramaOptions).also {
           lifecycleObserver =

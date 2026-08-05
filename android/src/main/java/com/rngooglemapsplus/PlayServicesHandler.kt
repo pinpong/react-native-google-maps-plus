@@ -14,12 +14,6 @@ class PlayServicesHandler(
 
   fun isPlayServicesAvailable(): Boolean {
     val availability = playServicesAvailability()
-    return when (availability) {
-      ConnectionResult.SERVICE_MISSING,
-      ConnectionResult.SERVICE_INVALID,
-      -> false
-
-      else -> true
-    }
+    return availability == ConnectionResult.SUCCESS
   }
 }

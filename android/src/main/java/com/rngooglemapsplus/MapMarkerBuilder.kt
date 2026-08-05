@@ -250,7 +250,7 @@ class MapMarkerBuilder(
     markerId: String,
     iconSvg: RNMarkerSvg,
     styleHash: Int,
-    onReady: (BitmapDescriptor) -> Unit,
+    onReady: (BitmapDescriptor?) -> Unit,
   ): Job =
     scope.launch {
       try {
@@ -258,13 +258,16 @@ class MapMarkerBuilder(
         val renderResult = renderBitmap(iconSvg, markerId)
 
         ensureActive()
-        val desc = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+        val desc =
+          try {
+            BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+          } finally {
+            renderResult.bitmap.recycle()
+          }
 
         if (!renderResult.isFallback) {
           iconCache.put(styleHash, desc)
         }
-        renderResult.bitmap.recycle()
-
         withContext(Dispatchers.Main) {
           ensureActive()
           onReady(desc)
@@ -274,7 +277,7 @@ class MapMarkerBuilder(
         clearIconCache()
         withContext(Dispatchers.Main) {
           ensureActive()
-          onReady(createFallbackDescriptor())
+          onReady(null)
         }
       } catch (_: CancellationException) {
         // cancelled
@@ -282,7 +285,7 @@ class MapMarkerBuilder(
         mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon failed", t)
         withContext(Dispatchers.Main) {
           ensureActive()
-          onReady(createFallbackDescriptor())
+          onReady(null)
         }
       }
     }
@@ -329,13 +332,6 @@ class MapMarkerBuilder(
     createBitmap(1, 1, Bitmap.Config.ARGB_8888).apply {
       setHasAlpha(true)
     }
-
-  private fun createFallbackDescriptor(): BitmapDescriptor {
-    val bmp = createFallbackBitmap()
-    return BitmapDescriptorFactory.fromBitmap(bmp).also {
-      bmp.recycle()
-    }
-  }
 
   private data class RenderBitmapResult(
     val bitmap: Bitmap,
