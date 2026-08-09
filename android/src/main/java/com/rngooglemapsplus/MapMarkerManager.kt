@@ -118,7 +118,6 @@ class MapMarkerManager(
 
   private fun requestIcon(state: MarkerState) {
     if (map == null) return
-
     state.renderJob?.cancel()
     state.renderJob = null
     iconGeneration += 1

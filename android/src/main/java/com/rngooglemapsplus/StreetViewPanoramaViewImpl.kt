@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.facebook.react.uimanager.ThemedReactContext
-import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.StreetViewPanorama
 import com.google.android.gms.maps.StreetViewPanoramaOptions
 import com.google.android.gms.maps.StreetViewPanoramaView
@@ -17,7 +16,6 @@ import com.google.android.gms.maps.model.StreetViewPanoramaOrientation
 import com.google.android.gms.maps.model.StreetViewSource
 import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
-import com.rngooglemapsplus.extensions.toRNMapErrorCodeOrNull
 
 @SuppressLint("ViewConstructor")
 class StreetViewPanoramaViewImpl(
@@ -46,19 +44,7 @@ class StreetViewPanoramaViewImpl(
   fun initStreetView() =
     onUi {
       if (streetViewInitialized) return@onUi
-
-      val result = playServiceHandler.playServicesAvailability()
-      val errorCode = result.toRNMapErrorCodeOrNull()
-      if (errorCode != null) {
-        mapErrorHandler.report(errorCode, "play services unavailable")
-      } else {
-        val initializationResult = MapsInitializer.initialize(reactContext)
-        val initializationErrorCode = initializationResult.toRNMapErrorCodeOrNull()
-        if (initializationErrorCode != null) {
-          mapErrorHandler.report(initializationErrorCode, "maps sdk initialization failed")
-        }
-      }
-
+      playServiceHandler.initMapsSdk(mapErrorHandler)
       streetViewInitialized = true
       streetViewPanoramaView =
         StreetViewPanoramaView(reactContext, streetViewPanoramaOptions).also {
