@@ -80,7 +80,13 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
    */
   customMapStyle?: string;
 
-  /** Overrides OS UI mode. See {@link RNUserInterfaceStyle}. */
+  /**
+   * Overrides OS UI mode. See {@link RNUserInterfaceStyle}.
+   *
+   * @remarks On Android, dark mode requires the latest Google Maps renderer and
+   * is not supported in `liteMode`. Devices or emulators with missing or
+   * outdated Google Play services may fall back to the legacy renderer.
+   */
   userInterfaceStyle?: RNUserInterfaceStyle;
 
   /** Zoom range. See {@link RNMapZoomConfig}. */
