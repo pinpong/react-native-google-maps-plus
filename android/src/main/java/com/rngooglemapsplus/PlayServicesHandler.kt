@@ -19,7 +19,7 @@ class PlayServicesHandler(
     return availability == ConnectionResult.SUCCESS
   }
 
-  fun initMapsSdk(mapErrorHandler: MapErrorHandler) {
+  fun initMapsSdk(mapErrorHandler: MapErrorHandler): Boolean {
     val availabilityErrorCode = playServicesAvailability().toRNMapErrorCodeOrNull()
     if (availabilityErrorCode != null) {
       mapErrorHandler.report(availabilityErrorCode, "play services unavailable")
@@ -28,5 +28,6 @@ class PlayServicesHandler(
     if (initErrorCode != null && initErrorCode != availabilityErrorCode) {
       mapErrorHandler.report(initErrorCode, "maps sdk initialization failed")
     }
+    return initErrorCode == null
   }
 }

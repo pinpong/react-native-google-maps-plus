@@ -91,7 +91,9 @@ class GoogleMapsViewImpl(
   fun initMapView() =
     onUi {
       if (mapViewInitialized) return@onUi
-      playServiceHandler.initMapsSdk(mapErrorHandler)
+      if (!playServiceHandler.initMapsSdk(mapErrorHandler)) {
+        onMapReady?.invoke(false)
+      }
       mapViewInitialized = true
       mapView =
         MapView(reactContext, googleMapsOptions).also {

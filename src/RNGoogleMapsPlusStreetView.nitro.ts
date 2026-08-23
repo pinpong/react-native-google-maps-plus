@@ -27,7 +27,11 @@ export interface RNGoogleMapsPlusStreetViewProps extends HybridViewProps {
   /** UI and gesture settings. See {@link RNStreetViewUiSettings}. */
   uiSettings?: RNStreetViewUiSettings;
 
-  /** Panorama is initialized and ready to use. */
+  /**
+   * Panorama is initialized and ready to use.
+   * Android: `false` if the Maps SDK could not be initialized, e.g. Play Services
+   * missing or outdated. Fires again with `true` once the user has resolved it.
+   */
   onPanoramaReady?: (ready: boolean) => void;
 
   /** Location update. */
