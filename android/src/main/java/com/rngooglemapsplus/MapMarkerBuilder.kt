@@ -257,9 +257,9 @@ class MapMarkerBuilder(
         ensureActive()
         val renderResult = renderBitmap(iconSvg, markerId)
 
-        ensureActive()
         val desc =
           try {
+            ensureActive()
             BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
           } finally {
             renderResult.bitmap.recycle()
