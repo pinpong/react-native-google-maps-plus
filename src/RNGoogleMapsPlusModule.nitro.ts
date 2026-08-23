@@ -33,6 +33,8 @@ export interface RNGoogleMapsPlusModule extends HybridObject<{
    * iOS: always returns `false`.
    * Android: performs a real system check.
    *
+   * Returns `false` for outdated, disabled or updating Play Services.
+   *
    * @returns `true` if Google Play Services are available, otherwise `false`.
    */
   isGooglePlayServicesAvailable(): boolean;
