@@ -129,7 +129,11 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** Map errors. */
   onMapError?: (error: RNMapErrorCode, msg: string) => void;
 
-  /** Native map instance created. */
+  /**
+   * Native map instance created.
+   * Android: `false` if the Maps SDK could not be initialized, e.g. Play Services
+   * missing or outdated. Fires again with `true` once the user has resolved it.
+   */
   onMapReady?: (ready: boolean) => void;
 
   /** First frame rendered. */

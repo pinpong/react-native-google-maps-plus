@@ -44,7 +44,9 @@ class StreetViewPanoramaViewImpl(
   fun initStreetView() =
     onUi {
       if (streetViewInitialized) return@onUi
-      playServiceHandler.initMapsSdk(mapErrorHandler)
+      if (!playServiceHandler.initMapsSdk(mapErrorHandler)) {
+        onPanoramaReady?.invoke(false)
+      }
       streetViewInitialized = true
       streetViewPanoramaView =
         StreetViewPanoramaView(reactContext, streetViewPanoramaOptions).also {

@@ -32,17 +32,21 @@ export function useMapCallbacks(
   const onMapError = useNitroCallback(
     props.onMapError,
     useCallback(
-      (e: RNMapErrorCode, message: string) => {
-        console.log('Map error:', RNMapErrorCode[e], message);
-        setMapLoaded(true);
-      },
-      [setMapLoaded]
+      (e: RNMapErrorCode, message: string) =>
+        console.log('Map error:', RNMapErrorCode[e], message),
+      []
     )
   );
 
   const onMapReady = useNitroCallback(
     props.onMapReady,
-    useCallback((ready: boolean) => console.log('Map is ready:', ready), [])
+    useCallback(
+      (ready: boolean) => {
+        console.log('Map is ready:', ready);
+        if (!ready) setMapLoaded(true);
+      },
+      [setMapLoaded]
+    )
   );
 
   const onMapLoaded = useNitroCallback(
