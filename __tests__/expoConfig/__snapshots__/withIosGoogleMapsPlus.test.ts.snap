@@ -145,10 +145,6 @@ target 'HelloWorld' do
   )
 
   post_install do |installer|
-# @generated begin react-native-google-maps-svgkit-patch - expo prebuild (DO NOT MODIFY) sync-ed16ec228929e9f6bcce5f8654ab58fb1bdadeea
-  require File.join(File.dirname(\`node --print "require.resolve('react-native-google-maps-plus/package.json')"\`), 'scripts', 'svgkit_patch')
-  apply_svgkit_patch(installer)
-# @generated end react-native-google-maps-svgkit-patch
     react_native_post_install(
       installer,
       config[:reactNativePath],
