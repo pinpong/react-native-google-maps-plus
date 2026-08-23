@@ -21,6 +21,7 @@ jest.mock('@expo/config-plugins', () => {
     ...actual,
     withInfoPlist: applyMod('infoPlist'),
     withPodfile: applyMod('podfile'),
+    withPodfileProperties: applyMod('podfileProperties'),
     withAppDelegate: applyMod('appDelegate'),
   };
 });
@@ -29,6 +30,30 @@ const PROPS: RNGoogleMapsPlusExpoPluginProps = {
   googleMapsAndroidApiKey: 'unused-android-key',
   googleMapsIosApiKey: 'ios-key',
 };
+
+const LEGACY_PODFILE_BLOCK = `# @generated begin react-native-google-maps-svgkit-patch - expo prebuild (DO NOT MODIFY) sync-ed16ec228929e9f6bcce5f8654ab58fb1bdadeea
+  require File.join(File.dirname(\`node --print "require.resolve('react-native-google-maps-plus/package.json')"\`), 'scripts', 'svgkit_patch')
+  apply_svgkit_patch(installer)
+# @generated end react-native-google-maps-svgkit-patch
+`;
+
+const LEGACY_MODULAR_HEADERS_BLOCK = `# @generated begin react-native-google-maps-modular-headers - expo prebuild (DO NOT MODIFY) sync-b7c1d0c0f4d0a3e1e0f2a0d6f1c4c1b0d1a2e3f4
+use_modular_headers!
+# @generated end react-native-google-maps-modular-headers
+`;
+
+const LEGACY_APP_DELEGATE_IMPORT = `// @generated begin react-native-google-maps-import - expo prebuild (DO NOT MODIFY) sync-3b9e722debd3c073b9705963208f8121ec9f576c
+import GoogleMaps
+// @generated end react-native-google-maps-import
+`;
+
+const LEGACY_APP_DELEGATE_INIT = `// @generated begin react-native-google-maps-init - expo prebuild (DO NOT MODIFY) sync-ed7def55dfd1b52fb685aa33a269aeb34fc6ab13
+
+    if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MAPS_API_KEY") as? String {
+      GMSServices.provideAPIKey(apiKey)
+    }
+// @generated end react-native-google-maps-init
+`;
 
 const LEGACY_APP_DELEGATE = `import UIKit
 import React
@@ -45,6 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 type PluginMods = {
   infoPlist: Record<string, unknown>;
+  podfileProperties: Record<string, string>;
   podfile: { path: string; language: string; contents: string };
   appDelegate: { path: string; language: string; contents: string };
 };
@@ -52,6 +78,7 @@ type PluginMods = {
 type ApplyOptions = {
   props?: Partial<RNGoogleMapsPlusExpoPluginProps>;
   infoPlist?: Record<string, unknown>;
+  podfileProperties?: Record<string, string>;
   podfile?: string;
   appDelegate?: string;
   appDelegateLanguage?: string;
@@ -64,6 +91,7 @@ function readFixture(name: string): string {
 function applyPlugin({
   props,
   infoPlist = {},
+  podfileProperties = {},
   podfile = readFixture('Podfile'),
   appDelegate = readFixture('AppDelegate.swift'),
   appDelegateLanguage = 'swift',
@@ -73,6 +101,7 @@ function applyPlugin({
     slug: 'example',
     __mods: {
       infoPlist,
+      podfileProperties,
       podfile: { path: 'ios/Podfile', language: 'rb', contents: podfile },
       appDelegate: {
         path: 'ios/AppDelegate.swift',
@@ -92,9 +121,9 @@ function reapply(mods: PluginMods, props?: ApplyOptions['props']): PluginMods {
   return applyPlugin({
     props,
     infoPlist: mods.infoPlist,
+    podfileProperties: mods.podfileProperties,
     podfile: mods.podfile.contents,
     appDelegate: mods.appDelegate.contents,
-    appDelegateLanguage: mods.appDelegate.language,
   });
 }
 
@@ -137,6 +166,23 @@ describe('withIosGoogleMapsPlus', () => {
     });
   });
 
+  describe('Podfile.properties.json', () => {
+    it('opts into dynamically linked frameworks', () => {
+      const { podfileProperties } = applyPlugin({ props: PROPS });
+
+      expect(podfileProperties['ios.useFrameworks']).toBe('dynamic');
+    });
+
+    it('keeps a linkage the app already chose', () => {
+      const { podfileProperties } = applyPlugin({
+        props: PROPS,
+        podfileProperties: { 'ios.useFrameworks': 'static' },
+      });
+
+      expect(podfileProperties['ios.useFrameworks']).toBe('static');
+    });
+  });
+
   describe('Podfile', () => {
     it('adds use_modular_headers! after the platform line', () => {
       const { contents } = applyPlugin({ props: PROPS }).podfile;
@@ -147,54 +193,18 @@ describe('withIosGoogleMapsPlus', () => {
       );
     });
 
-    it('injects the svgkit patch into the existing post_install block', () => {
-      const { contents } = applyPlugin({ props: PROPS }).podfile;
-
-      expect(contents).toContain(
-        `require File.join(File.dirname(\`node --print "require.resolve('react-native-google-maps-plus/package.json')"\`), 'scripts', 'svgkit_patch')`
+    it('keeps a single use_modular_headers! when the app already has one', () => {
+      const legacy = readFixture('Podfile').replace(
+        /^(platform\s+:ios.*\n)/m,
+        `$1${LEGACY_MODULAR_HEADERS_BLOCK}`
       );
-      expect(count(contents, 'post_install do |installer|')).toBe(1);
-      expect(contents.indexOf('apply_svgkit_patch(installer)')).toBeGreaterThan(
-        contents.indexOf('post_install do |installer|')
-      );
-    });
 
-    it('places the patch outside a nested if/end block from another plugin', () => {
-      const nestedEndPodfile = `platform :ios, '16.0'
-
-target 'Example' do
-  post_install do |installer|
-    if ENV['CI'] == 'true'
-      puts 'ci run'
-    end
-    react_native_post_install(installer)
-  end
-end
-`;
       const { contents } = applyPlugin({
         props: PROPS,
-        podfile: nestedEndPodfile,
+        podfile: legacy,
       }).podfile;
 
-      expect(count(contents, 'apply_svgkit_patch(installer)')).toBe(1);
-      expect(contents.indexOf('apply_svgkit_patch(installer)')).toBeLessThan(
-        contents.indexOf("if ENV['CI']")
-      );
-    });
-
-    it('appends a post_install block when the Podfile has none', () => {
-      const minimalPodfile = `platform :ios, '16.0'
-
-target 'Example' do
-end
-`;
-      const { contents } = applyPlugin({
-        props: PROPS,
-        podfile: minimalPodfile,
-      }).podfile;
-
-      expect(count(contents, 'post_install do |installer|')).toBe(1);
-      expect(contents).toContain('apply_svgkit_patch(installer)');
+      expect(contents.match(/use_modular_headers!/g)).toHaveLength(1);
     });
 
     it('is idempotent when applied twice', () => {
@@ -204,19 +214,20 @@ end
       expect(second.podfile.contents).toBe(first.podfile.contents);
     });
 
-    it('stays idempotent when the first run had to append the post_install block', () => {
-      const minimalPodfile = `platform :ios, '16.0'
+    it('removes the svgkit patch block generated by previous versions', () => {
+      const legacy = readFixture('Podfile').replace(
+        'post_install do |installer|\n',
+        `post_install do |installer|\n${LEGACY_PODFILE_BLOCK}`
+      );
+      expect(legacy).toContain('apply_svgkit_patch(installer)');
 
-target 'Example' do
-end
-`;
-      const first = applyPlugin({ props: PROPS, podfile: minimalPodfile });
-      const second = reapply(first, PROPS);
+      const { contents } = applyPlugin({
+        props: PROPS,
+        podfile: legacy,
+      }).podfile;
 
-      expect(second.podfile.contents).toBe(first.podfile.contents);
-      expect(
-        count(first.podfile.contents, 'apply_svgkit_patch(installer)')
-      ).toBe(1);
+      expect(contents).not.toContain('svgkit_patch');
+      expect(contents).not.toContain('react-native-google-maps-svgkit-patch');
     });
 
     it('matches the snapshot for the current Expo template', () => {
@@ -281,6 +292,27 @@ end
       expect(console.warn).toHaveBeenCalledWith(
         expect.stringContaining('AppDelegate is not Swift')
       );
+    });
+
+    it('does not duplicate the blocks generated by previous versions', () => {
+      const legacy = readFixture('AppDelegate.swift')
+        .replace(
+          'import React\n',
+          `import React\n${LEGACY_APP_DELEGATE_IMPORT}`
+        )
+        .replace(
+          /^(\s*return super\.application\()/m,
+          `${LEGACY_APP_DELEGATE_INIT}$1`
+        );
+
+      const { contents } = applyPlugin({
+        props: PROPS,
+        appDelegate: legacy,
+      }).appDelegate;
+
+      expect(count(contents, 'import GoogleMaps')).toBe(1);
+      expect(count(contents, 'GMSServices.provideAPIKey')).toBe(1);
+      expect(contents).toBe(applyPlugin({ props: PROPS }).appDelegate.contents);
     });
 
     it('matches the snapshot for the current Expo template', () => {

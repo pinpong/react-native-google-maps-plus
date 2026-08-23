@@ -12,8 +12,8 @@
 		1C2CD62E2E2A54A300F92915 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 1C2CD62C2E2A54A300F92915 /* Release.xcconfig */; };
 		1CFDC6AB2E6CA193005652FB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CFDC6A32E6CA144005652FB /* InfoPlist.strings */; };
 		1CFDC6AC2E6CA193005652FB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CFDC6A62E6CA144005652FB /* InfoPlist.strings */; };
-		2B37C898F2A1AAA9486D9912 /* Pods_GoogleMapsPlusExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EA1D48E107416ADB6C60F35 /* Pods_GoogleMapsPlusExample.framework */; };
 		50142BCB3C4DD87E00709364 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		570C82C0E51FAA6E842D1FE2 /* Pods_GoogleMapsPlusExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 902FEEDB270C42B435FCA90F /* Pods_GoogleMapsPlusExample.framework */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -28,9 +28,9 @@
 		1C2CD62C2E2A54A300F92915 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = GoogleMapsPlusExample/Release.xcconfig; sourceTree = "<group>"; };
 		1CFDC6A32E6CA144005652FB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
 		1CFDC6A62E6CA144005652FB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
-		5EA1D48E107416ADB6C60F35 /* Pods_GoogleMapsPlusExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapsPlusExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GoogleMapsPlusExample/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GoogleMapsPlusExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		902FEEDB270C42B435FCA90F /* Pods_GoogleMapsPlusExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapsPlusExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B44C46EC9F8E58D8B6DDD10 /* Pods-GoogleMapsPlusExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapsPlusExample.release.xcconfig"; path = "Target Support Files/Pods-GoogleMapsPlusExample/Pods-GoogleMapsPlusExample.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2B37C898F2A1AAA9486D9912 /* Pods_GoogleMapsPlusExample.framework in Frameworks */,
+				570C82C0E51FAA6E842D1FE2 /* Pods_GoogleMapsPlusExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5EA1D48E107416ADB6C60F35 /* Pods_GoogleMapsPlusExample.framework */,
+				902FEEDB270C42B435FCA90F /* Pods_GoogleMapsPlusExample.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -423,6 +423,7 @@
 					"${PODS_ROOT}/React-graphics/react/renderer/graphics/platform/ios",
 					"${PODS_ROOT}/React-featureflags",
 					"${PODS_ROOT}/React-renderercss",
+					"${PODS_ROOT}/React-bridging",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -529,6 +530,7 @@
 					"${PODS_ROOT}/React-graphics/react/renderer/graphics/platform/ios",
 					"${PODS_ROOT}/React-featureflags",
 					"${PODS_ROOT}/React-renderercss",
+					"${PODS_ROOT}/React-bridging",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (

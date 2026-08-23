@@ -31,5 +31,14 @@
       "other": "#"
     }
   },
-  "highlightLanguages": ["ts", "tsx", "js", "json", "bash", "ruby"]
+  "highlightLanguages": [
+    "ts",
+    "tsx",
+    "js",
+    "json",
+    "bash",
+    "ruby",
+    "swift",
+    "xml"
+  ]
 }
