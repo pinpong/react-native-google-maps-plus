@@ -11,19 +11,62 @@
  *
  * ## iOS Setup (Bare RN only)
  *
- * Add this to your Podfile:
+ * The native iOS dependencies (GoogleMaps, GoogleMapsUtils, SVGKit) are
+ * integrated via Swift Package Manager automatically during `pod install`.
+ *
+ * ### Install the pods as frameworks
+ *
+ * Swift packages require the pods to be installed as frameworks, so add
+ * `use_frameworks!` to your `Podfile`. React Native recommends dynamic
+ * linking, static linking also works if another dependency requires it:
  *
  * ```ruby
- * post_install do |installer|
- *   react_native_post_install(
- *       installer,
- *       config[:reactNativePath],
- *       :mac_catalyst_enabled => false,
- *     )
+ * platform :ios, 16.0
+ * prepare_react_native_project!
  *
- *   require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
- *   apply_svgkit_patch(installer)
- * end
+ * use_frameworks! :linkage => :dynamic
+ * ```
+ *
+ * React Native does not call `use_frameworks!` on its own, so setting the
+ * `USE_FRAMEWORKS` environment variable alone is not enough. The example app
+ * reads that variable to make the linkage switchable:
+ *
+ * ```ruby
+ * ENV['USE_FRAMEWORKS'] ||= 'dynamic'
+ * use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym
+ * ```
+ *
+ * ### Configure the API key
+ *
+ * Add your API key to `Info.plist` and hand it to the SDK in your
+ * `AppDelegate`, before the first map or Street View is created. Reading it
+ * from `Info.plist` keeps the key out of your sources:
+ *
+ * ```xml
+ * <key>MAPS_API_KEY</key>
+ * <string>YOUR_IOS_MAPS_API_KEY</string>
+ * ```
+ *
+ * ```swift
+ * import GoogleMaps
+ *
+ * if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MAPS_API_KEY") as? String {
+ *   GMSServices.provideAPIKey(apiKey)
+ * }
+ * ```
+ *
+ * The Google Maps SDK raises an unrecoverable Objective-C exception when a map
+ * is created without a valid key. That happens inside the SDK and is not
+ * reported through `onMapError`, unlike on Android.
+ *
+ * ### Upgrading from a CocoaPods based version
+ *
+ * Remove the svgkit patch from your `Podfile`. The script no longer ships with
+ * the package and `pod install` fails on the missing require:
+ *
+ * ```ruby
+ * require_relative '../node_modules/react-native-google-maps-plus/scripts/svgkit_patch'
+ * apply_svgkit_patch(installer)
  * ```
  *
  * ## Expo Setup
@@ -45,6 +88,17 @@
  *   }
  * }
  * ```
+ *
+ * On iOS the plugin writes the key to `Info.plist` and adds the matching
+ * `GMSServices.provideAPIKey` call to the `AppDelegate`, so no manual setup is
+ * needed. It also sets `ios.useFrameworks` to `dynamic` in
+ * `Podfile.properties.json`, because the native iOS dependencies are Swift
+ * packages. Set `ios.useFrameworks` yourself (e.g. via `expo-build-properties`)
+ * if you need `static`, the plugin keeps that value.
+ *
+ * When upgrading from a CocoaPods based version, the plugin removes the svgkit
+ * patch it generated into the `Podfile` before. Nothing has to be removed by
+ * hand.
  *
  * # API Keys
  *
@@ -68,6 +122,12 @@
  * - SVG Rendering
  *   iOS: SVGKit
  *   Android: AndroidSVG
+ *
+ * The iOS SDKs are resolved via Swift Package Manager, so CocoaPods can no
+ * longer deduplicate them against a `GoogleMaps` pod that another library pulls
+ * in (e.g. react-native-maps, expo-maps or GooglePlaces). Such a setup ends up
+ * with two copies of the SDK in the app, of which only one is configured by
+ * `GMSServices.provideAPIKey`.
  *
  *
  * @example Map View

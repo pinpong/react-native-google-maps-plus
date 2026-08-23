@@ -37,6 +37,7 @@ def getExtOrIntegerDefault(name) {
 
 android {
   namespace "com.rngooglemapsplus"
+  ndkVersion getExtOrDefault("ndkVersion")
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
