@@ -11,6 +11,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useAppTheme } from '@src/hooks/useAppTheme';
+import AdvancedMarkersScreen from '@src/screens/AdvancedMarkersScreen';
 import BasicMapScreen from '@src/screens/BasicMapScreen';
 import BlankScreen from '@src/screens/BlankScreen';
 import CameraTestScreen from '@src/screens/CameraTestScreen';
@@ -23,6 +24,7 @@ import HomeScreen from '@src/screens/HomeScreen';
 import IndoorLevelMapScreen from '@src/screens/IndoorLevelMapScreen';
 import KmlLayerScreen from '@src/screens/KmlLayerScreen';
 import LocationScreen from '@src/screens/LocationScreen';
+import MapIdScreen from '@src/screens/MapIdScreen';
 import MarkersScreen from '@src/screens/MarkersScreen';
 import PolygonsScreen from '@src/screens/PolygonsScreen';
 import PolylinesScreen from '@src/screens/PolylinesScreen';
@@ -69,6 +71,11 @@ export default function App() {
             options={{ title: 'Basic Map' }}
           />
           <Stack.Screen
+            name="MapId"
+            component={MapIdScreen}
+            options={{ title: 'Map ID' }}
+          />
+          <Stack.Screen
             name="ScrollView"
             component={ScrollViewScreen}
             options={{ title: 'Map in ScrollView' }}
@@ -82,6 +89,11 @@ export default function App() {
             name="SvgMarkers"
             component={SvgMarkersScreen}
             options={{ title: 'SVG Markers' }}
+          />
+          <Stack.Screen
+            name="AdvancedMarkers"
+            component={AdvancedMarkersScreen}
+            options={{ title: 'Advanced Markers' }}
           />
           <Stack.Screen
             name="Polygons"

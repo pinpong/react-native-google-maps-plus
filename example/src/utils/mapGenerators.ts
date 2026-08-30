@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { weightData } from '@src/data/heatMapWeightData';
 
 import type {
@@ -21,13 +23,18 @@ export function randomColor() {
 export function makeSvgIcon(
   width: number,
   height: number,
-  color?: string
+  color?: string,
+  label?: string
 ): string {
   color = color ?? randomColor();
+  const labelPosition =
+    Platform.OS === 'ios' ? 'y="29" dominant-baseline="middle"' : 'y="33"';
+
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 64 88">
   <path d="M32 2c-14.36 0-26 11.64-26 26 0 18.2 20.67 38.86 24.82 43.02a1.7 1.7 0 0 0 2.36 0C37.33 66.86 58 46.2 58 28 58 13.64 46.36 2 32 2z" fill="${color}" />
   <circle cx="32" cy="28" r="10" fill="#FFFFFF" />
+  ${label ? `<text x="32" ${labelPosition} font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle" fill="${color}">${label}</text>` : ''}
   <ellipse cx="32" cy="82" rx="14" ry="4" fill="#000000" opacity="0.15" />
 </svg>`;
 }

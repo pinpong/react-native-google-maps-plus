@@ -50,6 +50,10 @@ export function useMapCallbacks(
     )
   );
 
+  const onMapCapabilitiesChange = useNitroCallback(
+    props.onMapCapabilitiesChange
+  );
+
   const onMapLoaded = useNitroCallback(
     props.onMapLoaded,
     useCallback(
@@ -217,6 +221,7 @@ export function useMapCallbacks(
     hybridRef,
     onMapError,
     onMapReady,
+    onMapCapabilitiesChange,
     onMapLoaded,
     onMapPress,
     onMapLongPress,
