@@ -13,6 +13,16 @@ add_library(${PACKAGE_NAME} SHARED
         src/main/cpp/cpp-adapter.cpp
 )
 
+# Compile options, only JNI_OnLoad has to be exported, hide every other symbol
+target_compile_options(${PACKAGE_NAME} PRIVATE
+        -frtti
+        -fexceptions
+        -Wall
+        -fstack-protector-all
+        -fvisibility=hidden
+        $<$<CONFIG:Debug>:-O1>
+)
+
 # Add Nitrogen specs :)
 include(${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/RNGoogleMapsPlus+autolinking.cmake)
 
