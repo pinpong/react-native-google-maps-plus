@@ -13,6 +13,7 @@ import type {
   RNLocationConfig,
   RNLocationErrorCode,
   RNLocationPermissionResult,
+  RNMapCapabilities,
   RNMapErrorCode,
   RNMapPadding,
   RNMapType,
@@ -135,6 +136,9 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
    * missing or outdated. Fires again with `true` once the user has resolved it.
    */
   onMapReady?: (ready: boolean) => void;
+
+  /** Current runtime capabilities of the configured map. */
+  onMapCapabilitiesChange?: (capabilities: RNMapCapabilities) => void;
 
   /** First frame rendered. */
   onMapLoaded?: (region: RNRegion, camera: RNCamera) => void;

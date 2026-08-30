@@ -280,6 +280,11 @@ class RNGoogleMapsPlusView(
       view.onMapReady = cb
     }
 
+  override var onMapCapabilitiesChange: ((RNMapCapabilities) -> Unit)? = null
+    set(cb) {
+      view.onMapCapabilitiesChange = cb
+    }
+
   override var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
     set(cb) {
       view.onMapLoaded = cb

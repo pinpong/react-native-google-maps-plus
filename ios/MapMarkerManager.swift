@@ -12,6 +12,7 @@ private final class MarkerState {
   var renderingStyleHash: NSNumber?
   var renderTask: Task<Void, Never>?
   var infoWindowPrefetchTask: Task<Void, Never>?
+  var configurationErrorReported = false
 
   init(current: RNMarker) {
     self.current = current
@@ -20,21 +21,27 @@ private final class MarkerState {
 
 final class MapMarkerManager {
   private let builder: MapMarkerBuilder
+  private let mapErrorHandler: MapErrorHandler
   private weak var mapView: GMSMapView?
+  private var hasMapId = false
+  private var advancedMarkersAvailable = false
   private var states: [String: MarkerState] = [:]
   private var iconGeneration: UInt64 = 0
   private var destroyed = false
   private var shownInfoWindowView: UIImageView?
   private var shownInfoWindowId: String?
 
-  init(builder: MapMarkerBuilder) {
+  init(builder: MapMarkerBuilder, mapErrorHandler: MapErrorHandler) {
     self.builder = builder
+    self.mapErrorHandler = mapErrorHandler
   }
 
-  func attachMap(_ mapView: GMSMapView) {
+  func attachMap(_ mapView: GMSMapView, hasMapId: Bool) {
     onMain {
       guard !self.destroyed else { return }
       self.mapView = mapView
+      self.hasMapId = hasMapId
+      self.advancedMarkersAvailable = mapView.mapCapabilities.contains(.advancedMarkers)
       self.states.values
         .filter { $0.marker == nil && $0.iconReady && $0.renderTask == nil }
         .forEach { self.addToMap($0) }
@@ -58,6 +65,11 @@ final class MapMarkerManager {
       let prev = state.current
       if prev.markerEquals(next) { return }
       state.current = next
+
+      if !prev.advancedEquals(next) {
+        self.recreate(state)
+        return
+      }
 
       let nextStyleHash: NSNumber? = next.iconSvg != nil ? next.styleHash() : nil
       let renderingSameStyle = state.renderTask != nil && state.renderingStyleHash == nextStyleHash
@@ -133,6 +145,16 @@ final class MapMarkerManager {
     builder.clearIconCache()
   }
 
+  func updateAdvancedMarkersAvailable(_ available: Bool) {
+    onMain {
+      guard self.advancedMarkersAvailable != available else { return }
+      self.advancedMarkersAvailable = available
+      self.states.values
+        .filter { $0.current.usesAdvancedMarker() }
+        .forEach { self.recreate($0) }
+    }
+  }
+
   func destroy() {
     onMain {
       self.destroyed = true
@@ -203,7 +225,36 @@ final class MapMarkerManager {
   }
 
   private func addToMap(_ state: MarkerState) {
-    let marker = builder.build(state.current, icon: state.appliedIcon)
+    if let message = state.current.advancedMarkerConfigurationError() {
+      if !state.configurationErrorReported {
+        state.configurationErrorReported = true
+        mapErrorHandler.report(
+          RNMapErrorCode.invalidArgument,
+          "markerId=\(state.current.id) \(message)"
+        )
+      }
+      state.appliedIcon = nil
+      return
+    }
+
+    if state.current.usesAdvancedMarker(), !hasMapId {
+      if !state.configurationErrorReported {
+        state.configurationErrorReported = true
+        mapErrorHandler.report(
+          RNMapErrorCode.invalidArgument,
+          "markerId=\(state.current.id) Advanced Markers require initialProps.mapId"
+        )
+      }
+      state.appliedIcon = nil
+      return
+    }
+
+    let useAdvancedMarker = state.current.usesAdvancedMarker() && advancedMarkersAvailable
+    let marker = builder.build(
+      state.current,
+      icon: state.appliedIcon,
+      useAdvancedMarker: useAdvancedMarker
+    )
     marker.map = mapView
     state.marker = marker
     state.appliedIcon = nil
@@ -244,5 +295,16 @@ final class MapMarkerManager {
       $0.icon = nil
       $0.map = nil
     }
+    state.marker = nil
+  }
+
+  private func recreate(_ state: MarkerState) {
+    removeFromMap(state)
+    state.iconReady = false
+    state.appliedIcon = nil
+    state.appliedStyleHash = nil
+    state.anchorsDeferred = false
+    state.configurationErrorReported = false
+    requestIcon(for: state)
   }
 }

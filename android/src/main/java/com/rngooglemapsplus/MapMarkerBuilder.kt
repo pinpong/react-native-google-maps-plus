@@ -6,14 +6,17 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.graphics.createBitmap
 import com.facebook.react.uimanager.ThemedReactContext
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.rngooglemapsplus.extensions.advancedMarkerCollisionBehavior
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
+import com.rngooglemapsplus.extensions.toGoogleCollisionBehavior
 import com.rngooglemapsplus.extensions.toLatLng
 import com.rngooglemapsplus.extensions.toPixelSizeOrNull
 import kotlinx.coroutines.CoroutineScope
@@ -49,8 +52,9 @@ class MapMarkerBuilder(
   fun build(
     m: RNMarker,
     icon: BitmapDescriptor?,
+    useAdvancedMarker: Boolean,
   ): MarkerOptions =
-    MarkerOptions().apply {
+    (if (useAdvancedMarker) AdvancedMarkerOptions() else MarkerOptions()).apply {
       position(m.coordinate.toLatLng())
       icon(icon)
       m.title?.let { title(it) }
@@ -62,6 +66,12 @@ class MapMarkerBuilder(
       m.infoWindowAnchor?.let { infoWindowAnchor(it.x.toFloat(), it.y.toFloat()) }
       m.anchor?.let { anchor(it.x.toFloat(), it.y.toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
+      if (this is AdvancedMarkerOptions) {
+        collisionBehavior(
+          m.advancedMarkerCollisionBehavior()?.toGoogleCollisionBehavior()
+            ?: AdvancedMarkerOptions.CollisionBehavior.REQUIRED,
+        )
+      }
     }
 
   fun update(

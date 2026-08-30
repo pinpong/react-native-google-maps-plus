@@ -15,7 +15,31 @@ extension RNMarker {
     if !infoWindowAnchorEquals(b) { return false }
     if !markerInfoWindowStyleEquals(b) { return false }
     if !markerStyleEquals(b) { return false }
+    if !advancedEquals(b) { return false }
     return true
+  }
+
+  func advancedEquals(_ b: RNMarker) -> Bool {
+    if usesAdvancedMarker() != b.usesAdvancedMarker() { return false }
+    if (advancedOptions != nil) != (b.advancedOptions != nil) { return false }
+    if advancedMarkerCollisionBehavior() != b.advancedMarkerCollisionBehavior() { return false }
+    return true
+  }
+
+  func usesAdvancedMarker() -> Bool {
+    return advanced ?? false
+  }
+
+  func advancedMarkerCollisionBehavior() -> RNMarkerCollisionBehavior? {
+    guard usesAdvancedMarker() else { return nil }
+    return advancedOptions?.collisionBehavior ?? .required
+  }
+
+  func advancedMarkerConfigurationError() -> String? {
+    if advancedOptions != nil, !usesAdvancedMarker() {
+      return "advancedOptions require advanced: true"
+    }
+    return nil
   }
 
   func coordinatesEquals(_ b: RNMarker) -> Bool {
