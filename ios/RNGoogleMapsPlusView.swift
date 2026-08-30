@@ -277,6 +277,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onMapReady: ((Bool) -> Void)? {
     didSet { impl.onMapReady = onMapReady }
   }
+  var onMapCapabilitiesChange: ((RNMapCapabilities) -> Void)? {
+    didSet { impl.onMapCapabilitiesChange = onMapCapabilitiesChange }
+  }
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)? {
     didSet { impl.onMapLoaded = onMapLoaded }
   }

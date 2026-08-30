@@ -13,6 +13,7 @@ GMSIndoorDisplayDelegate {
   private var mapViewInitialized = false
   private var mapViewLoaded = false
   private var deInitialized = false
+  private var advancedMarkersAvailable: Bool?
 
   private let polylineManager = MapPolylineManager(builder: MapPolylineBuilder())
   private let polygonManager = MapPolygonManager(builder: MapPolygonBuilder())
@@ -31,7 +32,8 @@ GMSIndoorDisplayDelegate {
     self.mapErrorHandler = mapErrorHandler
     self.locationHandler = locationHandler
     self.markerManager = MapMarkerManager(
-      builder: MapMarkerBuilder(mapErrorHandler: mapErrorHandler)
+      builder: MapMarkerBuilder(mapErrorHandler: mapErrorHandler),
+      mapErrorHandler: mapErrorHandler
     )
     self.kmlLayerManager = MapKmlLayerManager(mapErrorHandler: mapErrorHandler)
     super.init(frame: frame)
@@ -137,7 +139,8 @@ GMSIndoorDisplayDelegate {
     ({ self.mapZoomConfig = self.mapZoomConfig })()
 
     mapView.map { mapView in
-      markerManager.attachMap(mapView)
+      markerManager.attachMap(mapView, hasMapId: googleMapOptions.mapID != nil)
+      updateMapCapabilities(mapView.mapCapabilities.contains(.advancedMarkers))
       polylineManager.attachMap(mapView)
       polygonManager.attachMap(mapView)
       circleManager.attachMap(mapView)
@@ -290,6 +293,13 @@ GMSIndoorDisplayDelegate {
   }
 
   var onMapReady: ((Bool) -> Void)?
+  var onMapCapabilitiesChange: ((RNMapCapabilities) -> Void)? {
+    didSet {
+      advancedMarkersAvailable.map {
+        onMapCapabilitiesChange?(RNMapCapabilities(supportsAdvancedMarkers: $0))
+      }
+    }
+  }
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((RNLocationErrorCode) -> Void)?
@@ -595,6 +605,22 @@ GMSIndoorDisplayDelegate {
 
       self.onMapLoaded?(visibleRegion, camera)
     }
+  }
+
+  func mapView(
+    _ mapView: GMSMapView,
+    didChangeMapCapabilities mapCapabilities: GMSMapCapabilityFlags
+  ) {
+    updateMapCapabilities(mapCapabilities.contains(.advancedMarkers))
+  }
+
+  private func updateMapCapabilities(_ available: Bool) {
+    markerManager.updateAdvancedMarkersAvailable(available)
+    guard advancedMarkersAvailable != available else { return }
+    advancedMarkersAvailable = available
+    onMapCapabilitiesChange?(
+      RNMapCapabilities(supportsAdvancedMarkers: available)
+    )
   }
 
   func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
