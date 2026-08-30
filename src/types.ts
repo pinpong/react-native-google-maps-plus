@@ -18,7 +18,10 @@ export type GoogleMapsStreetViewRef =
 
 /** Initial map configuration. */
 export type RNInitialProps = {
-  /** Map instance identifier. */
+  /**
+   * Map identifier applied when the map is created.
+   * Required by Google Maps features such as Advanced Markers.
+   */
   mapId?: string;
 
   /**
@@ -340,6 +343,27 @@ export type RNLineCapType = 'butt' | 'round' | 'square';
  */
 export type RNLineJoinType = 'miter' | 'round' | 'bevel';
 
+/** Controls how an Advanced Marker behaves when it overlaps map content. */
+export type RNMarkerCollisionBehavior =
+  | 'required'
+  | 'required-and-hides-optional'
+  | 'optional-and-hides-lower-priority';
+
+/** Advanced Marker-specific configuration. */
+export type RNAdvancedMarkerOptions = {
+  /**
+   * Controls visibility when the marker overlaps another marker or a map label.
+   * @defaultValue `'required'`
+   */
+  collisionBehavior?: RNMarkerCollisionBehavior;
+};
+
+/** Capabilities exposed by the current map configuration. */
+export type RNMapCapabilities = {
+  /** Whether the map can render Advanced Markers. */
+  supportsAdvancedMarkers: boolean;
+};
+
 /**
  * Marker definition.
  *
@@ -414,6 +438,20 @@ export type RNMarker = {
 
   /** Info window content rendered from an SVG string. See {@link RNMarkerSvg}. */
   infoWindowIconSvg?: RNMarkerSvg;
+
+  /**
+   * Creates an Advanced Marker using the existing marker properties and SVG icon.
+   * Requires {@link RNInitialProps.mapId}. Falls back to a standard marker when
+   * the configured map does not support Advanced Markers at runtime.
+   * @defaultValue `false`
+   */
+  advanced?: boolean;
+
+  /**
+   * Advanced Marker-specific configuration. Requires `advanced: true`.
+   * See {@link RNAdvancedMarkerOptions}.
+   */
+  advancedOptions?: RNAdvancedMarkerOptions;
 };
 
 /** Marker SVG definition. */

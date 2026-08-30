@@ -1,6 +1,7 @@
 package com.rngooglemapsplus.extensions
 
 import com.rngooglemapsplus.RNMarker
+import com.rngooglemapsplus.RNMarkerCollisionBehavior
 
 fun RNMarker.markerEquals(b: RNMarker): Boolean {
   if (id != b.id) return false
@@ -16,9 +17,30 @@ fun RNMarker.markerEquals(b: RNMarker): Boolean {
   if (rotation != b.rotation) return false
   if (!markerInfoWindowStyleEquals(b)) return false
   if (!markerStyleEquals(b)) return false
+  if (!advancedEquals(b)) return false
 
   return true
 }
+
+fun RNMarker.advancedEquals(b: RNMarker): Boolean {
+  if (usesAdvancedMarker() != b.usesAdvancedMarker()) return false
+  if ((advancedOptions != null) != (b.advancedOptions != null)) return false
+  if (advancedMarkerCollisionBehavior() != b.advancedMarkerCollisionBehavior()) return false
+  return true
+}
+
+fun RNMarker.usesAdvancedMarker(): Boolean = advanced ?: false
+
+fun RNMarker.advancedMarkerCollisionBehavior(): RNMarkerCollisionBehavior? {
+  if (!usesAdvancedMarker()) return null
+  return advancedOptions?.collisionBehavior ?: RNMarkerCollisionBehavior.REQUIRED
+}
+
+fun RNMarker.advancedMarkerConfigurationError(): String? =
+  when {
+    advancedOptions != null && !usesAdvancedMarker() -> "advancedOptions require advanced: true"
+    else -> null
+  }
 
 fun RNMarker.coordinatesEquals(b: RNMarker): Boolean {
   if (coordinate.latitude != b.coordinate.latitude) return false
