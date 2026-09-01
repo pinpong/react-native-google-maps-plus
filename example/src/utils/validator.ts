@@ -267,6 +267,7 @@ const RNAndroidLocationConfigValidator = object({
   priority: optional(enums(enumValues(RNAndroidLocationPriority))),
   interval: optional(number()),
   minUpdateInterval: optional(number()),
+  minUpdateDistanceMeters: optional(number()),
 });
 
 export const RNIOSLocationConfigValidator = object({

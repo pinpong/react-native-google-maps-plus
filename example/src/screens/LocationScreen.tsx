@@ -21,8 +21,9 @@ export default function LocationScreen() {
   const [locationConfig, setLocationConfig] = useState<RNLocationConfig>({
     android: {
       priority: RNAndroidLocationPriority.PRIORITY_HIGH_ACCURACY,
-      interval: 5000,
-      minUpdateInterval: 5000,
+      interval: 1000,
+      minUpdateInterval: 0,
+      minUpdateDistanceMeters: 10,
     },
     ios: {
       desiredAccuracy: RNIOSLocationAccuracy.ACCURACY_BEST,

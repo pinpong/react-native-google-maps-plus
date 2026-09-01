@@ -25,6 +25,7 @@ private const val REQ_LOCATION_SETTINGS = 2001
 private const val PRIORITY_DEFAULT = Priority.PRIORITY_BALANCED_POWER_ACCURACY
 private const val INTERVAL_DEFAULT = 600000L
 private const val MIN_UPDATE_INTERVAL = 3600000L
+private const val MIN_UPDATE_DISTANCE_METERS = 0f
 
 class LocationHandler(
   private val context: ReactContext,
@@ -40,23 +41,31 @@ class LocationHandler(
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
   private var minUpdateInterval: Long = MIN_UPDATE_INTERVAL
+  private var minUpdateDistanceMeters: Float = MIN_UPDATE_DISTANCE_METERS
 
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
 
   init {
-    buildLocationRequest(priority, interval, minUpdateInterval)
+    buildLocationRequest(priority, interval, minUpdateInterval, minUpdateDistanceMeters)
   }
 
   fun updateConfig(
     priority: Int? = null,
     interval: Long? = null,
     minUpdateInterval: Long? = null,
+    minUpdateDistanceMeters: Float? = null,
   ) {
     this.priority = priority ?: PRIORITY_DEFAULT
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
-    buildLocationRequest(this.priority, this.interval, this.minUpdateInterval)
+    this.minUpdateDistanceMeters = minUpdateDistanceMeters ?: MIN_UPDATE_DISTANCE_METERS
+    buildLocationRequest(
+      this.priority,
+      this.interval,
+      this.minUpdateInterval,
+      this.minUpdateDistanceMeters,
+    )
 
     if (!isActive) return
     stop()
@@ -113,12 +122,14 @@ class LocationHandler(
     priority: Int,
     interval: Long,
     minUpdateInterval: Long,
+    minUpdateDistanceMeters: Float,
   ) {
     locationRequest =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         LocationRequest
           .Builder(priority, interval)
           .setMinUpdateIntervalMillis(minUpdateInterval)
+          .setMinUpdateDistanceMeters(minUpdateDistanceMeters)
           .build()
       } else {
         LocationRequest
@@ -126,6 +137,7 @@ class LocationHandler(
           .setPriority(priority)
           .setInterval(interval)
           .setFastestInterval(minUpdateInterval)
+          .setSmallestDisplacement(minUpdateDistanceMeters)
       }
   }
 
