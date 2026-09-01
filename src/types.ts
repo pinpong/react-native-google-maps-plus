@@ -768,22 +768,28 @@ export type RNLocationConfig = {
 export type RNAndroidLocationConfig = {
   /**
    * Requested location priority.
-   * @defaultValue `PRIORITY_HIGH_ACCURACY`.
+   * @defaultValue `PRIORITY_BALANCED_POWER_ACCURACY`
    * See {@link RNAndroidLocationPriority}.
    */
   priority?: RNAndroidLocationPriority;
 
   /**
    * Desired update interval in milliseconds.
-   * @defaultValue `5000`
+   * @defaultValue `600000`
    */
   interval?: number;
 
   /**
    * Minimum update interval in milliseconds.
-   * @defaultValue `0`
+   * @defaultValue `3600000`
    */
   minUpdateInterval?: number;
+
+  /**
+   * Minimum distance in meters before a new update is delivered.
+   * @defaultValue `0` (no filter)
+   */
+  minUpdateDistanceMeters?: number;
 };
 
 /** Android location priorities. */
