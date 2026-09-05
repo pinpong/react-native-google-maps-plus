@@ -45,11 +45,7 @@ export default function App() {
   return (
     <GestureHandlerRootView>
       <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
-        <StatusBar
-          barStyle={isDark ? 'light-content' : 'dark-content'}
-          backgroundColor="transparent"
-          translucent
-        />
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={({ theme }) => ({
