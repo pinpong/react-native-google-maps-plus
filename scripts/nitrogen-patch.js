@@ -60,6 +60,22 @@ const STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE = `if (value.isNull()) {
         }
         ${STRICT_HITBOX_FROM_RAW_VALUE}`;
 
+const STRICT_HITBOX_REACT_PROP_FROM_RAW_VALUE =
+  'nitro::ReactProp<std::optional<bool>>::fromRawValue("RNGoogleMapsPlusView", "enableStrictMarkerPressHitbox", rawProps, sourceProps.enableStrictMarkerPressHitbox)';
+// Nitrogen 0.37+ delegates conversion to ReactProp. A reset must remain an
+// explicitly provided prop so the native setter receives std::nullopt.
+const STRICT_HITBOX_NULL_SAFE_REACT_PROP_FROM_RAW_VALUE = `[&]() {
+      const auto* rawValue = nitro::RawPropsCompat::at(rawProps, "enableStrictMarkerPressHitbox");
+      if (rawValue != nullptr) {
+        auto [runtime, value] = static_cast<std::pair<jsi::Runtime*, jsi::Value>>(*rawValue);
+        if (value.isNull()) {
+          auto cache = nitro::JSICache::getOrCreateCache(*runtime);
+          return nitro::ReactProp<std::optional<bool>>(std::nullopt, cache.makeShared(std::move(value)));
+        }
+      }
+      return ${STRICT_HITBOX_REACT_PROP_FROM_RAW_VALUE};
+    }()`;
+
 const REPLACEMENTS = [
   {
     regex: /com\.margelo\.nitro\.rngooglemapsplus/g,
@@ -121,20 +137,30 @@ async function copyJsonFiles() {
 async function patchStrictHitboxNullReset() {
   const content = await readFile(MAP_VIEW_COMPONENT_FILE, 'utf8');
 
-  if (content.includes(STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE)) {
+  if (
+    content.includes(STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE) ||
+    content.includes(STRICT_HITBOX_NULL_SAFE_REACT_PROP_FROM_RAW_VALUE)
+  ) {
     return;
   }
 
-  if (!content.includes(STRICT_HITBOX_FROM_RAW_VALUE)) {
+  let updated;
+  if (content.includes(STRICT_HITBOX_REACT_PROP_FROM_RAW_VALUE)) {
+    updated = content.replace(
+      STRICT_HITBOX_REACT_PROP_FROM_RAW_VALUE,
+      STRICT_HITBOX_NULL_SAFE_REACT_PROP_FROM_RAW_VALUE
+    );
+  } else if (content.includes(STRICT_HITBOX_FROM_RAW_VALUE)) {
+    updated = content.replace(
+      STRICT_HITBOX_FROM_RAW_VALUE,
+      STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE
+    );
+  } else {
     throw new Error(
       'Unable to patch enableStrictMarkerPressHitbox null handling in generated view component.'
     );
   }
 
-  const updated = content.replace(
-    STRICT_HITBOX_FROM_RAW_VALUE,
-    STRICT_HITBOX_NULL_SAFE_FROM_RAW_VALUE
-  );
   await writeFile(MAP_VIEW_COMPONENT_FILE, updated, 'utf8');
   console.log(`Updated: ${MAP_VIEW_COMPONENT_FILE}`);
 }
