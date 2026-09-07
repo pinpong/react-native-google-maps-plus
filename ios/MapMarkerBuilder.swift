@@ -16,10 +16,17 @@ final class MapMarkerBuilder {
     warmupSVGKit()
   }
 
-  func build(_ m: RNMarker, icon: UIImage?) -> GMSMarker {
-    let marker = GMSMarker(
-      position: m.coordinate.toCLLocationCoordinate2D()
-    )
+  func build(_ m: RNMarker, icon: UIImage?, useAdvancedMarker: Bool) -> GMSMarker {
+    let position = m.coordinate.toCLLocationCoordinate2D()
+    let marker: GMSMarker
+    if useAdvancedMarker {
+      let advancedMarker = GMSAdvancedMarker(position: position)
+      advancedMarker.collisionBehavior =
+        m.advancedMarkerCollisionBehavior()?.toGMSCollisionBehavior ?? .required
+      marker = advancedMarker
+    } else {
+      marker = GMSMarker(position: position)
+    }
     marker.icon = icon
     m.title.map { marker.title = $0 }
     m.snippet.map { marker.snippet = $0 }

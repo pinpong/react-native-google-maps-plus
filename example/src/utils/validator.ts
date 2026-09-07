@@ -157,6 +157,16 @@ export const RNMarkerSvgValidator = object({
   svgString: string(),
 });
 
+export const RNMarkerCollisionBehaviorValidator = union([
+  literal('required'),
+  literal('required-and-hides-optional'),
+  literal('optional-and-hides-lower-priority'),
+]);
+
+export const RNAdvancedMarkerOptionsValidator = object({
+  collisionBehavior: optional(RNMarkerCollisionBehaviorValidator),
+});
+
 export const RNMarkerValidator = object({
   id: string(),
   zIndex: optional(number()),
@@ -172,6 +182,8 @@ export const RNMarkerValidator = object({
   infoWindowAnchor: optional(RNPositionValidator),
   iconSvg: optional(RNMarkerSvgValidator),
   infoWindowIconSvg: optional(RNMarkerSvgValidator),
+  advanced: optional(boolean()),
+  advancedOptions: optional(RNAdvancedMarkerOptionsValidator),
 });
 
 export const RNPolygonHoleValidator = object({

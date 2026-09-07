@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.IndoorBuilding
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapCapabilities
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
@@ -71,10 +72,17 @@ class GoogleMapsViewImpl(
   private var mapViewInitialized = false
   private var mapViewLoaded = false
   private var destroyed = false
+  private var advancedMarkersAvailable: Boolean? = null
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
+  private val mapCapabilitiesChangedListener =
+    GoogleMap.OnMapCapabilitiesChangedListener(::updateMapCapabilities)
 
-  private val markerManager = MapMarkerManager(MapMarkerBuilder(reactContext, mapErrorHandler))
+  private val markerManager =
+    MapMarkerManager(
+      MapMarkerBuilder(reactContext, mapErrorHandler),
+      mapErrorHandler,
+    )
   private val polylineManager = MapPolylineManager(MapPolylineBuilder())
   private val polygonManager = MapPolygonManager(MapPolygonBuilder())
   private val circleManager = MapCircleManager(MapCircleBuilder())
@@ -113,7 +121,9 @@ class GoogleMapsViewImpl(
             googleMap = map
             googleMap?.setLocationSource(locationHandler)
             googleMap?.setOnMapLoadedCallback(this@GoogleMapsViewImpl)
-            markerManager.attachMap(map)
+            markerManager.attachMap(map, googleMapsOptions.mapId != null)
+            map.addOnMapCapabilitiesChangedListener(mapCapabilitiesChangedListener)
+            updateMapCapabilities(map.mapCapabilities)
             polylineManager.attachMap(map)
             polygonManager.attachMap(map)
             circleManager.attachMap(map)
@@ -344,6 +354,13 @@ class GoogleMapsViewImpl(
     }
 
   var onMapReady: ((Boolean) -> Unit)? = null
+  var onMapCapabilitiesChange: ((RNMapCapabilities) -> Unit)? = null
+    set(value) {
+      field = value
+      advancedMarkersAvailable?.let { available ->
+        value?.invoke(RNMapCapabilities(supportsAdvancedMarkers = available))
+      }
+    }
   var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
@@ -514,6 +531,7 @@ class GoogleMapsViewImpl(
       urlTileOverlayManager.destroy()
       kmlLayerManager.destroy()
       googleMap?.apply {
+        removeOnMapCapabilitiesChangedListener(mapCapabilitiesChangedListener)
         setOnMapLoadedCallback(null)
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
@@ -544,6 +562,17 @@ class GoogleMapsViewImpl(
       mapView = null
       super.removeAllViews()
       reactContext.unregisterComponentCallbacks(this)
+    }
+
+  private fun updateMapCapabilities(capabilities: MapCapabilities) =
+    onUi {
+      val available = capabilities.isAdvancedMarkersAvailable
+      markerManager.updateAdvancedMarkersAvailable(available)
+      if (advancedMarkersAvailable == available) return@onUi
+      advancedMarkersAvailable = available
+      onMapCapabilitiesChange?.invoke(
+        RNMapCapabilities(supportsAdvancedMarkers = available),
+      )
     }
 
   override fun requestLayout() {

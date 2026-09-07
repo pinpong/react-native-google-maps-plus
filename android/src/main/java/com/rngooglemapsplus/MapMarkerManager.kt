@@ -4,12 +4,15 @@ import android.widget.ImageView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.Marker
+import com.rngooglemapsplus.extensions.advancedEquals
+import com.rngooglemapsplus.extensions.advancedMarkerConfigurationError
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.infoWindowContentEquals
 import com.rngooglemapsplus.extensions.infoWindowIsEmpty
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.styleHash
+import com.rngooglemapsplus.extensions.usesAdvancedMarker
 import kotlinx.coroutines.Job
 
 private class MarkerState(
@@ -23,30 +26,38 @@ private class MarkerState(
   var appliedStyleHash: Int? = null
   var renderingStyleHash: Int? = null
   var renderJob: Job? = null
+  var configurationErrorReported: Boolean = false
 }
 
 class MapMarkerManager(
   private val builder: MapMarkerBuilder,
+  private val mapErrorHandler: MapErrorHandler,
 ) {
   private var map: GoogleMap? = null
+  private var hasMapId = false
+  private var advancedMarkersAvailable = false
   private val states = mutableMapOf<String, MarkerState>()
   private var iconGeneration = 0L
   private var destroyed = false
 
-  fun attachMap(map: GoogleMap) =
-    onUi {
-      if (destroyed) return@onUi
-      this.map = map
-      states.values
-        .filter { it.marker == null && it.renderJob == null }
-        .forEach { state ->
-          if (state.iconReady) {
-            addToMap(state)
-          } else {
-            requestIcon(state)
-          }
+  fun attachMap(
+    map: GoogleMap,
+    hasMapId: Boolean,
+  ) = onUi {
+    if (destroyed) return@onUi
+    this.map = map
+    this.hasMapId = hasMapId
+    advancedMarkersAvailable = map.mapCapabilities.isAdvancedMarkersAvailable
+    states.values
+      .filter { it.marker == null && it.renderJob == null }
+      .forEach { state ->
+        if (state.iconReady) {
+          addToMap(state)
+        } else {
+          requestIcon(state)
         }
-    }
+      }
+  }
 
   fun add(marker: RNMarker) =
     onUi {
@@ -64,6 +75,11 @@ class MapMarkerManager(
       val prev = state.current
       if (prev.markerEquals(next)) return@onUi
       state.current = next
+
+      if (!prev.advancedEquals(next)) {
+        recreate(state)
+        return@onUi
+      }
 
       val nextStyleHash = if (next.iconSvg != null) next.styleHash() else null
       val renderingSameStyle = state.renderJob != null && state.renderingStyleHash == nextStyleHash
@@ -173,8 +189,33 @@ class MapMarkerManager(
   }
 
   private fun addToMap(state: MarkerState) {
+    state.current.advancedMarkerConfigurationError()?.let { message ->
+      if (!state.configurationErrorReported) {
+        state.configurationErrorReported = true
+        mapErrorHandler.report(
+          RNMapErrorCode.INVALID_ARGUMENT,
+          "markerId=${state.current.id} $message",
+        )
+      }
+      state.appliedIcon = null
+      return
+    }
+
+    if (state.current.usesAdvancedMarker() && !hasMapId) {
+      if (!state.configurationErrorReported) {
+        state.configurationErrorReported = true
+        mapErrorHandler.report(
+          RNMapErrorCode.INVALID_ARGUMENT,
+          "markerId=${state.current.id} Advanced Markers require initialProps.mapId",
+        )
+      }
+      state.appliedIcon = null
+      return
+    }
+
+    val useAdvancedMarker = state.current.usesAdvancedMarker() && advancedMarkersAvailable
     state.marker =
-      map?.addMarker(builder.build(state.current, state.appliedIcon))?.apply {
+      map?.addMarker(builder.build(state.current, state.appliedIcon, useAdvancedMarker))?.apply {
         tag = MarkerTag(id = state.current.id, iconSvg = state.current.infoWindowIconSvg)
       }
     state.appliedIcon = null
@@ -184,5 +225,25 @@ class MapMarkerManager(
   private fun removeFromMap(state: MarkerState) {
     state.renderJob?.cancel()
     state.marker?.remove()
+    state.marker = null
   }
+
+  private fun recreate(state: MarkerState) {
+    removeFromMap(state)
+    state.iconReady = false
+    state.appliedIcon = null
+    state.appliedStyleHash = null
+    state.anchorsDeferred = false
+    state.configurationErrorReported = false
+    requestIcon(state)
+  }
+
+  fun updateAdvancedMarkersAvailable(available: Boolean) =
+    onUi {
+      if (advancedMarkersAvailable == available) return@onUi
+      advancedMarkersAvailable = available
+      states.values
+        .filter { it.current.usesAdvancedMarker() }
+        .forEach(::recreate)
+    }
 }
