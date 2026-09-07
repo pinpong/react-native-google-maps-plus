@@ -60,9 +60,9 @@
     "ios/**/*.mm",
     "ios/**/*.cpp",
     "ios/**/*.swift",
+    "ios/Resources",
     "app.plugin.js",
     "expoConfig/build",
-    "react-native.config.js",
     "*.podspec",
     "README.md",
     "LICENSE"

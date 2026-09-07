@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
     "cpp/**/*.{hpp,cpp}",
   ]
 
-  s.resource_bundles = {'RNGoogleMapsPlusPrivacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'RNGoogleMapsPlusPrivacy' => ['ios/Resources/PrivacyInfo.xcprivacy']}
 
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
