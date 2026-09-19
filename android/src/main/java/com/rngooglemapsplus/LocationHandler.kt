@@ -1,11 +1,16 @@
 package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.gms.common.ConnectionResult
@@ -36,6 +41,7 @@ class LocationHandler(
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
   private var lastLocation: Location? = null
+  private var locationModeReceiver: BroadcastReceiver? = null
   private var isActive = false
 
   private var priority: Int = PRIORITY_DEFAULT
@@ -152,6 +158,53 @@ class LocationHandler(
     onUpdate?.invoke(location)
   }
 
+  private fun reportLocationSettingsError() {
+    val request = locationRequest ?: return
+
+    val settingsRequest =
+      LocationSettingsRequest
+        .Builder()
+        .addLocationRequest(request)
+        .build()
+
+    LocationServices
+      .getSettingsClient(context)
+      .checkLocationSettings(settingsRequest)
+      .addOnFailureListener { ex ->
+        onError?.invoke(ex.toLocationErrorCode(context))
+      }
+  }
+
+  private fun registerLocationModeReceiver() {
+    if (locationModeReceiver != null) return
+
+    val receiver =
+      object : BroadcastReceiver() {
+        override fun onReceive(
+          context: Context?,
+          intent: Intent?,
+        ) = reportLocationSettingsError()
+      }
+
+    ContextCompat.registerReceiver(
+      context,
+      receiver,
+      IntentFilter(LocationManager.MODE_CHANGED_ACTION),
+      ContextCompat.RECEIVER_NOT_EXPORTED,
+    )
+    locationModeReceiver = receiver
+  }
+
+  private fun unregisterLocationModeReceiver() {
+    val receiver = locationModeReceiver ?: return
+    locationModeReceiver = null
+    try {
+      context.unregisterReceiver(receiver)
+    } catch (_: IllegalArgumentException) {
+      // ignore
+    }
+  }
+
   @SuppressLint("MissingPermission")
   fun start() {
     if (isActive) return
@@ -165,6 +218,10 @@ class LocationHandler(
       onError?.invoke(RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE)
       return
     }
+
+    reportLocationSettingsError()
+    registerLocationModeReceiver()
+
     try {
       fusedLocationClientProviderClient
         .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
@@ -207,6 +264,7 @@ class LocationHandler(
   fun stop() {
     if (!isActive) return
     isActive = false
+    unregisterLocationModeReceiver()
     val callback = locationCallback ?: return
     fusedLocationClientProviderClient.removeLocationUpdates(callback)
     fusedLocationClientProviderClient.flushLocations()
