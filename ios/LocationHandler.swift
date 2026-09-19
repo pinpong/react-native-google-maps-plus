@@ -99,26 +99,10 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   func openLocationSettings() {
     onMain {
-      let openSettings = {
-        if #available(iOS 18.3, *) {
-          guard
-            let url = URL(
-              string: UIApplication.openDefaultApplicationsSettingsURLString
-            )
-          else {
-            return
-          }
-          UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else {
-          guard let url = URL(string: UIApplication.openSettingsURLString)
-          else {
-            return
-          }
-          UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
+      guard let url = URL(string: UIApplication.openSettingsURLString) else {
+        return
       }
-
-      openSettings()
+      UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
   }
 
