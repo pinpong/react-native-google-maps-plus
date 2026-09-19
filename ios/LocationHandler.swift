@@ -81,6 +81,10 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   func start() {
     guard !isActive else { return }
+    guard manager.authorizationStatus != .denied || CLLocationManager.locationServicesEnabled() else {
+      onError?(.settingsNotSatisfied)
+      return
+    }
     isActive = true
 
     manager.requestLocation()
