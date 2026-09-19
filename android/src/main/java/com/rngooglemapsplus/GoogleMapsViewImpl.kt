@@ -86,6 +86,7 @@ class GoogleMapsViewImpl(
 
   init {
     reactContext.registerComponentCallbacks(this)
+    initLocationCallbacks()
   }
 
   fun initMapView() =
@@ -120,8 +121,7 @@ class GoogleMapsViewImpl(
             heatmapManager.attachMap(map)
             kmlLayerManager.attachMap(map)
             urlTileOverlayManager.attachMap(map)
-            applyProps()
-            initLocationCallbacks()
+            applyMapProps()
             onMapReady?.invoke(true)
           }
         }
@@ -204,7 +204,7 @@ class GoogleMapsViewImpl(
     }
   }
 
-  fun applyProps() {
+  fun applyMapProps() {
     mapPadding = mapPadding
     uiSettings = uiSettings
     myLocationEnabled = myLocationEnabled
@@ -216,7 +216,6 @@ class GoogleMapsViewImpl(
     mapType = mapType
     userInterfaceStyle = userInterfaceStyle
     mapZoomConfig = mapZoomConfig
-    locationConfig = locationConfig
   }
 
   val currentCamera: CameraPosition?
