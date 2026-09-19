@@ -1,17 +1,21 @@
 package com.rngooglemapsplus
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
 import android.provider.Settings
+import androidx.core.location.LocationManagerCompat
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -32,6 +36,8 @@ class LocationHandler(
 ) : LocationSource {
   private val fusedLocationClientProviderClient: FusedLocationProviderClient =
     LocationServices.getFusedLocationProviderClient(context)
+  private val locationManager: LocationManager =
+    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
   private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
@@ -152,10 +158,31 @@ class LocationHandler(
     onUpdate?.invoke(location)
   }
 
+  private fun checkLocationSettings(callback: LocationCallback) {
+    if (!LocationManagerCompat.isLocationEnabled(locationManager)) {
+      onError?.invoke(RNLocationErrorCode.SETTINGS_NOT_SATISFIED)
+      return
+    }
+    val request = locationRequest ?: return
+
+    val settingsRequest =
+      LocationSettingsRequest
+        .Builder()
+        .addLocationRequest(request)
+        .build()
+
+    LocationServices
+      .getSettingsClient(context)
+      .checkLocationSettings(settingsRequest)
+      .addOnFailureListener { ex ->
+        if (callback !== locationCallback) return@addOnFailureListener
+        onError?.invoke(ex.toLocationErrorCode(context))
+      }
+  }
+
   @SuppressLint("MissingPermission")
   fun start() {
     if (isActive) return
-    isActive = true
 
     val playServicesStatus =
       GoogleApiAvailability
@@ -165,6 +192,7 @@ class LocationHandler(
       onError?.invoke(RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE)
       return
     }
+
     try {
       fusedLocationClientProviderClient
         .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
@@ -186,6 +214,11 @@ class LocationHandler(
               onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
             }
           }
+
+          override fun onLocationAvailability(availability: LocationAvailability) {
+            if (availability.isLocationAvailable) return
+            checkLocationSettings(this)
+          }
         }
 
       val req = locationRequest ?: return
@@ -196,6 +229,8 @@ class LocationHandler(
         .addOnFailureListener { e ->
           onError?.invoke(e.toLocationErrorCode(context))
         }
+      isActive = true
+      checkLocationSettings(callback)
     } catch (_: SecurityException) {
       onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {

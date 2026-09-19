@@ -39,6 +39,7 @@ class StreetViewPanoramaViewImpl(
 
   init {
     reactContext.registerComponentCallbacks(this)
+    initLocationCallbacks()
   }
 
   fun initStreetView() =
@@ -67,8 +68,7 @@ class StreetViewPanoramaViewImpl(
             streetViewPanorama?.setOnStreetViewPanoramaChangeListener(this@StreetViewPanoramaViewImpl)
             streetViewPanorama?.setOnStreetViewPanoramaCameraChangeListener(this@StreetViewPanoramaViewImpl)
             streetViewPanorama?.setOnStreetViewPanoramaClickListener(this@StreetViewPanoramaViewImpl)
-            applyProps()
-            initLocationCallbacks()
+            applyPanoramaProps()
             onPanoramaReady?.invoke(true)
           }
         }
@@ -127,7 +127,7 @@ class StreetViewPanoramaViewImpl(
     }
   }
 
-  fun applyProps() {
+  fun applyPanoramaProps() {
     uiSettings = uiSettings
   }
 
