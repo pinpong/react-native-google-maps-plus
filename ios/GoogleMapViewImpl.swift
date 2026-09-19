@@ -35,6 +35,7 @@ GMSIndoorDisplayDelegate {
     )
     self.kmlLayerManager = MapKmlLayerManager(mapErrorHandler: mapErrorHandler)
     super.init(frame: frame)
+    initLocationCallbacks()
   }
 
   private var lifecycleAttached = false
@@ -97,8 +98,7 @@ GMSIndoorDisplayDelegate {
       self.mapView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       self.mapView?.paddingAdjustmentBehavior = .never
       self.mapView.map { self.addSubview($0) }
-      self.applyProps()
-      self.initLocationCallbacks()
+      self.applyMapProps()
       self.onMapReady?(true)
     }
   }
@@ -117,7 +117,7 @@ GMSIndoorDisplayDelegate {
     }
   }
 
-  private func applyProps() {
+  private func applyMapProps() {
     ({ self.uiSettings = self.uiSettings })()
     ({ self.mapPadding = self.mapPadding })()
     ({ self.myLocationEnabled = self.myLocationEnabled })()
@@ -129,7 +129,6 @@ GMSIndoorDisplayDelegate {
     ({ self.mapType = self.mapType })()
     ({ self.userInterfaceStyle = self.userInterfaceStyle })()
     ({ self.mapZoomConfig = self.mapZoomConfig })()
-    ({ self.locationConfig = self.locationConfig })()
 
     mapView.map { mapView in
       markerManager.attachMap(mapView)
