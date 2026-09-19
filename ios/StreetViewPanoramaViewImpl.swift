@@ -19,6 +19,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
     self.mapErrorHandler = mapErrorHandler
     self.locationHandler = locationHandler
     super.init(frame: frame)
+    initLocationCallbacks()
   }
 
   private var lifecycleAttached = false
@@ -83,8 +84,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       self.panoramaView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       self.panoramaView.map { self.addSubview($0) }
 
-      self.applyProps()
-      self.initLocationCallbacks()
+      self.applyPanoramaProps()
       self.onPanoramaReady?(true)
     }
   }
@@ -103,7 +103,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
     }
   }
 
-  private func applyProps() {
+  private func applyPanoramaProps() {
     ({ self.uiSettings = self.uiSettings })()
   }
 
