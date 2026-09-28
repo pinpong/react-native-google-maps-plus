@@ -4,7 +4,7 @@ import { useClusterer } from 'react-native-clusterer';
 
 import ControlPanel from '@src/components/ControlPanel';
 import MapWrapper from '@src/components/MapWrapper';
-import { randomCoordinates } from '@src/utils/mapGenerators';
+import { gridCoordinates, makeSvgIcon } from '@src/utils/mapGenerators';
 import { rnRegionToRegion } from '@src/utils/mapUtils';
 
 import type { Supercluster } from 'react-native-clusterer';
@@ -18,8 +18,8 @@ import type {
 export default function ClusteringScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const [coordinates] = useState(
-    Array.from({ length: 500 }, () =>
-      randomCoordinates(37.7749, -122.4194, 0.2)
+    Array.from({ length: 500 }, (_, i) =>
+      gridCoordinates(i, 25, 37.8549, -122.5194, 0.008)
     )
   );
 
@@ -48,16 +48,7 @@ export default function ClusteringScreen() {
             svgIcon: {
               width: 32,
               height: 44,
-              svgString: `
-            <svg xmlns="http://www.w3.org/2000/svg" width="66" height="88" viewBox="0 0 64 88">
-              <path
-                d="M32 2c-14.36 0-26 11.64-26 26 0 18.2 20.67 38.86 24.82 43.02a1.7 1.7 0 0 0 2.36 0C37.33 66.86 58 46.2 58 28 58 13.64 46.36 2 32 2z"
-                fill="red"
-              />
-              <circle cx="32" cy="28" r="10" fill="#FFFFFF" />
-              <ellipse cx="32" cy="82" rx="14" ry="4" fill="#000000" opacity="0.15" />
-            </svg>
-          `,
+              svgString: makeSvgIcon(64, 88, 'red'),
             },
           },
         };
@@ -90,14 +81,24 @@ export default function ClusteringScreen() {
 
       const icon = isCluster
         ? {
-            width: 36,
-            height: 36,
-            svgString: `<svg viewBox="0 0 64 64" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="28" fill="#7C4DFF"/>
-            <text x="32" y="40" text-anchor="middle" font-size="22" font-family="Arial" fill="#fff" font-weight="bold">
-              ${count}
-            </text>
-          </svg>`,
+            width: 64,
+            height: 64,
+            svgString: `
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="16" fill="#7C4DFF" stroke="#FFFFFF" stroke-width="4" />
+  <text
+    x="32"
+    y="32"
+    font-family="Roboto-Bold"
+    font-size="11"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="#fff"
+  >
+    ${count}
+  </text>
+</svg>
+`,
           }
         : feature.properties.svgIcon;
 
