@@ -32,7 +32,7 @@ export function makeSvgIcon(
 </svg>`;
 }
 
-export function makeInfoWindowIconSvg(
+export function makeSvgInfoWindow(
   width: number,
   height: number,
   color?: string,
@@ -44,7 +44,7 @@ export function makeInfoWindowIconSvg(
   const pointerHeight = 12;
 
   const rectHeight = height - pointerHeight;
-  const textY = rectHeight / 2 + 5;
+  const textY = rectHeight / 2;
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -85,6 +85,58 @@ export function makeInfoWindowIconSvg(
 `.trim();
 }
 
+export function makeSvgText(text: string, font?: string): string {
+  return `
+  <text
+    x="32"
+    y="32"
+    ${font ?? 'font-family="Roboto, sans-serif"'}
+    font-size="11"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="#fff"
+  >${text}</text>`;
+}
+
+export function makeSvgFontMarker(text: string, font: string): string {
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="16" fill="#1565C0" stroke="#FFFFFF" stroke-width="4" />
+  ${makeSvgText(text, font)}
+</svg>
+`;
+}
+
+export function makeSvgViewBoxMarker(size: number, nested: boolean): string {
+  const content = `
+  <circle cx="32" cy="32" r="16" fill="#2E7D32" stroke="#FFFFFF" stroke-width="4" />
+  ${makeSvgText(size.toString())}`;
+  const image = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">${content}</svg>`;
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 ${size} ${size}">
+  ${
+    nested
+      ? `<image width="${size}" height="${size}" href="data:image/svg+xml,${encodeURIComponent(image)}" />`
+      : `<svg width="${size}" height="${size}" viewBox="0 0 64 64">${content}</svg>`
+  }
+</svg>
+`;
+}
+
+export function makeSvgAspectMarker(
+  text: string,
+  width: number,
+  height: number
+): string {
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <rect x="1" y="1" width="${width - 2}" height="${height - 2}" fill="#FFFFFF" fill-opacity="0.7" stroke="#6A1B9A" stroke-width="2" />
+  <circle cx="${width / 2}" cy="${height / 2}" r="16" fill="#6A1B9A" stroke="#FFFFFF" stroke-width="4" />
+  <text x="${width / 2}" y="${height / 2}" font-family="sans-serif" font-size="11" text-anchor="middle" dominant-baseline="central" fill="#fff">${text}</text>
+</svg>
+`;
+}
+
 export const randomCoordinates = (
   baseLat: number,
   baseLng: number,
@@ -92,6 +144,19 @@ export const randomCoordinates = (
 ) => ({
   latitude: baseLat + (Math.random() - 0.5) * offset,
   longitude: baseLng + (Math.random() - 0.5) * offset,
+});
+
+export const gridCoordinates = (
+  index: number,
+  columns: number,
+  top: number,
+  left: number,
+  spacing: number
+) => ({
+  latitude:
+    top -
+    Math.floor(index / columns) * spacing * Math.cos((top * Math.PI) / 180),
+  longitude: left + (index % columns) * spacing,
 });
 
 export const makePolygon = (id: number): RNPolygon => ({
@@ -228,7 +293,7 @@ export function makeMarker(id: number): RNMarker {
     infoWindowIconSvg: {
       width: 150,
       height: 50,
-      svgString: makeInfoWindowIconSvg(150, 50, '#2D6BE9'),
+      svgString: makeSvgInfoWindow(150, 50, '#2D6BE9'),
     },
   };
 }
