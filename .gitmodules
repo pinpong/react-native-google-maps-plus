@@ -1,0 +1,3 @@
+[submodule "cpp/third_party/lunasvg"]
+	path = cpp/third_party/lunasvg
+	url = https://github.com/sammycage/lunasvg.git

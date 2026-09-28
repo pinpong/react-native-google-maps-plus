@@ -4,3 +4,6 @@ lib/
 expoConfig/build/
 docs/
 .yarn
+cpp/third_party/
+example/android/link-assets-manifest.json
+example/ios/link-assets-manifest.json
