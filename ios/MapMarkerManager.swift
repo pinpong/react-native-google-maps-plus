@@ -11,6 +11,7 @@ private final class MarkerState {
   var appliedStyleHash: NSNumber?
   var renderingStyleHash: NSNumber?
   var renderTask: Task<Void, Never>?
+  var infoWindowPrefetchTask: Task<Void, Never>?
 
   init(current: RNMarker) {
     self.current = current
@@ -67,6 +68,8 @@ final class MapMarkerManager {
         state.anchorsDeferred = true
       }
 
+      if !prev.markerInfoWindowStyleEquals(next) { self.prefetchInfoWindowImages(state) }
+
       state.marker.map { marker in
         self.builder.update(prev, next, marker, deferAnchors: deferAnchors)
         guard let mapView = self.mapView, mapView.selectedMarker == marker,
@@ -74,11 +77,8 @@ final class MapMarkerManager {
 
         if next.infoWindowIsEmpty() {
           self.hideInfoWindow(id: next.id)
-        } else if let infoWindowView = self.shownInfoWindowView,
-                  self.shownInfoWindowId == next.id,
-                  let updated = self.builder.buildInfoWindow(markerTag: marker.tagData) {
-          infoWindowView.frame = updated.frame
-          infoWindowView.image = updated.image
+        } else if self.refreshShownInfoWindow(id: next.id, marker: marker) {
+          return
         } else if prev.infoWindowIconSvg != nil || next.infoWindowIconSvg != nil {
           self.showInfoWindow(id: next.id)
         }
@@ -113,6 +113,7 @@ final class MapMarkerManager {
   }
 
   func infoWindowView(markerTag: MarkerTag) -> UIImageView? {
+    states[markerTag.id].map { prefetchInfoWindowImages($0) }
     let view = builder.buildInfoWindow(markerTag: markerTag)
     shownInfoWindowView = view
     shownInfoWindowId = view != nil ? markerTag.id : nil
@@ -207,10 +208,34 @@ final class MapMarkerManager {
     state.marker = marker
     state.appliedIcon = nil
     state.anchorsDeferred = false
+    prefetchInfoWindowImages(state)
+  }
+
+  @discardableResult
+  private func refreshShownInfoWindow(id: String, marker: GMSMarker) -> Bool {
+    guard let infoWindowView = shownInfoWindowView,
+          shownInfoWindowId == id,
+          let updated = builder.buildInfoWindow(markerTag: marker.tagData) else { return false }
+    infoWindowView.frame = updated.frame
+    infoWindowView.image = updated.image
+    return true
+  }
+
+  private func prefetchInfoWindowImages(_ state: MarkerState) {
+    state.infoWindowPrefetchTask?.cancel()
+    state.infoWindowPrefetchTask = nil
+    guard let iconSvg = state.current.infoWindowIconSvg, state.marker != nil else { return }
+    let id = state.current.id
+    state.infoWindowPrefetchTask = builder.prefetchInfoWindowImages(markerId: id, iconSvg: iconSvg) { [weak self] in
+      guard let self, let marker = self.states[id]?.marker,
+            self.mapView?.selectedMarker == marker else { return }
+      self.refreshShownInfoWindow(id: id, marker: marker)
+    }
   }
 
   private func removeFromMap(_ state: MarkerState) {
     state.renderTask?.cancel()
+    state.infoWindowPrefetchTask?.cancel()
     if shownInfoWindowId == state.current.id {
       shownInfoWindowView = nil
       shownInfoWindowId = nil

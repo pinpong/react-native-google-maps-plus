@@ -9,6 +9,7 @@ import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.infoWindowContentEquals
 import com.rngooglemapsplus.extensions.infoWindowIsEmpty
 import com.rngooglemapsplus.extensions.markerEquals
+import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.styleHash
 import kotlinx.coroutines.Job
 
@@ -23,6 +24,8 @@ private class MarkerState(
   var appliedStyleHash: Int? = null
   var renderingStyleHash: Int? = null
   var renderJob: Job? = null
+  var infoWindowPrefetchJob: Job? = null
+  var infoWindowRefreshing: Boolean = false
 }
 
 class MapMarkerManager(
@@ -74,6 +77,8 @@ class MapMarkerManager(
         state.anchorsDeferred = true
       }
 
+      if (!prev.markerInfoWindowStyleEquals(next)) prefetchInfoWindowImages(state)
+
       state.marker?.let { marker ->
         builder.update(prev, next, marker, deferAnchors)
         if (marker.isInfoWindowShown && !prev.infoWindowContentEquals(next)) {
@@ -103,7 +108,10 @@ class MapMarkerManager(
       states[id]?.marker?.hideInfoWindow()
     }
 
-  fun infoWindowView(markerTag: MarkerTag): ImageView? = builder.buildInfoWindow(markerTag)
+  fun infoWindowView(markerTag: MarkerTag): ImageView? {
+    states[markerTag.id]?.let { if (!it.infoWindowRefreshing) prefetchInfoWindowImages(it) }
+    return builder.buildInfoWindow(markerTag)
+  }
 
   fun clearIconCache() = builder.clearIconCache()
 
@@ -179,10 +187,27 @@ class MapMarkerManager(
       }
     state.appliedIcon = null
     state.anchorsDeferred = false
+    prefetchInfoWindowImages(state)
+  }
+
+  private fun prefetchInfoWindowImages(state: MarkerState) {
+    state.infoWindowPrefetchJob?.cancel()
+    state.infoWindowPrefetchJob = null
+    val iconSvg = state.current.infoWindowIconSvg ?: return
+    if (state.marker == null) return
+    val id = state.current.id
+    state.infoWindowPrefetchJob =
+      builder.prefetchInfoWindowImages(id, iconSvg) {
+        val shown = states[id]?.takeIf { it.marker?.isInfoWindowShown == true } ?: return@prefetchInfoWindowImages
+        shown.infoWindowRefreshing = true
+        shown.marker?.showInfoWindow()
+        shown.infoWindowRefreshing = false
+      }
   }
 
   private fun removeFromMap(state: MarkerState) {
     state.renderJob?.cancel()
+    state.infoWindowPrefetchJob?.cancel()
     state.marker?.remove()
   }
 }
