@@ -11,7 +11,7 @@
  *
  * ## iOS Setup (Bare RN only)
  *
- * The native iOS dependencies (GoogleMaps, GoogleMapsUtils, SVGKit) are
+ * The native iOS dependencies (GoogleMaps, GoogleMapsUtils) are
  * integrated via Swift Package Manager automatically during `pod install`.
  *
  * ### Install the pods as frameworks
@@ -119,9 +119,8 @@
  * - Android Google Maps SDK
  *   https://developers.google.com/maps/documentation/android-sdk
  *
- * - SVG Rendering
- *   iOS: SVGKit
- *   Android: AndroidSVG
+ * - SVG Rendering (bundled, iOS + Android)
+ *   lunasvg: https://github.com/sammycage/lunasvg
  *
  * The iOS SDKs are resolved via Swift Package Manager, so CocoaPods can no
  * longer deduplicate them against a `GoogleMaps` pod that another library pulls

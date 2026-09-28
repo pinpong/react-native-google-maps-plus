@@ -439,11 +439,14 @@ export type RNMarkerSvg = {
   height: number;
 
   /**
-   * Raw SVG content.
+   * Raw SVG content, rendered by lunasvg — https://github.com/sammycage/lunasvg
    *
-   * Rendering engines:
-   * - Android: AndroidSVG — http://bigbadaboom.github.io/androidsvg/
-   * - iOS: SVGKit — https://github.com/SVGKit/SVGKit
+   * The SVG is fitted into `width` x `height` and centered, it keeps its aspect ratio.
+   * `<image>` may reference data URIs and http(s) URLs.
+   * `font-family` finds the system fonts and the fonts bundled with the app by
+   * their file name, e.g. `Roboto-Bold`, or their family, e.g. `Roboto`.
+   *
+   * See "SVG markers" in the README for the known limitations.
    */
   svgString: string;
 };
