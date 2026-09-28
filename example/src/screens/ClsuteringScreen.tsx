@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useClusterer } from 'react-native-clusterer';
+import Supercluster from 'react-native-clusterer';
 
 import ControlPanel from '@src/components/ControlPanel';
 import MapWrapper from '@src/components/MapWrapper';
 import { gridCoordinates, makeSvgIcon } from '@src/utils/mapGenerators';
 import { rnRegionToRegion } from '@src/utils/mapUtils';
 
-import type { Supercluster } from 'react-native-clusterer';
+import type { Supercluster as SuperclusterTypes } from 'react-native-clusterer';
 import type {
   GoogleMapsViewRef,
   RNMarker,
@@ -29,7 +29,7 @@ export default function ClusteringScreen() {
 
   const data = useMemo<
     Array<
-      Supercluster.PointFeature<{
+      SuperclusterTypes.PointFeature<{
         id: string;
         svgIcon: RNMarkerSvg;
       }>
@@ -63,11 +63,14 @@ export default function ClusteringScreen() {
     []
   );
 
-  const [points] = useClusterer(
-    data,
-    mapDimensions,
-    clusterRegion,
-    clusterOptions
+  const supercluster = useMemo(
+    () => new Supercluster(clusterOptions).load(data),
+    [clusterOptions, data]
+  );
+
+  const points = useMemo(
+    () => supercluster.getClustersFromRegion(clusterRegion, mapDimensions),
+    [supercluster, clusterRegion, mapDimensions]
   );
 
   const markers: RNMarker[] = useMemo(() => {
