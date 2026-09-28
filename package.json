@@ -28,7 +28,8 @@
     "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
     "release": "semantic-release",
-    "build": "yarn nitrogen && bob build && yarn build:plugin"
+    "build": "yarn nitrogen && bob build && yarn build:plugin",
+    "prepack": "test -f cpp/third_party/lunasvg/include/lunasvg.h || (echo 'lunasvg submodule missing: git submodule update --init' && exit 1)"
   },
   "keywords": [
     "react-native",
@@ -49,6 +50,13 @@
     "src",
     "nitrogen",
     "nitro.json",
+    "cpp/svg",
+    "cpp/third_party/lunasvg/LICENSE",
+    "cpp/third_party/lunasvg/include",
+    "cpp/third_party/lunasvg/source",
+    "cpp/third_party/lunasvg/plutovg/LICENSE",
+    "cpp/third_party/lunasvg/plutovg/include",
+    "cpp/third_party/lunasvg/plutovg/source",
     "android/src",
     "android/build.gradle",
     "android/fix-prefab.gradle",
