@@ -1,19 +1,10 @@
 package com.rngooglemapsplus
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Typeface
-import android.graphics.drawable.PictureDrawable
-import android.util.Base64
 import android.util.LruCache
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.graphics.createBitmap
-import com.caverock.androidsvg.SVG
-import com.caverock.androidsvg.SVGExternalFileResolver
-import com.caverock.androidsvg.SVGParseException
-import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -24,6 +15,7 @@ import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toPixelSizeOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,9 +24,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLDecoder
 import kotlin.coroutines.cancellation.CancellationException
 
 class MapMarkerBuilder(
@@ -42,6 +31,9 @@ class MapMarkerBuilder(
   private val mapErrorHandler: MapErrorHandler,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
+  private val imageLoader = SvgImageLoader(mapErrorHandler)
+  private val fontRegistry = SvgFontRegistry(context, mapErrorHandler)
+
   private val iconCache =
     object : LruCache<Int, BitmapDescriptor>(256) {
       override fun sizeOf(
@@ -51,108 +43,7 @@ class MapMarkerBuilder(
     }
 
   init {
-    // TODO: refactor with androidsvg 1.5 release
-    SVG.registerExternalFileResolver(
-      object : SVGExternalFileResolver() {
-        override fun resolveImage(filename: String?): Bitmap? {
-          if (filename.isNullOrBlank()) return null
-
-          return runCatching {
-            when {
-              filename.startsWith("data:image/svg+xml") -> {
-                val svgContent =
-                  if ("base64," in filename) {
-                    val base64 = filename.substringAfter("base64,")
-                    String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8)
-                  } else {
-                    URLDecoder.decode(filename.substringAfter(","), "UTF-8")
-                  }
-
-                val svg = SVG.getFromString(svgContent)
-                val width = (svg.documentWidth.takeIf { it > 0 } ?: 128f).toInt()
-                val height = (svg.documentHeight.takeIf { it > 0 } ?: 128f).toInt()
-
-                createBitmap(width, height).apply {
-                  density = context.resources.displayMetrics.densityDpi
-                  Canvas(this).also {
-                    svg.renderToCanvas(it)
-                  }
-                }
-              }
-
-              filename.startsWith("http://") || filename.startsWith("https://") -> {
-                val conn =
-                  (URL(filename).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 5000
-                    readTimeout = 5000
-                    requestMethod = "GET"
-                    instanceFollowRedirects = true
-                  }
-                conn.connect()
-
-                val contentType = conn.contentType ?: ""
-                val result =
-                  if (contentType.contains("svg") || filename.endsWith(".svg")) {
-                    val svgText = conn.inputStream.bufferedReader().use { it.readText() }
-                    val innerSvg = SVG.getFromString(svgText)
-                    val w = innerSvg.documentWidth.takeIf { it > 0 } ?: 128f
-                    val h = innerSvg.documentHeight.takeIf { it > 0 } ?: 128f
-                    createBitmap(w.toInt(), h.toInt()).apply {
-                      density = context.resources.displayMetrics.densityDpi
-                      Canvas(this).also {
-                        innerSvg.renderToCanvas(it)
-                      }
-                    }
-                  } else {
-                    conn.inputStream.use { BitmapFactory.decodeStream(it) }
-                  }
-
-                conn.disconnect()
-                result
-              }
-
-              else -> {
-                null
-              }
-            }
-          }.onFailure { t ->
-            mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "external svg resolve failed", t)
-          }.getOrNull()
-        }
-
-        override fun resolveFont(
-          fontFamily: String?,
-          fontWeight: Int,
-          fontStyle: String?,
-        ): Typeface? {
-          if (fontFamily.isNullOrBlank()) return null
-
-          return runCatching {
-            val assetManager = context.assets
-
-            val candidates =
-              listOf(
-                "fonts/$fontFamily.ttf",
-                "fonts/$fontFamily.otf",
-              )
-
-            for (path in candidates) {
-              try {
-                return Typeface.createFromAsset(assetManager, path)
-              } catch (t: Throwable) {
-                mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "font resolve failed: $path", t)
-              }
-            }
-
-            Typeface.create(fontFamily, Typeface.NORMAL)
-          }.getOrElse {
-            Typeface.create(fontFamily, fontWeight)
-          }
-        }
-
-        override fun isFormatSupported(mimeType: String?): Boolean = mimeType?.startsWith("image/") == true
-      },
-    )
+    scope.launch { fontRegistry.register() }
   }
 
   fun build(
@@ -265,7 +156,7 @@ class MapMarkerBuilder(
             renderResult.bitmap.recycle()
           }
 
-        if (!renderResult.isFallback) {
+        if (renderResult.cacheable) {
           iconCache.put(styleHash, desc)
         }
         withContext(Dispatchers.Main) {
@@ -290,20 +181,40 @@ class MapMarkerBuilder(
       }
     }
 
+  fun prefetchInfoWindowImages(
+    markerId: String,
+    iconSvg: RNMarkerSvg,
+    onLoaded: () -> Unit,
+  ): Job =
+    scope.launch {
+      try {
+        if (!imageLoader.prefetch(iconSvg.svgString, markerId)) return@launch
+        withContext(Dispatchers.Main) {
+          ensureActive()
+          onLoaded()
+        }
+      } catch (_: CancellationException) {
+        // cancelled
+      } catch (t: Throwable) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId infoWindow: image prefetch failed", t)
+      }
+    }
+
   fun clearIconCache() {
     iconCache.evictAll()
+    imageLoader.clear()
   }
 
   fun buildInfoWindow(markerTag: MarkerTag): ImageView? {
     val iconSvg = markerTag.iconSvg ?: return null
 
-    val wPx = iconSvg.width.dpToPx().toInt()
-    val hPx = iconSvg.height.dpToPx().toInt()
-
-    if (wPx <= 0 || hPx <= 0) {
-      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} invalid svg size")
+    val size = iconSvg.toPixelSizeOrNull()
+    if (size == null) {
+      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} infoWindow: invalid svg size")
       return createFallbackImageView()
     }
+    val wPx = size.width
+    val hPx = size.height
 
     val svgView =
       ImageView(context).apply {
@@ -311,15 +222,21 @@ class MapMarkerBuilder(
       }
 
     try {
-      val svg =
-        SVG.getFromString(iconSvg.svgString).apply {
-          documentWidth = wPx.toFloat()
-          documentHeight = hPx.toFloat()
+      parse(iconSvg, wPx, hPx).use {
+        if (!it.isValid) {
+          mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=${markerTag.id} infoWindow: svg parse failed")
+          return createFallbackImageView()
         }
-      val drawable = PictureDrawable(svg.renderToPicture())
-      svgView.setImageDrawable(drawable)
-    } catch (e: Exception) {
-      mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed", e)
+        imageLoader.resolveCachedImages(it, markerTag.id)
+        val bmp = render(it, wPx, hPx)
+        if (bmp == null) {
+          mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed")
+          return createFallbackImageView()
+        }
+        svgView.setImageBitmap(bmp)
+      }
+    } catch (t: Throwable) {
+      mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=${markerTag.id} infoWindow: svg render failed", t)
       return createFallbackImageView()
     }
 
@@ -342,53 +259,59 @@ class MapMarkerBuilder(
 
   private data class RenderBitmapResult(
     val bitmap: Bitmap,
-    val isFallback: Boolean,
+    val cacheable: Boolean,
   )
 
   private suspend fun renderBitmap(
     iconSvg: RNMarkerSvg,
     markerId: String,
   ): RenderBitmapResult {
-    val wPx = iconSvg.width.dpToPx().toInt()
-    val hPx = iconSvg.height.dpToPx().toInt()
-
-    if (wPx <= 0 || hPx <= 0) {
-      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId invalid svg size")
-      return RenderBitmapResult(createFallbackBitmap(), true)
+    val size = iconSvg.toPixelSizeOrNull()
+    if (size == null) {
+      mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: invalid svg size")
+      return RenderBitmapResult(createFallbackBitmap(), false)
     }
+    val wPx = size.width
+    val hPx = size.height
 
-    var bmp: Bitmap? = null
-    try {
-      val svg =
-        try {
-          SVG.getFromString(iconSvg.svgString).apply {
-            documentWidth = wPx.toFloat()
-            documentHeight = hPx.toFloat()
-          }
-        } catch (e: SVGParseException) {
-          mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: svg parse failed", e)
-          return RenderBitmapResult(createFallbackBitmap(), true)
-        } catch (e: IllegalArgumentException) {
-          mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: svg invalid", e)
-          return RenderBitmapResult(createFallbackBitmap(), true)
-        }
+    return parse(iconSvg, wPx, hPx).use {
+      if (!it.isValid) {
+        mapErrorHandler.report(RNMapErrorCode.INVALID_ARGUMENT, "markerId=$markerId icon: svg parse failed")
+        return RenderBitmapResult(createFallbackBitmap(), false)
+      }
+      val complete = imageLoader.resolveImages(it, markerId)
 
       currentCoroutineContext().ensureActive()
-      bmp =
-        createBitmap(wPx, hPx, Bitmap.Config.ARGB_8888).apply {
-          density = context.resources.displayMetrics.densityDpi
-          Canvas(this).also {
-            svg.renderToCanvas(it)
-          }
-        }
+      val bmp = render(it, wPx, hPx)
+      if (bmp == null) {
+        mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId icon: svg render failed")
+        return RenderBitmapResult(createFallbackBitmap(), false)
+      }
 
-      currentCoroutineContext().ensureActive()
-
-      return RenderBitmapResult(bmp, false)
-    } catch (e: Exception) {
-      if (e is CancellationException) throw e
-      bmp?.recycle()
-      throw e
+      RenderBitmapResult(bmp, complete)
     }
+  }
+
+  private fun parse(
+    iconSvg: RNMarkerSvg,
+    wPx: Int,
+    hPx: Int,
+  ): SvgDocument {
+    fontRegistry.register()
+    return SvgDocument(iconSvg.svgString, wPx, hPx)
+  }
+
+  private fun render(
+    document: SvgDocument,
+    wPx: Int,
+    hPx: Int,
+  ): Bitmap? {
+    val bmp = createBitmap(wPx, hPx, Bitmap.Config.ARGB_8888)
+    if (!document.render(bmp)) {
+      bmp.recycle()
+      return null
+    }
+    bmp.density = context.resources.displayMetrics.densityDpi
+    return bmp
   }
 }

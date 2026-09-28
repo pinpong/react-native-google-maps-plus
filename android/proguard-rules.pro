@@ -12,7 +12,4 @@
     @androidx.annotation.Keep *;
 }
 
--keep class com.caverock.androidsvg.SVG { *; }
--dontwarn com.caverock.androidsvg.**
-
 -keep class com.rngooglemapsplus.** { *; }
