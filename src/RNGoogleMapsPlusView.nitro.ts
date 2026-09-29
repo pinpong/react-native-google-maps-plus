@@ -6,7 +6,7 @@ import type {
   RNHeatmap,
   RNIndoorBuilding,
   RNIndoorLevel,
-  RNInitialProps,
+  RNMapOptions,
   RNKMLayer,
   RNLatLng,
   RNLatLngBounds,
@@ -40,8 +40,8 @@ import type {
  * Platform differences remain unless explicitly aligned.
  */
 export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
-  /** Initial map configuration. See {@link RNInitialProps}. */
-  initialProps?: RNInitialProps;
+  /** Initial map configuration. Applied once at mount time. See {@link RNMapOptions}. */
+  mapOptions?: RNMapOptions;
 
   /** UI and gesture settings. See {@link RNMapUiSettings}. */
   uiSettings?: RNMapUiSettings;

@@ -78,7 +78,7 @@ export default function SvgMarkersScreen() {
     <MapWrapper
       mapRef={mapRef}
       markers={markers}
-      initialProps={{
+      mapOptions={{
         camera: {
           center: { ...SF_CENTER, latitude: SF_CENTER.latitude + 0.0006 },
           zoom: 14.6,

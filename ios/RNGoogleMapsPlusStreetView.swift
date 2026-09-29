@@ -28,8 +28,8 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
     impl.deinitInternal()
   }
 
-  var initialProps: RNStreetViewInitialProps? {
-    didSet { impl.streetViewInitialProps = initialProps }
+  var panoramaOptions: RNPanoramaOptions? {
+    didSet { impl.panoramaOptions = panoramaOptions }
   }
 
   var uiSettings: RNStreetViewUiSettings? {

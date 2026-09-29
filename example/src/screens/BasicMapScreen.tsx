@@ -21,7 +21,7 @@ export default function BasicMapScreen() {
   const navigation = useNavigation();
   const [init, setInit] = useState(false);
   const [mapConfig, setMapConfig] = useState<RNBasicMapConfig>({
-    initialProps: {
+    mapOptions: {
       mapId: undefined,
       liteMode: false,
       camera: {

@@ -29,15 +29,15 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     impl.deinitInternal()
   }
 
-  var initialProps: RNInitialProps? {
+  var mapOptions: RNMapOptions? {
     didSet {
       let options = GMSMapViewOptions()
-      initialProps?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
-      initialProps?.liteMode.map { _ in /* not supported */ }
-      initialProps?.camera.map {
+      mapOptions?.mapId.map { options.mapID = GMSMapID(identifier: $0) }
+      mapOptions?.liteMode.map { _ in /* not supported */ }
+      mapOptions?.camera.map {
         options.camera = $0.toGMSCameraPosition(current: nil)
       }
-      initialProps?.backgroundColor.map {
+      mapOptions?.backgroundColor.map {
         options.backgroundColor = $0.toUIColor()
       }
 

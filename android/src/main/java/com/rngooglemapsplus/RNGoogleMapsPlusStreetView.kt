@@ -29,22 +29,22 @@ class RNGoogleMapsPlusStreetView(
     view.destroyInternal()
   }
 
-  override var initialProps: RNStreetViewInitialProps? = null
+  override var panoramaOptions: RNPanoramaOptions? = null
     set(value) {
       if (field == value) return
       field = value
 
       val options =
         StreetViewPanoramaOptions().apply {
-          panoramaId(initialProps?.panoramaId)
-          initialProps?.position?.let {
+          panoramaId(panoramaOptions?.panoramaId)
+          panoramaOptions?.position?.let {
             position(
               it.toLatLng(),
-              initialProps?.radius?.toInt(),
-              initialProps?.source.toStreetViewSource(),
+              panoramaOptions?.radius?.toInt(),
+              panoramaOptions?.source.toStreetViewSource(),
             )
           }
-          initialProps?.camera?.toStreetViewPanoramaCamera()?.let { panoramaCamera(it) }
+          panoramaOptions?.camera?.toStreetViewPanoramaCamera()?.let { panoramaCamera(it) }
         }
 
       view.streetViewPanoramaOptions = options

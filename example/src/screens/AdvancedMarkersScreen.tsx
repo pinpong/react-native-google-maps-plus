@@ -15,12 +15,12 @@ import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   GoogleMapsViewRef,
-  RNInitialProps,
+  RNMapOptions,
   RNMapCapabilities,
   RNMarker,
 } from 'react-native-google-maps-plus';
 
-const initialProps: RNInitialProps = {
+const mapOptions: RNMapOptions = {
   mapId: 'DEMO_MAP_ID',
   camera: {
     center: SF_CENTER,
@@ -80,7 +80,7 @@ export default function AdvancedMarkersScreen() {
       <MapWrapper
         mapRef={mapRef}
         markers={markers}
-        initialProps={initialProps}
+        mapOptions={mapOptions}
         onMapReady={onMapReady}
         onMapCapabilitiesChange={setCapabilities}
       >

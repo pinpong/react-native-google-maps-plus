@@ -9,7 +9,7 @@ import type {
 } from 'react-native-google-maps-plus';
 
 export type RNBasicMapConfig = {
-  initialProps?: {
+  mapOptions?: {
     mapId?: string;
     liteMode?: boolean;
     camera?: RNCameraUpdate;

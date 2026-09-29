@@ -10,7 +10,7 @@ export default function IndoorLevelMapScreen() {
   return (
     <MapWrapper
       mapRef={mapRef}
-      initialProps={{
+      mapOptions={{
         camera: {
           center: {
             latitude: 37.617596832174385,
