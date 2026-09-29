@@ -5,7 +5,7 @@ import Supercluster from 'react-native-clusterer';
 import ControlPanel from '@src/components/ControlPanel';
 import MapWrapper from '@src/components/MapWrapper';
 import { gridCoordinates, makeSvgIcon } from '@src/utils/mapGenerators';
-import { rnRegionToRegion } from '@src/utils/mapUtils';
+import { SF_CENTER, rnRegionToRegion } from '@src/utils/mapUtils';
 
 import type { Supercluster as SuperclusterTypes } from 'react-native-clusterer';
 import type {
@@ -15,11 +15,20 @@ import type {
   RNRegion,
 } from 'react-native-google-maps-plus';
 
+const COLUMNS = 25;
+const SPACING = 0.008;
+
 export default function ClusteringScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const [coordinates] = useState(
     Array.from({ length: 500 }, (_, i) =>
-      gridCoordinates(i, 25, 37.8549, -122.5194, 0.008)
+      gridCoordinates(
+        i,
+        COLUMNS,
+        SF_CENTER.latitude + 0.0601,
+        SF_CENTER.longitude - Math.floor(COLUMNS / 2) * SPACING,
+        SPACING
+      )
     )
   );
 
