@@ -27,6 +27,20 @@ React Native wrapper for Android & iOS Google Maps SDK with Street View support
 
 For the supported SVG features and known rendering issues see lunasvg's [feature list](https://github.com/sammycage/lunasvg#features) and [issues](https://github.com/sammycage/lunasvg/issues).
 
+## Advanced markers
+
+A marker with `advancedOptions` is rendered as an Advanced Marker ([Android](https://developers.google.com/maps/documentation/android-sdk/advanced-markers/overview), [iOS](https://developers.google.com/maps/documentation/ios-sdk/advanced-markers/overview)).
+
+- **Map ID:** set `initialProps.mapId`. `DEMO_MAP_ID` works for testing.
+- **Availability:** `onMapReady` reports whether Advanced Markers are available, `onMapCapabilitiesChange` reports a later change. While they are not available, the marker is rendered as a standard marker and `pinConfig` has no effect.
+- **Collision behavior:** `collisionBehavior` decides whether the marker hides other markers and map labels or is hidden by them. A change re-creates the marker.
+- **Pin:** `pinConfig` sets the background, border and glyph of the default pin. The glyph is one of `iconSvg`, `text` or `color`, in that order.
+- **Icon:** `iconSvg` takes precedence over `pinConfig`. An SVG that fails to render leaves the icon empty, the pin is not used as a fallback.
+
+### Limitations
+
+- Android: Advanced Markers are not available with the legacy map renderer.
+
 ## Contributing
 
 - [Development workflow](CONTRIBUTING.md#development-workflow)
