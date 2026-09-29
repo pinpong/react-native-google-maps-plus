@@ -16,12 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Comment and close PR
         run: |
-          HEAD_REF="${{ github.event.pull_request.head.ref }}"
-          HEAD_REPO="${{ github.event.pull_request.head.repo.full_name }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
+          # Re-runs replay the original payload, so check the current base.
+          BASE_REF=$(gh pr view "$PR_NUMBER" --json baseRefName -q .baseRefName)
+          if [ "$BASE_REF" != "main" ]; then
+            echo "PR #$PR_NUMBER now targets $BASE_REF, skipping"
+            exit 0
+          fi
 
           echo "Closing PR #$PR_NUMBER from invalid source: $HEAD_REPO / $HEAD_REF"
 
