@@ -13,6 +13,9 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   private let manager = CLLocationManager()
 
   private var isActive = false
+  private var isStarted = false
+  private var isEnabled = false
+  private var lastReportedError: RNLocationErrorCode?
 
   private var currentDesiredAccuracy: CLLocationAccuracy =
     kCLLocationAccuracyDefault
@@ -22,6 +25,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
   var onUpdate: ((CLLocation) -> Void)?
   var onError: ((RNLocationErrorCode) -> Void)?
+  var onStatusChange: ((RNLocationPermissionResult) -> Void)?
 
   override init() {
     super.init()
@@ -30,6 +34,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   }
 
   func updateConfig(
+    enabled: Bool?,
     desiredAccuracy: CLLocationAccuracy?,
     distanceFilterMeters: CLLocationDistance?,
     activityType: CLActivityType?
@@ -42,6 +47,14 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
     currentActivityType = activityType ?? kCLActivityTypeDefault
     manager.activityType = currentActivityType
+
+    isEnabled = enabled ?? false
+    guard isStarted else { return }
+    if isEnabled {
+      startUpdates()
+    } else {
+      stopUpdates()
+    }
   }
 
   func showLocationDialog() {
@@ -79,19 +92,55 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     }
   }
 
-  func start() {
-    guard !isActive else { return }
-    guard manager.authorizationStatus != .denied || CLLocationManager.locationServicesEnabled() else {
-      onError?(.settingsNotSatisfied)
-      return
-    }
-    isActive = true
+  private func checkLocationSettings() {
+    reportStatus()
 
-    manager.requestLocation()
-    manager.startUpdatingLocation()
+    switch manager.authorizationStatus {
+    case .denied:
+      manager.stopUpdatingLocation()
+      // .denied is also reported when Location Services are off system-wide.
+      reportError(
+        CLLocationManager.locationServicesEnabled()
+          ? .permissionDenied : .settingsNotSatisfied
+      )
+    case .restricted, .notDetermined:
+      manager.stopUpdatingLocation()
+      reportError(.permissionDenied)
+    default:
+      lastReportedError = nil
+      manager.requestLocation()
+      manager.startUpdatingLocation()
+    }
+  }
+
+  private func reportStatus() {
+    onStatusChange?(manager.toRNLocationPermissionResult())
+  }
+
+  private func reportError(_ code: RNLocationErrorCode) {
+    guard lastReportedError != code else { return }
+    lastReportedError = code
+    onError?(code)
+  }
+
+  func start() {
+    isStarted = true
+    startUpdates()
   }
 
   func stop() {
+    isStarted = false
+    stopUpdates()
+  }
+
+  private func startUpdates() {
+    guard !isActive, isEnabled else { return }
+    isActive = true
+    lastReportedError = nil
+    checkLocationSettings()
+  }
+
+  private func stopUpdates() {
     guard isActive else { return }
     isActive = false
     manager.stopUpdatingLocation()
@@ -106,17 +155,23 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     }
   }
 
+  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    guard isActive else { return }
+    checkLocationSettings()
+  }
+
   func locationManager(
     _ manager: CLLocationManager,
     didFailWithError error: Error
   ) {
-    let code: RNLocationErrorCode
-    if let clError = error as? CLError {
-      code = clError.code.toRNLocationErrorCode
-    } else {
-      code = .internalError
+    guard isActive else { return }
+    guard let clError = error as? CLError else {
+      reportError(.internalError)
+      return
     }
-    onError?(code)
+    // .locationUnknown is transient, .denied comes with the authorization change.
+    guard clError.code != .locationUnknown, clError.code != .denied else { return }
+    reportError(clError.code.toRNLocationErrorCode)
   }
 
   func locationManager(
@@ -124,6 +179,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     didUpdateLocations locations: [CLLocation]
   ) {
     guard let loc = locations.last else { return }
+    lastReportedError = nil
     onUpdate?(loc)
   }
 

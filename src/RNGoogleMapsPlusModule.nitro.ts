@@ -28,6 +28,13 @@ export interface RNGoogleMapsPlusModule extends HybridObject<{
   requestLocationPermission(): Promise<RNLocationPermissionResult>;
 
   /**
+   * Returns the current location permission without prompting.
+   *
+   * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
+   */
+  getLocationPermission(): RNLocationPermissionResult;
+
+  /**
    * Checks Google Play Services availability.
    *
    * iOS: always returns `false`.

@@ -45,7 +45,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   uiSettings?: RNMapUiSettings;
 
   /**
-   * Enables "My Location" blue dot.
+   * Enables "My Location" blue dot and location updates.
    * @defaultValue `false`
    */
   myLocationEnabled?: boolean;
@@ -139,11 +139,35 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** First frame rendered. */
   onMapLoaded?: (region: RNRegion, camera: RNCamera) => void;
 
-  /** Location update. */
+  /**
+   * Location update.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
   onLocationUpdate?: (location: RNLocation) => void;
 
-  /** Location subsystem error. */
+  /**
+   * Location subsystem error.
+   *
+   * Reports an error once while it persists.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
   onLocationError?: (error: RNLocationErrorCode) => void;
+
+  /**
+   * Location permission or device location settings changed.
+   *
+   * Reports the status when location updates start, then every change while
+   * the view is active. Changes made in background are reported on return.
+   * Without location permission the device location switch is only reported
+   * when location updates start.
+   *
+   * The same status can be reported more than once.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
+  onLocationStatusChange?: (status: RNLocationPermissionResult) => void;
 
   /** Tap on map. */
   onMapPress?: (coordinate: RNLatLng) => void;
@@ -339,6 +363,13 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
    */
   requestLocationPermission(): Promise<RNLocationPermissionResult>;
+
+  /**
+   * Returns the current location permission without prompting.
+   *
+   * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
+   */
+  getLocationPermission(): RNLocationPermissionResult;
 
   /**
    * Checks Google Play Services availability.

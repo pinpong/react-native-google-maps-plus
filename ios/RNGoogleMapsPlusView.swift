@@ -286,6 +286,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onLocationError: ((RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
   }
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)? {
+    didSet { impl.onLocationStatusChange = onLocationStatusChange }
+  }
   var onMapPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapPress = onMapPress }
   }
@@ -421,6 +424,10 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   func openLocationSettings() {
     locationHandler.openLocationSettings()
+  }
+
+  func getLocationPermission() -> RNLocationPermissionResult {
+    return permissionHandler.getLocationPermission()
   }
 
   func requestLocationPermission()

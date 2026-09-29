@@ -115,6 +115,12 @@ GMSIndoorDisplayDelegate {
         self?.onLocationError?(error)
       }
     }
+
+    locationHandler.onStatusChange = { [weak self] status in
+      onMain {
+        self?.onLocationStatusChange?(status)
+      }
+    }
   }
 
   private func applyMapProps() {
@@ -178,6 +184,7 @@ GMSIndoorDisplayDelegate {
 
   var myLocationEnabled: Bool? {
     didSet {
+      ({ self.locationConfig = self.locationConfig })()
       onMain {
         self.mapView?.isMyLocationEnabled = self.myLocationEnabled ?? false
       }
@@ -273,6 +280,7 @@ GMSIndoorDisplayDelegate {
   var locationConfig: RNLocationConfig? {
     didSet {
       locationHandler.updateConfig(
+        enabled: locationConfig?.enabled == true || myLocationEnabled == true,
         desiredAccuracy: locationConfig?.ios?.desiredAccuracy?
           .toCLLocationAccuracy,
         distanceFilterMeters: locationConfig?.ios?.distanceFilterMeters,
@@ -285,6 +293,7 @@ GMSIndoorDisplayDelegate {
   var onMapLoaded: ((RNRegion, RNCamera) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((RNLocationErrorCode) -> Void)?
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
   var onMapLongPress: ((RNLatLng) -> Void)?
   var onPoiPress: ((String, String, RNLatLng) -> Void)?

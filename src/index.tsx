@@ -100,6 +100,26 @@
  * patch it generated into the `Podfile` before. Nothing has to be removed by
  * hand.
  *
+ * # Location
+ *
+ * Location updates are off by default. They run while `myLocationEnabled` or
+ * `locationConfig.enabled` is set and the view is visible, and stop in
+ * background. `onLocationUpdate`, `onLocationError` and
+ * `onLocationStatusChange` only fire while they run.
+ *
+ * `getLocationPermission` and `requestLocationPermission` work independently
+ * of that.
+ *
+ * iOS: the blue dot is drawn by the Maps SDK with its own location manager.
+ * `locationConfig` does not affect it, and the SDK asks for the location
+ * permission as soon as `myLocationEnabled` is set.
+ *
+ * ## Upgrading from 1.x
+ *
+ * Location updates used to run for every view. Set
+ * `locationConfig={{ enabled: true }}` if you use the location callbacks
+ * without `myLocationEnabled`.
+ *
  * # API Keys
  *
  * You need a valid Google Maps API key.
