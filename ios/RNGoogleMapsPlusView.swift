@@ -274,7 +274,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onMapError: ((RNMapErrorCode, String) -> Void)? {
     didSet { mapErrorHandler.callback = onMapError }
   }
-  var onMapReady: ((Bool) -> Void)? {
+  var onMapReady: ((Bool, RNMapCapabilities) -> Void)? {
     didSet { impl.onMapReady = onMapReady }
   }
   var onMapCapabilitiesChange: ((RNMapCapabilities) -> Void)? {

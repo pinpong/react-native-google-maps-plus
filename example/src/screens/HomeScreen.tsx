@@ -18,11 +18,9 @@ import type {
 
 const screens = [
   { name: 'BasicMap', title: 'Basic Map' },
-  { name: 'MapId', title: 'Map ID' },
   { name: 'ScrollView', title: 'Map in ScrollView' },
   { name: 'Markers', title: 'Markers' },
   { name: 'SvgMarkers', title: 'SVG Markers' },
-  { name: 'AdvancedMarkers', title: 'Advanced Markers' },
   { name: 'Polygons', title: 'Polygons' },
   { name: 'Polylines', title: 'Polylines' },
   { name: 'Circles', title: 'Circles' },
