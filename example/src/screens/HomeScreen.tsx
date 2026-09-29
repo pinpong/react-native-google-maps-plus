@@ -23,6 +23,7 @@ const screens = [
   { name: 'Markers', title: 'Markers' },
   { name: 'SvgMarkers', title: 'SVG Markers' },
   { name: 'AdvancedMarkers', title: 'Advanced Markers' },
+  { name: 'SvgTextMarkers', title: 'SVG Text Markers' },
   { name: 'Polygons', title: 'Polygons' },
   { name: 'Polylines', title: 'Polylines' },
   { name: 'Circles', title: 'Circles' },

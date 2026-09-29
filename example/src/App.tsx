@@ -35,6 +35,7 @@ import SnapshotTestScreen from '@src/screens/SnaptshotTestScreen';
 import StreetViewScreen from '@src/screens/StreetViewScreen';
 import StressTestScreen from '@src/screens/StressTestScreen';
 import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
+import SvgTextMarkersScreen from '@src/screens/SvgTextMarkersScreen';
 import UrlTileOverlayScreen from '@src/screens/UrlTileOverlayScreen';
 import type { RootStackParamList } from '@src/types/navigation';
 
@@ -99,6 +100,11 @@ export default function App() {
             name="AdvancedMarkers"
             component={AdvancedMarkersScreen}
             options={{ title: 'Advanced Markers' }}
+          />
+          <Stack.Screen
+            name="SvgTextMarkers"
+            component={SvgTextMarkersScreen}
+            options={{ title: 'SVG Text Markers' }}
           />
           <Stack.Screen
             name="Polygons"

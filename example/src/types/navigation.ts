@@ -9,6 +9,7 @@ export type RootStackParamList = {
   Markers: undefined;
   SvgMarkers: undefined;
   AdvancedMarkers: undefined;
+  SvgTextMarkers: undefined;
   Polygons: undefined;
   Polylines: undefined;
   Circles: undefined;
