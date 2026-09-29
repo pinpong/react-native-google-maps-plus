@@ -15,31 +15,14 @@ extension RNMarker {
     if !infoWindowAnchorEquals(b) { return false }
     if !markerInfoWindowStyleEquals(b) { return false }
     if !markerStyleEquals(b) { return false }
-    if !advancedEquals(b) { return false }
+    if !advancedMarkerEquals(b) { return false }
     return true
   }
 
-  func advancedEquals(_ b: RNMarker) -> Bool {
-    if usesAdvancedMarker() != b.usesAdvancedMarker() { return false }
+  func advancedMarkerEquals(_ b: RNMarker) -> Bool {
     if (advancedOptions != nil) != (b.advancedOptions != nil) { return false }
-    if advancedMarkerCollisionBehavior() != b.advancedMarkerCollisionBehavior() { return false }
+    if advancedOptions?.collisionBehavior != b.advancedOptions?.collisionBehavior { return false }
     return true
-  }
-
-  func usesAdvancedMarker() -> Bool {
-    return advanced ?? false
-  }
-
-  func advancedMarkerCollisionBehavior() -> RNMarkerCollisionBehavior? {
-    guard usesAdvancedMarker() else { return nil }
-    return advancedOptions?.collisionBehavior ?? .required
-  }
-
-  func advancedMarkerConfigurationError() -> String? {
-    if advancedOptions != nil, !usesAdvancedMarker() {
-      return "advancedOptions require advanced: true"
-    }
-    return nil
   }
 
   func coordinatesEquals(_ b: RNMarker) -> Bool {
@@ -84,6 +67,22 @@ extension RNMarker {
     if iconSvg?.width != b.iconSvg?.width { return false }
     if iconSvg?.height != b.iconSvg?.height { return false }
     if iconSvg?.svgString != b.iconSvg?.svgString { return false }
+    if !markerPinConfigEquals(b) { return false }
+    return true
+  }
+
+  func markerPinConfigEquals(_ b: RNMarker) -> Bool {
+    let pinConfig = advancedOptions?.pinConfig
+    let bPinConfig = b.advancedOptions?.pinConfig
+    if (pinConfig != nil) != (bPinConfig != nil) { return false }
+    if pinConfig?.backgroundColor != bPinConfig?.backgroundColor { return false }
+    if pinConfig?.borderColor != bPinConfig?.borderColor { return false }
+    if pinConfig?.glyph?.iconSvg?.width != bPinConfig?.glyph?.iconSvg?.width { return false }
+    if pinConfig?.glyph?.iconSvg?.height != bPinConfig?.glyph?.iconSvg?.height { return false }
+    if pinConfig?.glyph?.iconSvg?.svgString != bPinConfig?.glyph?.iconSvg?.svgString { return false }
+    if pinConfig?.glyph?.text != bPinConfig?.glyph?.text { return false }
+    if pinConfig?.glyph?.textColor != bPinConfig?.glyph?.textColor { return false }
+    if pinConfig?.glyph?.color != bPinConfig?.glyph?.color { return false }
     return true
   }
 
@@ -92,6 +91,16 @@ extension RNMarker {
     hasher.combine(iconSvg?.width)
     hasher.combine(iconSvg?.height)
     hasher.combine(iconSvg?.svgString)
+    let pinConfig = advancedOptions?.pinConfig
+    hasher.combine(pinConfig != nil)
+    hasher.combine(pinConfig?.backgroundColor)
+    hasher.combine(pinConfig?.borderColor)
+    hasher.combine(pinConfig?.glyph?.iconSvg?.width)
+    hasher.combine(pinConfig?.glyph?.iconSvg?.height)
+    hasher.combine(pinConfig?.glyph?.iconSvg?.svgString)
+    hasher.combine(pinConfig?.glyph?.text)
+    hasher.combine(pinConfig?.glyph?.textColor)
+    hasher.combine(pinConfig?.glyph?.color)
     return NSNumber(value: hasher.finalize())
   }
 }
