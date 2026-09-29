@@ -16,8 +16,8 @@ export type GoogleMapsViewRef = HybridView<RNGoogleMapsPlusViewMethods>;
 export type GoogleMapsStreetViewRef =
   HybridView<RNGoogleMapsPlusStreetViewMethods>;
 
-/** Initial map configuration. */
-export type RNInitialProps = {
+/** Initial map configuration. Applied once at mount time. */
+export type RNMapOptions = {
   /**
    * Map identifier applied when the map is created.
    * Required by Google Maps features such as Advanced Markers.
@@ -361,7 +361,7 @@ export type RNMarkerCollisionBehavior =
 /**
  * Advanced Marker configuration.
  *
- * Requires {@link RNInitialProps.mapId}.
+ * Requires {@link RNMapOptions.mapId}.
  * Has no effect while Advanced Markers are not available. The marker is then
  * rendered as a standard marker with its `iconSvg` or the default pin.
  */
@@ -1193,8 +1193,8 @@ export type RNStreetViewUiSettings = {
 /** Street View panorama source filter. */
 export type RNStreetViewSource = 'default' | 'outdoor';
 
-/** Initial Street View configuration. Set once before the view mounts. */
-export type RNStreetViewInitialProps = {
+/** Initial Street View configuration. Applied once at mount time. */
+export type RNPanoramaOptions = {
   /**
    * Load a specific panorama by ID.
    * Takes priority over position when set.

@@ -6,7 +6,7 @@ import type {
   RNLocationPermissionResult,
   RNMapErrorCode,
   RNStreetViewCamera,
-  RNStreetViewInitialProps,
+  RNPanoramaOptions,
   RNStreetViewOrientation,
   RNStreetViewPanoramaLocation,
   RNStreetViewSource,
@@ -22,8 +22,8 @@ import type {
  * Native Google Maps Street View props.
  */
 export interface RNGoogleMapsPlusStreetViewProps extends HybridViewProps {
-  /** Initial panorama configuration. See {@link RNStreetViewInitialProps}. */
-  initialProps?: RNStreetViewInitialProps;
+  /** Initial panorama configuration. Applied once at mount time. See {@link RNPanoramaOptions}. */
+  panoramaOptions?: RNPanoramaOptions;
 
   /** UI and gesture settings. See {@link RNStreetViewUiSettings}. */
   uiSettings?: RNStreetViewUiSettings;

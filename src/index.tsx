@@ -199,7 +199,7 @@
  * ```tsx
  * <GoogleMapsView
  *   style={{ flex: 1 }}
- *   initialProps={{
+ *   mapOptions={{
  *     camera: {
  *       center: { latitude: 37.7749, longitude: -122.4194 },
  *       zoom: 12,
@@ -212,7 +212,7 @@
  * ```tsx
  * <GoogleMapsStreetView
  *   style={{ flex: 1 }}
- *   initialProps={{
+ *   panoramaOptions={{
  *     position: { latitude: 37.8090233, longitude: -122.4742005 },
  *     camera: { bearing: 315, tilt: 0, zoom: 0 },
  *   }}

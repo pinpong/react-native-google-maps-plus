@@ -19,7 +19,7 @@ import { SF_CENTER } from '@src/utils/mapUtils';
 import type {
   GoogleMapsViewRef,
   RNGoogleMapsPlusViewProps,
-  RNInitialProps,
+  RNMapOptions,
   RNLocationConfig,
   RNMapPadding,
   RNMapUiSettings,
@@ -39,7 +39,7 @@ export default function MapWrapper(props: Props) {
   const layout = useSafeAreaInsets();
 
   const [mapLoaded, setMapLoaded] = useState(false);
-  const initialProps: RNInitialProps = useMemo(
+  const mapOptions: RNMapOptions = useMemo(
     () => ({
       camera: {
         center: SF_CENTER,
@@ -102,7 +102,7 @@ export default function MapWrapper(props: Props) {
     <View style={[styles.container, props.style]}>
       <GoogleMapsView
         {...rest}
-        initialProps={props.initialProps ?? initialProps}
+        mapOptions={props.mapOptions ?? mapOptions}
         uiSettings={props.uiSettings ?? uiSettings}
         myLocationEnabled={props.myLocationEnabled ?? true}
         trafficEnabled={props.trafficEnabled ?? false}

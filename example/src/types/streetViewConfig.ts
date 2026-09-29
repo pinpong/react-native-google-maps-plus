@@ -1,11 +1,11 @@
 import type {
   RNLocationConfig,
-  RNStreetViewInitialProps,
+  RNPanoramaOptions,
   RNStreetViewUiSettings,
 } from 'react-native-google-maps-plus';
 
 export type RNStreetViewConfig = {
-  initialProps?: RNStreetViewInitialProps;
+  panoramaOptions?: RNPanoramaOptions;
   uiSettings?: RNStreetViewUiSettings;
   locationConfig?: RNLocationConfig;
 };

@@ -64,7 +64,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
       if self.panoramaViewInitialized { return }
       self.panoramaViewInitialized = true
 
-      let props = self.streetViewInitialProps
+      let props = self.panoramaOptions
       if let position = props?.position {
         let coordinate = position.toCLLocationCoordinate2D()
         let source = props?.source?.toGMSPanoramaSource ?? .default
@@ -115,7 +115,7 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
 
   var currentCamera: GMSPanoramaCamera? { panoramaView?.camera }
 
-  var streetViewInitialProps: RNStreetViewInitialProps?
+  var panoramaOptions: RNPanoramaOptions?
 
   var uiSettings: RNStreetViewUiSettings? {
     didSet {

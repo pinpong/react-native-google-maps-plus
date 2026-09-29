@@ -28,7 +28,7 @@ export default function StreetViewScreen() {
 
   const [init, setInit] = useState(false);
   const [config, setConfig] = useState<RNStreetViewConfig>({
-    initialProps: {
+    panoramaOptions: {
       panoramaId: undefined,
       position: { latitude: 37.8090233, longitude: -122.4742005 },
       radius: 50,
@@ -210,7 +210,7 @@ export default function StreetViewScreen() {
           <GoogleMapsStreetView
             hybridRef={hybridRef}
             style={styles.streetView}
-            initialProps={config.initialProps}
+            panoramaOptions={config.panoramaOptions}
             uiSettings={config.uiSettings}
             locationConfig={config.locationConfig}
             onPanoramaReady={onPanoramaReady}

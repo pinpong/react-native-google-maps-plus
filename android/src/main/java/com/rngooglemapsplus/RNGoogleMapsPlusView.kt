@@ -32,17 +32,17 @@ class RNGoogleMapsPlusView(
     view.destroyInternal()
   }
 
-  override var initialProps: RNInitialProps? = null
+  override var mapOptions: RNMapOptions? = null
     set(value) {
       if (field == value) return
       field = value
 
       val options =
         GoogleMapOptions().apply {
-          initialProps?.mapId?.let { mapId(it) }
-          initialProps?.liteMode?.let { liteMode(it) }
-          initialProps?.camera?.let { camera(it.toCameraPosition(current = null)) }
-          initialProps?.backgroundColor?.let { backgroundColor(it.toColor()) }
+          mapOptions?.mapId?.let { mapId(it) }
+          mapOptions?.liteMode?.let { liteMode(it) }
+          mapOptions?.camera?.let { camera(it.toCameraPosition(current = null)) }
+          mapOptions?.backgroundColor?.let { backgroundColor(it.toColor()) }
         }
 
       view.googleMapsOptions = options

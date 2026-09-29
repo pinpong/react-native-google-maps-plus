@@ -351,7 +351,7 @@ export const RNMapStyleElementValidator = object({
 });
 
 export const RNBasicMapConfigValidator = object({
-  initialProps: optional(
+  mapOptions: optional(
     object({
       mapId: optional(string()),
       liteMode: optional(boolean()),
@@ -392,7 +392,7 @@ export const RNStreetViewUiSettingsValidator = object({
 });
 
 export const RNStreetViewConfigValidator = object({
-  initialProps: optional(
+  panoramaOptions: optional(
     object({
       panoramaId: optional(string()),
       position: optional(RNLatLngValidator),

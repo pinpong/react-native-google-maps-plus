@@ -6,10 +6,10 @@ import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   GoogleMapsViewRef,
-  RNInitialProps,
+  RNMapOptions,
 } from 'react-native-google-maps-plus';
 
-const initialProps: RNInitialProps = {
+const mapOptions: RNMapOptions = {
   mapId: 'DEMO_MAP_ID',
   camera: {
     center: SF_CENTER,
@@ -21,7 +21,7 @@ export default function MapIdScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
 
   return (
-    <MapWrapper mapRef={mapRef} initialProps={initialProps}>
+    <MapWrapper mapRef={mapRef} mapOptions={mapOptions}>
       <ControlPanel viewRef={mapRef} buttons={[]} />
     </MapWrapper>
   );

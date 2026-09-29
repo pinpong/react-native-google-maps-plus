@@ -47,7 +47,7 @@ export default function ScrollViewScreen() {
             <MapWrapper
               mapRef={mapRef}
               style={styles.map}
-              initialProps={{
+              mapOptions={{
                 camera: { center, zoom: 12 },
                 liteMode: isLite,
               }}
