@@ -1,4 +1,6 @@
-import type { RNRegion } from 'react-native-google-maps-plus';
+import type { RNLatLng, RNRegion } from 'react-native-google-maps-plus';
+
+export const SF_CENTER: RNLatLng = { latitude: 37.7749, longitude: -122.4194 };
 
 export function rnRegionToRegion(rn: RNRegion | null): {
   latitude: number;

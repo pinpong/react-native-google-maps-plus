@@ -9,6 +9,7 @@ import MapWrapper from '@src/components/MapWrapper';
 import { useAppTheme } from '@src/hooks/useAppTheme';
 import { useHeaderButton } from '@src/hooks/useHeaderButton';
 import type { RNBasicMapConfig } from '@src/types/basicMapConfig';
+import { SF_CENTER } from '@src/utils/mapUtils';
 import { RNBasicMapConfigValidator } from '@src/utils/validator';
 
 import type { GoogleMapsViewRef } from 'react-native-google-maps-plus';
@@ -24,7 +25,7 @@ export default function BasicMapScreen() {
       mapId: undefined,
       liteMode: false,
       camera: {
-        center: { latitude: 37.7749, longitude: -122.4194 },
+        center: SF_CENTER,
         zoom: 12,
       },
       backgroundColor: theme.bgAccent,

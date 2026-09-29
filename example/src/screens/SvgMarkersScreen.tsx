@@ -10,13 +10,17 @@ import {
 } from '@src/data/svgMarkersData';
 import type { SvgMarker } from '@src/data/svgMarkersData';
 import { gridCoordinates } from '@src/utils/mapGenerators';
+import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   GoogleMapsViewRef,
   RNMarker,
 } from 'react-native-google-maps-plus';
 
-const GRID_TOP = 37.7849;
+const COLUMNS = 5;
+const SPACING = 0.004;
+const GRID_TOP = SF_CENTER.latitude + 0.01;
+const GRID_LEFT = SF_CENTER.longitude - Math.floor(COLUMNS / 2) * SPACING;
 const ASPECT_GRID_TOP = GRID_TOP - 0.0016;
 
 const toMarker = (
@@ -26,7 +30,7 @@ const toMarker = (
 ): RNMarker => ({
   id: index.toString(),
   zIndex: index,
-  coordinate: gridCoordinates(index, 5, top, -122.4274, 0.004),
+  coordinate: gridCoordinates(index, COLUMNS, top, GRID_LEFT, SPACING),
   title: marker.title,
   snippet: marker.snippet,
   iconSvg: {
@@ -46,10 +50,10 @@ export default function SvgMarkersScreen() {
       zIndex: svgMarkers.length,
       coordinate: gridCoordinates(
         svgMarkers.length,
-        5,
+        COLUMNS,
         GRID_TOP,
-        -122.4274,
-        0.004
+        GRID_LEFT,
+        SPACING
       ),
       iconSvg: { width: 64, height: 64, svgString: svgStarIcon },
       infoWindowIconSvg: {
@@ -76,7 +80,7 @@ export default function SvgMarkersScreen() {
       markers={markers}
       initialProps={{
         camera: {
-          center: { latitude: 37.7755, longitude: -122.4194 },
+          center: { ...SF_CENTER, latitude: SF_CENTER.latitude + 0.0006 },
           zoom: 14.6,
         },
       }}

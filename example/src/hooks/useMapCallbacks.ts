@@ -10,6 +10,7 @@ import {
   type RNLocation,
   RNLocationErrorCode,
   type RNLocationPermissionResult,
+  type RNMapCapabilities,
   RNMapErrorCode,
   type RNRegion,
 } from 'react-native-google-maps-plus';
@@ -42,11 +43,20 @@ export function useMapCallbacks(
   const onMapReady = useNitroCallback(
     props.onMapReady,
     useCallback(
-      (ready: boolean) => {
-        console.log('Map is ready:', ready);
+      (ready: boolean, capabilities: RNMapCapabilities) => {
+        console.log('Map is ready:', ready, capabilities);
         if (!ready) setMapLoaded(true);
       },
       [setMapLoaded]
+    )
+  );
+
+  const onMapCapabilitiesChange = useNitroCallback(
+    props.onMapCapabilitiesChange,
+    useCallback(
+      (capabilities: RNMapCapabilities) =>
+        console.log('Map capabilities:', capabilities),
+      []
     )
   );
 
@@ -217,6 +227,7 @@ export function useMapCallbacks(
     hybridRef,
     onMapError,
     onMapReady,
+    onMapCapabilitiesChange,
     onMapLoaded,
     onMapPress,
     onMapLongPress,
