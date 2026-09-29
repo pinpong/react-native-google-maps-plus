@@ -1,7 +1,6 @@
 package com.rngooglemapsplus.extensions
 
 import com.rngooglemapsplus.RNMarker
-import com.rngooglemapsplus.RNMarkerCollisionBehavior
 
 fun RNMarker.markerEquals(b: RNMarker): Boolean {
   if (id != b.id) return false
@@ -17,30 +16,17 @@ fun RNMarker.markerEquals(b: RNMarker): Boolean {
   if (rotation != b.rotation) return false
   if (!markerInfoWindowStyleEquals(b)) return false
   if (!markerStyleEquals(b)) return false
-  if (!advancedEquals(b)) return false
+  if (!advancedMarkerEquals(b)) return false
 
   return true
 }
 
-fun RNMarker.advancedEquals(b: RNMarker): Boolean {
-  if (usesAdvancedMarker() != b.usesAdvancedMarker()) return false
+fun RNMarker.advancedMarkerEquals(b: RNMarker): Boolean {
   if ((advancedOptions != null) != (b.advancedOptions != null)) return false
-  if (advancedMarkerCollisionBehavior() != b.advancedMarkerCollisionBehavior()) return false
+  if (advancedOptions?.collisionBehavior != b.advancedOptions?.collisionBehavior) return false
+
   return true
 }
-
-fun RNMarker.usesAdvancedMarker(): Boolean = advanced ?: false
-
-fun RNMarker.advancedMarkerCollisionBehavior(): RNMarkerCollisionBehavior? {
-  if (!usesAdvancedMarker()) return null
-  return advancedOptions?.collisionBehavior ?: RNMarkerCollisionBehavior.REQUIRED
-}
-
-fun RNMarker.advancedMarkerConfigurationError(): String? =
-  when {
-    advancedOptions != null && !usesAdvancedMarker() -> "advancedOptions require advanced: true"
-    else -> null
-  }
 
 fun RNMarker.coordinatesEquals(b: RNMarker): Boolean {
   if (coordinate.latitude != b.coordinate.latitude) return false
@@ -84,13 +70,41 @@ fun RNMarker.markerStyleEquals(b: RNMarker): Boolean {
   if (iconSvg?.width != b.iconSvg?.width) return false
   if (iconSvg?.height != b.iconSvg?.height) return false
   if (iconSvg?.svgString != b.iconSvg?.svgString) return false
+  if (!markerPinConfigEquals(b)) return false
 
   return true
 }
 
-fun RNMarker.styleHash(): Int =
-  arrayOf<Any?>(
+fun RNMarker.markerPinConfigEquals(b: RNMarker): Boolean {
+  val pinConfig = advancedOptions?.pinConfig
+  val bPinConfig = b.advancedOptions?.pinConfig
+  if ((pinConfig != null) != (bPinConfig != null)) return false
+  if (pinConfig?.backgroundColor != bPinConfig?.backgroundColor) return false
+  if (pinConfig?.borderColor != bPinConfig?.borderColor) return false
+  if (pinConfig?.glyph?.iconSvg?.width != bPinConfig?.glyph?.iconSvg?.width) return false
+  if (pinConfig?.glyph?.iconSvg?.height != bPinConfig?.glyph?.iconSvg?.height) return false
+  if (pinConfig?.glyph?.iconSvg?.svgString != bPinConfig?.glyph?.iconSvg?.svgString) return false
+  if (pinConfig?.glyph?.text != bPinConfig?.glyph?.text) return false
+  if (pinConfig?.glyph?.textColor != bPinConfig?.glyph?.textColor) return false
+  if (pinConfig?.glyph?.color != bPinConfig?.glyph?.color) return false
+
+  return true
+}
+
+fun RNMarker.styleHash(): Int {
+  val pinConfig = advancedOptions?.pinConfig
+  return arrayOf<Any?>(
     iconSvg?.width,
     iconSvg?.height,
     iconSvg?.svgString,
+    pinConfig != null,
+    pinConfig?.backgroundColor,
+    pinConfig?.borderColor,
+    pinConfig?.glyph?.iconSvg?.width,
+    pinConfig?.glyph?.iconSvg?.height,
+    pinConfig?.glyph?.iconSvg?.svgString,
+    pinConfig?.glyph?.text,
+    pinConfig?.glyph?.textColor,
+    pinConfig?.glyph?.color,
   ).contentHashCode()
+}

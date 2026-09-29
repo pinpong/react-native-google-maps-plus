@@ -11,13 +11,13 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.rngooglemapsplus.extensions.advancedMarkerCollisionBehavior
 import com.rngooglemapsplus.extensions.anchorEquals
 import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.toGoogleCollisionBehavior
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toPinConfig
 import com.rngooglemapsplus.extensions.toPixelSizeOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,9 +52,9 @@ class MapMarkerBuilder(
   fun build(
     m: RNMarker,
     icon: BitmapDescriptor?,
-    useAdvancedMarker: Boolean,
+    advanced: Boolean,
   ): MarkerOptions =
-    (if (useAdvancedMarker) AdvancedMarkerOptions() else MarkerOptions()).apply {
+    (if (advanced) AdvancedMarkerOptions() else MarkerOptions()).apply {
       position(m.coordinate.toLatLng())
       icon(icon)
       m.title?.let { title(it) }
@@ -66,11 +66,8 @@ class MapMarkerBuilder(
       m.infoWindowAnchor?.let { infoWindowAnchor(it.x.toFloat(), it.y.toFloat()) }
       m.anchor?.let { anchor(it.x.toFloat(), it.y.toFloat()) }
       m.zIndex?.let { zIndex(it.toFloat()) }
-      if (this is AdvancedMarkerOptions) {
-        collisionBehavior(
-          m.advancedMarkerCollisionBehavior()?.toGoogleCollisionBehavior()
-            ?: AdvancedMarkerOptions.CollisionBehavior.REQUIRED,
-        )
+      m.advancedOptions?.collisionBehavior?.let {
+        (this as? AdvancedMarkerOptions)?.collisionBehavior(it.toGoogleCollisionBehavior())
       }
     }
 
@@ -147,10 +144,19 @@ class MapMarkerBuilder(
 
   fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
 
+  fun buildPinIcon(
+    pinConfig: RNMarkerPinConfig,
+    styleHash: Int,
+  ): BitmapDescriptor =
+    BitmapDescriptorFactory.fromPinConfig(pinConfig.toPinConfig(null)).also {
+      iconCache.put(styleHash, it)
+    }
+
   fun renderIcon(
     markerId: String,
     iconSvg: RNMarkerSvg,
     styleHash: Int,
+    pinConfig: RNMarkerPinConfig?,
     onReady: (BitmapDescriptor) -> Unit,
   ): Job =
     scope.launch {
@@ -161,7 +167,8 @@ class MapMarkerBuilder(
         val desc =
           try {
             ensureActive()
-            BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+            val icon = BitmapDescriptorFactory.fromBitmap(renderResult.bitmap)
+            pinConfig?.let { BitmapDescriptorFactory.fromPinConfig(it.toPinConfig(icon)) } ?: icon
           } finally {
             renderResult.bitmap.recycle()
           }

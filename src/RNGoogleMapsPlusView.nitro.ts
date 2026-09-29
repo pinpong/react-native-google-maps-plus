@@ -135,9 +135,9 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
    * Android: `false` if the Maps SDK could not be initialized, e.g. Play Services
    * missing or outdated. Fires again with `true` once the user has resolved it.
    */
-  onMapReady?: (ready: boolean) => void;
+  onMapReady?: (ready: boolean, capabilities: RNMapCapabilities) => void;
 
-  /** Current runtime capabilities of the configured map. */
+  /** Map capabilities changed after the map was ready. */
   onMapCapabilitiesChange?: (capabilities: RNMapCapabilities) => void;
 
   /** First frame rendered. */

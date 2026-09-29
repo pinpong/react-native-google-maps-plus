@@ -21,17 +21,9 @@ final class MapMarkerBuilder {
     displayScale = UIScreen.main.scale
   }
 
-  func build(_ m: RNMarker, icon: UIImage?, useAdvancedMarker: Bool) -> GMSMarker {
+  func build(_ m: RNMarker, icon: UIImage?, advanced: Bool) -> GMSMarker {
     let position = m.coordinate.toCLLocationCoordinate2D()
-    let marker: GMSMarker
-    if useAdvancedMarker {
-      let advancedMarker = GMSAdvancedMarker(position: position)
-      advancedMarker.collisionBehavior =
-        m.advancedMarkerCollisionBehavior()?.toGMSCollisionBehavior ?? .required
-      marker = advancedMarker
-    } else {
-      marker = GMSMarker(position: position)
-    }
+    let marker = advanced ? GMSAdvancedMarker(position: position) : GMSMarker(position: position)
     marker.icon = icon
     m.title.map { marker.title = $0 }
     m.snippet.map { marker.snippet = $0 }
@@ -52,6 +44,9 @@ final class MapMarkerBuilder {
       )
     }
     m.zIndex.map { marker.zIndex = Int32($0) }
+    m.advancedOptions?.collisionBehavior.map {
+      (marker as? GMSAdvancedMarker)?.collisionBehavior = $0.toGMSCollisionBehavior
+    }
 
     marker.tagData = MarkerTag(
       id: m.id,
@@ -135,6 +130,12 @@ final class MapMarkerBuilder {
     iconCache.object(forKey: styleHash)
   }
 
+  func buildPinIcon(_ pinConfig: RNMarkerPinConfig, styleHash: NSNumber) -> UIImage {
+    let icon = GMSPinImage(options: pinConfig.toGMSPinImageOptions(glyphImage: nil))
+    iconCache.setObject(icon, forKey: styleHash)
+    return icon
+  }
+
   func clearIconCache() {
     iconCache.removeAllObjects()
     imageLoader.clear()
@@ -144,6 +145,7 @@ final class MapMarkerBuilder {
     markerId: String,
     iconSvg: RNMarkerSvg,
     styleHash: NSNumber,
+    pinConfig: RNMarkerPinConfig?,
     onReady: @escaping (UIImage) -> Void
   ) -> Task<Void, Never> {
     Task(priority: .userInitiated) { [weak self] in
@@ -160,13 +162,22 @@ final class MapMarkerBuilder {
         return
       }
 
+      let icon: UIImage
+      if let pinConfig {
+        icon = await MainActor.run {
+          GMSPinImage(options: pinConfig.toGMSPinImageOptions(glyphImage: renderResult.image))
+        }
+      } else {
+        icon = renderResult.image
+      }
+
       if renderResult.cacheable {
-        self.iconCache.setObject(renderResult.image, forKey: styleHash)
+        self.iconCache.setObject(icon, forKey: styleHash)
       }
 
       await MainActor.run {
         guard !Task.isCancelled else { return }
-        onReady(renderResult.image)
+        onReady(icon)
       }
     }
   }

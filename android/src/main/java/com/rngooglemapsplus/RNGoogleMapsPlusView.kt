@@ -275,7 +275,7 @@ class RNGoogleMapsPlusView(
       mapErrorHandler.callback = cb
     }
 
-  override var onMapReady: ((Boolean) -> Unit)? = null
+  override var onMapReady: ((Boolean, RNMapCapabilities) -> Unit)? = null
     set(cb) {
       view.onMapReady = cb
     }

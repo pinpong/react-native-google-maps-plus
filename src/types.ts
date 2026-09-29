@@ -343,25 +343,86 @@ export type RNLineCapType = 'butt' | 'round' | 'square';
  */
 export type RNLineJoinType = 'miter' | 'round' | 'bevel';
 
-/** Controls how an Advanced Marker behaves when it overlaps map content. */
+/**
+ * Advanced Marker collision behavior.
+ *
+ * - `required`: always shown.
+ * - `required-and-hides-optional`: always shown, hides overlapping
+ *   `optional-and-hides-lower-priority` markers and map labels.
+ * - `optional-and-hides-lower-priority`: shown only when it does not overlap
+ *   another marker. Between two such markers the one with the higher `zIndex`
+ *   is shown.
+ */
 export type RNMarkerCollisionBehavior =
   | 'required'
   | 'required-and-hides-optional'
   | 'optional-and-hides-lower-priority';
 
-/** Advanced Marker-specific configuration. */
+/**
+ * Advanced Marker configuration.
+ *
+ * Requires {@link RNInitialProps.mapId}.
+ * Has no effect while Advanced Markers are not available. The marker is then
+ * rendered as a standard marker with its `iconSvg` or the default pin.
+ */
 export type RNAdvancedMarkerOptions = {
   /**
-   * Controls visibility when the marker overlaps another marker or a map label.
+   * Behavior when the marker overlaps another marker or a map label.
+   * A change re-creates the marker.
    * @defaultValue `'required'`
    */
   collisionBehavior?: RNMarkerCollisionBehavior;
+
+  /**
+   * Customizes the default pin.
+   * Ignored when {@link RNMarker.iconSvg} is set.
+   *
+   * See {@link RNMarkerPinConfig}.
+   */
+  pinConfig?: RNMarkerPinConfig;
 };
 
-/** Capabilities exposed by the current map configuration. */
+/** Advanced Marker pin customization. */
+export type RNMarkerPinConfig = {
+  /** Pin fill color. */
+  backgroundColor?: string;
+
+  /** Pin border color. */
+  borderColor?: string;
+
+  /** Glyph shown inside the pin. See {@link RNMarkerPinGlyph}. */
+  glyph?: RNMarkerPinGlyph;
+};
+
+/**
+ * Advanced Marker pin glyph.
+ *
+ * Only one glyph is shown: `iconSvg` before `text` before `color`.
+ */
+export type RNMarkerPinGlyph = {
+  /** Glyph rendered from an SVG string. See {@link RNMarkerSvg}. */
+  iconSvg?: RNMarkerSvg;
+
+  /** Glyph text. */
+  text?: string;
+
+  /**
+   * Glyph text color.
+   * @defaultValue `black`
+   */
+  textColor?: string;
+
+  /** Color of the default glyph. */
+  color?: string;
+};
+
+/** Map capabilities that depend on the map ID and the device. */
 export type RNMapCapabilities = {
-  /** Whether the map can render Advanced Markers. */
-  supportsAdvancedMarkers: boolean;
+  /** Advanced Markers are available. */
+  advancedMarkersAvailable: boolean;
+
+  /** Data-driven styling is available. */
+  dataDrivenStylingAvailable: boolean;
 };
 
 /**
@@ -440,15 +501,9 @@ export type RNMarker = {
   infoWindowIconSvg?: RNMarkerSvg;
 
   /**
-   * Creates an Advanced Marker using the existing marker properties and SVG icon.
-   * Requires {@link RNInitialProps.mapId}. Falls back to a standard marker when
-   * the configured map does not support Advanced Markers at runtime.
-   * @defaultValue `false`
-   */
-  advanced?: boolean;
-
-  /**
-   * Advanced Marker-specific configuration. Requires `advanced: true`.
+   * Renders the marker as an Advanced Marker.
+   * A standard marker is rendered while Advanced Markers are not available.
+   *
    * See {@link RNAdvancedMarkerOptions}.
    */
   advancedOptions?: RNAdvancedMarkerOptions;

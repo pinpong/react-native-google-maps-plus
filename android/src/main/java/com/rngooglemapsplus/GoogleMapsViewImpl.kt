@@ -37,6 +37,7 @@ import com.rngooglemapsplus.extensions.toRNIndoorBuilding
 import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
+import com.rngooglemapsplus.extensions.toRNMapCapabilities
 import com.rngooglemapsplus.extensions.toRNRegion
 
 @SuppressLint("ViewConstructor")
@@ -64,6 +65,7 @@ class GoogleMapsViewImpl(
   GoogleMap.OnMyLocationClickListener,
   GoogleMap.OnMyLocationButtonClickListener,
   GoogleMap.OnMapLoadedCallback,
+  GoogleMap.OnMapCapabilitiesChangedListener,
   GoogleMap.InfoWindowAdapter,
   ComponentCallbacks2 {
   private var lifecycleObserver: ViewLifecycleEventObserver? = null
@@ -72,17 +74,10 @@ class GoogleMapsViewImpl(
   private var mapViewInitialized = false
   private var mapViewLoaded = false
   private var destroyed = false
-  private var advancedMarkersAvailable: Boolean? = null
   private var googleMap: GoogleMap? = null
   private var mapView: MapView? = null
-  private val mapCapabilitiesChangedListener =
-    GoogleMap.OnMapCapabilitiesChangedListener(::updateMapCapabilities)
 
-  private val markerManager =
-    MapMarkerManager(
-      MapMarkerBuilder(reactContext, mapErrorHandler),
-      mapErrorHandler,
-    )
+  private val markerManager = MapMarkerManager(MapMarkerBuilder(reactContext, mapErrorHandler))
   private val polylineManager = MapPolylineManager(MapPolylineBuilder())
   private val polygonManager = MapPolygonManager(MapPolygonBuilder())
   private val circleManager = MapCircleManager(MapCircleBuilder())
@@ -101,7 +96,7 @@ class GoogleMapsViewImpl(
     onUi {
       if (mapViewInitialized) return@onUi
       if (!playServiceHandler.initMapsSdk(mapErrorHandler)) {
-        onMapReady?.invoke(false)
+        onMapReady?.invoke(false, RNMapCapabilities(false, false))
       }
       mapViewInitialized = true
       mapView =
@@ -122,9 +117,8 @@ class GoogleMapsViewImpl(
             googleMap = map
             googleMap?.setLocationSource(locationHandler)
             googleMap?.setOnMapLoadedCallback(this@GoogleMapsViewImpl)
-            markerManager.attachMap(map, googleMapsOptions.mapId != null)
-            map.addOnMapCapabilitiesChangedListener(mapCapabilitiesChangedListener)
-            updateMapCapabilities(map.mapCapabilities)
+            googleMap?.addOnMapCapabilitiesChangedListener(this@GoogleMapsViewImpl)
+            markerManager.attachMap(map)
             polylineManager.attachMap(map)
             polygonManager.attachMap(map)
             circleManager.attachMap(map)
@@ -132,7 +126,7 @@ class GoogleMapsViewImpl(
             kmlLayerManager.attachMap(map)
             urlTileOverlayManager.attachMap(map)
             applyMapProps()
-            onMapReady?.invoke(true)
+            onMapReady?.invoke(true, map.toRNMapCapabilities())
           }
         }
     }
@@ -357,14 +351,8 @@ class GoogleMapsViewImpl(
       )
     }
 
-  var onMapReady: ((Boolean) -> Unit)? = null
+  var onMapReady: ((Boolean, RNMapCapabilities) -> Unit)? = null
   var onMapCapabilitiesChange: ((RNMapCapabilities) -> Unit)? = null
-    set(value) {
-      field = value
-      advancedMarkersAvailable?.let { available ->
-        value?.invoke(RNMapCapabilities(supportsAdvancedMarkers = available))
-      }
-    }
   var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
@@ -536,8 +524,8 @@ class GoogleMapsViewImpl(
       urlTileOverlayManager.destroy()
       kmlLayerManager.destroy()
       googleMap?.apply {
-        removeOnMapCapabilitiesChangedListener(mapCapabilitiesChangedListener)
         setOnMapLoadedCallback(null)
+        removeOnMapCapabilitiesChangedListener(this@GoogleMapsViewImpl)
         setOnCameraMoveStartedListener(null)
         setOnCameraMoveListener(null)
         setOnCameraIdleListener(null)
@@ -567,17 +555,6 @@ class GoogleMapsViewImpl(
       mapView = null
       super.removeAllViews()
       reactContext.unregisterComponentCallbacks(this)
-    }
-
-  private fun updateMapCapabilities(capabilities: MapCapabilities) =
-    onUi {
-      val available = capabilities.isAdvancedMarkersAvailable
-      markerManager.updateAdvancedMarkersAvailable(available)
-      if (advancedMarkersAvailable == available) return@onUi
-      advancedMarkersAvailable = available
-      onMapCapabilitiesChange?.invoke(
-        RNMapCapabilities(supportsAdvancedMarkers = available),
-      )
     }
 
   override fun requestLayout() {
@@ -694,6 +671,12 @@ class GoogleMapsViewImpl(
       onIndoorLevelActivated?.invoke(
         activeLevel.toRNIndoorLevel(indoorBuilding.activeLevelIndex, true),
       )
+    }
+
+  override fun onMapCapabilitiesChanged(capabilities: MapCapabilities) =
+    onUi {
+      markerManager.updateAdvancedMarkers()
+      onMapCapabilitiesChange?.invoke(capabilities.toRNMapCapabilities())
     }
 
   override fun onPoiClick(poi: PointOfInterest) =
