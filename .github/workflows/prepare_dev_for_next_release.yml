@@ -9,10 +9,34 @@ permissions:
   contents: write
 
 jobs:
+  check-release:
+    name: Check for new release
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    outputs:
+      released: ${{ steps.check.outputs.released }}
+
+    steps:
+      # The run was triggered by the merged commit, not by the "release:" commit
+      # that semantic-release pushes afterwards, so look at main itself.
+      - name: Check if main ends with a release commit
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SUBJECT=$(gh api "repos/${{ github.repository }}/commits/main" --jq '.commit.message' | head -n1)
+          echo "Latest commit on main: $SUBJECT"
+          if [[ "$SUBJECT" == release:* ]]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
+
   update-pods:
     name: Update Podfile.lock after release
     runs-on: macos-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && startsWith(github.event.workflow_run.head_commit.message, 'release:') }}
+    needs: check-release
+    if: ${{ needs.check-release.outputs.released == 'true' }}
     env:
       XCODE_VERSION: latest-stable
 
@@ -49,8 +73,8 @@ jobs:
   sync-dev:
     name: Sync dev with main
     runs-on: ubuntu-latest
-    needs: update-pods
-    if: ${{ always() && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && startsWith(github.event.workflow_run.head_commit.message, 'release:') }}
+    needs: [check-release, update-pods]
+    if: ${{ always() && needs.check-release.outputs.released == 'true' }}
 
     steps:
       - name: Checkout dev
