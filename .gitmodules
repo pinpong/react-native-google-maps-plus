@@ -1,3 +1,9 @@
 [submodule "cpp/third_party/lunasvg"]
 	path = cpp/third_party/lunasvg
 	url = https://github.com/pinpong/lunasvg.git
+[submodule "cpp/third_party/harfbuzz"]
+	path = cpp/third_party/harfbuzz
+	url = https://github.com/harfbuzz/harfbuzz.git
+[submodule "cpp/third_party/SheenBidi"]
+	path = cpp/third_party/SheenBidi
+	url = https://github.com/Tehreer/SheenBidi.git
