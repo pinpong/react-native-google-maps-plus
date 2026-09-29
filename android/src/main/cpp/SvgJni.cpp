@@ -83,10 +83,22 @@ struct JSvgFontRegistry : jni::JavaClass<JSvgFontRegistry> {
     return rn_svg_add_font_face_file(family->toStdString().c_str(), bold, italic, path->toStdString().c_str());
   }
 
+  static jboolean addFallbackFontFile(
+    jni::alias_ref<javaobject>,
+    jni::alias_ref<jni::JString> family,
+    jni::alias_ref<jni::JString> path,
+    jint index,
+    jni::alias_ref<jni::JString> language,
+    jboolean serif) {
+    return rn_svg_add_fallback_font_file(
+      family->toStdString().c_str(), path->toStdString().c_str(), index, "", language->toStdString().c_str(), serif);
+  }
+
   static void registerNatives() {
     javaClassStatic()->registerNatives({
       makeNativeMethod("nativeAddFont", JSvgFontRegistry::addFont),
       makeNativeMethod("nativeAddFontFaceFile", JSvgFontRegistry::addFontFaceFile),
+      makeNativeMethod("nativeAddFallbackFontFile", JSvgFontRegistry::addFallbackFontFile),
     });
   }
 };
