@@ -5,6 +5,7 @@ import {
   RNIOSLocationActivityType,
   RNIOSPermissionResult,
   RNLocationErrorCode,
+  RNLocationPermissionAccuracy,
   RNMapErrorCode,
 } from 'react-native-google-maps-plus';
 import {
@@ -277,11 +278,14 @@ export const RNIOSLocationConfigValidator = object({
 });
 
 export const RNLocationConfigValidator = object({
+  enabled: optional(boolean()),
   android: optional(RNAndroidLocationConfigValidator),
   ios: optional(RNIOSLocationConfigValidator),
 });
 
 export const RNLocationPermissionResultValidator = object({
+  accuracy: enums(enumValues(RNLocationPermissionAccuracy)),
+  locationServicesEnabled: boolean(),
   android: optional(enums(enumValues(RNAndroidLocationPermissionResult))),
   ios: optional(enums(enumValues(RNIOSPermissionResult))),
 });
@@ -367,6 +371,7 @@ export const RNStreetViewConfigValidator = object({
     })
   ),
   uiSettings: optional(RNStreetViewUiSettingsValidator),
+  locationConfig: optional(RNLocationConfigValidator),
 });
 
 const schema: any = (RNBasicMapConfigValidator as any).schema;

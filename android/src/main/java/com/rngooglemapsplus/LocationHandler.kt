@@ -8,9 +8,10 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
 import android.provider.Settings
+import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
+import androidx.core.location.LocationRequestCompat
 import com.facebook.react.bridge.ReactContext
-import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ResolvableApiException
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import com.rngooglemapsplus.extensions.toRNLocationPermissionResult
 
 private const val REQ_LOCATION_SETTINGS = 2001
 private const val PRIORITY_DEFAULT = Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -42,7 +44,11 @@ class LocationHandler(
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
   private var lastLocation: Location? = null
+  private var locationProviderListener: LocationListenerCompat? = null
+  private var lastReportedError: RNLocationErrorCode? = null
   private var isActive = false
+  private var isStarted = false
+  private var isEnabled = false
 
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
@@ -51,17 +57,22 @@ class LocationHandler(
 
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
+  var onStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
 
   init {
     buildLocationRequest(priority, interval, minUpdateInterval, minUpdateDistanceMeters)
   }
 
   fun updateConfig(
+    enabled: Boolean? = null,
     priority: Int? = null,
     interval: Long? = null,
     minUpdateInterval: Long? = null,
     minUpdateDistanceMeters: Float? = null,
   ) {
+    val wasEnabled = isEnabled
+    val previousRequest = locationRequest
+    isEnabled = enabled ?: false
     this.priority = priority ?: PRIORITY_DEFAULT
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
@@ -73,9 +84,10 @@ class LocationHandler(
       this.minUpdateDistanceMeters,
     )
 
-    if (!isActive) return
-    stop()
-    start()
+    if (!isStarted) return
+    if (isEnabled == wasEnabled && locationRequest == previousRequest) return
+    stopUpdates()
+    startUpdates()
   }
 
   fun showLocationDialog() {
@@ -158,9 +170,53 @@ class LocationHandler(
     onUpdate?.invoke(location)
   }
 
+  @SuppressLint("MissingPermission")
+  private fun registerLocationProviderListener(callback: LocationCallback) {
+    if (locationProviderListener != null) return
+    val listener =
+      object : LocationListenerCompat {
+        override fun onLocationChanged(location: Location) = Unit
+
+        override fun onProviderEnabled(provider: String) = providerChanged(callback)
+
+        override fun onProviderDisabled(provider: String) = providerChanged(callback)
+      }
+
+    // The passive provider only reports when location is switched on or off.
+    LocationManagerCompat.requestLocationUpdates(
+      locationManager,
+      LocationManager.PASSIVE_PROVIDER,
+      LocationRequestCompat
+        .Builder(LocationRequestCompat.PASSIVE_INTERVAL)
+        .setMinUpdateIntervalMillis(LocationRequestCompat.PASSIVE_INTERVAL)
+        .build(),
+      listener,
+      Looper.getMainLooper(),
+    )
+    locationProviderListener = listener
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun unregisterLocationProviderListener() {
+    val listener = locationProviderListener ?: return
+    locationProviderListener = null
+    LocationManagerCompat.removeUpdates(locationManager, listener)
+  }
+
+  private fun providerChanged(callback: LocationCallback) {
+    reportStatus()
+    checkLocationSettings(callback)
+  }
+
+  private fun reportStatus() {
+    onStatusChange?.invoke(context.toRNLocationPermissionResult())
+  }
+
   private fun checkLocationSettings(callback: LocationCallback) {
+    if (!isActive || callback !== locationCallback) return
+
     if (!LocationManagerCompat.isLocationEnabled(locationManager)) {
-      onError?.invoke(RNLocationErrorCode.SETTINGS_NOT_SATISFIED)
+      reportError(RNLocationErrorCode.SETTINGS_NOT_SATISFIED)
       return
     }
     val request = locationRequest ?: return
@@ -174,22 +230,46 @@ class LocationHandler(
     LocationServices
       .getSettingsClient(context)
       .checkLocationSettings(settingsRequest)
-      .addOnFailureListener { ex ->
-        if (callback !== locationCallback) return@addOnFailureListener
-        onError?.invoke(ex.toLocationErrorCode(context))
+      .addOnCompleteListener { task ->
+        if (!isActive || callback !== locationCallback) return@addOnCompleteListener
+        if (task.isSuccessful) {
+          lastReportedError = null
+          return@addOnCompleteListener
+        }
+        val ex = task.exception ?: return@addOnCompleteListener
+        reportError(ex.toLocationErrorCode(context))
       }
   }
 
-  @SuppressLint("MissingPermission")
+  // Several sources report the same state, e.g. provider change and availability.
+  private fun reportError(code: RNLocationErrorCode) {
+    if (lastReportedError == code) return
+    lastReportedError = code
+    onError?.invoke(code)
+  }
+
   fun start() {
-    if (isActive) return
+    isStarted = true
+    startUpdates()
+  }
+
+  fun stop() {
+    isStarted = false
+    stopUpdates()
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun startUpdates() {
+    if (isActive || !isEnabled) return
+    lastReportedError = null
+    reportStatus()
 
     val playServicesStatus =
       GoogleApiAvailability
         .getInstance()
         .isGooglePlayServicesAvailable(context)
     if (playServicesStatus != ConnectionResult.SUCCESS) {
-      onError?.invoke(RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE)
+      reportError(RNLocationErrorCode.PLAY_SERVICE_NOT_AVAILABLE)
       return
     }
 
@@ -201,18 +281,15 @@ class LocationHandler(
           if (!isNewerLocation(location)) return@addOnSuccessListener
           notifyListener(location)
         }.addOnFailureListener { e ->
-          onError?.invoke(e.toLocationErrorCode(context))
+          reportError(e.toLocationErrorCode(context))
         }
       locationCallback =
         object : LocationCallback() {
           override fun onLocationResult(locationResult: LocationResult) {
-            val location = locationResult.lastLocation
-            if (location != null) {
-              if (!isNewerLocation(location)) return
-              notifyListener(location)
-            } else {
-              onError?.invoke(RNLocationErrorCode.POSITION_UNAVAILABLE)
-            }
+            // An empty result is not an error, the provider keeps trying.
+            val location = locationResult.lastLocation ?: return
+            if (!isNewerLocation(location)) return
+            notifyListener(location)
           }
 
           override fun onLocationAvailability(availability: LocationAvailability) {
@@ -227,21 +304,22 @@ class LocationHandler(
       fusedLocationClientProviderClient
         .requestLocationUpdates(req, callback, Looper.getMainLooper())
         .addOnFailureListener { e ->
-          onError?.invoke(e.toLocationErrorCode(context))
+          reportError(e.toLocationErrorCode(context))
         }
       isActive = true
+      registerLocationProviderListener(callback)
       checkLocationSettings(callback)
     } catch (_: SecurityException) {
-      onError?.invoke(RNLocationErrorCode.PERMISSION_DENIED)
+      reportError(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {
-      val error = ex.toLocationErrorCode(context)
-      onError?.invoke(error)
+      reportError(ex.toLocationErrorCode(context))
     }
   }
 
-  fun stop() {
+  private fun stopUpdates() {
     if (!isActive) return
     isActive = false
+    unregisterLocationProviderListener()
     val callback = locationCallback ?: return
     fusedLocationClientProviderClient.removeLocationUpdates(callback)
     fusedLocationClientProviderClient.flushLocations()

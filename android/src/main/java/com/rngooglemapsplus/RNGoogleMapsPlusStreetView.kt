@@ -57,6 +57,13 @@ class RNGoogleMapsPlusStreetView(
       view.uiSettings = value
     }
 
+  override var locationConfig: RNLocationConfig? = null
+    set(value) {
+      if (field == value) return
+      field = value
+      view.locationConfig = value
+    }
+
   override var onPanoramaReady: ((Boolean) -> Unit)? = null
     set(cb) {
       view.onPanoramaReady = cb
@@ -70,6 +77,11 @@ class RNGoogleMapsPlusStreetView(
   override var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
     set(cb) {
       view.onLocationError = cb
+    }
+
+  override var onLocationStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
+    set(cb) {
+      view.onLocationStatusChange = cb
     }
 
   override var onPanoramaChange: ((RNStreetViewPanoramaLocation) -> Unit)? = null
@@ -128,6 +140,8 @@ class RNGoogleMapsPlusStreetView(
   override fun openLocationSettings() {
     locationHandler.openLocationSettings()
   }
+
+  override fun getLocationPermission(): RNLocationPermissionResult = permissionHandler.getLocationPermission()
 
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 

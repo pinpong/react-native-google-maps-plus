@@ -19,21 +19,8 @@ final class PermissionHandler: NSObject, CLLocationManagerDelegate {
 
     let status = manager.authorizationStatus
     switch status {
-    case .authorizedAlways, .authorizedWhenInUse:
-      promise.resolve(
-        withResult: RNLocationPermissionResult(
-          android: nil,
-          ios: RNIOSPermissionResult.authorized
-        )
-      )
-      return promise
-    case .denied, .restricted:
-      promise.resolve(
-        withResult: RNLocationPermissionResult(
-          android: nil,
-          ios: RNIOSPermissionResult.denied
-        )
-      )
+    case .authorizedAlways, .authorizedWhenInUse, .denied, .restricted:
+      promise.resolve(withResult: getLocationPermission())
       return promise
     case .notDetermined:
       break
@@ -47,27 +34,19 @@ final class PermissionHandler: NSObject, CLLocationManagerDelegate {
     return promise
   }
 
+  func getLocationPermission() -> RNLocationPermissionResult {
+    return manager.toRNLocationPermissionResult()
+  }
+
   func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
     guard !pendingPromises.isEmpty else { return }
+    guard manager.authorizationStatus != .notDetermined else { return }
 
-    let status: RNIOSPermissionResult
-    switch manager.authorizationStatus {
-    case .authorizedWhenInUse, .authorizedAlways:
-      status = RNIOSPermissionResult.authorized
-    case .denied, .restricted:
-      status = RNIOSPermissionResult.denied
-    case .notDetermined:
-      return
-    @unknown default:
-      status = RNIOSPermissionResult.denied
-    }
-
+    let result = getLocationPermission()
     let promises = pendingPromises
     pendingPromises.removeAll()
     promises.forEach {
-      $0.resolve(
-        withResult: RNLocationPermissionResult(android: nil, ios: status)
-      )
+      $0.resolve(withResult: result)
     }
   }
 }

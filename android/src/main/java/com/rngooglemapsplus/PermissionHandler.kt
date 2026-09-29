@@ -1,19 +1,20 @@
 package com.rngooglemapsplus
 
 import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 import com.margelo.nitro.core.Promise
+import com.rngooglemapsplus.extensions.toRNLocationPermissionResult
 
 private const val REQ_LOCATION = 1001
 
 class PermissionHandler(
   private val context: ReactContext,
 ) {
+  fun getLocationPermission(): RNLocationPermissionResult = context.toRNLocationPermissionResult()
+
   fun requestLocationPermission(): Promise<RNLocationPermissionResult> {
     val promise = Promise<RNLocationPermissionResult>()
 
@@ -23,20 +24,16 @@ class PermissionHandler(
         Manifest.permission.ACCESS_FINE_LOCATION,
       )
 
-    val alreadyGranted =
-      ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-      ) == PackageManager.PERMISSION_GRANTED
-    if (alreadyGranted) {
-      promise.resolve(RNLocationPermissionResult(RNAndroidLocationPermissionResult.GRANTED, null))
+    val current = getLocationPermission()
+    if (current.android == RNAndroidLocationPermissionResult.GRANTED) {
+      promise.resolve(current)
       return promise
     }
 
     UiThreadUtil.runOnUiThread {
       val hostActivity = context.currentActivity
       if (hostActivity !is PermissionAwareActivity) {
-        promise.resolve(RNLocationPermissionResult(RNAndroidLocationPermissionResult.DENIED, null))
+        promise.resolve(current)
         return@runOnUiThread
       }
 
@@ -51,59 +48,20 @@ class PermissionHandler(
           ): Boolean {
             if (requestCode != REQ_LOCATION) return false
 
-            var coarseGranted = false
-            var fineGranted = false
+            val result = getLocationPermission()
+            val neverAskAgain =
+              result.android == RNAndroidLocationPermissionResult.DENIED &&
+                context.currentActivity?.shouldShowRequestPermissionRationale(
+                  Manifest.permission.ACCESS_COARSE_LOCATION,
+                ) == false
 
-            for (i in permissions.indices) {
-              val p = permissions[i]
-              val r = grantResults.getOrNull(i) ?: continue
-              if (p == Manifest.permission.ACCESS_COARSE_LOCATION && r == PackageManager.PERMISSION_GRANTED) {
-                coarseGranted = true
-              }
-              if (p == Manifest.permission.ACCESS_FINE_LOCATION && r == PackageManager.PERMISSION_GRANTED) {
-                fineGranted = true
-              }
-            }
-
-            val hostActivity =
-              context.currentActivity ?: run {
-                promise.resolve(
-                  RNLocationPermissionResult(
-                    RNAndroidLocationPermissionResult.DENIED,
-                    null,
-                  ),
-                )
-                return true
-              }
-
-            val granted = coarseGranted || fineGranted
-            if (granted) {
-              promise.resolve(
-                RNLocationPermissionResult(
-                  RNAndroidLocationPermissionResult.GRANTED,
-                  null,
-                ),
-              )
-            } else {
-              val neverAskAgain =
-                !hostActivity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-
+            promise.resolve(
               if (neverAskAgain) {
-                promise.resolve(
-                  RNLocationPermissionResult(
-                    RNAndroidLocationPermissionResult.NEVER_ASK_AGAIN,
-                    null,
-                  ),
-                )
+                result.copy(android = RNAndroidLocationPermissionResult.NEVER_ASK_AGAIN)
               } else {
-                promise.resolve(
-                  RNLocationPermissionResult(
-                    RNAndroidLocationPermissionResult.DENIED,
-                    null,
-                  ),
-                )
-              }
-            }
+                result
+              },
+            )
 
             return true
           }

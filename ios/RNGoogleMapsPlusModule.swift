@@ -17,6 +17,10 @@ final class RNGoogleMapsPlusModule: HybridRNGoogleMapsPlusModuleSpec {
     locationHandler.openLocationSettings()
   }
 
+  func getLocationPermission() -> RNLocationPermissionResult {
+    return permissionHandler.getLocationPermission()
+  }
+
   func requestLocationPermission()
   -> NitroModules.Promise<RNLocationPermissionResult> {
     return permissionHandler.requestLocationPermission()

@@ -35,6 +35,11 @@ export default function GoogleMapPlusModuleScreen() {
         onPress: () => GoogleMapsModule.requestLocationPermission(),
       },
       {
+        label: 'Get location permission',
+        onPress: () =>
+          Alert.alert(JSON.stringify(GoogleMapsModule.getLocationPermission())),
+      },
+      {
         label: 'Show location enable dialog',
         onPress: () => GoogleMapsModule.showLocationDialog(),
       },

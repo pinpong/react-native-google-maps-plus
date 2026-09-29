@@ -295,6 +295,11 @@ class RNGoogleMapsPlusView(
       view.onLocationError = cb
     }
 
+  override var onLocationStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
+    set(cb) {
+      view.onLocationStatusChange = cb
+    }
+
   override var onMapPress: ((RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMapPress = cb
@@ -470,6 +475,8 @@ class RNGoogleMapsPlusView(
   override fun openLocationSettings() {
     locationHandler.openLocationSettings()
   }
+
+  override fun getLocationPermission(): RNLocationPermissionResult = permissionHandler.getLocationPermission()
 
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 

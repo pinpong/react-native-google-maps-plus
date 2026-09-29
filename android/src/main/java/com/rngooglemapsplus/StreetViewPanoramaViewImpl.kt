@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.StreetViewPanoramaCamera
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation
 import com.google.android.gms.maps.model.StreetViewPanoramaOrientation
 import com.google.android.gms.maps.model.StreetViewSource
+import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
 
@@ -125,6 +126,9 @@ class StreetViewPanoramaViewImpl(
     locationHandler.onError = { error ->
       onUi { onLocationError?.invoke(error) }
     }
+    locationHandler.onStatusChange = { status ->
+      onUi { onLocationStatusChange?.invoke(status) }
+    }
   }
 
   fun applyPanoramaProps() {
@@ -149,9 +153,22 @@ class StreetViewPanoramaViewImpl(
       }
     }
 
+  var locationConfig: RNLocationConfig? = null
+    set(value) {
+      field = value
+      locationHandler.updateConfig(
+        value?.enabled,
+        value?.android?.priority?.toGooglePriority(),
+        value?.android?.interval?.toLong(),
+        value?.android?.minUpdateInterval?.toLong(),
+        value?.android?.minUpdateDistanceMeters?.toFloat(),
+      )
+    }
+
   var onPanoramaReady: ((Boolean) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
   var onPanoramaChange: ((RNStreetViewPanoramaLocation) -> Unit)? = null
   var onCameraChange: ((RNStreetViewCamera) -> Unit)? = null
   var onPanoramaPress: ((RNStreetViewOrientation) -> Unit)? = null

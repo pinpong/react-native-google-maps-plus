@@ -202,6 +202,9 @@ class GoogleMapsViewImpl(
     locationHandler.onError = { error ->
       onUi { onLocationError?.invoke(error) }
     }
+    locationHandler.onStatusChange = { status ->
+      onUi { onLocationStatusChange?.invoke(status) }
+    }
   }
 
   fun applyMapProps() {
@@ -248,6 +251,7 @@ class GoogleMapsViewImpl(
   var myLocationEnabled: Boolean? = null
     set(value) {
       field = value
+      locationConfig = locationConfig
       onUi {
         try {
           googleMap?.isMyLocationEnabled = value ?: false
@@ -335,6 +339,7 @@ class GoogleMapsViewImpl(
     set(value) {
       field = value
       locationHandler.updateConfig(
+        value?.enabled == true || myLocationEnabled == true,
         value?.android?.priority?.toGooglePriority(),
         value?.android?.interval?.toLong(),
         value?.android?.minUpdateInterval?.toLong(),
@@ -346,6 +351,7 @@ class GoogleMapsViewImpl(
   var onMapLoaded: ((RNRegion, RNCamera) -> Unit)? = null
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMapLongPress: ((RNLatLng) -> Unit)? = null
   var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null

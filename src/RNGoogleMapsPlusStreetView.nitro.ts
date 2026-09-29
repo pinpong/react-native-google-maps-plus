@@ -1,6 +1,7 @@
 import type {
   RNLatLng,
   RNLocation,
+  RNLocationConfig,
   RNLocationErrorCode,
   RNLocationPermissionResult,
   RNMapErrorCode,
@@ -34,11 +35,38 @@ export interface RNGoogleMapsPlusStreetViewProps extends HybridViewProps {
    */
   onPanoramaReady?: (ready: boolean) => void;
 
-  /** Location update. */
+  /** Location subsystem config. See {@link RNLocationConfig}. */
+  locationConfig?: RNLocationConfig;
+
+  /**
+   * Location update.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
   onLocationUpdate?: (location: RNLocation) => void;
 
-  /** Location subsystem error. */
+  /**
+   * Location subsystem error.
+   *
+   * Reports an error once while it persists.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
   onLocationError?: (error: RNLocationErrorCode) => void;
+
+  /**
+   * Location permission or device location settings changed.
+   *
+   * Reports the status when location updates start, then every change while
+   * the view is active. Changes made in background are reported on return.
+   * Without location permission the device location switch is only reported
+   * when location updates start.
+   *
+   * The same status can be reported more than once.
+   *
+   * Requires location updates, see {@link RNLocationConfig}.
+   */
+  onLocationStatusChange?: (status: RNLocationPermissionResult) => void;
 
   /**
    * User or programmatic navigation moved to a new panorama.
@@ -120,6 +148,13 @@ export interface RNGoogleMapsPlusStreetViewMethods extends HybridViewMethods {
    * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
    */
   requestLocationPermission(): Promise<RNLocationPermissionResult>;
+
+  /**
+   * Returns the current location permission without prompting.
+   *
+   * @returns The permission result per platform. See {@link RNLocationPermissionResult}.
+   */
+  getLocationPermission(): RNLocationPermissionResult;
 
   /**
    * Checks Google Play Services availability.

@@ -101,6 +101,12 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
         self?.onLocationError?(error)
       }
     }
+
+    locationHandler.onStatusChange = { [weak self] status in
+      onMain {
+        self?.onLocationStatusChange?(status)
+      }
+    }
   }
 
   private func applyPanoramaProps() {
@@ -122,9 +128,22 @@ final class StreetViewPanoramaViewImpl: UIView, GMSPanoramaViewDelegate {
     }
   }
 
+  var locationConfig: RNLocationConfig? {
+    didSet {
+      locationHandler.updateConfig(
+        enabled: locationConfig?.enabled,
+        desiredAccuracy: locationConfig?.ios?.desiredAccuracy?
+          .toCLLocationAccuracy,
+        distanceFilterMeters: locationConfig?.ios?.distanceFilterMeters,
+        activityType: locationConfig?.ios?.activityType?.toCLActivityType,
+      )
+    }
+  }
+
   var onPanoramaReady: ((Bool) -> Void)?
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((RNLocationErrorCode) -> Void)?
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)?
   var onPanoramaChange: ((RNStreetViewPanoramaLocation) -> Void)?
   var onCameraChange: ((RNStreetViewCamera) -> Void)?
   var onPanoramaPress: ((RNStreetViewOrientation) -> Void)?

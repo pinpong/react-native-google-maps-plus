@@ -19,6 +19,7 @@ export default function LocationScreen() {
   const mapRef = useRef<GoogleMapsViewRef | null>(null);
   const navigation = useNavigation();
   const [locationConfig, setLocationConfig] = useState<RNLocationConfig>({
+    enabled: true,
     android: {
       priority: RNAndroidLocationPriority.PRIORITY_HIGH_ACCURACY,
       interval: 1000,
@@ -31,7 +32,7 @@ export default function LocationScreen() {
       activityType: RNIOSLocationActivityType.NAVIGATION,
     },
   });
-  const [dialogVisible, setDialogVisible] = useState(true);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   useHeaderButton(navigation, 'Edit', () => setDialogVisible(true));
 
