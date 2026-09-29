@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 
 import ControlPanel from '@src/components/ControlPanel';
 import MapWrapper from '@src/components/MapWrapper';
+import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   GoogleMapsViewRef,
@@ -37,7 +38,7 @@ export default function CameraTestScreen() {
         title: 'Set Camera to SF',
         onPress: () => {
           const camera: RNCameraUpdate = {
-            center: { latitude: 37.7749, longitude: -122.4194 },
+            center: SF_CENTER,
             zoom: 12,
             bearing: 0,
             tilt: 0,

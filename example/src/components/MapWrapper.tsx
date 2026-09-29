@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@src/hooks/useAppTheme';
 import { useMapCallbacks } from '@src/hooks/useMapCallbacks';
 import type { AppTheme } from '@src/theme';
+import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   GoogleMapsViewRef,
@@ -41,7 +42,7 @@ export default function MapWrapper(props: Props) {
   const initialProps: RNInitialProps = useMemo(
     () => ({
       camera: {
-        center: { latitude: 37.7749, longitude: -122.4194 },
+        center: SF_CENTER,
         zoom: 12,
       },
     }),

@@ -1,4 +1,5 @@
 import { weightData } from '@src/data/heatMapWeightData';
+import { SF_CENTER } from '@src/utils/mapUtils';
 
 import type {
   RNCircle,
@@ -21,13 +22,16 @@ export function randomColor() {
 export function makeSvgIcon(
   width: number,
   height: number,
-  color?: string
+  color?: string,
+  label?: string
 ): string {
   color = color ?? randomColor();
+
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 64 88">
   <path d="M32 2c-14.36 0-26 11.64-26 26 0 18.2 20.67 38.86 24.82 43.02a1.7 1.7 0 0 0 2.36 0C37.33 66.86 58 46.2 58 28 58 13.64 46.36 2 32 2z" fill="${color}" />
   <circle cx="32" cy="28" r="10" fill="#FFFFFF" />
+  ${label ? `<text x="32" y="33" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle" fill="${color}">${label}</text>` : ''}
   <ellipse cx="32" cy="82" rx="14" ry="4" fill="#000000" opacity="0.15" />
 </svg>`;
 }
@@ -304,7 +308,7 @@ export function makeRandomMarkerForStressTest(id: number): RNMarker {
   return {
     id: id.toString(),
     zIndex: id,
-    coordinate: randomCoordinates(37.7749, -122.4194, 0.2),
+    coordinate: randomCoordinates(SF_CENTER.latitude, SF_CENTER.longitude, 0.2),
     draggable: false,
     iconSvg: customIcon
       ? {
