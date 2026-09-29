@@ -9,6 +9,7 @@ import {
   type RNLatLng,
   type RNLocation,
   RNLocationErrorCode,
+  type RNLocationPermissionResult,
   RNMapErrorCode,
   type RNRegion,
 } from 'react-native-google-maps-plus';
@@ -203,6 +204,15 @@ export function useMapCallbacks(
     )
   );
 
+  const onLocationStatusChange = useNitroCallback(
+    props.onLocationStatusChange,
+    useCallback(
+      (s: RNLocationPermissionResult) =>
+        console.log('Location status change:', s),
+      []
+    )
+  );
+
   return {
     hybridRef,
     onMapError,
@@ -230,5 +240,6 @@ export function useMapCallbacks(
     onCameraChangeComplete,
     onLocationUpdate,
     onLocationError,
+    onLocationStatusChange,
   };
 }

@@ -36,6 +36,10 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
     didSet { impl.uiSettings = uiSettings }
   }
 
+  var locationConfig: RNLocationConfig? {
+    didSet { impl.locationConfig = locationConfig }
+  }
+
   var onPanoramaReady: ((Bool) -> Void)? {
     didSet { impl.onPanoramaReady = onPanoramaReady }
   }
@@ -44,6 +48,9 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
   }
   var onLocationError: ((RNLocationErrorCode) -> Void)? {
     didSet { impl.onLocationError = onLocationError }
+  }
+  var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)? {
+    didSet { impl.onLocationStatusChange = onLocationStatusChange }
   }
   var onPanoramaChange: ((RNStreetViewPanoramaLocation) -> Void)? {
     didSet { impl.onPanoramaChange = onPanoramaChange }
@@ -83,6 +90,10 @@ final class RNGoogleMapsPlusStreetView: HybridRNGoogleMapsPlusStreetViewSpec {
 
   func openLocationSettings() {
     locationHandler.openLocationSettings()
+  }
+
+  func getLocationPermission() -> RNLocationPermissionResult {
+    return permissionHandler.getLocationPermission()
   }
 
   func requestLocationPermission() -> NitroModules.Promise<RNLocationPermissionResult> {

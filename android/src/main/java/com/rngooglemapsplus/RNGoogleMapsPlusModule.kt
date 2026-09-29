@@ -16,6 +16,8 @@ class RNGoogleMapsPlusModule : HybridRNGoogleMapsPlusModuleSpec() {
     locationHandler.openLocationSettings()
   }
 
+  override fun getLocationPermission(): RNLocationPermissionResult = permissionHandler.getLocationPermission()
+
   override fun requestLocationPermission(): Promise<RNLocationPermissionResult> = permissionHandler.requestLocationPermission()
 
   override fun isGooglePlayServicesAvailable(): Boolean = playServicesHandler.isPlayServicesAvailable()

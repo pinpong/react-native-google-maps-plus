@@ -750,6 +750,14 @@ export type RNIndoorLevel = {
 /** Location configuration. */
 export type RNLocationConfig = {
   /**
+   * Enables location updates.
+   *
+   * Location updates also run while `myLocationEnabled` is set.
+   * @defaultValue `false`
+   */
+  enabled?: boolean;
+
+  /**
    * Android-specific location configuration.
    *
    * See {@link RNAndroidLocationConfig}.
@@ -856,6 +864,23 @@ export enum RNIOSLocationActivityType {
 /** Combined location permission result. */
 export type RNLocationPermissionResult = {
   /**
+   * Granted location accuracy.
+   *
+   * See {@link RNLocationPermissionAccuracy}.
+   */
+  accuracy: RNLocationPermissionAccuracy;
+
+  /**
+   * Whether location services are enabled device-wide.
+   *
+   * Android: independent of the app's permission, the device switch can be
+   * off while the permission is granted, and vice versa.
+   * iOS: switching the services off reports the permission as denied as
+   * well, so this flag tells the two causes of a denial apart.
+   */
+  locationServicesEnabled: boolean;
+
+  /**
    * Android permission result.
    *
    * See {@link RNAndroidLocationPermissionResult}.
@@ -869,6 +894,27 @@ export type RNLocationPermissionResult = {
    */
   ios?: RNIOSPermissionResult;
 };
+
+/** Granted location accuracy. */
+export enum RNLocationPermissionAccuracy {
+  /** No location access granted. */
+  NONE = 0,
+  /**
+   * Approximate location only.
+   *
+   * Android: only `ACCESS_COARSE_LOCATION` is granted.
+   * iOS: reduced accuracy, e.g. with `NSLocationDefaultAccuracyReduced` or
+   * with "Precise Location" switched off.
+   */
+  APPROXIMATE = 1,
+  /**
+   * Precise location.
+   *
+   * Android: `ACCESS_FINE_LOCATION` is granted.
+   * iOS: full accuracy.
+   */
+  PRECISE = 2,
+}
 
 /** Android location permission results. */
 export enum RNAndroidLocationPermissionResult {
@@ -1102,7 +1148,11 @@ export enum RNLocationErrorCode {
   /** The device was unable to determine a position. */
   POSITION_UNAVAILABLE = 2,
 
-  /** The location request timed out. */
+  /**
+   * The location request timed out.
+   *
+   * Not reported on Android and iOS.
+   */
   TIMEOUT = 3,
 
   /** Required Google Play Services are not available. */

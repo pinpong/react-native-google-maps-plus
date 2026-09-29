@@ -8,6 +8,7 @@ import {
   type GoogleMapsStreetViewRef,
   type RNLocation,
   RNLocationErrorCode,
+  type RNLocationPermissionResult,
   type RNMapErrorCode,
   type RNStreetViewCamera,
   type RNStreetViewOrientation,
@@ -40,6 +41,9 @@ export default function StreetViewScreen() {
       panningGesturesEnabled: true,
       zoomGesturesEnabled: true,
     },
+    locationConfig: {
+      enabled: true,
+    },
   });
   const [dialogVisible, setDialogVisible] = useState(true);
   const [currentCamera, setCurrentCamera] = useState<RNStreetViewCamera | null>(
@@ -68,6 +72,14 @@ export default function StreetViewScreen() {
   const onLocationError = useNitroCallback(
     useCallback(
       (e: RNLocationErrorCode) => console.log('Location error:', e),
+      []
+    )
+  );
+
+  const onLocationStatusChange = useNitroCallback(
+    useCallback(
+      (s: RNLocationPermissionResult) =>
+        console.log('Location status change:', s),
       []
     )
   );
@@ -200,9 +212,11 @@ export default function StreetViewScreen() {
             style={styles.streetView}
             initialProps={config.initialProps}
             uiSettings={config.uiSettings}
+            locationConfig={config.locationConfig}
             onPanoramaReady={onPanoramaReady}
             onLocationUpdate={onLocationUpdate}
             onLocationError={onLocationError}
+            onLocationStatusChange={onLocationStatusChange}
             onPanoramaChange={onPanoramaChange}
             onCameraChange={onCameraChange}
             onPanoramaPress={onPanoramaPress}
