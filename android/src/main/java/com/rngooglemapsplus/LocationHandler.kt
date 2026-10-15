@@ -3,7 +3,6 @@ package com.rngooglemapsplus
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.hardware.GeomagneticField
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -29,10 +28,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
+import com.rngooglemapsplus.extensions.angularDistanceTo
+import com.rngooglemapsplus.extensions.declination
 import com.rngooglemapsplus.extensions.toLocationErrorCode
+import com.rngooglemapsplus.extensions.toRNHeading
 import com.rngooglemapsplus.extensions.toRNLocationPermissionResult
-import kotlin.math.abs
-import kotlin.math.min
 
 private const val REQ_LOCATION_SETTINGS = 2001
 private const val PRIORITY_DEFAULT = Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -189,13 +189,7 @@ class LocationHandler(
 
   private fun notifyListener(location: Location) {
     lastLocation = location
-    declination =
-      GeomagneticField(
-        location.latitude.toFloat(),
-        location.longitude.toFloat(),
-        location.altitude.toFloat(),
-        location.time,
-      ).declination.toDouble()
+    declination = location.declination()
     listener?.onLocationChanged(location)
     onUpdate?.invoke(location)
   }
@@ -370,25 +364,14 @@ class LocationHandler(
     if (headingListener != null) return
     val manager = sensorManager ?: return
     val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
-    val rotationMatrix = FloatArray(9)
-    val orientation = FloatArray(3)
     val listener =
       object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
-          SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-          SensorManager.getOrientation(rotationMatrix, orientation)
-          val heading = normalizeDegrees(Math.toDegrees(orientation[0].toDouble()) + declination)
-          val previous = lastHeading
-          if (previous != null && angularDistance(previous, heading) < headingFilterDegrees) return
-          lastHeading = heading
-          // values[4] is the estimated heading accuracy in radians, -1 when unavailable.
-          val accuracy =
-            if (event.values.size > 4 && event.values[4] >= 0f) {
-              Math.toDegrees(event.values[4].toDouble())
-            } else {
-              -1.0
-            }
-          onHeading?.invoke(RNHeading(heading, accuracy, System.currentTimeMillis().toDouble()))
+          val heading = event.toRNHeading(declination)
+          val change = lastHeading?.angularDistanceTo(heading.heading)
+          if (change != null && change < headingFilterDegrees) return
+          lastHeading = heading.heading
+          onHeading?.invoke(heading)
         }
 
         override fun onAccuracyChanged(
@@ -405,16 +388,6 @@ class LocationHandler(
     headingListener = null
     lastHeading = null
     sensorManager?.unregisterListener(listener)
-  }
-
-  private fun normalizeDegrees(degrees: Double): Double = ((degrees % 360) + 360) % 360
-
-  private fun angularDistance(
-    a: Double,
-    b: Double,
-  ): Double {
-    val difference = abs(a - b) % 360
-    return min(difference, 360 - difference)
   }
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {
