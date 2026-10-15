@@ -3,6 +3,11 @@ package com.rngooglemapsplus
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.hardware.GeomagneticField
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -26,12 +31,15 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNLocationPermissionResult
+import kotlin.math.abs
+import kotlin.math.min
 
 private const val REQ_LOCATION_SETTINGS = 2001
 private const val PRIORITY_DEFAULT = Priority.PRIORITY_BALANCED_POWER_ACCURACY
 private const val INTERVAL_DEFAULT = 600000L
 private const val MIN_UPDATE_INTERVAL = 3600000L
 private const val MIN_UPDATE_DISTANCE_METERS = 0f
+private const val HEADING_FILTER_DEGREES = 1.0
 
 class LocationHandler(
   private val context: ReactContext,
@@ -40,6 +48,8 @@ class LocationHandler(
     LocationServices.getFusedLocationProviderClient(context)
   private val locationManager: LocationManager =
     context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+  private val sensorManager: SensorManager? =
+    context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
   private var listener: LocationSource.OnLocationChangedListener? = null
   private var locationRequest: LocationRequest? = null
   private var locationCallback: LocationCallback? = null
@@ -49,6 +59,11 @@ class LocationHandler(
   private var isActive = false
   private var isStarted = false
   private var isEnabled = false
+  private var isHeadingEnabled = false
+  private var headingFilterDegrees: Double = HEADING_FILTER_DEGREES
+  private var headingListener: SensorEventListener? = null
+  private var lastHeading: Double? = null
+  private var declination = 0.0
 
   private var priority: Int = PRIORITY_DEFAULT
   private var interval: Long = INTERVAL_DEFAULT
@@ -58,6 +73,7 @@ class LocationHandler(
   var onUpdate: ((Location) -> Unit)? = null
   var onError: ((RNLocationErrorCode) -> Unit)? = null
   var onStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
+  var onHeading: ((RNHeading) -> Unit)? = null
 
   init {
     buildLocationRequest(priority, interval, minUpdateInterval, minUpdateDistanceMeters)
@@ -69,10 +85,14 @@ class LocationHandler(
     interval: Long? = null,
     minUpdateInterval: Long? = null,
     minUpdateDistanceMeters: Float? = null,
+    headingEnabled: Boolean? = null,
+    headingFilterDegrees: Double? = null,
   ) {
     val wasEnabled = isEnabled
     val previousRequest = locationRequest
     isEnabled = enabled ?: false
+    isHeadingEnabled = headingEnabled ?: false
+    this.headingFilterDegrees = headingFilterDegrees ?: HEADING_FILTER_DEGREES
     this.priority = priority ?: PRIORITY_DEFAULT
     this.interval = interval ?: INTERVAL_DEFAULT
     this.minUpdateInterval = minUpdateInterval ?: MIN_UPDATE_INTERVAL
@@ -85,7 +105,10 @@ class LocationHandler(
     )
 
     if (!isStarted) return
-    if (isEnabled == wasEnabled && locationRequest == previousRequest) return
+    if (isEnabled == wasEnabled && locationRequest == previousRequest) {
+      updateHeadingUpdates()
+      return
+    }
     stopUpdates()
     startUpdates()
   }
@@ -166,6 +189,13 @@ class LocationHandler(
 
   private fun notifyListener(location: Location) {
     lastLocation = location
+    declination =
+      GeomagneticField(
+        location.latitude.toFloat(),
+        location.longitude.toFloat(),
+        location.altitude.toFloat(),
+        location.time,
+      ).declination.toDouble()
     listener?.onLocationChanged(location)
     onUpdate?.invoke(location)
   }
@@ -309,6 +339,7 @@ class LocationHandler(
       isActive = true
       registerLocationProviderListener(callback)
       checkLocationSettings(callback)
+      updateHeadingUpdates()
     } catch (_: SecurityException) {
       reportError(RNLocationErrorCode.PERMISSION_DENIED)
     } catch (ex: Exception) {
@@ -319,11 +350,71 @@ class LocationHandler(
   private fun stopUpdates() {
     if (!isActive) return
     isActive = false
+    updateHeadingUpdates()
     unregisterLocationProviderListener()
     val callback = locationCallback ?: return
     fusedLocationClientProviderClient.removeLocationUpdates(callback)
     fusedLocationClientProviderClient.flushLocations()
     locationCallback = null
+  }
+
+  private fun updateHeadingUpdates() {
+    if (isActive && isHeadingEnabled) {
+      startHeadingUpdates()
+    } else {
+      stopHeadingUpdates()
+    }
+  }
+
+  private fun startHeadingUpdates() {
+    if (headingListener != null) return
+    val manager = sensorManager ?: return
+    val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
+    val rotationMatrix = FloatArray(9)
+    val orientation = FloatArray(3)
+    val listener =
+      object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+          SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+          SensorManager.getOrientation(rotationMatrix, orientation)
+          val heading = normalizeDegrees(Math.toDegrees(orientation[0].toDouble()) + declination)
+          val previous = lastHeading
+          if (previous != null && angularDistance(previous, heading) < headingFilterDegrees) return
+          lastHeading = heading
+          // values[4] is the estimated heading accuracy in radians, -1 when unavailable.
+          val accuracy =
+            if (event.values.size > 4 && event.values[4] >= 0f) {
+              Math.toDegrees(event.values[4].toDouble())
+            } else {
+              -1.0
+            }
+          onHeading?.invoke(RNHeading(heading, accuracy, System.currentTimeMillis().toDouble()))
+        }
+
+        override fun onAccuracyChanged(
+          sensor: Sensor,
+          accuracy: Int,
+        ) = Unit
+      }
+    manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
+    headingListener = listener
+  }
+
+  private fun stopHeadingUpdates() {
+    val listener = headingListener ?: return
+    headingListener = null
+    lastHeading = null
+    sensorManager?.unregisterListener(listener)
+  }
+
+  private fun normalizeDegrees(degrees: Double): Double = ((degrees % 360) + 360) % 360
+
+  private fun angularDistance(
+    a: Double,
+    b: Double,
+  ): Double {
+    val difference = abs(a - b) % 360
+    return min(difference, 360 - difference)
   }
 
   override fun activate(listener: LocationSource.OnLocationChangedListener) {

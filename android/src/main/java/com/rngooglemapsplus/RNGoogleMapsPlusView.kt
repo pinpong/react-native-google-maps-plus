@@ -305,6 +305,11 @@ class RNGoogleMapsPlusView(
       view.onLocationStatusChange = cb
     }
 
+  override var onHeadingUpdate: ((RNHeading) -> Unit)? = null
+    set(cb) {
+      view.onHeadingUpdate = cb
+    }
+
   override var onMapPress: ((RNLatLng) -> Unit)? = null
     set(cb) {
       view.onMapPress = cb

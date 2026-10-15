@@ -209,6 +209,9 @@ class GoogleMapsViewImpl(
     locationHandler.onStatusChange = { status ->
       onUi { onLocationStatusChange?.invoke(status) }
     }
+    locationHandler.onHeading = { heading ->
+      onUi { onHeadingUpdate?.invoke(heading) }
+    }
   }
 
   fun applyMapProps() {
@@ -348,6 +351,8 @@ class GoogleMapsViewImpl(
         value?.android?.interval?.toLong(),
         value?.android?.minUpdateInterval?.toLong(),
         value?.android?.minUpdateDistanceMeters?.toFloat(),
+        value?.heading?.enabled,
+        value?.heading?.filterDegrees,
       )
     }
 
@@ -357,6 +362,7 @@ class GoogleMapsViewImpl(
   var onLocationUpdate: ((RNLocation) -> Unit)? = null
   var onLocationError: ((RNLocationErrorCode) -> Unit)? = null
   var onLocationStatusChange: ((RNLocationPermissionResult) -> Unit)? = null
+  var onHeadingUpdate: ((RNHeading) -> Unit)? = null
   var onMapPress: ((RNLatLng) -> Unit)? = null
   var onMapLongPress: ((RNLatLng) -> Unit)? = null
   var onPoiPress: ((String, String, RNLatLng) -> Unit)? = null

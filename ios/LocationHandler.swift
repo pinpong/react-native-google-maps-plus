@@ -7,6 +7,7 @@ private let kCLLocationAccuracyDefault: CLLocationAccuracy =
 private let kCLDistanceFilterNoneDefault: CLLocationDistance =
   kCLDistanceFilterNone
 private let kCLActivityTypeDefault: CLActivityType = .other
+private let kCLHeadingFilterDefault: CLLocationDegrees = 1
 
 final class LocationHandler: NSObject, CLLocationManagerDelegate {
 
@@ -15,6 +16,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   private var isActive = false
   private var isStarted = false
   private var isEnabled = false
+  private var isHeadingEnabled = false
   private var lastReportedError: RNLocationErrorCode?
 
   private var currentDesiredAccuracy: CLLocationAccuracy =
@@ -26,6 +28,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
   var onUpdate: ((CLLocation) -> Void)?
   var onError: ((RNLocationErrorCode) -> Void)?
   var onStatusChange: ((RNLocationPermissionResult) -> Void)?
+  var onHeading: ((CLHeading) -> Void)?
 
   override init() {
     super.init()
@@ -37,7 +40,9 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     enabled: Bool?,
     desiredAccuracy: CLLocationAccuracy?,
     distanceFilterMeters: CLLocationDistance?,
-    activityType: CLActivityType?
+    activityType: CLActivityType?,
+    headingEnabled: Bool? = nil,
+    headingFilterDegrees: CLLocationDegrees? = nil
   ) {
     currentDesiredAccuracy = desiredAccuracy ?? kCLLocationAccuracyDefault
     manager.desiredAccuracy = currentDesiredAccuracy
@@ -48,12 +53,24 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     currentActivityType = activityType ?? kCLActivityTypeDefault
     manager.activityType = currentActivityType
 
+    manager.headingFilter = headingFilterDegrees ?? kCLHeadingFilterDefault
+    isHeadingEnabled = headingEnabled ?? false
+
     isEnabled = enabled ?? false
     guard isStarted else { return }
     if isEnabled {
       startUpdates()
     } else {
       stopUpdates()
+    }
+    updateHeadingUpdates()
+  }
+
+  private func updateHeadingUpdates() {
+    if isActive, isHeadingEnabled, CLLocationManager.headingAvailable() {
+      manager.startUpdatingHeading()
+    } else {
+      manager.stopUpdatingHeading()
     }
   }
 
@@ -138,12 +155,14 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     isActive = true
     lastReportedError = nil
     checkLocationSettings()
+    updateHeadingUpdates()
   }
 
   private func stopUpdates() {
     guard isActive else { return }
     isActive = false
     manager.stopUpdatingLocation()
+    updateHeadingUpdates()
   }
 
   func openLocationSettings() {
@@ -181,6 +200,21 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     guard let loc = locations.last else { return }
     lastReportedError = nil
     onUpdate?(loc)
+  }
+
+  func locationManager(
+    _ manager: CLLocationManager,
+    didUpdateHeading newHeading: CLHeading
+  ) {
+    // A negative accuracy means the heading could not be determined.
+    guard isActive, newHeading.headingAccuracy >= 0 else { return }
+    onHeading?(newHeading)
+  }
+
+  func locationManagerShouldDisplayHeadingCalibration(
+    _ manager: CLLocationManager
+  ) -> Bool {
+    return false
   }
 
   private static func topMostViewController() -> UIViewController? {

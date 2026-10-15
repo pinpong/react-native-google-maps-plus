@@ -2,6 +2,7 @@ import type {
   RNCamera,
   RNCameraUpdate,
   RNCircle,
+  RNHeading,
   RNHeatmap,
   RNIndoorBuilding,
   RNIndoorLevel,
@@ -172,6 +173,13 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
    * Requires location updates, see {@link RNLocationConfig}.
    */
   onLocationStatusChange?: (status: RNLocationPermissionResult) => void;
+
+  /**
+   * Compass heading update.
+   *
+   * Requires heading updates, see {@link RNHeadingConfig}.
+   */
+  onHeadingUpdate?: (heading: RNHeading) => void;
 
   /** Tap on map. */
   onMapPress?: (coordinate: RNLatLng) => void;

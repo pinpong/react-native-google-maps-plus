@@ -866,6 +866,30 @@ export type RNLocationConfig = {
    * See {@link RNIOSLocationConfig}.
    */
   ios?: RNIOSLocationConfig;
+
+  /**
+   * Compass heading configuration.
+   *
+   * See {@link RNHeadingConfig}.
+   */
+  heading?: RNHeadingConfig;
+};
+
+/** Compass heading configuration. */
+export type RNHeadingConfig = {
+  /**
+   * Enables compass heading updates.
+   *
+   * Heading updates only run while location updates run.
+   * @defaultValue `false`
+   */
+  enabled?: boolean;
+
+  /**
+   * Minimum change in degrees before a new heading is delivered.
+   * @defaultValue `1`
+   */
+  filterDegrees?: number;
 };
 
 /** Android location configuration. */
@@ -1029,6 +1053,24 @@ export enum RNIOSPermissionResult {
   /** Permission was granted. */
   AUTHORIZED = 1,
 }
+
+/** Compass heading. */
+export type RNHeading = {
+  /**
+   * Direction the top of the device points to, in degrees clockwise from
+   * true north (0–360). Falls back to magnetic north when true north is not
+   * available.
+   */
+  heading: number;
+
+  /**
+   * Maximum deviation in degrees, `-1` when unknown.
+   */
+  accuracy: number;
+
+  /** Timestamp in milliseconds since Unix epoch. */
+  time: number;
+};
 
 /** Location object. */
 export type RNLocation = {
