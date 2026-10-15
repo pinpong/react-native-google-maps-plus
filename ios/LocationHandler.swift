@@ -206,8 +206,7 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     _ manager: CLLocationManager,
     didUpdateHeading newHeading: CLHeading
   ) {
-    // A negative accuracy means the heading could not be determined.
-    guard isActive, newHeading.headingAccuracy >= 0 else { return }
+    guard isActive else { return }
     onHeading?(newHeading)
   }
 

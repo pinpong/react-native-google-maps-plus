@@ -1059,7 +1059,8 @@ export type RNHeading = {
   /**
    * Direction the top of the device points to, in degrees clockwise from
    * true north (0–360). Falls back to magnetic north when true north is not
-   * available.
+   * available. `-1` when the heading is invalid, e.g. iOS during strong
+   * magnetic interference.
    */
   heading: number;
 
