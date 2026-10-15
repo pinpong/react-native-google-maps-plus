@@ -211,12 +211,6 @@ final class LocationHandler: NSObject, CLLocationManagerDelegate {
     onHeading?(newHeading)
   }
 
-  func locationManagerShouldDisplayHeadingCalibration(
-    _ manager: CLLocationManager
-  ) -> Bool {
-    return false
-  }
-
   private static func topMostViewController() -> UIViewController? {
     let scenes = UIApplication.shared.connectedScenes
       .compactMap { $0 as? UIWindowScene }
