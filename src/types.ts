@@ -1088,10 +1088,10 @@ export type RNLocation = {
   /** Accuracy in meters. */
   accuracy: number;
 
-  /** Bearing in degrees. */
+  /** Bearing in degrees, `-1` when unknown. */
   bearing: number;
 
-  /** Speed in meters per second. */
+  /** Speed in meters per second, `-1` when unknown. */
   speed: number;
 
   /** Timestamp in milliseconds since Unix epoch. */
