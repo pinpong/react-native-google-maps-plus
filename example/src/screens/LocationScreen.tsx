@@ -31,6 +31,10 @@ export default function LocationScreen() {
       distanceFilterMeters: 10,
       activityType: RNIOSLocationActivityType.NAVIGATION,
     },
+    heading: {
+      enabled: true,
+      filterDegrees: 5,
+    },
   });
   const [dialogVisible, setDialogVisible] = useState(false);
 

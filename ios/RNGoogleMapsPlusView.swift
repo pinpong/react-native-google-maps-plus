@@ -292,6 +292,9 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)? {
     didSet { impl.onLocationStatusChange = onLocationStatusChange }
   }
+  var onHeadingUpdate: ((RNHeading) -> Void)? {
+    didSet { impl.onHeadingUpdate = onHeadingUpdate }
+  }
   var onMapPress: ((RNLatLng) -> Void)? {
     didSet { impl.onMapPress = onMapPress }
   }

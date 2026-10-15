@@ -123,6 +123,12 @@ GMSIndoorDisplayDelegate {
         self?.onLocationStatusChange?(status)
       }
     }
+
+    locationHandler.onHeading = { [weak self] heading in
+      onMain {
+        self?.onHeadingUpdate?(heading.toRNHeading())
+      }
+    }
   }
 
   private func applyMapProps() {
@@ -287,6 +293,8 @@ GMSIndoorDisplayDelegate {
           .toCLLocationAccuracy,
         distanceFilterMeters: locationConfig?.ios?.distanceFilterMeters,
         activityType: locationConfig?.ios?.activityType?.toCLActivityType,
+        headingEnabled: locationConfig?.heading?.enabled,
+        headingFilterDegrees: locationConfig?.heading?.filterDegrees,
       )
     }
   }
@@ -297,6 +305,7 @@ GMSIndoorDisplayDelegate {
   var onLocationUpdate: ((RNLocation) -> Void)?
   var onLocationError: ((RNLocationErrorCode) -> Void)?
   var onLocationStatusChange: ((RNLocationPermissionResult) -> Void)?
+  var onHeadingUpdate: ((RNHeading) -> Void)?
   var onMapPress: ((RNLatLng) -> Void)?
   var onMapLongPress: ((RNLatLng) -> Void)?
   var onPoiPress: ((String, String, RNLatLng) -> Void)?

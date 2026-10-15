@@ -302,10 +302,16 @@ export const RNIOSLocationConfigValidator = object({
   activityType: optional(enums(enumValues(RNIOSLocationActivityType))),
 });
 
+const RNHeadingConfigValidator = object({
+  enabled: optional(boolean()),
+  filterDegrees: optional(number()),
+});
+
 export const RNLocationConfigValidator = object({
   enabled: optional(boolean()),
   android: optional(RNAndroidLocationConfigValidator),
   ios: optional(RNIOSLocationConfigValidator),
+  heading: optional(RNHeadingConfigValidator),
 });
 
 export const RNLocationPermissionResultValidator = object({

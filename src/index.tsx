@@ -104,8 +104,8 @@
  *
  * Location updates are off by default. They run while `myLocationEnabled` or
  * `locationConfig.enabled` is set and the view is visible, and stop in
- * background. `onLocationUpdate`, `onLocationError` and
- * `onLocationStatusChange` only fire while they run.
+ * background. `onLocationUpdate`, `onLocationError`, `onLocationStatusChange`
+ * and `onHeadingUpdate` only fire while they run.
  *
  * `getLocationPermission` and `requestLocationPermission` work independently
  * of that.

@@ -4,6 +4,7 @@ import {
   type GoogleMapsViewRef,
   type RNCamera,
   type RNGoogleMapsPlusViewProps,
+  type RNHeading,
   type RNIndoorBuilding,
   type RNIndoorLevel,
   type RNLatLng,
@@ -223,6 +224,11 @@ export function useMapCallbacks(
     )
   );
 
+  const onHeadingUpdate = useNitroCallback(
+    props.onHeadingUpdate,
+    useCallback((h: RNHeading) => console.log('Heading:', h), [])
+  );
+
   return {
     hybridRef,
     onMapError,
@@ -252,5 +258,6 @@ export function useMapCallbacks(
     onLocationUpdate,
     onLocationError,
     onLocationStatusChange,
+    onHeadingUpdate,
   };
 }
