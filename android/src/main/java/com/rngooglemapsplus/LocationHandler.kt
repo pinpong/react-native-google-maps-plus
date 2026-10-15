@@ -3,6 +3,7 @@ package com.rngooglemapsplus
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.hardware.GeomagneticField
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -29,7 +30,6 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.LocationSource
 import com.rngooglemapsplus.extensions.angularDistanceTo
-import com.rngooglemapsplus.extensions.declination
 import com.rngooglemapsplus.extensions.toLocationErrorCode
 import com.rngooglemapsplus.extensions.toRNHeading
 import com.rngooglemapsplus.extensions.toRNLocationPermissionResult
@@ -189,7 +189,13 @@ class LocationHandler(
 
   private fun notifyListener(location: Location) {
     lastLocation = location
-    declination = location.declination()
+    declination =
+      GeomagneticField(
+        location.latitude.toFloat(),
+        location.longitude.toFloat(),
+        location.altitude.toFloat(),
+        location.time,
+      ).declination.toDouble()
     listener?.onLocationChanged(location)
     onUpdate?.invoke(location)
   }

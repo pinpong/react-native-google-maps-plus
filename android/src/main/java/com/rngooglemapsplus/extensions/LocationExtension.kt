@@ -1,6 +1,5 @@
 package com.rngooglemapsplus.extensions
 
-import android.hardware.GeomagneticField
 import android.location.Location
 import android.os.Build
 import androidx.core.location.LocationCompat
@@ -94,11 +93,3 @@ fun Location.toRNLocation(): RNLocation =
       ),
     ios = null,
   )
-
-fun Location.declination(): Double =
-  GeomagneticField(
-    latitude.toFloat(),
-    longitude.toFloat(),
-    altitude.toFloat(),
-    time,
-  ).declination.toDouble()
