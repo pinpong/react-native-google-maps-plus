@@ -12,8 +12,9 @@ fun Location.toRNLocation(): RNLocation =
     center = RNLatLng(latitude, longitude),
     altitude = altitude,
     accuracy = accuracy.toDouble(),
-    bearing = bearing.toDouble(),
-    speed = speed.toDouble(),
+    // getBearing() and getSpeed() return 0 when unknown, iOS reports -1.
+    bearing = if (hasBearing()) bearing.toDouble() else -1.0,
+    speed = if (hasSpeed()) speed.toDouble() else -1.0,
     time = time.toDouble(),
     android =
       RNLocationAndroid(
