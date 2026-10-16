@@ -19,6 +19,15 @@
   "navigationLinks": {
     "GitHub": "https://github.com/pinpong/react-native-google-maps-plus"
   },
+  "sidebarLinks": {
+    "Installation": "https://pinpong.github.io/react-native-google-maps-plus/#installation",
+    "Upgrading from 1.x": "https://pinpong.github.io/react-native-google-maps-plus/#upgrading-from-1x",
+    "Location": "https://pinpong.github.io/react-native-google-maps-plus/#location",
+    "SVG markers": "https://pinpong.github.io/react-native-google-maps-plus/#svg-markers",
+    "Advanced markers": "https://pinpong.github.io/react-native-google-maps-plus/#advanced-markers",
+    "Troubleshooting": "https://pinpong.github.io/react-native-google-maps-plus/#troubleshooting",
+    "Limitations": "https://pinpong.github.io/react-native-google-maps-plus/#limitations"
+  },
   "visibilityFilters": {
     "inherited": true,
     "external": true,

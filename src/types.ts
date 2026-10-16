@@ -539,7 +539,7 @@ export type RNMarkerSvg = {
    * `font-family` finds the system fonts and the fonts bundled with the app by
    * their file name, e.g. `Roboto-Bold`, or their family, e.g. `Roboto`.
    *
-   * See "SVG markers" in the README for the known limitations.
+   * See [SVG markers](https://pinpong.github.io/react-native-google-maps-plus/#svg-markers) in the docs.
    */
   svgString: string;
 };
