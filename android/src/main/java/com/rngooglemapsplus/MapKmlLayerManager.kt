@@ -1,21 +1,19 @@
 package com.rngooglemapsplus
 
-import android.content.Context
 import com.google.android.gms.maps.GoogleMap
-import com.google.maps.android.data.kml.KmlLayer
+import com.google.maps.android.data.renderer.mapview.MapViewRenderer
 import com.rngooglemapsplus.extensions.kmlLayerEquals
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
+import kotlinx.coroutines.Job
 
 private class KmlLayerState(
   val current: RNKMLayer,
 ) {
-  var layer: KmlLayer? = null
+  var renderer: MapViewRenderer? = null
+  var parseJob: Job? = null
 }
 
 class MapKmlLayerManager(
-  private val context: Context,
-  private val mapErrorHandler: MapErrorHandler,
+  private val builder: MapKmlLayerBuilder,
 ) {
   private var map: GoogleMap? = null
   private val states = mutableMapOf<String, KmlLayerState>()
@@ -25,7 +23,7 @@ class MapKmlLayerManager(
     onUi {
       if (destroyed) return@onUi
       this.map = map
-      states.values.filter { it.layer == null }.forEach { addToMap(it) }
+      states.values.filter { it.renderer == null && it.parseJob == null }.forEach { addToMap(it) }
     }
 
   fun add(kmlLayer: RNKMLayer) =
@@ -60,17 +58,18 @@ class MapKmlLayerManager(
 
   private fun addToMap(state: KmlLayerState) {
     val map = map ?: return
-    try {
-      val inputStream = ByteArrayInputStream(state.current.kmlString.toByteArray(StandardCharsets.UTF_8))
-      val layer = KmlLayer(map, inputStream, context)
-      state.layer = layer
-      layer.addLayerToMap()
-    } catch (e: Exception) {
-      mapErrorHandler.report(RNMapErrorCode.KML_LAYER_FAILED, "kmlLayerId=${state.current.id} parse failed", e)
-    }
+    state.parseJob =
+      builder.parse(state.current) { layer ->
+        state.parseJob = null
+        if (states[state.current.id] !== state) return@parse
+        state.renderer = builder.build(map, layer)
+      }
   }
 
   private fun removeFromMap(state: KmlLayerState) {
-    state.layer?.removeLayerFromMap()
+    state.parseJob?.cancel()
+    state.parseJob = null
+    state.renderer?.clear()
+    state.renderer = null
   }
 }
