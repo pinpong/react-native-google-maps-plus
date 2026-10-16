@@ -37,7 +37,7 @@ class MapHeatmapBuilder {
     var tilesDirty = false
 
     if (!prev.weightedData.contentEquals(next.weightedData)) {
-      provider.setWeightedData(next.weightedData.toWeightedLatLngs())
+      provider.updateData(next.weightedData.toWeightedLatLngs())
       tilesDirty = true
     }
 

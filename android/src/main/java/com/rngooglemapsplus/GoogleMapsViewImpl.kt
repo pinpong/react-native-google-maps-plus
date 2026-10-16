@@ -83,7 +83,7 @@ class GoogleMapsViewImpl(
   private val circleManager = MapCircleManager(MapCircleBuilder())
   private val heatmapManager = MapHeatmapManager(MapHeatmapBuilder())
   private val urlTileOverlayManager = MapUrlTileOverlayManager(MapUrlTileOverlayBuilder(mapErrorHandler))
-  private val kmlLayerManager = MapKmlLayerManager(reactContext, mapErrorHandler)
+  private val kmlLayerManager = MapKmlLayerManager(MapKmlLayerBuilder(mapErrorHandler))
 
   private var cameraMoveReason = -1
 
