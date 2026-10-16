@@ -44,12 +44,12 @@ Pod::Spec.new do |s|
 
   spm_dependency(s,
     url: 'https://github.com/googlemaps/ios-maps-sdk',
-    requirement: { kind: 'exactVersion', version: '10.15.0' },
+    requirement: { kind: 'exactVersion', version: '11.2.0' },
     products: ['GoogleMaps']
   )
   spm_dependency(s,
     url: 'https://github.com/googlemaps/google-maps-ios-utils',
-    requirement: { kind: 'exactVersion', version: '7.0.0' },
+    requirement: { kind: 'exactVersion', version: '7.1.2' },
     products: ['GoogleMapsUtils']
   )
 
