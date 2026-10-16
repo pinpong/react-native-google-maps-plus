@@ -69,6 +69,31 @@
  * apply_svgkit_patch(installer)
  * ```
  *
+ * ## Android Setup (Bare RN only)
+ *
+ * The Android build pulls in `android-maps-utils` 6.x, which ships Kotlin 2.4
+ * metadata. A Kotlin compiler only reads metadata up to one minor version
+ * ahead of itself, so the app has to build with Kotlin 2.3.0 or newer. React
+ * Native 0.88 still defaults to 2.2.0, which fails the build with an
+ * "incompatible version of Kotlin" error.
+ *
+ * Set the version in `android/build.gradle`:
+ *
+ * ```groovy
+ * buildscript {
+ *   ext {
+ *     kotlinVersion = "2.3.0"
+ *   }
+ *   dependencies {
+ *     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+ *   }
+ * }
+ * ```
+ *
+ * Setting `ext.kotlinVersion` alone is not enough. React Native resolves the
+ * Kotlin Gradle plugin through its own version catalog, so the classpath entry
+ * has to be pinned explicitly.
+ *
  * ## Expo Setup
  *
  * Add your keys via the config plugin:
@@ -99,6 +124,27 @@
  * When upgrading from a CocoaPods based version, the plugin removes the svgkit
  * patch it generated into the `Podfile` before. Nothing has to be removed by
  * hand.
+ *
+ * The Kotlin requirement from the Android setup applies here as well. Expo
+ * generates the Android project, so set the version through
+ * `expo-build-properties`:
+ *
+ * ```json
+ * {
+ *   "expo": {
+ *     "plugins": [
+ *       [
+ *         "expo-build-properties",
+ *         {
+ *           "android": {
+ *             "kotlinVersion": "2.3.0"
+ *           }
+ *         }
+ *       ]
+ *     ]
+ *   }
+ * }
+ * ```
  *
  * # Location
  *
