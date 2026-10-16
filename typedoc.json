@@ -39,6 +39,7 @@
     "bash",
     "ruby",
     "swift",
-    "xml"
+    "xml",
+    "groovy"
   ]
 }
