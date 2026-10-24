@@ -623,33 +623,36 @@ GMSIndoorDisplayDelegate {
     if !mapViewLoaded { return }
     onMain {
       self.cameraMoveReasonIsGesture = gesture
+      guard let callback = self.onCameraChangeStart else { return }
 
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
 
-      self.onCameraChangeStart?(visibleRegion, camera, gesture)
+      callback(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
     if !mapViewLoaded { return }
     onMain {
+      guard let callback = self.onCameraChange else { return }
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
       let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChange?(visibleRegion, camera, gesture)
+      callback(visibleRegion, camera, gesture)
     }
   }
 
   func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
     if !mapViewLoaded { return }
     onMain {
+      guard let callback = self.onCameraChangeComplete else { return }
       let visibleRegion = mapView.projection.visibleRegion().toRNRegion()
       let camera = mapView.camera.toRNCamera()
       let gesture = self.cameraMoveReasonIsGesture
 
-      self.onCameraChangeComplete?(visibleRegion, camera, gesture)
+      callback(visibleRegion, camera, gesture)
     }
   }
 
