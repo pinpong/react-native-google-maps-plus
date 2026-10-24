@@ -118,6 +118,13 @@ export default defineConfig([
     },
   },
   {
+    // The docs website renders to the DOM, not to React Native
+    files: ['docs/**/*.{ts,tsx}'],
+    rules: {
+      'react-native/no-inline-styles': 'off',
+    },
+  },
+  {
     ignores: [
       'node_modules/',
       'lib/',
@@ -126,7 +133,10 @@ export default defineConfig([
       'dist/',
       'android/',
       'ios/',
-      'docs/',
+      'docs/build/',
+      'docs/.docusaurus/',
+      'docs/docs/',
+      'docs/src/generated/',
     ],
   },
 ]);

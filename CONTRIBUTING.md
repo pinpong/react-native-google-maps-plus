@@ -133,6 +133,16 @@ The `package.json` file contains various scripts for common tasks:
 - `yarn example start`: start the Metro server for the example app.
 - `yarn example android`: run the example app on Android.
 - `yarn example ios`: run the example app on iOS.
+- `yarn docs`: build the docs website in `docs/`, see [Docs website](#docs-website).
+
+### Docs website
+
+The website in `docs/` is built with Docusaurus. `yarn docs` builds it, `yarn start` in `docs/` serves a live preview.
+
+- **Guides:** generated from the `@packageDocumentation` comment in `src/index.tsx`, so the guide also shows up in IDE hovers. Edit the guide there. Every `# Heading` becomes a page, a new page needs a description in `docs/scripts/generate-guides.mjs`.
+- **API reference:** generated from the TSDoc comments of the exported types.
+- **Examples:** one component per file in `docs/examples`, listed in `docs/examples/index.ts`. The comment at the top of a file holds the title, the description, `@alt` for the screenshot and `@props`. The example app shows the examples under **Docs Examples**, and `yarn typecheck` checks them against the library.
+- **Screenshots:** taken from the example app on an Android emulator and an iOS simulator, not on devices, because the script sets the device location. Start Metro, run `adb reverse tcp:8081 tcp:8081` for Android, install and open the app, then run `node docs/scripts/capture-screenshots.mjs android` or `ios`, optionally with example ids. It needs macOS and `cwebp` (`brew install webp`).
 
 ### Sending a pull request
 

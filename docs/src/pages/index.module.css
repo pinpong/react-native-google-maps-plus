@@ -1,0 +1,165 @@
+.hero {
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+}
+
+.hero h1 {
+  margin-bottom: 1.25rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  max-width: 34rem;
+  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--gmp-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.65rem 1.15rem;
+  border: 1px solid var(--gmp-rule);
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.button:hover {
+  border-color: var(--ifm-font-color-base);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+}
+
+.buttonPrimary,
+.buttonPrimary:hover {
+  border-color: var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: var(--gmp-on-primary);
+}
+
+.buttonPrimary:hover {
+  border-color: var(--ifm-color-primary-darker);
+  background: var(--ifm-color-primary-darker);
+}
+
+.install {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border: 1px solid var(--gmp-rule);
+  border-radius: 6px;
+}
+
+.install code {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.install button {
+  flex: none;
+  padding: 0.3rem 0.65rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--gmp-rule);
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.button:focus-visible,
+.install button:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.more {
+  margin-top: 1.5rem;
+  color: var(--gmp-muted);
+}
+
+/* Features and quickstart */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 2rem 4rem;
+  padding-top: 5rem;
+}
+
+.split:last-child {
+  padding-bottom: 6rem;
+}
+
+.split h2 {
+  font-size: 2rem;
+  letter-spacing: -0.015em;
+}
+
+.split p {
+  color: var(--gmp-muted);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 0;
+}
+
+.features dt {
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+
+.features dd {
+  margin: 0;
+  color: var(--gmp-muted);
+}
+
+.steps {
+  margin-bottom: 1.5rem;
+  padding-left: 1.25rem;
+}
+
+.steps li + li {
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 996px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 3.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .features {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

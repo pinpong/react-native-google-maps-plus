@@ -1,0 +1,102 @@
+.platforms {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  padding: 3px;
+  border: 1px solid var(--gmp-rule);
+  border-radius: 8px;
+}
+
+.platforms button {
+  padding: 0.35rem 0.9rem;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gmp-muted);
+  cursor: pointer;
+}
+
+.platforms button[aria-pressed='true'] {
+  background: var(--ifm-font-color-base);
+  color: var(--gmp-on-ink);
+}
+
+.platforms button:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2rem 1rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  line-height: 1.4;
+  color: var(--ifm-font-color-base);
+}
+
+.tile:hover {
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+}
+
+.tile img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.4rem;
+  border: 1px solid var(--gmp-rule);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+
+.tile:hover img {
+  border-color: var(--ifm-color-primary);
+}
+
+.tile:hover strong {
+  color: var(--ifm-color-primary);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.props {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.props code {
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+  color: var(--gmp-muted);
+}
+
+/* Inside a docs page the content column is narrower. */
+:global(.markdown) .grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 996px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .grid,
+  :global(.markdown) .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

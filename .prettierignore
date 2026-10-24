@@ -2,7 +2,13 @@ CHANGELOG.md
 node_modules/
 lib/
 expoConfig/build/
-docs/
+# Docs site, generated from the sources
+docs/build
+docs/.docusaurus
+docs/docs/guides
+docs/docs/examples
+docs/docs/api
+docs/src/generated
 .yarn
 cpp/third_party/
 example/android/link-assets-manifest.json

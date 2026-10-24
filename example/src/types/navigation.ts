@@ -24,6 +24,8 @@ export type RootStackParamList = {
   Stress: undefined;
   StreetView: undefined;
   Module: undefined;
+  DocsExamples: undefined;
+  DocsExample: { id: string; capture?: boolean };
 };
 
 export type RootNavigationProp = StackNavigationProp<RootStackParamList>;

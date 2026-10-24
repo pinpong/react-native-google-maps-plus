@@ -24,7 +24,7 @@
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "test": "jest",
     "git:clean": "git clean -dfX",
-    "docs": "typedoc",
+    "docs": "yarn workspace react-native-google-maps-plus-docs build",
     "build:plugin": "tsc -p expoConfig/tsconfig.json",
     "nitrogen": "nitrogen --logLevel=\"debug\" && node scripts/nitrogen-patch.js",
     "release": "semantic-release",
@@ -76,7 +76,8 @@
     "LICENSE"
   ],
   "workspaces": [
-    "example"
+    "example",
+    "docs"
   ],
   "repository": "https://github.com/pinpong/react-native-google-maps-plus.git",
   "author": "pinpong",
@@ -121,7 +122,6 @@
     "react-native-builder-bob": "0.43.2",
     "react-native-nitro-modules": "0.37.1",
     "semantic-release": "25.0.9",
-    "typedoc": "0.28.20",
     "typescript": "6.0.3"
   },
   "peerDependencies": {
