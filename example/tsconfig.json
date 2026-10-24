@@ -6,5 +6,6 @@
       "react-native-google-maps-plus": ["./../src"]
     }
   },
-  "include": ["src", "../src"]
+  "include": ["src", "../src", "../docs/examples"],
+  "exclude": ["**/node_modules", "**/lib"]
 }

@@ -81,6 +81,9 @@ jobs:
       - name: Build docs
         run: yarn docs
 
+      - name: Typecheck docs
+        run: yarn workspace react-native-google-maps-plus-docs typecheck
+
   build-android:
     runs-on: ubuntu-latest
     needs: [lint, test, docs]

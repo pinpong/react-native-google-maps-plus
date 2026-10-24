@@ -173,7 +173,7 @@ export type RNSnapshotOptions = {
   /** Image format. See {@link RNSnapshotFormat}. */
   format: RNSnapshotFormat;
 
-  /** Image quality (0–100). */
+  /** Image quality from 0 to 1, used for JPEG. */
   quality: number;
 
   /** Result return type. See {@link RNSnapshotResultType}. */
@@ -539,7 +539,7 @@ export type RNMarkerSvg = {
    * `font-family` finds the system fonts and the fonts bundled with the app by
    * their file name, e.g. `Roboto-Bold`, or their family, e.g. `Roboto`.
    *
-   * See [SVG markers](https://pinpong.github.io/react-native-google-maps-plus/#svg-markers) in the docs.
+   * See [SVG markers](https://pinpong.github.io/react-native-google-maps-plus/docs/guides/svg-markers) in the docs.
    */
   svgString: string;
 };

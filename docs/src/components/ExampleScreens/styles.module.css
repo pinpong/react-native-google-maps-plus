@@ -1,0 +1,24 @@
+.screens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 260px));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.screen {
+  margin: 0;
+}
+
+.screen img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--gmp-rule);
+  border-radius: 8px;
+}
+
+.screen figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.875rem;
+  color: var(--gmp-muted);
+}

@@ -129,6 +129,89 @@
  * }
  * ```
  *
+ * # Usage
+ *
+ * `GoogleMapsView` renders a map and `GoogleMapsStreetView` a Street View
+ * panorama. Both are native views and take a `style` like any other view.
+ *
+ * ## Overlays
+ *
+ * Markers, polylines, polygons, circles, heatmaps, KML layers and URL tile
+ * overlays are arrays of plain objects. Every item needs an `id` that stays
+ * the same across renders: when an array changes, the view adds, updates and
+ * removes items by `id`. Keep the arrays in state or memoize them, and pass a
+ * new array to change something.
+ *
+ * ```tsx
+ * const [markers, setMarkers] = useState<RNMarker[]>([
+ *   {
+ *     id: 'ferry-building',
+ *     coordinate: { latitude: 37.7955, longitude: -122.3937 },
+ *   },
+ * ]);
+ *
+ * <GoogleMapsView style={{ flex: 1 }} markers={markers} />;
+ * ```
+ *
+ * Markers without a `zIndex` overlap in no defined order. Give labels, cards
+ * and a selected marker a higher `zIndex` than the rest. Marker icons are SVG
+ * strings, see [SVG markers](#svg-markers).
+ *
+ * ## Initial options
+ *
+ * `mapOptions` and `panoramaOptions` are applied once, when the view is
+ * created. Move the camera later with the methods below.
+ *
+ * ## Callbacks
+ *
+ * Nitro passes a function to a native view only when it is wrapped with
+ * `callback()` from `react-native-nitro-modules`. Memoize the wrapped
+ * function, so it is not created again on every render:
+ *
+ * ```tsx
+ * import { callback } from 'react-native-nitro-modules';
+ *
+ * const onMarkerPress = useMemo(
+ *   () => callback((id: string) => setSelectedId(id)),
+ *   []
+ * );
+ *
+ * <GoogleMapsView style={{ flex: 1 }} onMarkerPress={onMarkerPress} />;
+ * ```
+ *
+ * ## Methods
+ *
+ * `hybridRef` passes the native view to a callback. Keep it in a ref and call
+ * its methods, e.g. to move the camera:
+ *
+ * ```tsx
+ * const map = useRef<GoogleMapsViewRef | null>(null);
+ * const hybridRef = useMemo(
+ *   () =>
+ *     callback((ref: GoogleMapsViewRef) => {
+ *       map.current = ref;
+ *     }),
+ *   []
+ * );
+ *
+ * <GoogleMapsView style={{ flex: 1 }} hybridRef={hybridRef} />;
+ *
+ * map.current?.setCamera(
+ *   { center: { latitude: 37.7955, longitude: -122.3937 }, zoom: 15 },
+ *   true,
+ *   600
+ * );
+ * ```
+ *
+ * The methods are listed under `RNGoogleMapsPlusViewMethods` and
+ * `RNGoogleMapsPlusStreetViewMethods` in the API reference.
+ *
+ * ## Examples
+ *
+ * The [examples](https://pinpong.github.io/react-native-google-maps-plus/docs/examples)
+ * show complete use cases with the code and screenshots on iOS and Android.
+ * The example app in the repository runs them under **Docs Examples**.
+ *
  * # Upgrading from 1.x
  *
  * ## React Native
@@ -221,7 +304,10 @@
  *   family it declares, e.g. `font-family="Roboto" font-weight="bold"`. Fonts
  *   registered at runtime, e.g. with `expo-font`, are not found. Text without
  *   a known `font-family` is drawn with the system font on Android and with
- *   Arial on iOS.
+ *   Arial on iOS. `font-weight` picks among the bundled faces of a family and
+ *   does not apply to that fallback: on Android,
+ *   `font-family="sans-serif" font-weight="bold"` is drawn regular. Use a
+ *   bundled bold font for bold text.
  *
  * For the known limitations see [Limitations](#limitations).
  *
@@ -280,6 +366,12 @@
  *   [issues](https://github.com/sammycage/lunasvg/issues).
  * - **Advanced Markers:** not available with the legacy map renderer on
  *   Android. `onMapReady` reports the availability.
+ * - **Heatmaps:** both platforms derive the color scale from the data, so the
+ *   same points, `radius` and `gradient` look different. In a city view
+ *   Android reached the last gradient color on most of the area, iOS stayed at
+ *   the first colors. Android converts `radius` from dp to pixels and clamps
+ *   it to 10 to 50 pixels. Tune `radius`, the weights and
+ *   `gradient.startPoints` per platform, e.g. with `Platform.select`.
  * - **Lite mode:** Android ignores `userInterfaceStyle` in `liteMode`, the map
  *   stays light.
  * - **Heading:** reported for portrait orientation only. iOS keeps delivering

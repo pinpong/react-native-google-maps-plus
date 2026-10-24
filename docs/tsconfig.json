@@ -1,0 +1,9 @@
+{
+  "extends": "@docusaurus/tsconfig",
+  "compilerOptions": {
+    // @docusaurus/tsconfig still sets baseUrl, which TypeScript 6 deprecates
+    "ignoreDeprecations": "6.0"
+  },
+  // The examples are React Native code, example/tsconfig.json checks them
+  "exclude": [".docusaurus", "build", "examples"]
+}

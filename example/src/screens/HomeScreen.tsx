@@ -38,6 +38,7 @@ const screens = [
   { name: 'Stress', title: 'Stress Test' },
   { name: 'StreetView', title: 'Street View' },
   { name: 'Module', title: 'Module Test' },
+  { name: 'DocsExamples', title: 'Docs Examples' },
 ];
 
 export default function HomeScreen() {
@@ -53,7 +54,9 @@ export default function HomeScreen() {
           key={s.name}
           label={s.title}
           onPress={() =>
-            navigation.navigate(s.name as keyof RootStackParamList)
+            navigation.navigate(
+              s.name as Exclude<keyof RootStackParamList, 'DocsExample'>
+            )
           }
         />
       ))}

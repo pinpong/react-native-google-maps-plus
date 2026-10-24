@@ -97,4 +97,10 @@ example/android/.kotlinc/
 
 tsconfig.tsbuildinfo
 expoConfig/build
-docs/
+# Docs site, generated from the sources
+docs/build
+docs/.docusaurus
+docs/docs/guides
+docs/docs/examples
+docs/docs/api
+docs/src/generated

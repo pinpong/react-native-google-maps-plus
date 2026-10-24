@@ -18,6 +18,8 @@ import CameraTestScreen from '@src/screens/CameraTestScreen';
 import CirclesScreen from '@src/screens/CirclesScreen';
 import ClusteringScreen from '@src/screens/ClsuteringScreen';
 import CustomStyleScreen from '@src/screens/CustomStyleScreen';
+import DocsExampleScreen from '@src/screens/DocsExampleScreen';
+import DocsExamplesScreen from '@src/screens/DocsExamplesScreen';
 import GoogleMapPlusModuleScreen from '@src/screens/GoogleMapPlusModuleScreen';
 import HeatmapScreen from '@src/screens/HeatmapScreen';
 import HomeScreen from '@src/screens/HomeScreen';
@@ -36,6 +38,9 @@ import SvgMarkersScreen from '@src/screens/SvgMarkersScreen';
 import UrlTileOverlayScreen from '@src/screens/UrlTileOverlayScreen';
 import type { RootStackParamList } from '@src/types/navigation';
 
+import { examples } from '../../docs/examples';
+import { capture } from '../../docs/examples/capture';
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
@@ -47,7 +52,7 @@ export default function App() {
       <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>
         <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName={capture ? 'DocsExample' : 'Home'}
           screenOptions={({ theme }) => ({
             headerShown: true,
             headerTitleAlign: 'center',
@@ -169,6 +174,22 @@ export default function App() {
             name="Module"
             component={GoogleMapPlusModuleScreen}
             options={{ title: 'Module test' }}
+          />
+          <Stack.Screen
+            name="DocsExamples"
+            component={DocsExamplesScreen}
+            options={{ title: 'Docs examples' }}
+          />
+          <Stack.Screen
+            name="DocsExample"
+            component={DocsExampleScreen}
+            initialParams={capture ? { id: capture, capture: true } : undefined}
+            options={({ route }) => ({
+              title:
+                examples.find((e) => e.id === route.params.id)?.title ??
+                route.params.id,
+              headerShown: !route.params.capture,
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>
