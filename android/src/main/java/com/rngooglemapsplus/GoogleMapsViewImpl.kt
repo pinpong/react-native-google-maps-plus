@@ -164,9 +164,10 @@ class GoogleMapsViewImpl(
     onUi {
       if (!mapViewLoaded) return@onUi
       cameraMoveReason = reason
+      val callback = onCameraChangeStart ?: return@onUi
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
-      onCameraChangeStart?.invoke(
+      callback(
         visibleRegion.toRNRegion(),
         cameraPosition.toRNCamera(),
         GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == reason,
@@ -176,10 +177,11 @@ class GoogleMapsViewImpl(
   override fun onCameraMove() =
     onUi {
       if (!mapViewLoaded) return@onUi
+      val callback = onCameraChange ?: return@onUi
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
-      onCameraChange?.invoke(
+      callback(
         visibleRegion.toRNRegion(),
         cameraPosition.toRNCamera(),
         gesture,
@@ -189,10 +191,11 @@ class GoogleMapsViewImpl(
   override fun onCameraIdle() =
     onUi {
       if (!mapViewLoaded) return@onUi
+      val callback = onCameraChangeComplete ?: return@onUi
       val visibleRegion = googleMap?.projection?.visibleRegion ?: return@onUi
       val cameraPosition = googleMap?.cameraPosition ?: return@onUi
       val gesture = GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE == cameraMoveReason
-      onCameraChangeComplete?.invoke(
+      callback(
         visibleRegion.toRNRegion(),
         cameraPosition.toRNCamera(),
         gesture,
