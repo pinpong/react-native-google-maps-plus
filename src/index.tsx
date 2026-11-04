@@ -224,7 +224,8 @@
  * on `GoogleMapsStreetView`. The types `RNInitialProps` and
  * `RNStreetViewInitialProps` are now `RNMapOptions` and `RNPanoramaOptions`.
  *
- * The type `RNKMLayer` is now `RNKmlLayer`.
+ * The type `RNKMLayer` is now `RNKmlLayer`. `onMyLocationButtonPress` is
+ * called without arguments, the `pressed` argument was always `true`.
  *
  * ## Location updates
  *

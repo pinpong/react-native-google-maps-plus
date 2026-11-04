@@ -390,7 +390,7 @@ class RNGoogleMapsPlusView(
       view.onMyLocationPress = cb
     }
 
-  override var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
+  override var onMyLocationButtonPress: (() -> Unit)? = null
     set(cb) {
       view.onMyLocationButtonPress = cb
     }

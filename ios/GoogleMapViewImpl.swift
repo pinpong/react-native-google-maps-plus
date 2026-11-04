@@ -322,7 +322,7 @@ GMSIndoorDisplayDelegate {
   var onInfoWindowClose: ((String) -> Void)?
   var onInfoWindowLongPress: ((String) -> Void)?
   var onMyLocationPress: ((RNLocation) -> Void)?
-  var onMyLocationButtonPress: ((Bool) -> Void)?
+  var onMyLocationButtonPress: (() -> Void)?
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChange: ((RNRegion, RNCamera, Bool) -> Void)?
   var onCameraChangeComplete: ((RNRegion, RNCamera, Bool) -> Void)?
@@ -802,7 +802,7 @@ GMSIndoorDisplayDelegate {
 
   func didTapMyLocationButton(for mapView: GMSMapView) -> Bool {
     onMain {
-      self.onMyLocationButtonPress?(true)
+      self.onMyLocationButtonPress?()
     }
     return uiSettings?.consumeOnMyLocationButtonPress ?? false
   }

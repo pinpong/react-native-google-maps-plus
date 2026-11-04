@@ -343,7 +343,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
   var onMyLocationPress: ((RNLocation) -> Void)? {
     didSet { impl.onMyLocationPress = onMyLocationPress }
   }
-  var onMyLocationButtonPress: ((Bool) -> Void)? {
+  var onMyLocationButtonPress: (() -> Void)? {
     didSet { impl.onMyLocationButtonPress = onMyLocationButtonPress }
   }
   var onCameraChangeStart: ((RNRegion, RNCamera, Bool) -> Void)? {

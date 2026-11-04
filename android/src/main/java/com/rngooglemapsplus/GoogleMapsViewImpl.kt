@@ -382,7 +382,7 @@ class GoogleMapsViewImpl(
   var onInfoWindowClose: ((String) -> Unit)? = null
   var onInfoWindowLongPress: ((String) -> Unit)? = null
   var onMyLocationPress: ((RNLocation) -> Unit)? = null
-  var onMyLocationButtonPress: ((Boolean) -> Unit)? = null
+  var onMyLocationButtonPress: (() -> Unit)? = null
   var onCameraChangeStart: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChange: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
   var onCameraChangeComplete: ((RNRegion, RNCamera, Boolean) -> Unit)? = null
@@ -715,7 +715,7 @@ class GoogleMapsViewImpl(
 
   override fun onMyLocationButtonClick(): Boolean {
     onUi {
-      onMyLocationButtonPress?.invoke(true)
+      onMyLocationButtonPress?.invoke()
     }
     return uiSettings?.consumeOnMyLocationButtonPress ?: false
   }
