@@ -1887,7 +1887,7 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets (>= 0.8.0)
     - Yoga
-  - RNGoogleMapsPlus (1.15.0):
+  - RNGoogleMapsPlus (2.0.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2520,7 +2520,7 @@ SPEC CHECKSUMS:
   ReactCommon: b63ce798b898ed77c6cfdeb80b18080161f52ed5
   ReactNativeDependencies: a5164c3ebbe90d992022b5d9cbabbf770a6d7d05
   RNGestureHandler: abdc2d49ac3970908acd127980b429d377927ee1
-  RNGoogleMapsPlus: 10bf8af2b19eac395f77e38a75fd5ba17cc9ea55
+  RNGoogleMapsPlus: ffe88450edc07f8645ef1b264598645421e13cd8
   RNReanimated: 5c641cc430b7255eae87c8039204eb0f816ea1b8
   RNScreens: fdca179295dcb421672af2a9e2979a9cebeda720
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
