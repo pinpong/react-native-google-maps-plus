@@ -13,19 +13,21 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => 16.0 }
   s.source       = { :git => "https://github.com/pinpong/react-native-google-maps-plus.git", :tag => "#{s.version}", :submodules => true }
 
+  # HarfBuzz and SheenBidi shape the text of SVG markers, RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING=0 turns text shaping off
+  svg_text_shaping = ENV["RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING"] != "0"
+  text_shaping_sources = ["cpp/third_party/harfbuzz/src/harfbuzz.cc", "cpp/third_party/SheenBidi/Source/SheenBidi.c"]
+
   s.source_files = [
     "ios/**/*.{swift}",
     "ios/**/*.{h,m,mm}",
     "cpp/svg/*.{h,c,cpp}",
     "cpp/third_party/lunasvg/{include,source}/*.{h,cpp}",
     "cpp/third_party/lunasvg/plutovg/{include,source}/*.{h,c}",
-    "cpp/third_party/harfbuzz/src/harfbuzz.cc",
-    "cpp/third_party/SheenBidi/Source/SheenBidi.c",
-  ]
+  ] + (svg_text_shaping ? text_shaping_sources : [])
 
   s.exclude_files = "cpp/third_party/lunasvg/plutovg/source/plutovg-font.c"
 
-  ["cpp/third_party/lunasvg/include/lunasvg.h", "cpp/third_party/harfbuzz/src/harfbuzz.cc", "cpp/third_party/SheenBidi/Source/SheenBidi.c"].each do |file|
+  (["cpp/third_party/lunasvg/include/lunasvg.h"] + (svg_text_shaping ? text_shaping_sources : [])).each do |file|
     unless File.exist?(File.join(__dir__, file))
       raise "[RNGoogleMapsPlus] lunasvg, HarfBuzz or SheenBidi sources are missing. In a git checkout run `git submodule update --init`, otherwise install the package from npm."
     end
@@ -35,9 +37,11 @@ Pod::Spec.new do |s|
 
   third_party_dir = "$(PODS_TARGET_SRCROOT)/cpp/third_party"
   lunasvg_dir = "#{third_party_dir}/lunasvg"
+  text_shaping_headers = svg_text_shaping ? " \"#{third_party_dir}/harfbuzz/src\" \"#{third_party_dir}/SheenBidi/Headers\" \"#{third_party_dir}/SheenBidi/Source\"" : ""
+  text_shaping_defines = svg_text_shaping ? " LUNASVG_ENABLE_TEXT_SHAPING SB_CONFIG_UNITY" : ""
   s.pod_target_xcconfig = {
-    "HEADER_SEARCH_PATHS" => "$(inherited) \"$(PODS_TARGET_SRCROOT)/cpp/svg/compat\" \"#{lunasvg_dir}/include\" \"#{lunasvg_dir}/source\" \"#{lunasvg_dir}/plutovg/include\" \"#{third_party_dir}/harfbuzz/src\" \"#{third_party_dir}/SheenBidi/Headers\" \"#{third_party_dir}/SheenBidi/Source\"",
-    "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) LUNASVG_BUILD LUNASVG_BUILD_STATIC PLUTOVG_BUILD PLUTOVG_BUILD_STATIC LUNASVG_DISABLE_EXTERNAL_RESOURCES LUNASVG_ENABLE_TEXT_SHAPING SB_CONFIG_UNITY",
+    "HEADER_SEARCH_PATHS" => "$(inherited) \"$(PODS_TARGET_SRCROOT)/cpp/svg/compat\" \"#{lunasvg_dir}/include\" \"#{lunasvg_dir}/source\" \"#{lunasvg_dir}/plutovg/include\"#{text_shaping_headers}",
+    "GCC_PREPROCESSOR_DEFINITIONS" => "$(inherited) LUNASVG_BUILD LUNASVG_BUILD_STATIC PLUTOVG_BUILD PLUTOVG_BUILD_STATIC LUNASVG_DISABLE_EXTERNAL_RESOURCES#{text_shaping_defines}",
     "GCC_C_LANGUAGE_STANDARD" => "gnu11",
     "GCC_OPTIMIZATION_LEVEL" => "2",
   }
