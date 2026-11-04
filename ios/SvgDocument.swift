@@ -43,9 +43,9 @@ final class SvgDocument {
       space: CGColorSpaceCreateDeviceRGB(),
       bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
     ),
-      let pixels = context.data,
-      rn_svg_document_render(handle, pixels, Int32(width), Int32(height), Int32(context.bytesPerRow), false),
-      let cgImage = context.makeImage()
+          let pixels = context.data,
+          rn_svg_document_render(handle, pixels, Int32(width), Int32(height), Int32(context.bytesPerRow), false),
+          let cgImage = context.makeImage()
     else {
       return nil
     }
