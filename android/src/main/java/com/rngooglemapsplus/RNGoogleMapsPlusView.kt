@@ -457,13 +457,13 @@ class RNGoogleMapsPlusView(
 
   override fun animateToBounds(
     bounds: RNLatLngBounds,
-    padding: Double?,
+    padding: RNMapPadding?,
     durationMs: Double?,
     lockBounds: Boolean?,
   ) {
     view.animateToBounds(
       bounds.toLatLngBounds(),
-      padding = padding?.toInt() ?: 0,
+      padding = padding ?: RNMapPadding(0.0, 0.0, 0.0, 0.0),
       durationMs?.toInt() ?: 3000,
       lockBounds = lockBounds ?: false,
     )

@@ -70,7 +70,12 @@ export default function CameraTestScreen() {
       },
       {
         title: 'Animate To Bounds',
-        onPress: () => mapRef.current?.animateToBounds(bounds, 50, 1200),
+        onPress: () =>
+          mapRef.current?.animateToBounds(
+            bounds,
+            { top: 50, left: 50, bottom: 50, right: 50 },
+            1200
+          ),
       },
     ],
     [bounds, boundsActive, coordinates]

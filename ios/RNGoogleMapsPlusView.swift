@@ -399,13 +399,13 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
 
   func animateToBounds(
     bounds: RNLatLngBounds,
-    padding: Double?,
+    padding: RNMapPadding?,
     durationMs: Double?,
     lockBounds: Bool?
   ) {
     impl.animateToBounds(
       bounds.toCoordinateBounds(),
-      padding: padding ?? 0,
+      padding: padding ?? RNMapPadding(0, 0, 0, 0),
       durationMs: durationMs ?? 3000,
       lockBounds: lockBounds ?? false
     )
