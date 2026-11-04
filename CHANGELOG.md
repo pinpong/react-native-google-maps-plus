@@ -1,3 +1,110 @@
+## [2.0.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.15.0...v2.0.0) (2026-11-04)
+
+### ⚠ BREAKING CHANGES
+
+* animateToBounds takes the padding as RNMapPadding.
+* onMyLocationButtonPress is called without arguments.
+* RNKMLayer is now RNKmlLayer.
+* react-native-nitro-modules 0.37.2 or newer is required.
+* initialProps is now mapOptions on GoogleMapsView and
+panoramaOptions on GoogleMapsStreetView. The types RNInitialProps and
+RNStreetViewInitialProps are now RNMapOptions and RNPanoramaOptions.
+* **android:** android-maps-utils 6.0.0 needs Kotlin 2.3.0 or newer in
+the app, see the Android Setup section of the docs.
+* marker svgs are rendered by lunasvg. An svg can look
+different than with androidsvg and SVGKit, check your markers. See
+https://github.com/sammycage/lunasvg#features for the supported features.
+- dominant-baseline is applied, manual y offsets for text need to go.
+- font-family finds bundled fonts by file name, e.g. Roboto-Bold, and
+  by the family they declare, e.g. Roboto. Fonts registered at runtime,
+  e.g. with expo-font, are not found.
+- Text without a known font-family is drawn with Arial on iOS.
+- font-weight and font-style have no effect with variable fonts such
+  as the Android system font.
+- An svg that can't be parsed reports INVALID_ARGUMENT, on iOS and for
+  info windows on Android too.
+- Remote images are limited to 8 MB and 5 redirects.
+- Whitespace before </text> shifts text with text-anchor middle or end
+* location updates are off by default. Set
+locationConfig.enabled if you use onLocationUpdate or onLocationError
+without myLocationEnabled.
+* **ios:** Requires react-native >= 0.87.0.
+Bare RN iOS apps must install pods as frameworks (`use_frameworks!`, either
+`:dynamic` or `:static`) and remove the svgkit patch from their Podfile
+(`require_relative '.../scripts/svgkit_patch'` and
+`apply_svgkit_patch(installer)`). Expo apps are migrated by the config plugin.
+
+### ✨ Features
+
+* add advanced markers ([4ff8670](https://github.com/pinpong/react-native-google-maps-plus/commit/4ff86706f42b4f01adb3ca9658590996ccd3f59b))
+* add Advanced Markers collision support ([c935d06](https://github.com/pinpong/react-native-google-maps-plus/commit/c935d06ff98691d834234ccf3f5b98954769f2be))
+* add compass heading updates ([fb4b0e8](https://github.com/pinpong/react-native-google-maps-plus/commit/fb4b0e8740ff2aae203dc77ab10775502878ad3d))
+* **android:** add minUpdateDistanceMeters to location config ([65915e7](https://github.com/pinpong/react-native-google-maps-plus/commit/65915e73ab24a65406f391d2834bad623cd65c8b))
+* **android:** report unsatisfied location settings ([ece9877](https://github.com/pinpong/react-native-google-maps-plus/commit/ece9877170223e7f0681e57752ed49890e05ffc9))
+* **example:** add Map ID and Advanced Markers examples ([3cd1f7b](https://github.com/pinpong/react-native-google-maps-plus/commit/3cd1f7bbb27d5b87c6b5f83c2a163bb837404b48))
+* fall back to system fonts for svg text ([c3a1d8c](https://github.com/pinpong/react-native-google-maps-plus/commit/c3a1d8ce8874c6c4d5515f27bcbb0136e9150a38))
+* **ios:** integrate native dependencies via Swift Package Manager ([4b70566](https://github.com/pinpong/react-native-google-maps-plus/commit/4b705669c9dfd588403ec33ea0c8dd5815348dc9))
+* **ios:** report invalid headings instead of dropping them ([fc847cd](https://github.com/pinpong/react-native-google-maps-plus/commit/fc847cdf63a3c3d9c9bfa245a1b6194869ef6154))
+* **ios:** report unsatisfied location settings ([052f263](https://github.com/pinpong/react-native-google-maps-plus/commit/052f2635a88f5f3e05ef4a1b27b9a1aff0c8bf18))
+* make svg text shaping optional ([f7c27a9](https://github.com/pinpong/react-native-google-maps-plus/commit/f7c27a980da7e0b3814fbd55670b3cf4097d68a5))
+* render marker svgs with lunasvg ([48cdd4d](https://github.com/pinpong/react-native-google-maps-plus/commit/48cdd4d96f4417dd3b2d0071f4a38dc0bc8f93b1)), closes [sammycage/lunasvg#275](https://github.com/sammycage/lunasvg/issues/275) [sammycage/lunasvg#213](https://github.com/sammycage/lunasvg/issues/213)
+* report location status and run location updates on demand ([f6955b4](https://github.com/pinpong/react-native-google-maps-plus/commit/f6955b4ee1ceb52833a23a8edc7f2fbf1746e80d))
+* support React Native 0.88 ([5416e22](https://github.com/pinpong/react-native-google-maps-plus/commit/5416e22c54520c7055fb0dda8ceb9968583f9255))
+
+### 🐛 Bug Fixes
+
+* **android:** add the camera fit padding to the map padding ([069ac66](https://github.com/pinpong/react-native-google-maps-plus/commit/069ac66a6f70312a6c53e1fa07e9ae7e1d18f34f))
+* **android:** derive location settings state from the location session ([c7f33a7](https://github.com/pinpong/react-native-google-maps-plus/commit/c7f33a7bb58909d0f9d2484586ab4f08de16cdff))
+* **android:** report unknown bearing and speed as -1 ([e679223](https://github.com/pinpong/react-native-google-maps-plus/commit/e6792233b0013e759b1d1d9d9e96b10779d17e4e))
+* **ci:** run gh without a checkout and skip PRs no longer targeting main ([49a4a44](https://github.com/pinpong/react-native-google-maps-plus/commit/49a4a446baf7eb28a8030bd49c9060dc7dd85d1c))
+* **example:** compute clusters without effect updates ([31fa142](https://github.com/pinpong/react-native-google-maps-plus/commit/31fa1428077c2ea06add20be304446444d823573))
+* **example:** declare the apache http legacy library ([8db25df](https://github.com/pinpong/react-native-google-maps-plus/commit/8db25df20adfebe25ef4b54278cfaceef3a337a8))
+* **ios:** open the app settings page from openLocationSettings ([6a42c49](https://github.com/pinpong/react-native-google-maps-plus/commit/6a42c4906598ecc6ad5474033dec4fe08f2e685f))
+* **ios:** remove invalid privacy manifest entries ([833d7e1](https://github.com/pinpong/react-native-google-maps-plus/commit/833d7e1ee4c5b1fe93a3b20512770fe2d0404be3))
+* **ios:** ship privacy manifest in npm package and pod bundle ([49dc4ef](https://github.com/pinpong/react-native-google-maps-plus/commit/49dc4ef3c902629133f54e89c3ef444e98eced54))
+* pin lunasvg fork with open upstream fixes ([8f6234a](https://github.com/pinpong/react-native-google-maps-plus/commit/8f6234a9417198bcda1d0bcacc605b0c04f7df8d))
+* require react-native-nitro-modules 0.37.2 ([5a92c97](https://github.com/pinpong/react-native-google-maps-plus/commit/5a92c97d449d25087fea3ddcecc306131ab89446))
+* take RNMapPadding in animateToBounds ([5e632fa](https://github.com/pinpong/react-native-google-maps-plus/commit/5e632faffe3c09a5c40eca2e6a733e5112e5419c))
+
+### 💨 Performance Improvements
+
+* **android:** hide native symbols and consolidate compile flags ([bc5d343](https://github.com/pinpong/react-native-google-maps-plus/commit/bc5d3437fc769757705f63984962fbc4b55b4ddd))
+* skip camera payloads when no listener is set ([31e88ff](https://github.com/pinpong/react-native-google-maps-plus/commit/31e88ffa5cdbdc837287375cfba4cafb8824a653))
+
+### 🔄 Code Refactors
+
+* **android:** keep the declination lookup in the handler ([1548e09](https://github.com/pinpong/react-native-google-maps-plus/commit/1548e093596d3ab208f8b337f5d5d531296ec96c))
+* **android:** move heading conversion into extensions ([621ad88](https://github.com/pinpong/react-native-google-maps-plus/commit/621ad88a7e5360c72d26e59c6be7335e10736df2))
+* **android:** render kml layers with the maps-utils data layer api ([456cfe0](https://github.com/pinpong/react-native-google-maps-plus/commit/456cfe0ae0e2d30f6d293a0a88a0e4373c897c79))
+* call onMyLocationButtonPress without arguments ([12f6a31](https://github.com/pinpong/react-native-google-maps-plus/commit/12f6a3138ce44d67c357a6a0b229d7266b20180e))
+* **ios:** drop redundant heading calibration delegate ([0526b71](https://github.com/pinpong/react-native-google-maps-plus/commit/0526b7119ce35e0ec7309d1d825d6cb6dcf31ea9))
+* rename initialProps to mapOptions and panoramaOptions ([6b86796](https://github.com/pinpong/react-native-google-maps-plus/commit/6b867967db32392dc5c587bc4f6775ed319da5e3))
+* rename RNKMLayer to RNKmlLayer ([158f751](https://github.com/pinpong/react-native-google-maps-plus/commit/158f75152e36d9c74f9de49bc1358abda31cc0dc))
+
+### 📚 Documentation
+
+* add docusaurus website ([7767ef1](https://github.com/pinpong/react-native-google-maps-plus/commit/7767ef14ab76a48de94544c2235e34df55e67e1b))
+* describe advanced markers ([b67cca6](https://github.com/pinpong/react-native-google-maps-plus/commit/b67cca6ddd849606f0979948ff7a8477fd9835a2))
+* describe svg marker rendering with lunasvg ([0bf823a](https://github.com/pinpong/react-native-google-maps-plus/commit/0bf823a5d0e60da1d226138bc3ead6de545a0e30))
+* describe text in svg markers ([124e31e](https://github.com/pinpong/react-native-google-maps-plus/commit/124e31e048be62de62982a61a78a4d79b7ef5f52))
+* describe the map crash with old google play services ([50825b3](https://github.com/pinpong/react-native-google-maps-plus/commit/50825b3448e4c2db72933548ac1067c8655986ea))
+* move guides into the docs site ([24a15ce](https://github.com/pinpong/react-native-google-maps-plus/commit/24a15ceb61189d7e4f6f8dd70c99fd69bd603f59))
+* shorten the play services crash heading ([f0891ca](https://github.com/pinpong/react-native-google-maps-plus/commit/f0891ca45cda418bcf4415067845a137916206e3))
+
+### 🛠️ Other changes
+
+* **android:** update maps-utils ([9a5b79b](https://github.com/pinpong/react-native-google-maps-plus/commit/9a5b79b46306f12098529c6e9e1804edab73fb91))
+* **android:** update play services and gradle plugin ([9fda46c](https://github.com/pinpong/react-native-google-maps-plus/commit/9fda46c45b77be1b012074e88dd4bce2f55110db))
+* **example:** add advanced markers and map id screens ([315051e](https://github.com/pinpong/react-native-google-maps-plus/commit/315051ebbeee1c8482cd116e5d876a64a33ca7f6))
+* **example:** add svg markers for fonts and info window images ([0ecb54f](https://github.com/pinpong/react-native-google-maps-plus/commit/0ecb54f28719d7f56ea771e3458c4dd15bb03282))
+* **example:** add svg text markers screen ([39a48ae](https://github.com/pinpong/react-native-google-maps-plus/commit/39a48ae8fe952b438010f51fa0efb4da47ad90a0))
+* **ios:** update maps sdk ([27b4df8](https://github.com/pinpong/react-native-google-maps-plus/commit/27b4df86b7b43e950512e897d4d17135f7dba096))
+* sync the lockfile with the nitro peer dependency ([740dbdf](https://github.com/pinpong/react-native-google-maps-plus/commit/740dbdf9d02ed855ffedf15acfe8753574d48772))
+* update dependencies ([304c13f](https://github.com/pinpong/react-native-google-maps-plus/commit/304c13ff24e0a0ba0b9dc2232f8bca93fd3ab140))
+* update dependencies ([9fe81ef](https://github.com/pinpong/react-native-google-maps-plus/commit/9fe81ef76d9fd6bfc4659d0b1c67af578c031e99))
+* update dependencies ([1f4ef9d](https://github.com/pinpong/react-native-google-maps-plus/commit/1f4ef9d151ed6251b3c4e593abc17e558e2b6b1f))
+* update dependencies ([a11ed18](https://github.com/pinpong/react-native-google-maps-plus/commit/a11ed18459db6ae8ed48fe99d3c4b76170b57a04))
+
 ## [1.15.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.14.0...v1.15.0) (2026-08-24)
 
 ### ✨ Features
