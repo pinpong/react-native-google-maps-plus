@@ -227,6 +227,12 @@
  * The type `RNKMLayer` is now `RNKmlLayer`. `onMyLocationButtonPress` is
  * called without arguments, the `pressed` argument was always `true`.
  *
+ * ## Methods
+ *
+ * `animateToBounds` takes the padding as `RNMapPadding`, like
+ * `setCameraToCoordinates`. Android now treats it as logical units instead of
+ * pixels, and iOS now applies `durationMs`.
+ *
  * ## Location updates
  *
  * Location updates used to run for every view. They are off by default now.

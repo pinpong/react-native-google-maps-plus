@@ -337,8 +337,7 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    * Android: uses native timing.
    *
    * @param bounds - Target bounds the camera should fit. See {@link RNLatLngBounds}.
-   * @param padding - Padding in logical units.
-   * @defaultValue `0`
+   * @param padding - Padding around the fitted area. See {@link RNMapPadding}.
    * @param durationMs - Animation duration in milliseconds.
    * @defaultValue `3000`
    * @param lockBounds - Restricts the camera to these bounds after animating.
@@ -346,7 +345,7 @@ export interface RNGoogleMapsPlusViewMethods extends HybridViewMethods {
    */
   animateToBounds(
     bounds: RNLatLngBounds,
-    padding?: number,
+    padding?: RNMapPadding,
     durationMs?: number,
     lockBounds?: boolean
   ): void;

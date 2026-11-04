@@ -446,7 +446,7 @@ class GoogleMapsViewImpl(
 
   fun animateToBounds(
     bounds: LatLngBounds,
-    padding: Int,
+    padding: RNMapPadding,
     durationMs: Int,
     lockBounds: Boolean,
   ) = onUi {
@@ -454,8 +454,14 @@ class GoogleMapsViewImpl(
       if (lockBounds) {
         map.setLatLngBoundsForCameraTarget(bounds)
       }
-      val update = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+
+      val previousMapPadding = mapPadding
+      mapPadding = padding
+
+      val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
       map.animateCamera(update, durationMs, null)
+
+      mapPadding = previousMapPadding
     }
   }
 

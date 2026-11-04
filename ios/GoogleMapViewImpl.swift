@@ -406,7 +406,7 @@ GMSIndoorDisplayDelegate {
 
   func animateToBounds(
     _ bounds: GMSCoordinateBounds,
-    padding: Double,
+    padding: RNMapPadding,
     durationMs: Double,
     lockBounds: Bool
   ) {
@@ -415,8 +415,20 @@ GMSIndoorDisplayDelegate {
         self.mapView?.cameraTargetBounds = bounds
       }
 
-      let update = GMSCameraUpdate.fit(bounds, withPadding: CGFloat(padding))
-      self.mapView?.animate(with: update)
+      let insets = UIEdgeInsets(
+        top: padding.top,
+        left: padding.left,
+        bottom: padding.bottom,
+        right: padding.right
+      )
+
+      let update = GMSCameraUpdate.fit(bounds, with: insets)
+      withCATransaction(
+        disableActions: false,
+        duration: durationMs / 1000.0
+      ) {
+        self.mapView?.animate(with: update)
+      }
     }
   }
 
