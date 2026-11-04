@@ -233,6 +233,9 @@
  * `setCameraToCoordinates`. Android now treats it as logical units instead of
  * pixels, and iOS now applies `durationMs`.
  *
+ * On Android, `setCameraToCoordinates` adds its padding to `mapPadding` like iOS
+ * does, instead of replacing it while the camera moves.
+ *
  * ## Location updates
  *
  * Location updates used to run for every view. They are off by default now.
