@@ -7,7 +7,7 @@ import type {
   RNIndoorBuilding,
   RNIndoorLevel,
   RNMapOptions,
-  RNKMLayer,
+  RNKmlLayer,
   RNLatLng,
   RNLatLngBounds,
   RNLocation,
@@ -119,8 +119,8 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /** Heatmaps. See {@link RNHeatmap}. */
   heatmaps?: RNHeatmap[];
 
-  /** KML layers. See {@link RNKMLayer}. */
-  kmlLayers?: RNKMLayer[];
+  /** KML layers. See {@link RNKmlLayer}. */
+  kmlLayers?: RNKmlLayer[];
 
   /** URL tile overlays. See {@link RNUrlTileOverlay}. */
   urlTileOverlays?: RNUrlTileOverlay[];

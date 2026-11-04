@@ -261,7 +261,7 @@ export const RNHeatmapValidator = object({
   gradient: optional(RNHeatmapGradientValidator),
 });
 
-export const RNKMLayerValidator = object({
+export const RNKmlLayerValidator = object({
   id: string(),
   kmlString: string(),
 });

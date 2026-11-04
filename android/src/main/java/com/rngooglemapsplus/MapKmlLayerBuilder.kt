@@ -22,7 +22,7 @@ class MapKmlLayerBuilder(
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
   fun parse(
-    kmlLayer: RNKMLayer,
+    kmlLayer: RNKmlLayer,
     onReady: (DataLayer) -> Unit,
   ): Job =
     scope.launch {

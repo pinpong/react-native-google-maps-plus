@@ -1,8 +1,8 @@
 package com.rngooglemapsplus.extensions
 
-import com.rngooglemapsplus.RNKMLayer
+import com.rngooglemapsplus.RNKmlLayer
 
-fun RNKMLayer.kmlLayerEquals(b: RNKMLayer): Boolean {
+fun RNKmlLayer.kmlLayerEquals(b: RNKmlLayer): Boolean {
   if (kmlString != b.kmlString) return false
   return true
 }

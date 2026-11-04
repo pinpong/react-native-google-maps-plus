@@ -1,7 +1,7 @@
 import Foundation
 
-extension RNKMLayer {
-  func kmlLayerEquals(_ b: RNKMLayer) -> Bool {
+extension RNKmlLayer {
+  func kmlLayerEquals(_ b: RNKmlLayer) -> Bool {
     if kmlString != b.kmlString { return false }
     return true
   }

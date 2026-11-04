@@ -225,7 +225,7 @@ class RNGoogleMapsPlusView(
       }
     }
 
-  override var kmlLayers: Array<RNKMLayer>? = null
+  override var kmlLayers: Array<RNKmlLayer>? = null
     set(value) {
       if (field.contentEquals(value)) return
       val prevById = field?.associateBy { it.id } ?: emptyMap()

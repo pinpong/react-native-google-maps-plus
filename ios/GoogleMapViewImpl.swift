@@ -517,11 +517,11 @@ GMSIndoorDisplayDelegate {
     heatmapManager.remove(id: id)
   }
 
-  func addKmlLayer(_ kmlLayer: RNKMLayer) {
+  func addKmlLayer(_ kmlLayer: RNKmlLayer) {
     kmlLayerManager.add(kmlLayer)
   }
 
-  func updateKmlLayer(_ kmlLayer: RNKMLayer) {
+  func updateKmlLayer(_ kmlLayer: RNKmlLayer) {
     kmlLayerManager.update(kmlLayer)
   }
 
