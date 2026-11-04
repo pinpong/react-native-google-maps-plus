@@ -262,8 +262,8 @@
  *
  * - `dominant-baseline` is applied. Manual `y` offsets that compensated for it
  *   shift the text now.
- * - Trailing whitespace inside `<text>` shifts centered text to the left.
- *   Write `<text>label</text>` without whitespace around the label.
+ * - `<image>` without `width` and `height` is drawn at the size of the image.
+ *   Set both to scale it.
  * - Raster images in `<image>` are not resampled smoothly. Provide them in
  *   device resolution.
  *
