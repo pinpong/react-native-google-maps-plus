@@ -6,7 +6,7 @@ import com.rngooglemapsplus.extensions.kmlLayerEquals
 import kotlinx.coroutines.Job
 
 private class KmlLayerState(
-  val current: RNKMLayer,
+  val current: RNKmlLayer,
 ) {
   var renderer: MapViewRenderer? = null
   var parseJob: Job? = null
@@ -26,7 +26,7 @@ class MapKmlLayerManager(
       states.values.filter { it.renderer == null && it.parseJob == null }.forEach { addToMap(it) }
     }
 
-  fun add(kmlLayer: RNKMLayer) =
+  fun add(kmlLayer: RNKmlLayer) =
     onUi {
       if (destroyed) return@onUi
       remove(kmlLayer.id)
@@ -35,7 +35,7 @@ class MapKmlLayerManager(
       if (map != null) addToMap(state)
     }
 
-  fun update(next: RNKMLayer) =
+  fun update(next: RNKmlLayer) =
     onUi {
       if (destroyed) return@onUi
       val state = states[next.id] ?: return@onUi

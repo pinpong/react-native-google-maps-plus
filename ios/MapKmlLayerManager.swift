@@ -2,10 +2,10 @@ import GoogleMaps
 import GoogleMapsUtils
 
 private final class KmlLayerState {
-  let current: RNKMLayer
+  let current: RNKmlLayer
   var renderer: GMUGeometryRenderer?
 
-  init(current: RNKMLayer) {
+  init(current: RNKmlLayer) {
     self.current = current
   }
 }
@@ -28,7 +28,7 @@ final class MapKmlLayerManager {
     }
   }
 
-  func add(_ kmlLayer: RNKMLayer) {
+  func add(_ kmlLayer: RNKmlLayer) {
     onMain {
       guard !self.destroyed else { return }
       self.remove(id: kmlLayer.id)
@@ -40,7 +40,7 @@ final class MapKmlLayerManager {
     }
   }
 
-  func update(_ next: RNKMLayer) {
+  func update(_ next: RNKmlLayer) {
     onMain {
       guard !self.destroyed else { return }
       guard let state = self.states[next.id] else { return }

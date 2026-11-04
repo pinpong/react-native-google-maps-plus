@@ -507,9 +507,9 @@ class GoogleMapsViewImpl(
 
   fun removeHeatmap(id: String) = heatmapManager.remove(id)
 
-  fun addKmlLayer(kmlLayer: RNKMLayer) = kmlLayerManager.add(kmlLayer)
+  fun addKmlLayer(kmlLayer: RNKmlLayer) = kmlLayerManager.add(kmlLayer)
 
-  fun updateKmlLayer(kmlLayer: RNKMLayer) = kmlLayerManager.update(kmlLayer)
+  fun updateKmlLayer(kmlLayer: RNKmlLayer) = kmlLayerManager.update(kmlLayer)
 
   fun removeKmlLayer(id: String) = kmlLayerManager.remove(id)
 

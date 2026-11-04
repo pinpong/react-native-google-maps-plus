@@ -217,7 +217,7 @@ final class RNGoogleMapsPlusView: HybridRNGoogleMapsPlusViewSpec {
     }
   }
 
-  var kmlLayers: [RNKMLayer]? {
+  var kmlLayers: [RNKmlLayer]? {
     didSet {
       let prevById = Dictionary(
         (oldValue ?? []).map { ($0.id, $0) },

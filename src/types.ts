@@ -772,7 +772,7 @@ export type RNHeatmapGradient = {
 };
 
 /** KML layer configuration. */
-export type RNKMLayer = {
+export type RNKmlLayer = {
   /** Unique KML layer identifier. */
   id: string;
 

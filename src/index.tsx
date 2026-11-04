@@ -224,6 +224,8 @@
  * on `GoogleMapsStreetView`. The types `RNInitialProps` and
  * `RNStreetViewInitialProps` are now `RNMapOptions` and `RNPanoramaOptions`.
  *
+ * The type `RNKMLayer` is now `RNKmlLayer`.
+ *
  * ## Location updates
  *
  * Location updates used to run for every view. They are off by default now.
