@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.Polyline
 import com.margelo.nitro.core.Promise
+import com.rngooglemapsplus.extensions.combinedWith
 import com.rngooglemapsplus.extensions.encode
 import com.rngooglemapsplus.extensions.toGooglePriority
 import com.rngooglemapsplus.extensions.toLatLng
@@ -425,7 +426,7 @@ class GoogleMapsViewImpl(
           }.build()
 
       val previousMapPadding = mapPadding
-      mapPadding = padding
+      mapPadding = previousMapPadding.combinedWith(padding)
 
       val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
 
@@ -456,7 +457,7 @@ class GoogleMapsViewImpl(
       }
 
       val previousMapPadding = mapPadding
-      mapPadding = padding
+      mapPadding = previousMapPadding.combinedWith(padding)
 
       val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
       map.animateCamera(update, durationMs, null)
