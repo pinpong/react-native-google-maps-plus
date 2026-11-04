@@ -61,7 +61,7 @@
  *
  * ## Android Setup (Bare RN only)
  *
- * `android-maps-utils` 6.x is built with Kotlin 2.4, so the app has to build
+ * `android-maps-utils` 7.x is built with Kotlin 2.4, so the app has to build
  * with Kotlin 2.3.0 or newer. React Native 0.88 defaults to 2.2.0 and fails
  * the build with an "incompatible version of Kotlin" error.
  *
@@ -250,7 +250,7 @@
  *
  * ## Android
  *
- * `android-maps-utils` 6.x needs Kotlin 2.3.0 or newer in the app, see
+ * `android-maps-utils` 7.x needs Kotlin 2.3.0 or newer in the app, see
  * [Android Setup](#android-setup-bare-rn-only). Expo: set `kotlinVersion`
  * through `expo-build-properties`, see [Expo Setup](#expo-setup).
  *
