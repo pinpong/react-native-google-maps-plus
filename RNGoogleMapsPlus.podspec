@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   # HarfBuzz and SheenBidi shape the text of SVG markers, RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING=0 turns text shaping off
   svg_text_shaping = ENV["RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING"] != "0"
-  text_shaping_sources = ["cpp/third_party/harfbuzz/src/harfbuzz.cc", "cpp/third_party/SheenBidi/Source/SheenBidi.c"]
+  text_shaping_sources = ["cpp/svg/RNSvgHarfBuzz.cc", "cpp/third_party/SheenBidi/Source/SheenBidi.c"]
 
   s.source_files = [
     "ios/**/*.{swift}",
@@ -27,7 +27,8 @@ Pod::Spec.new do |s|
 
   s.exclude_files = "cpp/third_party/lunasvg/plutovg/source/plutovg-font.c"
 
-  (["cpp/third_party/lunasvg/include/lunasvg.h"] + (svg_text_shaping ? text_shaping_sources : [])).each do |file|
+  third_party_sources = ["cpp/third_party/harfbuzz/src/harfbuzz.cc", "cpp/third_party/SheenBidi/Source/SheenBidi.c"]
+  (["cpp/third_party/lunasvg/include/lunasvg.h"] + (svg_text_shaping ? third_party_sources : [])).each do |file|
     unless File.exist?(File.join(__dir__, file))
       raise "[RNGoogleMapsPlus] lunasvg, HarfBuzz or SheenBidi sources are missing. In a git checkout run `git submodule update --init`, otherwise install the package from npm."
     end

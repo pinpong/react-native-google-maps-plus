@@ -331,8 +331,8 @@
  *
  * ## Text shaping
  *
- * Text shaping with HarfBuzz and SheenBidi makes an app about 0.8 MB larger per
- * ABI on Android and about 1.1 MB larger on iOS. Apps that only draw Latin text
+ * Text shaping with HarfBuzz and SheenBidi makes an app about 0.7 MB larger per
+ * ABI on Android and about 0.9 MB larger on iOS. Apps that only draw Latin text
  * in bundled fonts can turn it off. Without text shaping:
  *
  * - characters that the fonts of the `font-family` list do not cover are drawn

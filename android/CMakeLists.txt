@@ -38,7 +38,7 @@ target_compile_definitions(rngmp_svg PRIVATE
         LUNASVG_DISABLE_EXTERNAL_RESOURCES
 )
 if(RNGMP_SVG_TEXT_SHAPING)
-    target_sources(rngmp_svg PRIVATE ${HARFBUZZ_DIR}/src/harfbuzz.cc ${SHEENBIDI_DIR}/Source/SheenBidi.c)
+    target_sources(rngmp_svg PRIVATE ../cpp/svg/RNSvgHarfBuzz.cc ${SHEENBIDI_DIR}/Source/SheenBidi.c)
     target_include_directories(rngmp_svg PRIVATE ${HARFBUZZ_DIR}/src ${SHEENBIDI_DIR}/Headers ${SHEENBIDI_DIR}/Source)
     target_compile_definitions(rngmp_svg PRIVATE LUNASVG_ENABLE_TEXT_SHAPING SB_CONFIG_UNITY)
 endif()
