@@ -20281,7 +20281,7 @@ __metadata:
     expo: "*"
     react: "*"
     react-native: ">=0.87.0"
-    react-native-nitro-modules: ">=0.35.1"
+    react-native-nitro-modules: ">=0.37.2"
   peerDependenciesMeta:
     expo:
       optional: true
