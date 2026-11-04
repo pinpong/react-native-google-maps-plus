@@ -298,7 +298,9 @@
  * # SVG markers
  *
  * `iconSvg` and `infoWindowIconSvg` are rendered by
- * [lunasvg](https://github.com/sammycage/lunasvg) on iOS and Android.
+ * [lunasvg](https://github.com/sammycage/lunasvg) on iOS and Android, with
+ * text shaped by [HarfBuzz](https://github.com/harfbuzz/harfbuzz) and
+ * [SheenBidi](https://github.com/Tehreer/SheenBidi).
  *
  * - **Size:** the SVG is fitted into `width` x `height` and centered. It keeps
  *   its aspect ratio.
@@ -315,11 +317,17 @@
  *   name without extension, e.g. `font-family="Roboto-Bold"`, and by the
  *   family it declares, e.g. `font-family="Roboto" font-weight="bold"`. Fonts
  *   registered at runtime, e.g. with `expo-font`, are not found. Text without
- *   a known `font-family` is drawn with the system font on Android and with
- *   Arial on iOS. `font-weight` picks among the bundled faces of a family and
- *   does not apply to that fallback: on Android,
- *   `font-family="sans-serif" font-weight="bold"` is drawn regular. Use a
- *   bundled bold font for bold text.
+ *   a known `font-family` is drawn with the system font (iOS: SF, Android:
+ *   Roboto).
+ * - **Text:** text is shaped and ordered like native text, so Arabic, Hebrew,
+ *   Indic, Thai, CJK and emoji are drawn correctly. Characters that no font of
+ *   the `font-family` list covers are drawn with the fallback fonts of the
+ *   platform, which differ between iOS and Android. For the same look on both,
+ *   bundle a font that covers them and name it in `font-family`, e.g.
+ *   `font-family="Roboto, Noto Sans Arabic"`. `xml:lang` and `lang` select
+ *   language specific forms and fonts. `font-weight` 1 to 1000 selects the
+ *   closest face or the instance of a variable font, missing bold and italic
+ *   are synthesized.
  *
  * For the known limitations see [Limitations](#limitations).
  *
@@ -375,7 +383,10 @@
  *   `height` is not drawn. Fonts registered at runtime, e.g. with `expo-font`,
  *   are not found. Supported features and known rendering issues: lunasvg's
  *   [feature list](https://github.com/sammycage/lunasvg#features) and
- *   [issues](https://github.com/sammycage/lunasvg/issues).
+ *   [issues](https://github.com/sammycage/lunasvg/issues). On iOS, text in
+ *   fonts that only iOS can draw, like Apple Color Emoji and PingFang, is
+ *   filled with a solid color and has no stroke, gradients and patterns fall
+ *   back to black.
  * - **Advanced Markers:** not available with the legacy map renderer on
  *   Android. `onMapReady` reports the availability.
  * - **Heatmaps:** both platforms derive the color scale from the data, so the
@@ -415,6 +426,8 @@
  * - SVG Rendering (bundled, iOS + Android)
  *   lunasvg: https://github.com/sammycage/lunasvg
  *   plutovg: https://github.com/sammycage/plutovg
+ *   HarfBuzz: https://github.com/harfbuzz/harfbuzz (Old MIT license)
+ *   SheenBidi: https://github.com/Tehreer/SheenBidi (Apache License 2.0)
  *
  * plutovg contains code from FreeType under the FreeType License. Apps that
  * ship this library have to include this notice in their documentation:
