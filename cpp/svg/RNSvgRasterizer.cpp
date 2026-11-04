@@ -115,13 +115,24 @@ void appendPng(void* closure, void* data, int size) {
 
 void prepareImages(lunasvg::Document& document, float scale, std::vector<std::string>* remoteHrefs);
 
-std::string rasterizeToDataUri(std::string_view svg, const lunasvg::Element& image, float scale) {
+// lunasvg sizes an <image> without width or height from the image, which it can't load for svg
+void sizeFromSvg(lunasvg::Element& image, float svgW, float svgH) {
+  bool hasW = image.hasAttribute("width");
+  bool hasH = image.hasAttribute("height");
+  if (hasW && hasH) return;
+  lunasvg::Box box = image.getBoundingBox();
+  if (!hasW) image.setAttribute("width", std::to_string(hasH ? box.h * svgW / svgH : svgW));
+  if (!hasH) image.setAttribute("height", std::to_string(hasW ? box.w * svgH / svgW : svgH));
+}
+
+std::string rasterizeToDataUri(std::string_view svg, lunasvg::Element& image, float scale) {
   auto document = lunasvg::Document::loadFromData(svg.data(), svg.size());
   if (!document) return {};
 
   float intrinsicW = document->width();
   float intrinsicH = document->height();
   if (intrinsicW <= 0.f || intrinsicH <= 0.f) return {};
+  sizeFromSvg(image, intrinsicW, intrinsicH);
   // size of the image in output pixels, through every viewBox and transform above it
   lunasvg::Box box = image.getBoundingBox();
   lunasvg::Matrix matrix = image.getGlobalMatrix();
