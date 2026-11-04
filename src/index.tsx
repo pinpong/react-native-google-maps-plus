@@ -390,15 +390,18 @@
  * The app builds with a Kotlin version older than 2.3.0. See
  * [Android Setup](#android-setup-bare-rn-only).
  *
- * ## Android: the map crashes with `NoClassDefFoundError: org/apache/http/ProtocolVersion`
+ * ## Android: the map crashes with `NoClassDefFoundError`
  *
- * Devices with an old version of Google Play services draw the map with the
- * legacy renderer, which needs the Apache HTTP library. Apps that target
- * Android 9 or newer only get it when they declare it in the `<application>`
- * element of `AndroidManifest.xml`:
+ * The missing class is `org/apache/http/ProtocolVersion`. Devices with an old
+ * version of Google Play services draw the map with the legacy renderer, which
+ * needs the Apache HTTP library. Apps that target Android 9 or newer only get
+ * it when they declare it in the `<application>` element of
+ * `AndroidManifest.xml`:
  *
  * ```xml
- * <uses-library android:name="org.apache.http.legacy" android:required="false" />
+ * <uses-library
+ *   android:name="org.apache.http.legacy"
+ *   android:required="false" />
  * ```
  *
  * ## iOS: `pod install` fails with "cannot load such file" for `svgkit_patch`
