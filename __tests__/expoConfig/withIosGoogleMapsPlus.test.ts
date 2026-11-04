@@ -234,6 +234,34 @@ describe('withIosGoogleMapsPlus', () => {
       const { contents } = applyPlugin({ props: PROPS }).podfile;
       expect(contents).toMatchSnapshot();
     });
+
+    it('leaves SVG text shaping on by default', () => {
+      const { contents } = applyPlugin({ props: PROPS }).podfile;
+
+      expect(contents).not.toContain('RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING');
+    });
+
+    it('turns SVG text shaping off before the platform line', () => {
+      const { contents } = applyPlugin({
+        props: { ...PROPS, svgTextShaping: false },
+      }).podfile;
+
+      expect(
+        count(contents, "ENV['RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING'] = '0'")
+      ).toBe(1);
+      expect(
+        contents.indexOf('RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING')
+      ).toBeLessThan(contents.search(/platform\s+:ios/));
+    });
+
+    it('removes the switch again when svgTextShaping is no longer false', () => {
+      const off = applyPlugin({ props: { ...PROPS, svgTextShaping: false } });
+      const on = reapply(off, PROPS);
+
+      expect(on.podfile.contents).not.toContain(
+        'RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING'
+      );
+    });
   });
 
   describe('AppDelegate', () => {

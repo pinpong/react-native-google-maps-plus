@@ -1,7 +1,9 @@
 #include "RNSvgRasterizer.h"
 
+#ifdef LUNASVG_ENABLE_TEXT_SHAPING
 #include <hb-ot.h>
 #include <hb.h>
+#endif
 #include <lunasvg.h>
 #include <plutovg.h>
 
@@ -403,6 +405,8 @@ bool addFont(const char* name, Bytes data) {
   return true;
 }
 
+#ifdef LUNASVG_ENABLE_TEXT_SHAPING
+
 struct FallbackFont {
   std::string path;
   int index;
@@ -674,6 +678,8 @@ const char* selectFallbackFont(uint32_t codepoint, int, bool, const char* langua
   return family;
 }
 
+#endif
+
 }  // namespace
 
 bool rn_svg_add_font_face_file(const char* family, bool bold, bool italic, const char* path) try {
@@ -689,6 +695,8 @@ bool rn_svg_add_font_file(const char* name, const char* path) try {
 } catch (...) {
   return false;
 }
+
+#ifdef LUNASVG_ENABLE_TEXT_SHAPING
 
 bool rn_svg_add_fallback_font_file(
   const char* family, const char* path, int index, const char* postScriptName, const char* language, bool serif) try {
@@ -746,6 +754,19 @@ void rn_svg_set_fallback_font_resolver(RNSvgFallbackFontResolver resolver) {
   fallbackFamilies.clear();
   scriptFallbacks.clear();
 }
+
+#else
+
+// without text shaping, text is drawn only with the added fonts
+bool rn_svg_add_fallback_font_file(const char*, const char*, int, const char*, const char*, bool) {
+  return false;
+}
+
+void rn_svg_set_text_image_renderer(RNSvgTextImageRenderer) {}
+
+void rn_svg_set_fallback_font_resolver(RNSvgFallbackFontResolver) {}
+
+#endif
 
 bool rn_svg_add_font(const char* name, const void* data, size_t length) try {
   // the font cache reads the copy as long as the process runs

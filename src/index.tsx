@@ -329,6 +329,36 @@
  *   closest face or the instance of a variable font, missing bold and italic
  *   are synthesized.
  *
+ * ## Text shaping
+ *
+ * Text shaping with HarfBuzz and SheenBidi makes an app about 0.8 MB larger per
+ * ABI on Android and about 1.1 MB larger on iOS. Apps that only draw Latin text
+ * in bundled fonts can turn it off. Without text shaping:
+ *
+ * - characters that the fonts of the `font-family` list do not cover are drawn
+ *   as boxes on Android and as bars on iOS, there are no fallback fonts,
+ * - Arabic is not joined and right-to-left text is not reordered,
+ * - `font-weight` does not change the system fonts, bold text needs a bundled
+ *   bold font.
+ *
+ * Android, in `android/gradle.properties`:
+ *
+ * ```properties
+ * RNGoogleMapsPlus_svgTextShaping=false
+ * ```
+ *
+ * iOS, at the top of the `Podfile`, then run `pod install`:
+ *
+ * ```ruby
+ * ENV['RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING'] = '0'
+ * ```
+ *
+ * Expo, in the plugin options:
+ *
+ * ```json
+ * ["react-native-google-maps-plus", { "svgTextShaping": false }]
+ * ```
+ *
  * For the known limitations see [Limitations](#limitations).
  *
  * # Advanced markers

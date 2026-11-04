@@ -24,8 +24,21 @@ jest.mock('@expo/config-plugins', () => {
       config.__mods.androidManifest = result.modResults;
       return config;
     },
+    withGradleProperties: (
+      config: { __mods: { gradleProperties: unknown } },
+      action: (conf: unknown) => { modResults: unknown }
+    ) => {
+      const result = action({
+        ...config,
+        modResults: config.__mods.gradleProperties,
+      });
+      config.__mods.gradleProperties = result.modResults;
+      return config;
+    },
   };
 });
+
+type GradleProperty = { type: string; key?: string; value?: string };
 
 const API_KEY_NAME = 'com.google.android.geo.API_KEY';
 
@@ -37,18 +50,33 @@ async function loadManifest(): Promise<AndroidManifest> {
 
 function applyPlugin(
   manifest: AndroidManifest,
-  props?: Partial<RNGoogleMapsPlusExpoPluginProps>
+  props?: Partial<RNGoogleMapsPlusExpoPluginProps>,
+  gradleProperties: GradleProperty[] = []
 ): AndroidManifest {
+  return applyPluginMods(manifest, props, gradleProperties).androidManifest;
+}
+
+function applyPluginMods(
+  manifest: AndroidManifest,
+  props?: Partial<RNGoogleMapsPlusExpoPluginProps>,
+  gradleProperties: GradleProperty[] = []
+) {
   const config = {
     name: 'example',
     slug: 'example',
-    __mods: { androidManifest: manifest },
+    __mods: { androidManifest: manifest, gradleProperties },
   };
   withAndroidGoogleMapsPlus(
     config as never,
     props as RNGoogleMapsPlusExpoPluginProps
   );
-  return config.__mods.androidManifest;
+  return config.__mods;
+}
+
+function textShapingEntries(gradleProperties: GradleProperty[]) {
+  return gradleProperties.filter(
+    (item) => item.key === 'RNGoogleMapsPlus_svgTextShaping'
+  );
 }
 
 function apiKeyEntries(manifest: AndroidManifest) {
@@ -123,5 +151,42 @@ describe('withAndroidGoogleMapsPlus', () => {
 
     expect(() => applyPlugin(manifest, undefined)).not.toThrow();
     expect(apiKeyEntries(manifest)[0]?.$['android:value']).toBe('env-key');
+  });
+
+  it('leaves SVG text shaping on by default', async () => {
+    const { gradleProperties } = applyPluginMods(await loadManifest(), {
+      googleMapsAndroidApiKey: 'key',
+    });
+
+    expect(textShapingEntries(gradleProperties)).toHaveLength(0);
+  });
+
+  it('turns SVG text shaping off with svgTextShaping: false', async () => {
+    const { gradleProperties } = applyPluginMods(await loadManifest(), {
+      googleMapsAndroidApiKey: 'key',
+      svgTextShaping: false,
+    });
+
+    expect(textShapingEntries(gradleProperties)).toEqual([
+      {
+        type: 'property',
+        key: 'RNGoogleMapsPlus_svgTextShaping',
+        value: 'false',
+      },
+    ]);
+  });
+
+  it('removes the property again when svgTextShaping is no longer false', async () => {
+    const off = applyPluginMods(await loadManifest(), {
+      googleMapsAndroidApiKey: 'key',
+      svgTextShaping: false,
+    });
+    const { gradleProperties } = applyPluginMods(
+      await loadManifest(),
+      { googleMapsAndroidApiKey: 'key' },
+      off.gradleProperties
+    );
+
+    expect(textShapingEntries(gradleProperties)).toHaveLength(0);
   });
 });

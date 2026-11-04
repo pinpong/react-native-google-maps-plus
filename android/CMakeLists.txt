@@ -9,10 +9,11 @@ set (CMAKE_CXX_STANDARD 20)
 add_compile_options(-DRN_SERIALIZABLE_STATE=1)
 
 # SVG renderer (lunasvg + bundled plutovg) with text shaping (HarfBuzz, SheenBidi), git submodules at cpp/third_party
+option(RNGMP_SVG_TEXT_SHAPING "Shape SVG text with HarfBuzz and SheenBidi" ON)
 set(LUNASVG_DIR ${CMAKE_SOURCE_DIR}/../cpp/third_party/lunasvg)
 set(HARFBUZZ_DIR ${CMAKE_SOURCE_DIR}/../cpp/third_party/harfbuzz)
 set(SHEENBIDI_DIR ${CMAKE_SOURCE_DIR}/../cpp/third_party/SheenBidi)
-if(NOT EXISTS ${LUNASVG_DIR}/include/lunasvg.h OR NOT EXISTS ${HARFBUZZ_DIR}/src/harfbuzz.cc OR NOT EXISTS ${SHEENBIDI_DIR}/Source/SheenBidi.c)
+if(NOT EXISTS ${LUNASVG_DIR}/include/lunasvg.h OR (RNGMP_SVG_TEXT_SHAPING AND (NOT EXISTS ${HARFBUZZ_DIR}/src/harfbuzz.cc OR NOT EXISTS ${SHEENBIDI_DIR}/Source/SheenBidi.c)))
     message(FATAL_ERROR "[RNGoogleMapsPlus] lunasvg, HarfBuzz or SheenBidi sources are missing. In a git checkout run `git submodule update --init`, otherwise install the package from npm.")
 endif()
 file(GLOB LUNASVG_SOURCES
@@ -22,14 +23,11 @@ file(GLOB LUNASVG_SOURCES
 list(FILTER LUNASVG_SOURCES EXCLUDE REGEX "plutovg-font\\.c$")
 add_library(rngmp_svg STATIC
         ${LUNASVG_SOURCES}
-        ${HARFBUZZ_DIR}/src/harfbuzz.cc
-        ${SHEENBIDI_DIR}/Source/SheenBidi.c
         ../cpp/svg/RNSvgPlutovgFont.c
         ../cpp/svg/RNSvgRasterizer.cpp
 )
 target_include_directories(rngmp_svg
         PRIVATE ${LUNASVG_DIR}/source ${LUNASVG_DIR}/include ${LUNASVG_DIR}/plutovg/include
-                ${HARFBUZZ_DIR}/src ${SHEENBIDI_DIR}/Headers ${SHEENBIDI_DIR}/Source
         PUBLIC ../cpp/svg
 )
 target_compile_definitions(rngmp_svg PRIVATE
@@ -38,9 +36,12 @@ target_compile_definitions(rngmp_svg PRIVATE
         PLUTOVG_BUILD
         PLUTOVG_BUILD_STATIC
         LUNASVG_DISABLE_EXTERNAL_RESOURCES
-        LUNASVG_ENABLE_TEXT_SHAPING
-        SB_CONFIG_UNITY
 )
+if(RNGMP_SVG_TEXT_SHAPING)
+    target_sources(rngmp_svg PRIVATE ${HARFBUZZ_DIR}/src/harfbuzz.cc ${SHEENBIDI_DIR}/Source/SheenBidi.c)
+    target_include_directories(rngmp_svg PRIVATE ${HARFBUZZ_DIR}/src ${SHEENBIDI_DIR}/Headers ${SHEENBIDI_DIR}/Source)
+    target_compile_definitions(rngmp_svg PRIVATE LUNASVG_ENABLE_TEXT_SHAPING SB_CONFIG_UNITY)
+endif()
 target_compile_options(rngmp_svg PRIVATE -fvisibility=hidden $<$<CONFIG:Debug>:-O2>)
 set_target_properties(rngmp_svg PROPERTIES POSITION_INDEPENDENT_CODE ON C_STANDARD 11)
 

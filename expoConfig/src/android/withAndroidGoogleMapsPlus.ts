@@ -1,4 +1,7 @@
-import { withAndroidManifest } from '@expo/config-plugins';
+import {
+  withAndroidManifest,
+  withGradleProperties,
+} from '@expo/config-plugins';
 import {
   addMetaDataItemToMainApplication,
   getMainApplicationOrThrow,
@@ -8,10 +11,26 @@ import {
 import type { RNGoogleMapsPlusExpoPluginProps } from '../types';
 import type { ConfigPlugin } from '@expo/config-plugins';
 
+const SVG_TEXT_SHAPING = 'RNGoogleMapsPlus_svgTextShaping';
+
 const withMapsAndroid: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
   config,
   props
 ) => {
+  config = withGradleProperties(config, (conf) => {
+    conf.modResults = conf.modResults.filter(
+      (item) => !(item.type === 'property' && item.key === SVG_TEXT_SHAPING)
+    );
+    if (props?.svgTextShaping === false) {
+      conf.modResults.push({
+        type: 'property',
+        key: SVG_TEXT_SHAPING,
+        value: 'false',
+      });
+    }
+    return conf;
+  });
+
   return withAndroidManifest(config, (conf) => {
     const manifest = conf.modResults;
     const mainApplication = getMainApplicationOrThrow(manifest);

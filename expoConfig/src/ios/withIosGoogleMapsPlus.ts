@@ -62,6 +62,21 @@ const withIosGoogleMapsPlus: ConfigPlugin<RNGoogleMapsPlusExpoPluginProps> = (
       }).contents;
     }
 
+    src = removeContents({
+      src,
+      tag: 'react-native-google-maps-svg-text-shaping',
+    }).contents;
+    if (props?.svgTextShaping === false) {
+      src = mergeContents({
+        tag: 'react-native-google-maps-svg-text-shaping',
+        src,
+        newSrc: "ENV['RNGOOGLEMAPSPLUS_SVG_TEXT_SHAPING'] = '0'",
+        anchor: /platform\s+:ios.*/,
+        offset: 0,
+        comment: '#',
+      }).contents;
+    }
+
     conf.modResults.contents = src;
     return conf;
   });
