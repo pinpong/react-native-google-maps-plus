@@ -230,7 +230,7 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   onMyLocationPress?: (location: RNLocation) => void;
 
   /** Tap on the My-Location button. */
-  onMyLocationButtonPress?: (pressed: boolean) => void;
+  onMyLocationButtonPress?: () => void;
 
   /** Camera move started. */
   onCameraChangeStart?: (

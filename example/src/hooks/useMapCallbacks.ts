@@ -169,10 +169,7 @@ export function useMapCallbacks(
 
   const onMyLocationButtonPress = useNitroCallback(
     props.onMyLocationButtonPress,
-    useCallback(
-      (press: boolean) => console.log('MyLocation button press:', press),
-      []
-    )
+    useCallback(() => console.log('MyLocation button press'), [])
   );
 
   const onCameraChangeStart = useNitroCallback(
