@@ -69,6 +69,11 @@ endif()
 # Add Nitrogen specs :)
 include(${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/RNGoogleMapsPlus+autolinking.cmake)
 
+# The generated bridge only converts props and callbacks, so it is built for size
+get_target_property(NITROGEN_SOURCES ${PACKAGE_NAME} SOURCES)
+list(FILTER NITROGEN_SOURCES INCLUDE REGEX "nitrogen/generated")
+set_source_files_properties(${NITROGEN_SOURCES} PROPERTIES COMPILE_OPTIONS "-Oz")
+
 # Set up local includes
 include_directories(
         "src/main/cpp"
