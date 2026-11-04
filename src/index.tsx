@@ -216,7 +216,7 @@
  *
  * ## React Native
  *
- * react-native 0.87.0 or newer is required.
+ * react-native 0.87.0 and react-native-nitro-modules 0.37.2 or newer are required.
  *
  * ## Props
  *
