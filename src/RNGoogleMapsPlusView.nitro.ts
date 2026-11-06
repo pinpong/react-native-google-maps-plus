@@ -79,6 +79,11 @@ export interface RNGoogleMapsPlusViewProps extends HybridViewProps {
   /**
    * JSON map style string.
    * Must be a Google Maps StyleSpec JSON.
+   *
+   * @remarks Ignored while {@link RNMapOptions.mapId} is set. On Android, the
+   * legacy Google Maps renderer applies it anyway. Devices or emulators with
+   * missing or outdated Google Play services may fall back to the legacy
+   * renderer.
    */
   customMapStyle?: string;
 
